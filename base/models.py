@@ -1,25 +1,32 @@
-from django.db import models
+from django.contrib.gis.db import models
 from django.contrib.auth.models import AbstractUser
-from api.managers import CustomManagers
+from base.api.managers import CustomManagers
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 
 class CustomUser(AbstractUser):
-    phonenumber = models.IntegerField(unique=True)
-    username = models.CharField(verbose_name="Username", max_length=200)
-    is_verivecation = models.BooleanField(default=False)
-
+    phonenumber = PhoneNumberField(region='DZ',unique=True)
+    username = models.CharField(max_length=200)
+    is_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'phonenumber'
-    REQUIRED_FIELDS = ('username',)
+    REQUIRED_FIELDS = ('username',) 
     
     objects = CustomManagers()
+
+    def __str__(self):
+        return self.username
 
 
 
 class Client(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    # categoru
+    # user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=30)
+    # location = 
+
+    def __str__(self):
+        return self.name
 
 
 
@@ -34,7 +41,6 @@ class SalesEmployee(models.Model):
     # nots text
     # شاحنة
     
-
 
 
 class Product(models.Model):
@@ -52,9 +58,6 @@ class Product(models.Model):
 
 
     
-
-
-
 
 
 class Category(models.Model):
