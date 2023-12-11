@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from base.models import *
 from django.contrib.auth import login
+from django.contrib.auth.password_validation import validate_password
+
 
 class signupSerializer(serializers.ModelSerializer):
     
@@ -21,8 +23,8 @@ class signupSerializer(serializers.ModelSerializer):
         password = self.validated_data['password']
         user.set_password(password)
         user.is_active = False
-        login(request,user)
         user.save()
+    
         return user
     # def save(self, **kwargs):
     #     user = CustomUser(
@@ -36,30 +38,24 @@ class signupSerializer(serializers.ModelSerializer):
     #     return user
 
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['phonenumber','username', 'password']
 
-    def create(self, validated_data):
-        return CustomUser.objects.create_user(**validated_data)
+    def validate(self, data):
+        validate_password(data['password'])
+        return data
 
-    def save(self, **kwargs):
-        user = CustomUser(
-            phonenumber=self.validated_data['phonenumber'],
-            username = self.validated_data['username']
-        )
-        password = self.validated_data['password']
-        user.set_password(password)
+    def create(self, validated_data):
+        user = CustomUser.objects.create_user(**validated_data)
         user.is_active = False
-        login(request,user)
         user.save()
         return user
 
-    def to_representation(self, instance):
-        repr = super().to_representation(instance)
-        return repr['username','phonenumber']
+
+
+
 
 
 

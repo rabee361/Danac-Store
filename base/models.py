@@ -13,7 +13,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',) 
     
-    objects = CustomManagers()
+    # objects = CustomManagers()
 
     def __str__(self):
         return self.username
