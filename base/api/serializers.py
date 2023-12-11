@@ -49,5 +49,16 @@ class UserSerializer(serializers.ModelSerializer):
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
-        fields = ['']
+        fields = '__all__'
 
+    # def save(self, **kwargs):
+    #     user = CustomUser(
+    #         phonenumber=self.validated_data['phonenumber'],
+    #         username = self.validated_data['username']
+    #     )
+    #     password = self.validated_data['password']
+    #     user.set_password(password)
+    #     user.is_active = False
+    #     user.save()
+    #     return user
+    
