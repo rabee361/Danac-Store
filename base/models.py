@@ -1,8 +1,9 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from api.managers import CustomManagers
 
 
-<<<<<<< HEAD
-=======
+
 class CustomUser(AbstractUser):
     phonenumber = models.IntegerField(unique=True)
     username = models.CharField(verbose_name="Username", max_length=200)
@@ -16,8 +17,8 @@ class CustomUser(AbstractUser):
 
 
 
-class Clinet(models.Model):
-    clinet = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+class Client(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     # categoru
 
 
@@ -26,7 +27,8 @@ class Clinet(models.Model):
 class Driver(models.Model):
     driver = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
 
-class Representative(models.Model):
+
+class SalesEmployee(models.Model):
     representative = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     # address = 
     # nots text
@@ -85,4 +87,3 @@ class Supplier(models.Model):
     # location
     # notes text
     pass
->>>>>>> origin/jacoub

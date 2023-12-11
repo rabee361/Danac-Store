@@ -80,12 +80,12 @@ WSGI_APPLICATION = 'systempro.wsgi.application'
 
 DATABASES = {
        'default': {
-           'ENGINE': 'django.db.backends.postgresql',
-           'NAME': 'myproject',
-           'USER': 'myprojectuser',
-           'PASSWORD': 'password',
+           'ENGINE': 'django.contrib.gis.db.backends.postgis',
+           'NAME': 'pro_db',
+           'USER': 'postgres',
+           'PASSWORD': 'rabee123',
            'HOST': 'localhost',
-           'PORT': '',
+           'PORT': '5432',
        }
    }
 

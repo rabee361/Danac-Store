@@ -32,3 +32,22 @@ class signupSerializer(serializers.ModelSerializer):
     #     user.save()
     #     # Student.objects.create(user=user)
     #     return user
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['phonenumber','username', 'password']
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        return repr['username','phonenumber']
+
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = ['']
+
