@@ -21,9 +21,8 @@ class CustomUser(AbstractUser):
 
 
 class Client(models.Model):
-    # user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
-    # location = 
+    location = models.PointField()
 
     def __str__(self):
         return self.name

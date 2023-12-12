@@ -6,12 +6,13 @@ class CustomManagers(BaseUserManager):
             raise ValueError("the give phonenumber must be set")
         phonenumber = phonenumber
         user = self.model(
-            phonenumber = phonenumber,
+            phonenumber = phonenumber,  
             username = username,
             **extrafileds
         )
         user.set_password(password)
         user.save(using = self._db)
+        return user
 
     def create_user(self, phonenumber, username, password=None, **extrafileds):
         extrafileds.setdefault("is_superuser", False)

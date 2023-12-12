@@ -1,9 +1,14 @@
 from django.contrib import admin
 from .models import *
+from django.contrib.gis.admin import GISModelAdmin
+
+
+@admin.register(Client)
+class EstateAdmin(GISModelAdmin):
+    list_display = ('location',)
 
 
 admin.site.register(CustomUser)
-admin.site.register(Client)
 admin.site.register(SalesEmployee)
 admin.site.register(Driver)
 admin.site.register(Product)
