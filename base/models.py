@@ -22,6 +22,8 @@ class CustomUser(AbstractUser):
 
 class Client(models.Model):
     name = models.CharField(max_length=30)
+    address = models.CharField(max_length=100)
+    # category = 
     location = models.PointField()
 
     def __str__(self):
@@ -42,25 +44,32 @@ class SalesEmployee(models.Model):
     
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=35)
+
+    def __str__(self):
+        return self.name
+
+
+
 class Product(models.Model):
     name = models.CharField(max_length=50)
-    iamge = models.ImageField()
+    image = models.ImageField(upload_to='images/products')
     description = models.TextField(max_length=2000)
     quantity = models.IntegerField()
     purchasing_price = models.FloatField()
-    # num_per_item
-    # item_per_carton
-    # category
-    # nots text
-    # limit 
+    category = models.ForeignKey(Category , on_delete=models.CASCADE)
+    info = models.TextField(max_length=1000)
+    limit = models.IntegerField()
+    num_per_item = models.IntegerField()
+    item_per_carton = models.IntegerField
     # barcode
 
+    def __str__(self):
+        return self.name
 
     
 
-
-class Category(models.Model):
-    pass
 
 
 class Order(models.Model):
