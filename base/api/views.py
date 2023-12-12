@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from base.filters import ProductFilter
 
-class StudentSignupView(CreateAPIView):
+class SignupView(CreateAPIView):
     serializer_class = UserSerializer
     queryset = CustomUser.objects.all()
 
@@ -35,10 +35,13 @@ class test(ListAPIView):
 
 
 class CurrentUserView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
     def get_queryset(self):
         return CustomUser.objects.filter(id=self.request.user.id)
+
 
 
 
@@ -61,6 +64,60 @@ class GetProduct(RetrieveAPIView):
 
 
 
+class LogoutAPIView(GenericAPIView):
+    serializer_class = UserLogoutSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+class UserLoginApiView(GenericAPIView):
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = UserLoginSerilizer
+
+    def post(self, request, *args, **kwargs):
+
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        user = CustomUser.objects.get(phonenumber = request.data['phonenumber'])
+        token = RefreshToken.for_user(user)
+        data = serializer.data
+        data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
+        return Response(data, status=status.HTTP_200_OK)
+
+
+
+
+
+class ResetPasswordView(GenericAPIView):
+    serializer_class = ResetPasswordSerializer
+    permission_classes = [permissions.IsAuthenticated,]
+
+    def post(self, request):
+        data = request.data
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        messages = {
+            'message':'Password Changed Successfully.'
+        }
+        return Response(messages, status=status.HTTP_200_OK)
+
+
+
+class CartProducts(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Cart_Products.objects.all()
+    serializer_class = Cart_ProductsSerializer
+
+    def get_queryset(self):
+        client = Client.objects.get(id=1)
+        return Cart_Products.objects.filter(cart__customer=client)
 # class QuantityHandlerView(APIView):
 #     def post(self, request, pk, pk2):
 #         item = Cart_Products.objects.get(id=pk)
