@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
     username = models.CharField(verbose_name="Username", max_length=200)
     is_verivecation = models.BooleanField(default=False)
 
+
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',)
     
@@ -17,6 +18,8 @@ class CustomUser(AbstractUser):
 
 class Clinet(models.Model):
     clinet = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    # categoru
+
 
 
 
@@ -25,11 +28,30 @@ class Driver(models.Model):
 
 class Representative(models.Model):
     representative = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    # address = 
+    # nots text
+    # شاحنة
+    
 
 
 
 class Product(models.Model):
-    nameproduct = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
+    iamge = models.ImageField()
+    description = models.TextField(max_length=2000)
+    quantity = models.IntegerField()
+    purchasing_price = models.FloatField()
+    # num_per_item
+    # item_per_carton
+    # category
+    # nots text
+    # limit 
+    # barcode
+
+
+    
+
+
 
 
 
@@ -38,11 +60,28 @@ class Category(models.Model):
 
 
 class Order(models.Model):
+    # clinet 
+    # number order 
+    # num prodect
+    # full price 
+    # date
+    # 
     pass
+
+
 
 class Cart(models.Model):
-    # get Items num
     pass
 
+
 class Notifications(models.Model):
+    pass
+
+
+class Supplier(models.Model):
+    # name
+    # company name
+    # phone number
+    # location
+    # notes text
     pass
