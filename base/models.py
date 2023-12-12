@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class CustomUser(AbstractUser):
@@ -136,3 +137,14 @@ class Supplier(models.Model):
     # location
     # notes text
     pass
+
+
+
+
+class CodeVerification(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    code = models.IntegerField(validators=[MinValueValidator(1000), MaxValueValidator(9999)])
+
+    def __str__(self):
+        return f'{self.user} code:{self.code}'
+

@@ -128,14 +128,6 @@ class UserLogoutSerializer(serializers.Serializer):
 
 
 
-class CodeVerification(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    code = models.IntegerField(validators=[MinValueValidator(1000), MaxValueValidator(9999)])
-
-    def __str__(self):
-        return f'{self.user} code:{self.code}'
-
-
 
 
 
