@@ -22,13 +22,20 @@ class signupSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return CustomUser.objects.create_user(**validated_data)
 
-    # def save(self, **kwargs):
-    #     user = CustomUser(
-    #         username=self.validated_data['username'],
-    #         email = self.validated_data['email']
-    #     )
-    #     password = self.validated_data['password']
-    #     user.set_password(password)
-    #     user.save()
-    #     # Student.objects.create(user=user)
-    #     return user
+    def save(self, **kwargs):
+        user = CustomUser(
+            phonenumber=self.validated_data['phonenumber'],
+            username = self.validated_data['username']
+        )
+        password = self.validated_data['password']
+        user.set_password(password)
+        user.is_active = False
+        user.save()
+        return user
+    
+# class userSerializers(serializers.ModelSerializer):
+#     code = serializers.IntegerField()
+
+#     class Meta:
+#         model = CustomUser
+#         fieldes = 

@@ -13,7 +13,7 @@ class StudentSignupView(GenericAPIView):
     An endpoint for the client to create a new Student.
     """
     permission_classes = [permissions.AllowAny]
-    serializer_class = StudentSignupSerializer
+    serializer_class = signupSerializer
 
     def post(self, request, *args, **kwargs):
         clean_data = custom_validation(request.data)
@@ -23,13 +23,6 @@ class StudentSignupView(GenericAPIView):
         user_data = serializer.data
         user = CustomUser.objects.get(email=user_data['email'])
         token = RefreshToken.for_user(user)
-        # current_site = get_current_site(request).domain
-        # relativelink = reverse('email-verify')
-        # absurl = 'http://'+current_site+relativelink+'?token='+str(token.access_token)
-        # rand_num = random.randint(1,10000)
-        # email_body = 'Hi '+user.username+' Use the link below to verify your email \n'+ absurl
-        # data = {'email_body':email_body, 'to_email':user.email, 'ema(il_subject':'Verify your email'}
-        # Utlil.send_eamil(data)
         data_user = serializer.data
         data_user['tokens'] = {"refresh" : str(token), "access":str(token.access_token)}
         return Response(
