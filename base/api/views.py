@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from base.models import *
 from .serializers import *
 from rest_framework.generics import ListAPIView, RetrieveAPIView , CreateAPIView, GenericAPIView
-from api.validation import custom_validation
+from .validation import custom_validation
 from rest_framework import permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 

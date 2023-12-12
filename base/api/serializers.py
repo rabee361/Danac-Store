@@ -32,10 +32,4 @@ class signupSerializer(serializers.ModelSerializer):
         user.is_active = False
         user.save()
         return user
-    
-# class userSerializers(serializers.ModelSerializer):
-#     code = serializers.IntegerField()
-
-#     class Meta:
-#         model = CustomUser
-#         fieldes = 
+     

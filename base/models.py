@@ -1,11 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from api.managers import CustomManagers
-
+from base.api.managers import CustomManagers
+from phonenumber_field.modelfields import PhoneNumberField
 
 class CustomUser(AbstractUser):
-    phonenumber = models.IntegerField(unique=True)
-    username = models.CharField(verbose_name="Username", max_length=200)
+    phonenumber = PhoneNumberField(region='DZ', unique=True)
+    username = models.CharField(max_length=200, unique=True)
     is_verivecation = models.BooleanField(default=False)
 
 
@@ -16,9 +16,21 @@ class CustomUser(AbstractUser):
 
 
 
-class Clinet(models.Model):
-    clinet = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    # categoru
+class Client(models.Model):
+    CHOICES = (
+        ('سوبر ماركت', 'سوبر ماركت'),
+        ('مقهى', 'مقهى'),
+        ('محل جملة', 'محل جملة'),
+        ('محل نصف جملة', 'محل نصف جملة'),
+    )
+    name = models.CharField(max_length=30)
+    address = models.CharField(max_length=100)
+    category = models.CharField(max_length=75, choices=CHOICES)
+    number = PhoneNumberField(region='DZ')
+    info = models.TextField(null=True)
+    # location
+
+
 
 
 
@@ -33,6 +45,8 @@ class Representative(models.Model):
     # شاحنة
     
 
+class Category(models.Model):
+    name = models.CharField(max_length=20)
 
 
 class Product(models.Model):
@@ -41,22 +55,15 @@ class Product(models.Model):
     description = models.TextField(max_length=2000)
     quantity = models.IntegerField()
     purchasing_price = models.FloatField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    num_per_item = models.IntegerField()
+    item_per_carton = models.IntegerField()
     # num_per_item
     # item_per_carton
-    # category
     # nots text
     # limit 
     # barcode
 
-
-    
-
-
-
-
-
-class Category(models.Model):
-    pass
 
 
 class Order(models.Model):
@@ -79,9 +86,9 @@ class Notifications(models.Model):
 
 
 class Supplier(models.Model):
-    # name
-    # company name
-    # phone number
-    # location
-    # notes text
-    pass
+
+    name = models.CharField(max_length=30)
+    company = models.CharField(max_length=30)
+    phonenumber =  PhoneNumberField(region='DZ')
+    address = models.CharField(max_length=100)
+    info = models.TextField()

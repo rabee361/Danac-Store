@@ -38,11 +38,23 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'base'
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    'base',
 ]
 
 
 AUTH_USER_MODEL = 'base.CustomUser'
+
+REST_FRAMEWORK = {
+
+    # 'NON_FIELD_ERRORS_KEY':'error',
+    'DEFAULT_AUTHENTICATION_CLASSES':(
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
