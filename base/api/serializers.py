@@ -68,6 +68,12 @@ class ClientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CodeVerification
+        fields = '__all__'
+
+
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:

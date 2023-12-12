@@ -7,7 +7,7 @@ from django.contrib.gis.admin import GISModelAdmin
 class EstateAdmin(GISModelAdmin):
     list_display = ('location',)
 
-
+admin.site.register(CodeVerification)
 admin.site.register(CustomUser)
 admin.site.register(SalesEmployee)
 admin.site.register(Driver)

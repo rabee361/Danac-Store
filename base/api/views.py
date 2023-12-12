@@ -10,6 +10,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from base.filters import ProductFilter
+import random
+from django.shortcuts import get_object_or_404
 
 class SignupView(CreateAPIView):
     serializer_class = UserSerializer
@@ -118,6 +120,26 @@ class CartProducts(ListAPIView):
     def get_queryset(self):
         client = Client.objects.get(id=1)
         return Cart_Products.objects.filter(cart__customer=client)
+    
+class GetPhonenumberView(APIView):    
+    def post(self, request):
+        phonenumber = request.data['phonenumber']
+        if phonenumber is None:
+            return Response({'error': 'Phone number is required'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = get_object_or_404(CustomUser, phonenumber=phonenumber)
+            print(user)
+            existing_code = CodeVerification.objects.filter(user=user).first()
+
+            if existing_code:
+                existing_code.delete()
+
+            code_verification = random.randint(1000,9999)
+            code = CodeVerification.objects.create(user=user, code=code_verification)
+            serializer = CodeSerializer(code)
+            return Response({'message':'تم ارسال رمز التحقق', 'data': serializer.data})
+        except:
+            raise serializers.ValidationError({'error':'Please enter a valid phone number'})
 # class QuantityHandlerView(APIView):
 #     def post(self, request, pk, pk2):
 #         item = Cart_Products.objects.get(id=pk)
