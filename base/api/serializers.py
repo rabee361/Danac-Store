@@ -9,12 +9,7 @@ class signupSerializer(serializers.ModelSerializer):
     class Meta:
         model=CustomUser
         fields = ['phonenumber','username', 'password']
-        extra_kwargs = {
-            'password':{'write_only':True,}
-        }
 
-
-    
     def save(self, **kwargs):
         user = CustomUser(
             phonenumber=self.validated_data['phonenumber'],
@@ -54,6 +49,17 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
 
 
 

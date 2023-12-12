@@ -6,7 +6,7 @@ class CustomManagers(BaseUserManager):
             raise ValueError("the give phonenumber must be set")
         phonenumber = phonenumber
         user = self.model(
-            phonenumber = phonenumber,  
+            phonenumber = phonenumber,
             username = username,
             **extrafileds
         )

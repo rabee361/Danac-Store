@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 from django.contrib.auth.models import AbstractUser
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
-
+from django.utils import timezone
 
 
 class CustomUser(AbstractUser):
@@ -63,12 +63,53 @@ class Product(models.Model):
     limit = models.IntegerField()
     num_per_item = models.IntegerField()
     item_per_carton = models.IntegerField
+    sale_price = models.IntegerField(default=50)
+    added = models.DateTimeField(auto_now_add=True)
     # barcode
+    class Meta:
+        ordering = ['-added']
+
 
     def __str__(self):
         return self.name
 
     
+
+class Cart(models.Model):
+    customer = models.ForeignKey(Client , on_delete=models.CASCADE)
+    items = models.ManyToManyField(Product ,through='Cart_Products')
+
+    @property
+    def get_items_num(self):
+        return self.items.count()
+
+    def __str__(self):
+        return f'{self.customer} cart'
+
+
+
+class Cart_Products(models.Model):
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+
+    class Meta:
+        ordering = ['products__added']
+
+    @property
+    def add_item(self):
+        self.quantity = self.quantity + 1
+        self.save()
+
+    @property
+    def sub_item(self):
+        self.quantity = self.quantity - 1
+        self.save()
+
+    def __str__(self):
+        return self.cart.customer.name
+
+
 
 
 
@@ -82,9 +123,6 @@ class Order(models.Model):
     pass
 
 
-
-class Cart(models.Model):
-    pass
 
 
 class Notifications(models.Model):
