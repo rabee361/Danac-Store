@@ -27,11 +27,11 @@ class CustomUser(AbstractUser):
 
 
 class CodeVerivecation(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     code = models.IntegerField(validators=[MinValueValidator(1000,9999),])
 
     def __str__(self) -> str:
-        return f'${self.user.username} ${self.code}'
+        return f'{self.user.username} {self.code}'
 
 
 class Client(models.Model):

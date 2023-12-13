@@ -13,6 +13,7 @@ urlpatterns = [
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('logout/', LogoutAPIView.as_view(), name='logout'),
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
+    path('send-code/', sendCodeView.as_view(), name='send-code'),
     path('categorys/', ListCreatCategoryView.as_view(), name='catogorys'),
     path('products/', ListCreateProductView().as_view(), name='products'),
     path('get-product/<str:pk>/', GetProductView.as_view()),

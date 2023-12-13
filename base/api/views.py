@@ -97,18 +97,32 @@ class GetPhonenumberView(APIView):
     def post(self, request):
         phonenumber = request.data['phonenumber']
 
-        try:
+        try: 
             user = get_object_or_404(CustomUser, phonenumber=phonenumber)
-            print(user)
+            existing_code = CodeVerivecation.objects.filter(user=user).first()
+            if existing_code:
+                existing_code.delete()
+
             code_verivecation = random.randint(1000,9999)
-            code = CodeVerivecation.objects.create(user=user, code=code_verivecation)
-            serializer = CodeVerivecationSerializer(data = code, many=False)
-            # serializer.is_valid(raise_exception=True)
+            serializer = CodeVerivecationSerializer(data ={
+                'user':user.id,
+                'code':code_verivecation
+            })
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response({'message':'تم ارسال رمز التحقق'})
         except:
             raise serializers.ValidationError({'error':'pleace enter valid phone number'})
 
+class sendCodeView(APIView):
+    def post(self, request):
+        code = request.data['code']
 
+        code_ver = CodeVerivecation.objects.filter(code=code).first()
+        if code_ver:
+            return Response(status=status.HTTP_200_OK)
+        else:
+            raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
 
 class ListCreatCategoryView(ListCreateAPIView):
     queryset = Category.objects.all()
