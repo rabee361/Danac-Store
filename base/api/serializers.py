@@ -194,6 +194,7 @@ class UserLoginSerilizer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.ListField(child=serializers.CharField(), write_only=True)
+    products_data = ProductSerializer(source='products', many=True, read_only=True)
 
     class Meta:
         model = Order
