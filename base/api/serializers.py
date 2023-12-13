@@ -58,14 +58,21 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
+    category = serializers.CharField()
     class Meta:
         model = Product
         fields = '__all__'
 
+    def create(self, validated_data):
+        category_name = validated_data.pop('category')
+        category = Category.objects.get(name=category_name)
+        product = Product.objects.create(category=category, **validated_data)
+        return product
+
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['name'] = modify_name(repr['name'])
+        repr['category'] = instance.category.name
         return repr
 
 
