@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from phonenumber_field.modelfields import PhoneNumberField
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
-
+from django.core.validators import MinValueValidator
 class CustomUser(AbstractUser):
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     username = models.CharField(max_length=200)
@@ -25,6 +25,13 @@ class CustomUser(AbstractUser):
     #         'access':str(refresh.access_token)
     #     }
 
+
+class CodeVerivecation(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    code = models.IntegerField(validators=[MinValueValidator(1000,9999),])
+
+    def __str__(self) -> str:
+        return f'${self.user.username} ${self.code}'
 
 
 class Client(models.Model):

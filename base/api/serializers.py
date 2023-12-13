@@ -13,6 +13,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = '__all__'
 
+
+class CodeVerivecationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CodeVerivecation
+        fields = '__all__'
+
 class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -128,4 +134,10 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
+        fields = '__all__'
+
+class CartProductsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Cart_Products
         fields = '__all__'

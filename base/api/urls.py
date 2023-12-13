@@ -12,6 +12,7 @@ urlpatterns = [
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('logout/', LogoutAPIView.as_view(), name='logout'),
+    path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('categorys/', ListCreatCategoryView.as_view(), name='catogorys'),
     path('products/', ListCreateProductView().as_view(), name='products'),
     path('get-product/<str:pk>/', GetProductView.as_view()),

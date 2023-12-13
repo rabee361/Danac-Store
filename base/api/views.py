@@ -8,6 +8,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from base.filter import ProductFilter
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+import random
 
 
 
@@ -62,7 +65,7 @@ class UserLoginApiView(GenericAPIView):
 
 class ResetPasswordView(GenericAPIView):
     serializer_class = ResetPasswordSerializer
-    permission_classes = [permissions.IsAuthenticated,]
+    permission_classes = [permissions.AllowAny,]
 
     def post(self, request):
         data = request.data
@@ -88,6 +91,24 @@ class LogoutAPIView(GenericAPIView):
         serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class GetPhonenumberView(APIView):
+    # serializer_class = CustomUserSerializer
+
+    def post(self, request):
+        phonenumber = request.data['phonenumber']
+
+        try:
+            user = get_object_or_404(CustomUser, phonenumber=phonenumber)
+            print(user)
+            code_verivecation = random.randint(1000,9999)
+            code = CodeVerivecation.objects.create(user=user, code=code_verivecation)
+            serializer = CodeVerivecationSerializer(data = code, many=False)
+            # serializer.is_valid(raise_exception=True)
+            return Response({'message':'تم ارسال رمز التحقق'})
+        except:
+            raise serializers.ValidationError({'error':'pleace enter valid phone number'})
+
+
 
 class ListCreatCategoryView(ListCreateAPIView):
     queryset = Category.objects.all()
@@ -95,8 +116,6 @@ class ListCreatCategoryView(ListCreateAPIView):
 
 # class retrieveUpdateDestroyCategoryView(RetrieveUpdateDestroyAPIView):
 
-
-    
 
 class ListCreateProductView(ListCreateAPIView):
     queryset = Product.objects.all()
@@ -114,7 +133,6 @@ class UserListView(ListAPIView):
     serializer_class = ProductSerializer
 
 
-
     # def post(self, request, *args, **kwargs):
     #     serializer = self.get_serializer(data=request.data)
     #     serializer.is_valid(raise_exception=True)
@@ -127,6 +145,9 @@ class UserListView(ListAPIView):
     #     serializer = self.get_serializer(queryset, many=True)
     #     return Response(serializer.data)
 
+
+class CreateCartProductsView(ListCreatCategoryView):
+    pass
 
 # class ListClients(ListAPIView)
 # class getClients
