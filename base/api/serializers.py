@@ -4,7 +4,11 @@ from django.contrib.auth import login , authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
 from django.core.validators import MinValueValidator, MaxValueValidator
-
+from rest_framework.serializers import StringRelatedField
+from rest_framework.response import Response
+from rest_framework import status
+def modify_name(name):
+    return  name
 
 # class signupSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -59,6 +63,10 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['name'] = modify_name(repr['name'])
+        return repr
 
 
 
@@ -72,6 +80,18 @@ class CodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CodeVerification
         fields = '__all__'
+
+
+
+class SupplierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Supplier
+        fields = ['name','company_name','address','phone_number','info']
+    
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['name'] = modify_name(repr['name'])
+        return repr
 
 
 
@@ -163,3 +183,25 @@ class UserLoginSerilizer(serializers.ModelSerializer):
             raise serializers.ValidationError({'message_error':'This user is not currently activated.'})
         
         return data
+    
+
+class OrderSerializer(serializers.ModelSerializer):
+    products = serializers.ListField(child=serializers.CharField(), write_only=True)
+
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+    def create(self, validated_data):
+        product_names = validated_data.pop('products', [])
+        order = Order.objects.create(**validated_data)
+
+        for product_name in product_names:
+            try:
+                product = Product.objects.get(name=product_name)
+                order.products.add(product)
+            except Product.DoesNotExist:
+                raise serializers.ValidationError({'error': f'Product with name {product_name} does not exist'})
+
+        order.save()
+        return order

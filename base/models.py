@@ -22,9 +22,16 @@ class CustomUser(AbstractUser):
 
 
 class Client(models.Model):
+    CHOICES = (
+        ('سوبرماركت','سوبرماركت'),
+        ('مقهى','مقهى'),
+        ('محل جملة','محل جملة'),
+        ('محل نصف جملة','محل نصف جملة')
+    )
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=100)
-    # category = 
+    phonenumber = PhoneNumberField(region='DZ',default='+213876543232')
+    category = models.CharField(max_length=75,choices=CHOICES,default=' ')
     location = models.PointField()
 
     def __str__(self):
@@ -115,13 +122,15 @@ class Cart_Products(models.Model):
 
 
 class Order(models.Model):
-    # clinet 
-    # number order 
-    # num prodect
-    # full price 
-    # date
-    # 
-    pass
+    client = models.ForeignKey(Client,on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product)
+    total = models.IntegerField() 
+    created = models.DateField(auto_now_add=True)
+    delivery_date = models.DateField()
+    delivered = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.client} : {self.id}'
 
 
 
@@ -131,12 +140,14 @@ class Notifications(models.Model):
 
 
 class Supplier(models.Model):
-    # name
-    # company name
-    # phone number
-    # location
-    # notes text
-    pass
+    name = models.CharField(max_length=30)
+    company_name = models.CharField(max_length=50)
+    phone_number = PhoneNumberField(region='DZ')
+    address = models.CharField(max_length=100)
+    info = models.TextField(max_length=500)
+
+    def __str__(self):
+        return self.name
 
 
 
@@ -147,4 +158,6 @@ class CodeVerification(models.Model):
 
     def __str__(self):
         return f'{self.user} code:{self.code}'
+
+
 

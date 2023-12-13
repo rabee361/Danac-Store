@@ -16,6 +16,10 @@ urlpatterns = [
     path('product/<str:pk>' , GetProduct.as_view() , name="product"),
     path('user_items/' , CartProducts.as_view() , name="user_products"),
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
+    path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"),
+    path('get-supplier/<str:pk>' , GetSupplier.as_view() , name="get-supplier"),
+    path('orders/' , ListCreateOrder.as_view() ,name="orders"),
+    path('create/' , CreateOrder.as_view() )
     # path('remove-item/<str:pk>' , remove_from_cart , name="remove-item"),
     # path('add-to-cart/<str:pk>' , add_to_cart, name="add-to-cart"),
     # path('quantity_handler/<str:pk>/<str:pk2>' , QuantityHandlerView.as_view(), name="quantity_handler"),

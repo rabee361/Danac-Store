@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from base.models import *
 from .serializers import *
-from rest_framework.generics import ListAPIView, RetrieveAPIView , CreateAPIView, GenericAPIView , ListCreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView ,RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView , ListCreateAPIView
 from .validation import custom_validation
 from rest_framework import permissions
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -140,6 +140,26 @@ class GetPhonenumberView(APIView):
             return Response({'message':'تم ارسال رمز التحقق', 'data': serializer.data})
         except:
             raise serializers.ValidationError({'error':'Please enter a valid phone number'})
+        
+
+
+
+class ListCreateOrder(ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+
+class CreateOrder(APIView):
+    def post(self,request):
+        i = request.data
+        serializer = OrderSerializer(data=i)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response("bad")
+
+
+
 # class QuantityHandlerView(APIView):
 #     def post(self, request, pk, pk2):
 #         item = Cart_Products.objects.get(id=pk)
@@ -178,9 +198,16 @@ class GetPhonenumberView(APIView):
 # class createClientView()
 
 
-# class listSupplier
-# class getSupplier
-# class createSupplier
+class ListCreateSupplier(ListCreateAPIView):
+    queryset = Supplier.objects.all()
+    serializer_class = SupplierSerializer
+
+
+class GetSupplier(RetrieveUpdateDestroyAPIView):
+    queryset = Supplier.objects.all()
+    serializer_class = SupplierSerializer
+
+
 
 
 
