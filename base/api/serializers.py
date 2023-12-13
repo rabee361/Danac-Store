@@ -7,11 +7,13 @@ from django.contrib.auth.password_validation import validate_password
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = CustomUser
         fields = '__all__'
 
 class SignUpSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = CustomUser
         fields = ['phonenumber','username', 'password']
@@ -19,7 +21,6 @@ class SignUpSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password':{'write_only':True,}
         }
-
 
         def validate(self, validated_data):
             validate_password(validated_data['password'])
@@ -39,12 +40,9 @@ class SignUpSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-    # def to_representation(self, instance):
-    #     repr = super().to_representation(instance)
-    #     return repr['phonenumber','username']
-
 
 class ResetPasswordSerializer(serializers.ModelSerializer):
+
     newpassword = serializers.CharField(style={"input_type":"password"}, write_only=True)
 
     class Meta:
@@ -109,9 +107,6 @@ class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields = '__all__'
-
-    
-
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()

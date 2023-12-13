@@ -1,13 +1,7 @@
 # from django.contrib.gis.db import models
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.utils import timezone
-
-
-
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
 
