@@ -2,7 +2,8 @@ from rest_framework import serializers
 from base.models import *
 from django.contrib.auth import login
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import TokenError
+from rest_framework_simplejwt.tokens import TokenError, RefreshToken
+
 from django.contrib.auth.password_validation import validate_password
 
 
