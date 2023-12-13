@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils import timezone
 
 
 
@@ -76,26 +77,63 @@ class SalesEmployee(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=50)
 
-
+    def __str__(self) -> str:
+        return self.name
 
 
 class Product(models.Model):
     name = models.CharField(max_length=50)
-    iamge = models.ImageField(upload_to='images/poduct')
+    iamge = models.ImageField(upload_to='images\poduct')
     description = models.TextField(max_length=2000)
     quantity = models.IntegerField()
-    purchasing_price = models.FloatField()
+    purch_price = models.FloatField()
+    sale_price = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     num_per_item = models.IntegerField()
     item_per_carton = models.IntegerField()
     limit = models.IntegerField()
-    info = models.TextField(max_length=1000) 
+    info = models.TextField(max_length=1000)
+    added = models.DateTimeField(auto_now_add=True)
     # barcode
 
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ['-added']
 
+class Cart(models.Model):
+    customer = models.ForeignKey(Client, on_delete=models.CASCADE)
+    items = models.ManyToManyField(Product, through='Cart_Products')
+
+    @property
+    def get_items_num(self):
+        return self.items.count()
+    
+    def __str__(self):
+        return f'{self.customer} cart'
     
 
+class Cart_Products(models.Model):
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
 
+    class Meta:
+        ordering = ['-products__added']
+
+    @property
+    def add_item(self):
+        self.quantity += self.quantity  
+        self.save()
+
+    @property
+    def sub_item(self):
+        self.quantity -= self.quantity
+        self.save()
+
+    def __str__(self):
+        return self.cart.customer.name
 
 
 
@@ -111,9 +149,6 @@ class Order(models.Model):
     pass
 
 
-
-class Cart(models.Model):
-    pass
 
 
 class Notifications(models.Model):
