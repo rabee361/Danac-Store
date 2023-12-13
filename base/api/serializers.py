@@ -1,23 +1,23 @@
 from rest_framework import serializers
 from base.models import *
+from django.contrib.auth import login
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import TokenError
+from django.contrib.auth.password_validation import validate_password
 
-
-class signupSerializer(serializers.ModelSerializer):
-    
+class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
-        model=CustomUser
+        model = CustomUser
         fields = ['phonenumber','username', 'password']
+
         extra_kwargs = {
             'password':{'write_only':True,}
         }
 
-    # def validate(self, attrs):
-    #     eamil = attrs.get('email', '')
-    #     username = attrs.get('username', '')
 
-    #     if not username.isalnum:
-    #         raise serializers.ValidationError('The username should only contain alphanumeric characters')
-    #     return attrs
+        def validate(self, validated_data):
+            validate_password(validated_data['password'])
+            return validated_data
 
     def create(self, validated_data):
         return CustomUser.objects.create_user(**validated_data)
@@ -32,4 +32,28 @@ class signupSerializer(serializers.ModelSerializer):
         user.is_active = False
         user.save()
         return user
-     
+
+    # def to_representation(self, instance):
+    #     repr = super().to_representation(instance)
+    #     return repr['phonenumber','username']
+
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = '__all__'
+
+    
+
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+    def validate(self, attrs):
+        self.token = attrs['refresh']
+        return attrs
+    def save(self, **kwargs):
+        try:
+            RefreshToken(self.token).blacklist()
+        except TokenError:
+            self.fail('bad_token')
