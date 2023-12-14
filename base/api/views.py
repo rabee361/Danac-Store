@@ -29,22 +29,6 @@ class SignupView(CreateAPIView):
         self.headers = {"user": data_user, "message":"account created successfully"}
 
 
-
-    # def post(self, request, *args, **kwargs):
-    #     # clean_data = custom_validation(request.data)
-    #     serializer = self.get_serializer(data=request.data)   
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     user_data = serializer.data
-    #     user = CustomUser.objects.get(phonenumber=user_data['phonenumber'])
-    #     token = RefreshToken.for_user(user)
-    #     user_data['tokens'] = {"refresh" : str(token), "access":str(token.access_token)}
-    #     return Response(
-    #         {
-    #             "user": user_data,
-    #             "message":"account created successfully"
-    #         })
-
 class UserLoginApiView(GenericAPIView):
     """
     An endpoint to authenticate existing users their email and passowrd.
@@ -61,8 +45,31 @@ class UserLoginApiView(GenericAPIView):
         data = serializer.data
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)
+    
+class UpdateImageUserView(APIView):
 
+    permission_classes=[permissions.IsAuthenticated]
 
+    def put(self, requset, user_pk):
+
+        user_pk = requset.user.id
+        user = CustomUser.objects.get(id=user_pk)
+        serializer = UpdateUserSerializer(user, data=requset.data, many=False, context={'request':requset})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+
+                {'success':"The changed image Profile has been successfully."},
+                status=status.HTTP_200_OK
+            )
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class ListInformationUserView(RetrieveAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class= CustomUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    
 class ResetPasswordView(GenericAPIView):
     serializer_class = ResetPasswordSerializer
     permission_classes = [permissions.AllowAny,]
@@ -93,7 +100,6 @@ class LogoutAPIView(GenericAPIView):
 
 class GetPhonenumberView(APIView):
     # serializer_class = CustomUserSerializer
-
     def post(self, request):
         phonenumber = request.data['phonenumber']
 
@@ -114,7 +120,7 @@ class GetPhonenumberView(APIView):
         except:
             raise serializers.ValidationError({'error':'pleace enter valid phone number'})
 
-class sendCodeView(APIView):
+class VerefyCodeView(APIView):
     def post(self, request):
         code = request.data['code']
 
@@ -128,6 +134,7 @@ class ListCreatCategoryView(ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
+
 # class retrieveUpdateDestroyCategoryView(RetrieveUpdateDestroyAPIView):
 
 
@@ -137,7 +144,7 @@ class ListCreateProductView(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
 
-class GetProductView(RetrieveAPIView):
+class GetProductView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -147,22 +154,88 @@ class UserListView(ListAPIView):
     serializer_class = ProductSerializer
 
 
-    # def post(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response(serializer.data)
+
+class CartProducts(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Cart_Products.objects.all()
+    serializer_class = Cart_ProductsSerializer
+
+    def get_queryset(self):
+        client = Client.objects.get(id=1)
+        return Cart_Products.objects.filter(cart__customer=client)
 
 
-    # def get(self, request, *args, **kwargs):
-    #     queryset = self.get_queryset()
-    #     serializer = self.get_serializer(queryset, many=True)
-    #     return Response(serializer.data)
+class ListPointsView(GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated,]
+
+    def get(self, request):
+        user = request.user
+        clinet = Client.objects.get(phomnenumber=user.phonenumber)
+        points = clinet.point_set.all()
+        serializer = PointSerializer(points, many=True)
+        response = serializer.data
+        return Response(response)
+        
+
 
 
 class CreateCartProductsView(ListCreatCategoryView):
     pass
 
+
+class ListCreateSupplierView(ListCreateAPIView):
+    queryset = Supplier.objects.all()
+    serializer_class= SupplierSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class GetSupplier(RetrieveUpdateDestroyAPIView):
+    queryset = Supplier.objects.all()
+    serializer_class= SupplierSerializer
+
+
+class ListOrdersUserView(GenericAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated,]
+
+    def get(self, request):
+        user = request.user
+        client = Client.objects.get(phomnenumber=user.phonenumber)
+        orders = client.order_set.all()
+        serializer = self.get_serializer(orders, many=True)
+        response = serializer.data
+
+        return Response(response)
+
+class ListCreateOrderView(ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+
+# class ListOrdersUserView(RetrieveAPIView):
+#     queryset = Order.objects.all()
+#     serializer_class = OrderSerializer
+
+
+        
+
+# def validate_desires(data):
+
+#     list_desires = []
+#     student_desires = data
+#     desires = Dseires.objects.all()
+
+#     for student_desire in student_desires:
+#         for desire in desires:
+#             if student_desire == desire.desire:
+#                 print(student_desire)
+#                 list_desires.append(desire.id)
+
+#     return list_desires
+
+
+# class UpdateSupplier():
+#     pass
 # class ListClients(ListAPIView)
 # class getClients
 # class createClientView()

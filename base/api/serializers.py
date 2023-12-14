@@ -7,17 +7,31 @@ from rest_framework_simplejwt.tokens import TokenError, RefreshToken
 from django.contrib.auth.password_validation import validate_password
 
 
+def modify_name(name):
+    return name
+
 class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = '__all__'
+        fields = ['id', 'username', 'phonenumber', 'password', 'image']
 
 
 class CodeVerivecationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CodeVerivecation
         fields = '__all__'
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['image']
+
+    def update(self, instance, validated_data):
+        instance.image = validated_data['image']
+        instance.save()
+        return instance
+
 
 class SignUpSerializer(serializers.ModelSerializer):
 
@@ -43,7 +57,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         )
         password = self.validated_data['password']
         user.set_password(password)
-        user.is_active = False
+        # user.is_active = False
         user.save()
         return user
 
@@ -115,6 +129,12 @@ class ClientSerializer(serializers.ModelSerializer):
         model = Client
         fields = '__all__'
 
+
+class PointSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Point
+        fields = '__all__'
+
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
     def validate(self, attrs):
@@ -131,13 +151,72 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        return repr['name']
+
 class ProductSerializer(serializers.ModelSerializer):
+    category = serializers.CharField()
     class Meta:
         model = Product
         fields = '__all__'
 
-class CartProductsSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        category_name = validated_data.pop('category')
+        category = Category.objects.get(name=category_name)
+        product = Product.objects.create(category=category, **validated_data)
+        return product
 
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['name'] = modify_name(repr['name'])
+        repr['category'] = instance.category.name
+        return repr
+        
+
+class Cart_ProductsSerializer(serializers.ModelSerializer):
+    products = ProductSerializer()
     class Meta:
         model = Cart_Products
+        fields = fields = ['products', 'quantity']
+
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
         fields = '__all__'
+
+
+class SupplierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Supplier
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        # return [repr['name'], repr['company']]
+        repr['name'] = modify_name(repr['name'])
+        # supplier_data = repr.pop('name', 'company')
+        return repr
+    
+
+class OrderSerializer(serializers.ModelSerializer):
+    products = serializers.ListField(child=serializers.CharField(), write_only=True)
+    products_data = ProductSerializer(source='products', many=True, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+    def create(self, validated_data):
+        product_names = validated_data.pop('products', [])
+        order = Order.objects.create(**validated_data)
+
+        for product_name in product_names:
+            try:
+                product = Product.objects.get(name=product_name)
+                order.products.add(product)
+            except Product.DoesNotExist:
+                raise serializers.ValidationError({'error': f'Product with name {product_name} does not exist'})
+
+        order.save()
+        return order
