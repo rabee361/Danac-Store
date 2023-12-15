@@ -144,7 +144,7 @@ class ListCreateProductView(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
 
-class GetProductView(RetrieveUpdateDestroyAPIView):
+class GetUdpDesProductView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -186,7 +186,7 @@ class CreateCartProductsView(ListCreatCategoryView):
 class ListCreateSupplierView(ListCreateAPIView):
     queryset = Supplier.objects.all()
     serializer_class= SupplierSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
 
 class GetSupplier(RetrieveUpdateDestroyAPIView):
@@ -253,3 +253,59 @@ class ListCreateOrderView(ListCreateAPIView):
 
 # class addToCart
 # class listCart
+
+class ListCreatEmployeeView(ListCreateAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
+class RetUpdDesEmployeeAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
+class ListCreatOverTimeView(ListCreateAPIView):
+    queryset = OverTime.objects.all()
+    serializer_class = OverTimeSerializer
+
+class RetUpdDesOverTimeView(RetrieveUpdateDestroyAPIView):
+    queryset = OverTime.objects.all()
+    serializer_class = OverTimeSerializer
+
+class ListCreateAbsenceView(ListCreateAPIView):
+    queryset = Absence.objects.all()
+    serializer_class = AbsenceSerializer
+
+class RetUpdDesAbsenceAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Absence.objects.all()
+    serializer_class = AbsenceSerializer
+
+class ListCreateAwardView(ListCreateAPIView):
+    queryset = Award.objects.all()
+    serializer_class = AwardSerializer
+
+class RetUpdDesAwardView(RetrieveUpdateDestroyAPIView):
+    queryset = Award.objects.all()
+    serializer_class = AwardSerializer
+
+class ListCreateDicountView(ListCreateAPIView):
+    queryset = Discount.objects.all()
+    serializer_class = DiscountSerializer
+
+class RetUpdDesDicountView(RetrieveUpdateDestroyAPIView):
+    queryset = Discount.objects.all()
+    serializer_class = DiscountSerializer
+
+class ListCreateAdvanceView(ListCreateAPIView):
+    queryset = Advance.objects.all()
+    serializer_class = AdvanceSerializer
+
+class RetUpdDesAdvanceView(RetrieveUpdateDestroyAPIView):
+    queryset = Advance.objects.all()
+    serializer_class = AdvanceSerializer
+
+class ListCreateExpenceView(ListCreateAPIView):
+    queryset = Expense.objects.all()
+    serializer_class = ExpenseSerializer
+
+class RetUpdDesExpenceView(RetrieveUpdateDestroyAPIView):
+    queryset = Expense.objects.all()
+    serializer_class = ExpenseSerializer

@@ -14,6 +14,7 @@ class CustomUser(AbstractUser):
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True)
+    address = models.CharField(max_length=100, default='one')
 
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',)
@@ -53,7 +54,7 @@ class Client(models.Model):
     )
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=100)
-    category = models.CharField(max_length=75, choices=CHOICES)
+    category = models.CharField(max_length=75, choices=CHOICES, null=True)
     phomnenumber = PhoneNumberField(region='DZ')
     info = models.TextField(null=True)
 
@@ -97,7 +98,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=50)
-    iamge = models.ImageField(upload_to='images\product')
+    iamge = models.ImageField(upload_to='images/product')
     description = models.TextField(max_length=2000)
     quantity = models.IntegerField()
     purch_price = models.FloatField()
@@ -188,11 +189,81 @@ class Supplier(models.Model):
         return self.name
 
 
+class Department(models.Model):
+    name = models.CharField(max_length=30)
 
+    def __str__(self) -> str:
+        return self.name
+    
 
-    # name
-    # company name
-    # phone number
-    # location
-    # notes text
-    pass
+class Employee(models.Model):
+    name = models.CharField(max_length=30)
+    breath_date = models.DateField()
+    phonenumber = PhoneNumberField(region='DZ')
+    type_employee = models.CharField(max_length=20) 
+    number_track = models.IntegerField()
+    salery = models.FloatField()
+    sale_perce = models.FloatField()
+    address = models.CharField(max_length=100)
+    info = models.TextField(max_length=1000)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.name
+    
+class OverTime(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    num_hours = models.FloatField()
+    deserved_amount = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.employee.name
+
+class Absence(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    num_absence = models.IntegerField()
+    amoumt_deducted = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.employee.name
+    
+
+class Award(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    reason_award = models.CharField(max_length=100)
+    total = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.employee.name
+    
+
+class Discount(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    reason_discount = models.CharField(max_length=100)
+    total = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.employee.name
+    
+
+class Advance(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    reason_advance = models.CharField(max_length=100)
+    total = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.employee.name
+    
+class Expense(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    reason_expense = models.CharField(max_length=100)
+    total = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+    
+    def __str__(self) -> str:
+        return self.employee.name

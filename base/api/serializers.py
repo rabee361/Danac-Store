@@ -153,7 +153,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
-        return repr['name']
+        repr['name'] = modify_name(repr['name'])
+        return repr
 
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.CharField()
@@ -173,6 +174,25 @@ class ProductSerializer(serializers.ModelSerializer):
         repr['category'] = instance.category.name
         return repr
         
+    def update(self, instance, validated_data):
+        category_name = validated_data.pop('category')
+        category = Category.objects.get(name=category_name)
+        instance.category = validated_data.get('category', category)
+        instance.name = validated_data.get('name', instance.name)
+        instance.iamge = validated_data.get('iaage', instance.iamge)
+        instance.description = validated_data.get('description', instance.description)
+        instance.quantity = validated_data.get('quantity', instance.quantity)
+        instance.purch_price = validated_data.get('purch_price', instance.purch_price)
+        instance.sale_price = validated_data.get('sale_price', instance.sale_price)
+        instance.num_per_item = validated_data.get('num_per_item', instance.num_per_item)
+        instance.item_per_carton = validated_data.get('item_per_carton', instance.item_per_carton)
+        instance.limit = validated_data.get('limit', instance.limit)
+        instance.info = validated_data.get('info', instance.info)
+        instance.added = validated_data.get('added', instance.added)
+        instance.save()
+        return instance
+
+ 
 
 class Cart_ProductsSerializer(serializers.ModelSerializer):
     products = ProductSerializer()
@@ -220,3 +240,39 @@ class OrderSerializer(serializers.ModelSerializer):
 
         order.save()
         return order
+    
+
+class EmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = '__all__'
+
+class OverTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OverTime
+        fields = '__all__'
+
+class AbsenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Absence
+        fields = '__all__'
+
+class AwardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Award
+        fields = '__all__'
+
+class DiscountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Discount
+        fields = '__all__'
+
+class AdvanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Advance
+        fields = '__all__'
+
+class ExpenseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Expense
+        fields = '__all__'
