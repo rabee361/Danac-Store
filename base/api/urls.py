@@ -12,14 +12,14 @@ urlpatterns = [
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('test/' , test.as_view()),
     path('user/' , CurrentUserView.as_view()),
-    path('products/' , listCreateProducts.as_view() , name="products"),
+    path('products/' , listCreateProducts.as_view() , name="products"),######
     path('categories/' , ListCreateCategory.as_view() , name="categories"),##### post/get
-    path('product/<str:pk>' , GetProduct.as_view() , name="product"),
+    path('product/<str:pk>' , GetProduct.as_view() , name="product"),#####
     path('user_items/' , CartProducts.as_view() , name="user_products"),
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), ##### post/get
     path('get-supplier/<str:pk>' , GetSupplier.as_view() , name="get-supplier"),##### post/get
-    path('orders/' , ListCreateOrder.as_view() ,name="orders"),
+    path('orders/' , ListCreateOrder.as_view() ,name="orders"),####
     path('create/' , CreateOrder.as_view() ),
     path('incomings/' , ListCreateIncomings.as_view() , name="incomings"),
     path('incoming_product/' , CreateIncomingProducts.as_view() , name="")
