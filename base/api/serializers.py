@@ -135,12 +135,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 
-class ClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Client
-        fields = '__all__'
-
-
 class CodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CodeVerification
