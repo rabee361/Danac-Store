@@ -7,6 +7,10 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from rest_framework.serializers import StringRelatedField
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
+
+
+
 def modify_name(name):
     return  name
 
@@ -114,6 +118,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 
+class ClientSerializer(serializers.ModelSerializer):
+    total_points = serializers.SerializerMethodField()
+    class Meta:
+        model = Client
+        fields = ['name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points']
+
+    def get_total_points(self,obj):
+        total = Point.objects.filter(Q(client=obj)&Q(is_used=False)).aggregate(total_points=models.Sum('number'))['total_points'] or 0
+        return total
+
 
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.CharField()
@@ -135,10 +149,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 
-class ClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Client
-        fields = '__all__'
 
 
 class CodeSerializer(serializers.ModelSerializer):
@@ -289,7 +299,110 @@ class IncomingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class IncomingProductsSerializer(serializers.ModelSerializer):
+class IncomingProductSerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=False)
+    incoming = IncomingSerializer(many=False)
     class Meta:
         model = Incoming_Products
+        fields = '__all__'
+
+
+
+
+class OverTimeSerializer(serializers.ModelSerializer):
+
+    employee = serializers.CharField()
+    class Meta:
+        model = OverTime
+        fields = '__all__'
+
+    def create(self, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        overtime = OverTime.objects.create(employee=employee, **validated_data)
+        return overtime
+
+    def update(self, instance, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        instance.employee = validated_data.get('employee', employee)
+        instance.num_hours = validated_data.get('num_hours', instance.num_hours)
+        instance.deserved_amount = validated_data.get('deserved_amount', instance.deserved_amount)
+        instance.save()
+        return instance
+
+class AbsenceSerializer(serializers.ModelSerializer):
+    employee = serializers.CharField()
+
+    class Meta:
+        model = Absence
+        fields = '__all__'
+
+    def create(self, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        absence = Absence.objects.create(employee=employee, **validated_data)
+        return absence
+    
+    def update(self, instance, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        instance.employee = validated_data.get('employee', employee)
+        instance.num_absence = validated_data.get('num_absence', instance.num_absence)
+        instance.amoumt_deducted = validated_data.get('amoumt_deducted', instance.amoumt_deducted)
+        instance.save()
+        return instance
+    
+
+class AwardSerializer(serializers.ModelSerializer):
+    employee = serializers.CharField()
+
+    class Meta:
+        model = Award
+        fields = '__all__'
+
+    def create(self, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        award = Award.objects.create(employee=employee, **validated_data)
+        return award
+
+    def update(self, instance, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        instance.employee = validated_data.get('employee', employee)
+        instance.reason_award = validated_data.get('reason_award', instance.reason_award)
+        instance.total = validated_data.get('total', instance.total)
+        instance.save()
+        return instance
+    
+
+class DiscountSerializer(serializers.ModelSerializer):
+    employee = serializers.CharField()
+
+    class Meta:
+        model = Discount
+        fields = '__all__'
+
+    def create(self, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        discount = Discount.objects.create(employee=employee, **validated_data)
+        return discount
+    
+    def update(self, instance, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        instance.employee = validated_data.get('employee', employee)
+        instance.reason_discount = validated_data.get('reason_discount', instance.reason_discount)
+        instance.total = validated_data.get('total', instance.total)
+        instance.save()
+        return instance
+ 
+
+
+
+class Product2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
         fields = '__all__'

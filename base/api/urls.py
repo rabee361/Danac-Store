@@ -12,17 +12,28 @@ urlpatterns = [
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('test/' , test.as_view()),
     path('user/' , CurrentUserView.as_view()),
+    path('clients/' , ListCreateClient.as_view() , name="clients"),######post/get
+    path('get-client/<str:pk>/' , RetrieveClient.as_view() , name="get-client"),
     path('products/' , listCreateProducts.as_view() , name="products"),######
     path('categories/' , ListCreateCategory.as_view() , name="categories"),##### post/get
-    path('product/<str:pk>' , GetProduct.as_view() , name="product"),#####
+    path('product/<str:pk>' , GetProduct.as_view() , name="product"),##### post/get
     path('user_items/' , CartProducts.as_view() , name="user_products"),
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), ##### post/get
     path('get-supplier/<str:pk>' , GetSupplier.as_view() , name="get-supplier"),##### post/get
     path('orders/' , ListCreateOrder.as_view() ,name="orders"),####
     path('create/' , CreateOrder.as_view() ),
-    path('incomings/' , ListCreateIncomings.as_view() , name="incomings"),
-    path('incoming_product/' , CreateIncomingProducts.as_view() , name="")
+    path('incomings/' , ListIncomings.as_view() , name="incomings"),
+    path('create-incoming/' , CreateIncomingView.as_view()),
+    path('incoming_product/' , CreateIncomingProducts.as_view() , name=""),
+    path('overtimes/', ListCreatOverTimeView.as_view(), name='overtimes'),
+    path('overtimes/<str:pk>/', RetUpdDesOverTimeView.as_view(), name='get_overtime'),
+    path('absences/', ListCreateAbsenceView.as_view(), name='absence'),
+    path('absences/<str:pk>/', RetUpdDesAbsenceAPIView.as_view(), name='get-absence'),
+    path('awards/', ListCreateAwardView.as_view(), name='award'),
+    path('awards/<str:pk>/', RetUpdDesAwardView.as_view(), name='get-award'),
+    path('discounts/', ListCreateDicountView.as_view(), name='discount'),
+    path('discounts/<str:pk>/', RetUpdDesDicountView.as_view(), name='get-discount'),
     # path('employees/', ListCreatEmployeeView.as_view(), name='employee'),
     # path('employees/<str:pk>/', RetUpdDesEmployeeAPIView.as_view(), name='get-employee'),
     # path('overtimes/', ListCreatOverTimeView.as_view(), name='overtimes'),

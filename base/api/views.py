@@ -111,6 +111,15 @@ class LogoutAPIView(GenericAPIView):
 
 
 
+class ListCreateClient(ListCreateAPIView):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+
+
+class RetrieveClient(RetrieveAPIView):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+
 
 class UserLoginApiView(GenericAPIView):
     permission_classes = (permissions.AllowAny,)
@@ -195,14 +204,34 @@ class CreateOrder(APIView):
 
 
 
-class ListCreateIncomings(ListCreateAPIView):
+class ListIncomings(ListCreateAPIView):
     queryset = Incoming.objects.all()
     serializer_class = IncomingSerializer
 
 
+
+class CreateIncomingView(APIView):
+    def post(self, request, format=None):
+        incoming_data = request.data
+        incoming_serializer = IncomingSerializer(data=incoming_data)
+        if incoming_serializer.is_valid():
+            incoming = incoming_serializer.save()
+            products_data = incoming_data.get('products', [])
+            for product_data in products_data:
+                product_data['incoming'] = incoming.id
+                product_serializer = IncomingProductSerializer(data=product_data)
+                if product_serializer.is_valid():
+                    product_serializer.save()
+                else:
+                    return Response(product_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(incoming_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(incoming_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 class CreateIncomingProducts(ListCreateAPIView):
-    queryset = Cart_Products.objects.all().distinct()
-    serializer_class = Cart_ProductsSerializer
+    queryset = Incoming_Products.objects.all()
+    serializer_class = IncomingProductSerializer
 
 
 
@@ -223,6 +252,64 @@ class GetSupplier(RetrieveUpdateDestroyAPIView):
     serializer_class = SupplierSerializer
 
 
+
+
+
+class ListCreatEmployeeView(ListCreateAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
+class RetUpdDesEmployeeAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
+class ListCreatOverTimeView(ListCreateAPIView):
+    queryset = OverTime.objects.all()
+    serializer_class = OverTimeSerializer
+
+class RetUpdDesOverTimeView(RetrieveUpdateDestroyAPIView):
+    queryset = OverTime.objects.all()
+    serializer_class = OverTimeSerializer
+
+class ListCreateAbsenceView(ListCreateAPIView):
+    queryset = Absence.objects.all()
+    serializer_class = AbsenceSerializer
+
+class RetUpdDesAbsenceAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Absence.objects.all()
+    serializer_class = AbsenceSerializer
+
+class ListCreateAwardView(ListCreateAPIView):
+    queryset = Award.objects.all()
+    serializer_class = AwardSerializer
+
+class RetUpdDesAwardView(RetrieveUpdateDestroyAPIView):
+    queryset = Award.objects.all()
+    serializer_class = AwardSerializer
+
+class ListCreateDicountView(ListCreateAPIView):
+    queryset = Discount.objects.all()
+    serializer_class = DiscountSerializer
+
+class RetUpdDesDicountView(RetrieveUpdateDestroyAPIView):
+    queryset = Discount.objects.all()
+    serializer_class = DiscountSerializer
+
+# class ListCreateAdvanceView(ListCreateAPIView):
+#     queryset = Advance.objects.all()
+#     serializer_class = AdvanceSerializer
+
+# class RetUpdDesAdvanceView(RetrieveUpdateDestroyAPIView):
+#     queryset = Advance.objects.all()
+#     serializer_class = AdvanceSerializer
+
+# class ListCreateExpenceView(ListCreateAPIView):
+#     queryset = Expense.objects.all()
+#     serializer_class = ExpenseSerializer
+
+# class RetUpdDesExpenceView(RetrieveUpdateDestroyAPIView):
+#     queryset = Expense.objects.all()
+#     serializer_class = ExpenseSerializer
 
 
 
