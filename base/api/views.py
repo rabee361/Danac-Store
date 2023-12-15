@@ -13,19 +13,24 @@ from base.filters import ProductFilter
 import random
 from django.shortcuts import get_object_or_404
 
-class SignupView(CreateAPIView):
-    serializer_class = UserSerializer
-    queryset = CustomUser.objects.all()
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+
+class SignUpView(GenericAPIView):
+    serializer_class  = SignUpSerializer
+    def post(self, request):
+        user_information = request.data
+        serializer = self.get_serializer(data=user_information)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        refresh = RefreshToken.for_user(user)
-        response = Response(serializer.data, status=status.HTTP_201_CREATED)
-        response.data['refresh'] = str(refresh)
-        response.data['access'] = str(refresh.access_token)
-        return response
+        serializer.save()
+        user_data = serializer.data
+        user = CustomUser.objects.get(phonenumber=user_data['phonenumber'])
+        token = RefreshToken.for_user(user)
+        tokens = {
+            'refresh':str(token),
+            'accsess':str(token.access_token)
+        }
+        return Response({'information_user':user_data,'tokens':tokens})
+
 
 
 
@@ -46,8 +51,23 @@ class CurrentUserView(ListAPIView):
 
 
 
+class UserLoginApiView(GenericAPIView):
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = UserLoginSerilizer
 
-class listProducts(ListCreateAPIView):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        user = CustomUser.objects.get(phonenumber = request.data['phonenumber'])
+        token = RefreshToken.for_user(user)
+        data = serializer.data
+        data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
+        return Response(data, status=status.HTTP_200_OK)
+    
+
+
+
+class listCreateProducts(ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend]
@@ -55,9 +75,23 @@ class listProducts(ListCreateAPIView):
 
 
 
-class ListCategory(ListCreateAPIView):
+class ListCreateCategory(ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                {"message": "تمت الإضافة بنجاح"},
+                status=status.HTTP_201_CREATED,
+                headers=headers
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class GetProduct(RetrieveAPIView):
@@ -160,37 +194,18 @@ class CreateOrder(APIView):
 
 
 
-# class QuantityHandlerView(APIView):
-#     def post(self, request, pk, pk2):
-#         item = Cart_Products.objects.get(id=pk)
-#         if pk2 == 'add':
-#             item.add_item()
-#         elif pk2 == 'subtract':
-#             if item.quantity == 1:
-#                 item.sub_item()
-#                 item.delete()
-#             else:
-#                 item.sub_item()
-#         else:
-#             return Response({"error": "Invalid operation"}, status=status.HTTP_400_BAD_REQUEST)
 
-#         return Response({"success": "Operation performed successfully"}, status=status.HTTP_200_OK)
+class ListCreateIncomings(ListCreateAPIView):
+    queryset = Incoming.objects.all()
+    serializer_class = IncomingSerializer
 
 
-# def remove_from_cart(request , pk):
-#     item = Cart_Products.objects.get(id=pk)
-#     item.delete()
-#     return redirect(request.META.get('HTTP_REFERER'))
+class CreateIncomingProducts(ListCreateAPIView):
+    queryset = Cart_Products.objects.all().distinct()
+    serializer_class = Cart_ProductsSerializer
 
 
-# def add_to_cart(request,pk):
-#     item = Product.objects.get(id=pk)
-#     cart, created = Cart.objects.get_or_create(customer=request.user)
-#     cart_products, created = Cart_Products.objects.get_or_create(products=item, cart=cart)
-#     if not created:
-#         Cart_Products.objects.filter(products=item, cart=cart).\
-#                                 update(quantity=F('quantity') + 1)
-#     return redirect(request.META.get('HTTP_REFERER'))
+
 
 
 # class ListClients(ListAPIView)

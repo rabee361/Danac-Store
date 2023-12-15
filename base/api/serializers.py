@@ -44,15 +44,73 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class SignUpSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUser
+        fields = ['phonenumber','username', 'password']
+
+        extra_kwargs = {
+            'password':{'write_only':True,}
+        }
+
+        def validate(self, validated_data):
+            validate_password(validated_data['password'])
+            return validated_data
+
+    def create(self, validated_data):
+        return CustomUser.objects.create_user(**validated_data)
+
+    def save(self, **kwargs):
+        user = CustomUser(
+            phonenumber=self.validated_data['phonenumber'],
+            username = self.validated_data['username']
+        )
+        password = self.validated_data['password']
+        user.set_password(password)
+        # user.is_active = False
+        user.save()
+        return user
+
+
+
+
+class UserLoginSerilizer(serializers.ModelSerializer):
+
+    phonenumber = serializers.CharField()
+    password = serializers.CharField(max_length=55, min_length=6,write_only = True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['phonenumber', 'password']
+
+    def validate(self, data):
+
+        phonenumber = data.get('phonenumber', )
+        password = data.get('password',)
+
+        if phonenumber is None:
+                raise serializers.ValidationError({'message_error':'An phonenubmer address is required to log in.'})
+        
+        if password is None:
+            raise serializers.ValidationError({'message_error':'A password is required to log in.'})
+        
+        user = authenticate(username= phonenumber, password= password)
+
+        if user is None:
+            raise serializers.ValidationError({'message_error':'A user with this phonenumber and password was not found.'})
+        
+        if not user.is_active:
+            raise serializers.ValidationError({'message_error':'This user is not currently activated.'})
+        
+        return data
+
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
-
-    def to_representation(self, instance):
-        repr = super().to_representation(instance)
-        return repr['name']
 
 
 
@@ -213,3 +271,25 @@ class OrderSerializer(serializers.ModelSerializer):
 
         order.save()
         return order
+    
+
+
+
+
+class EmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = '__all__'
+
+
+    
+class IncomingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Incoming
+        fields = '__all__'
+
+
+class IncomingProductsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Incoming_Products
+        fields = '__all__'

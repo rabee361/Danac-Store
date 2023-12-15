@@ -104,19 +104,6 @@ class Cart_Products(models.Model):
     class Meta:
         ordering = ['products__added']
 
-    @property
-    def add_item(self):
-        self.quantity = self.quantity + 1
-        self.save()
-
-    @property
-    def sub_item(self):
-        self.quantity = self.quantity - 1
-        self.save()
-
-    def __str__(self):
-        return self.cart.customer.name
-
 
 
 
@@ -161,3 +148,50 @@ class CodeVerification(models.Model):
 
 
 
+class Employee(models.Model):
+    name = models.CharField(max_length=30)
+    breath_date = models.DateField()
+    phonenumber = PhoneNumberField(region='DZ')
+    type_employee = models.CharField(max_length=20) 
+    number_track = models.IntegerField()
+    salery = models.FloatField()
+    sale_perce = models.FloatField()
+    address = models.CharField(max_length=100)
+    info = models.TextField(max_length=1000)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+
+class Incoming(models.Model):
+    product = models.ManyToManyField(Product, through='Incoming_Products')
+    supplier = models.ForeignKey(Supplier,blank=True, on_delete=models.CASCADE)
+    agent = models.CharField(max_length=30,blank=True)
+    num_truck = models.IntegerField(null=True)
+    employee = models.ForeignKey(Employee,blank=True, on_delete=models.CASCADE)
+    code_verefy = models.IntegerField(null=True)
+    recive_pyement = models.FloatField(null=True)
+    discount = models.FloatField(null=True)
+    # products_retrieved = models.CharField(max_length=100)
+    previous_depts = models.FloatField(null=True)
+    # remaining_amount = models.FloatField()
+
+    def __str__(self):
+        return f'incoming : {self.id}'
+    
+    
+class Incoming_Products(models.Model):
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    incoming = models.ForeignKey(Incoming, on_delete=models.CASCADE)
+    # num_item = models.IntegerField()
+    # purch_price = models.FloatField()
+
+    def __str__(self) -> str:
+        return f'{self.incoming.id} : {self.products.name}'
+    
+    @property
+    def get_items_num(self):
+        return self.products.count()
+    
