@@ -7,26 +7,30 @@ from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from base.filter import ProductFilter
+from base.filter import ProductFilter, ProductFilterName
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 import random
+from rest_framework import filters
 
 
 
-class SignupView(CreateAPIView):
-    """
-    An endpoint for the client to create a new Student.
-    """
-    permission_classes = [permissions.AllowAny]
-    serializer_class = SignUpSerializer
+class SingupView(GenericAPIView):
 
-    def perform_create(self, serializer):
-        user = serializer.save()
+    serializer_class  = SignUpSerializer
+    def post(self, request):
+        user_information = request.data
+        serializer = self.get_serializer(data=user_information)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        user_data = serializer.data
+        user = CustomUser.objects.get(phonenumber=user_data['phonenumber'])
         token = RefreshToken.for_user(user)
-        data_user = serializer.data
-        data_user['tokens'] = {"refresh" : str(token), "access":str(token.access_token)}
-        self.headers = {"user": data_user, "message":"account created successfully"}
+        tokens = {
+            'refresh':str(token),
+            'accsess':str(token.access_token)
+        }
+        return Response({'information_user':user_data,'tokens':tokens})
 
 
 class UserLoginApiView(GenericAPIView):
@@ -309,3 +313,14 @@ class ListCreateExpenceView(ListCreateAPIView):
 class RetUpdDesExpenceView(RetrieveUpdateDestroyAPIView):
     queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
+
+
+class SearchView(ListAPIView):
+    # queryset = Product.objects.all()
+    # serializer_class = ProductSerializer
+    # filter_backends = [DjangoFilterBackend]
+    # filterset_class = ProductFilterName
+    search_fields = ['name']
+    filter_backends = (filters.SearchFilter,)
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer

@@ -6,7 +6,7 @@ from rest_framework_simplejwt import views as jwt_views
 from django.urls import path
 from .views import *
 urlpatterns = [
-    path('sign-up/' , SignupView.as_view()),
+    path('sign-up/' ,SingupView.as_view(), name='sign-up'),
     path('auth/reset-password/' , ResetPasswordView.as_view(), name='reset-password'),
     path('sign-in/', UserLoginApiView.as_view(), name='sign-in'),
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -38,6 +38,7 @@ urlpatterns = [
     path('advances/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),
     path('expences/', ListCreateExpenceView.as_view(), name='expendes'),
     path('expences/<str:pk>/', RetUpdDesExpenceView.as_view(), name='get-expence'),
+    path('search/product/', SearchView.as_view(), name='search-product'),
 
     # path('product/category/', UserListView.as_view()),
 ]

@@ -248,9 +248,17 @@ class EmployeeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class OverTimeSerializer(serializers.ModelSerializer):
+
+    employee = serializers.CharField()
     class Meta:
         model = OverTime
         fields = '__all__'
+
+    def create(self, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        overtime = OverTime.objects.create(employee=employee, **validated_data)
+        return overtime
 
 class AbsenceSerializer(serializers.ModelSerializer):
     class Meta:
