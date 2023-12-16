@@ -316,11 +316,8 @@ class RetUpdDesExpenceView(RetrieveUpdateDestroyAPIView):
 
 
 class SearchView(ListAPIView):
-    # queryset = Product.objects.all()
-    # serializer_class = ProductSerializer
-    # filter_backends = [DjangoFilterBackend]
-    # filterset_class = ProductFilterName
-    search_fields = ['name']
-    filter_backends = (filters.SearchFilter,)
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilterName
+
