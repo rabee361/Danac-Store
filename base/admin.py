@@ -1,19 +1,25 @@
 from collections import OrderedDict
 from typing import Any
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from django.http.request import HttpRequest
 from .models import *
 import random
 from base.api.serializers import CodeVerivecationSerializer
+# from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from .froms import CustomUserCreationForm, CustomUserChangeForm
 
 
-class AdminCustomUser(admin.ModelAdmin):
+class AdminCustomUser(UserAdmin, admin.ModelAdmin):
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
     actions = ['accept_user', 'print_user']
 
-    def accept_user(self, request, queryset):
-        queryset.update(is_active=True)
+    # def accept_user(self, request, queryset):
+        
 
     def print_user(self, request, queryset):
+        queryset.update(is_active=True)
         user = queryset.get(is_active=True)
         cline = Client.objects.create(
             name=user.username,
@@ -30,13 +36,30 @@ class AdminCustomUser(admin.ModelAdmin):
         serializer.save()
         print(code_verivecation)
 
-        # self.opts.verbose_name='phonen'
-    # def get_actions(self, request):
-    #     actions = super().get_actions(request)
-    #     print(request.user.id)
-    #     del actions['accept_user']
-    #     return actions
-    accept_user.short_descreption = 'Accept User For complet registration'
+    fieldsets = (
+        (None, 
+                {'fields':('phonenumber', 'password',)}
+            ),
+            ('User Information',
+                {'fields':('username', 'first_name', 'last_name',)}
+            ),
+            ('Permissions', 
+                {'fields':('is_verified', 'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type')}
+            ),
+            ('Registration', 
+                {'fields':('date_joined', 'last_login',)}
+        )
+    )
+
+    add_fieldsets = (
+        (None, {'classes':('wide',),
+            'fields':(
+                'phonenumber','username', 'password1', 'password2'
+            ),}
+            ),
+    )
+
+    # accept_user.short_descreption = 'Accept User For complet registration'
     print_user.short_descreption = 'print_user'
 
 
@@ -53,3 +76,8 @@ admin.site.register(Notifications)
 admin.site.register(Supplier)
 admin.site.register(Point)
 admin.site.register(Employee)
+# admin.site.register(Incoming)
+# admin.site.register(Incoming_Products)
+admin.site.register(UserType)
+admin.site.register(ManualReciept)
+admin.site.register(ManualReciept_Products)

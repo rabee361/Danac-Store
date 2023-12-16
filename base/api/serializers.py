@@ -123,6 +123,18 @@ class UserLoginSerilizer(serializers.ModelSerializer):
             raise serializers.ValidationError({'message_error':'This user is not currently activated.'})
         
         return data
+    
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+    def validate(self, attrs):
+        self.token = attrs['refresh']
+        return attrs
+    def save(self, **kwargs):
+        try:
+            RefreshToken(self.token).blacklist()
+        except TokenError:
+            self.fail('bad_token')
 
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -135,16 +147,6 @@ class PointSerializer(serializers.ModelSerializer):
         model = Point
         fields = '__all__'
 
-class LogoutSerializer(serializers.Serializer):
-    refresh = serializers.CharField()
-    def validate(self, attrs):
-        self.token = attrs['refresh']
-        return attrs
-    def save(self, **kwargs):
-        try:
-            RefreshToken(self.token).blacklist()
-        except TokenError:
-            self.fail('bad_token')
             
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -362,13 +364,13 @@ class ExpenseSerializer(serializers.ModelSerializer):
     employee = serializers.CharField()
 
     class Meta:
-        model = Expense
+        model = ExtraExpense
         fields = '__all__'
 
     def create(self, validated_data):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
-        expense = Expense.objects.create(employee=employee, **validated_data)
+        expense = ExtraExpense.objects.create(employee=employee, **validated_data)
         return expense
     
     def update(self, instance, validated_data):
@@ -380,13 +382,72 @@ class ExpenseSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class IncomingSerializer(serializers.ModelSerializer):
+# class IncomingSerializer(serializers.ModelSerializer):
+#     # products = serializers.ListField(child=serializers.CharField(), write_only=True)
+#     products_data = ProductSerializer(source='products', many=True, read_only=True)
+#     employee = serializers.CharField()
+#     supplier = serializers.CharField()
+
+#     class Meta:
+#         model = Incoming
+#         fields = '__all__'
+    
+#     def create(self, validated_data):
+#         # product_names = validated_data.pop('products', [])
+#         employee_name = validated_data.pop('employee')
+#         employee = Employee.objects.filter(name=employee_name).first()
+#         supplier_name = validated_data.pop('supplier')
+#         supplier = Supplier.objects.filter(name=supplier_name).first()
+#         # products = Incoming_Products
+#         incoming = Incoming.objects.create(employee= employee, supplier= supplier, **validated_data)
+#         # products = Incoming_Products.objects.filter(incoming=incoming.pk)
+#         incoming.save()
+
+#         return incoming
+    
+# class IncomingProductsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Incoming_Products
+#         fields = '__all__'
+
+
+class ManualRecieptSerializer(serializers.ModelSerializer):
+    # products = serializers.ListField(child=serializers.CharField(), write_only=True)
+    # products_name = ProductSerializer(source='products', many=True, read_only=True)
+    # employee = serializers.CharField()
+    # client = serializers.CharField()
 
     class Meta:
-        model = Incoming
+        model = ManualReciept
         fields = '__all__'
 
-class IncomingProductsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Incoming_Products
+    # def create(self, validated_data):
+    #     plapla = validated_data.pop('products')
+    #     emplyee_name= validated_data.pop('employee')
+    #     employee = Employee.objects.filter(name=emplyee_name).first()
+    #     client_name = validated_data.pop('client')
+    #     client = Client.objects.filter(name=client_name).first()
+    #     manual_reciept = ManualReciept.objects.create(
+    #         employee=employee,
+    #         client = client,
+    #         **validated_data
+    #     )
+    #     print(type(plapla))
+    #     for p in plapla:
+    #         print(p['name'])
+    #         product = Product.objects.filter(name="darko").first()
+    #         manualreciept_products = ManualReciept_Products.objects.create(
+    #             product = product,
+    #             manual_reciept=manual_reciept,
+    #             quantity = p['quantity'],
+    #             discount = p['discount']
+    #         )
+    #         manualreciept_products.save()
+    #     manual_reciept.save()
+
+    #     return manual_reciept
+    
+class ManualRecieptProductsSerializer(serializers.ModelSerializer):
+    class Meta :
+        model = ManualReciept_Products
         fields = '__all__'

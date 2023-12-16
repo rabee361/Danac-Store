@@ -215,49 +215,6 @@ class ListCreateOrderView(ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-
-# class ListOrdersUserView(RetrieveAPIView):
-#     queryset = Order.objects.all()
-#     serializer_class = OrderSerializer
-
-
-        
-
-# def validate_desires(data):
-
-#     list_desires = []
-#     student_desires = data
-#     desires = Dseires.objects.all()
-
-#     for student_desire in student_desires:
-#         for desire in desires:
-#             if student_desire == desire.desire:
-#                 print(student_desire)
-#                 list_desires.append(desire.id)
-
-#     return list_desires
-
-
-# class UpdateSupplier():
-#     pass
-# class ListClients(ListAPIView)
-# class getClients
-# class createClientView()
-
-
-# class listSupplier
-# class getSupplier
-# class createSupplier
-
-
-# class createProduct
-# class getProduct
-# class listProduct
-
-
-# class addToCart
-# class listCart
-
 class ListCreatEmployeeView(ListCreateAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
@@ -307,11 +264,11 @@ class RetUpdDesAdvanceView(RetrieveUpdateDestroyAPIView):
     serializer_class = AdvanceSerializer
 
 class ListCreateExpenceView(ListCreateAPIView):
-    queryset = Expense.objects.all()
+    queryset = ExtraExpense.objects.all()
     serializer_class = ExpenseSerializer
 
 class RetUpdDesExpenceView(RetrieveUpdateDestroyAPIView):
-    queryset = Expense.objects.all()
+    queryset = ExtraExpense.objects.all()
     serializer_class = ExpenseSerializer
 
 
@@ -321,3 +278,41 @@ class SearchView(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilterName
 
+# class ListCreateIncomingView(ListCreateAPIView):
+#     queryset = Incoming.objects.all()
+#     serializer_class = IncomingSerializer
+
+# class CreateIncomingProductsView(APIView):
+
+#     def post(self, request, id):
+#         incoming = Incoming.objects.get_or_create(id=id)
+#         print(incoming)
+#         product_name = request.data['product']
+#         product = Product.objects.get(name=product_name)
+#         serializer = IncomingProductsSerializer(data={
+#             'incoming':incoming.id,
+#             'product':product.id,
+#             'quantity':request.data['quantity']
+#         })
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors)
+class ListCreateManualRecieptView(ListCreateAPIView):
+    # queryset  = ManualReciept.objects.all()
+    # serializer_class = ManualRecieptSerializer
+    def post(self, request):
+        manualreciept = request.data
+        serializer = ManualRecieptSerializer(data=manualreciept)
+        print
+        if serializer.is_valid():
+            manual_reciept = serializer.save()
+            manual_products = manualreciept.data['products']
+            for manual_product in manual_products:
+                manual_product['manualreciept'] = manual_reciept.id
+                manualrecieptser = ManualRecieptProductsSerializer(data=manual_product)
+                if manualrecieptser.is_valid():
+                    manualrecieptser.save()
+                    return Response(serializer.data)
+                return Response(manualrecieptser.errors)
+            return Response(serializer.errors)

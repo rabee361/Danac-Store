@@ -8,6 +8,12 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
 
 
+class UserType(models.Model):
+    user_type = models.CharField(max_length=20)
+
+    def __str__(self) -> str:
+        return self.user_type
+    
 
 class CustomUser(AbstractUser):
     phonenumber = PhoneNumberField(region='DZ',unique=True)
@@ -15,11 +21,12 @@ class CustomUser(AbstractUser):
     is_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True)
     address = models.CharField(max_length=100, default='one')
+    user_type = models.ForeignKey(UserType, on_delete=models.CASCADE, null=True)
 
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',)
     
-    # objects = CustomManagers()
+    objects = CustomManagers()
 
     def __str__(self):
         return self.username
@@ -30,7 +37,6 @@ class CustomUser(AbstractUser):
     #         'refresh':str(refresh),
     #         'access':str(refresh.access_token)
     #     }
-
 
 class CodeVerivecation(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -259,7 +265,7 @@ class Advance(models.Model):
     def __str__(self) -> str:
         return self.employee.name
     
-class Expense(models.Model):
+class ExtraExpense(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     reason_expense = models.CharField(max_length=100)
     total = models.FloatField()
@@ -269,30 +275,112 @@ class Expense(models.Model):
         return self.employee.name
 
 
-class Incoming(models.Model):
-    product = models.ManyToManyField(Product, through='Incoming_Products')
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    agent = models.CharField(max_length=30)
-    num_truck = models.IntegerField()
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    code_verefy = models.IntegerField()
-    recive_pyement = models.FloatField()
-    discount = models.FloatField()
-    # products_retrieved = models.CharField(max_length=100)
-    previous_depts = models.FloatField()
-    # remaining_amount = models.FloatField()
+# class Incoming(models.Model):
+#     products = models.ManyToManyField(Product, through='Incoming_Products')
+#     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+#     agent = models.CharField(max_length=30)
+#     num_truck = models.IntegerField(null=True)
+#     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+#     code_verefy = models.IntegerField()
+#     recive_pyement = models.FloatField()
+#     discount = models.FloatField()
+#     # Reclaimed_products = models.CharField(max_length=100)
+#     previous_depts = models.FloatField()
+#     # remaining_amount = models.FloatField()
 
-    def __str__(self):
-        return self.id
+#     def __str__(self):
+#         return str(self.id)
     
-class Incoming_Products(models.Model):
-    products = models.ForeignKey(Product, on_delete=models.CASCADE)
-    incoming = models.ForeignKey(Incoming, on_delete=models.CASCADE)
-    num_item = models.IntegerField()
-    purch_price = models.FloatField()
+# class Incoming_Products(models.Model):
+#     products = models.ForeignKey(Product, on_delete=models.CASCADE)
+#     incoming = models.ForeignKey(Incoming, on_delete=models.CASCADE)
+#     # num_item = models.IntegerField()
+#     # purch_price = models.FloatField()
+#     quantity = models.IntegerField()
+
+#     def __str__(self) -> str:
+#         return self.incoming.supplier.name
+#     @property
+#     def get_items_num(self):
+#         return self.products
+
+
+class ManualReciept(models.Model):
+    products = models.ManyToManyField(Product, through='ManualReciept_Products')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    verify_code = models.IntegerField()
+    phonenumber = PhoneNumberField(region='DZ')
+    recive_pyement = models.FloatField()
+    Reclaimed_products = models.FloatField()
+    previous_debts = models.FloatField()
+    remaining_amount = models.FloatField()
 
     def __str__(self) -> str:
-        return self.incoming.supplier.name
-    @property
-    def get_items_num(self):
-        return self.products.count()
+        return self.client.name
+    
+class ManualReciept_Products(models.Model):
+    products = models.ForeignKey(Product, on_delete= models.CASCADE)
+    manualreciept = models.ForeignKey(ManualReciept, on_delete= models.CASCADE)
+    quantity = models.IntegerField()
+    discount = models.FloatField()
+
+    def __str__(self) -> str:
+        return str(self.id)
+
+
+
+
+class Deposite(models.Model):
+    detail_deposite = models.CharField(max_length=50)
+    client = models.ForeignKey(Client, on_delete= models.CASCADE)
+    total = models.FloatField()
+    verify_code = models.IntegerField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.client.name
+
+class WithDraw(models.Model):
+    details_withdraw = models.CharField(max_length=50)
+    name_user = models.CharField(max_length= 30)
+    total = models.FloatField()
+    verify_code = models.IntegerField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.name_user
+    
+class Expence(models.Model):
+    detail_expence = models.CharField(max_length=50)
+    name_user = models.CharField(max_length=30)
+    total = models.FloatField()
+    num_reciept = models.IntegerField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.name_user
+    
+class DeptsSuppliers(models.Model):
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    recive_pyement = models.FloatField()
+    pyement_method = models.CharField(max_length=10)
+    name_bank = models.CharField(max_length=20)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.supplier.name
+    
+class DeptsClients(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    recive_pyement = models.FloatField()
+    pyement_method = models.CharField(max_length=10)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.client.name
+
+
+
+
+

@@ -36,9 +36,12 @@ urlpatterns = [
     path('discounts/<str:pk>/', RetUpdDesDicountView.as_view(), name='get-discount'),
     path('advances/', ListCreateAdvanceView.as_view(), name='advances'),
     path('advances/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),
-    path('expences/', ListCreateExpenceView.as_view(), name='expendes'),
-    path('expences/<str:pk>/', RetUpdDesExpenceView.as_view(), name='get-expence'),
+    path('sxtraexpences/', ListCreateExpenceView.as_view(), name='extra-expence'),
+    path('extraexpences/<str:pk>/', RetUpdDesExpenceView.as_view(), name='get-extra-expence'),
     path('search/product/', SearchView.as_view(), name='search-product'),
+    # path('incomings/', ListCreateIncomingView.as_view(), name='incoming'),
+    # path('incoming-products/<int:id>/', CreateIncomingProductsView.as_view(), name='incoming-produc')
+    path('manual-reciepts/', ListCreateManualRecieptView.as_view(), name='manual-reciepts'),
 
     # path('product/category/', UserListView.as_view()),
 ]
