@@ -145,7 +145,7 @@ class LogoutSerializer(serializers.Serializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             self.fail('bad_token')
-
+            
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -283,4 +283,14 @@ class AdvanceSerializer(serializers.ModelSerializer):
 class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
+        fields = '__all__'
+
+class IncomingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Incoming
+        fields = '__all__'
+
+class IncomingProductsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Incoming_Products
         fields = '__all__'

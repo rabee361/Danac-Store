@@ -267,3 +267,32 @@ class Expense(models.Model):
     
     def __str__(self) -> str:
         return self.employee.name
+
+
+class Incoming(models.Model):
+    product = models.ManyToManyField(Product, through='Incoming_Products')
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    agent = models.CharField(max_length=30)
+    num_truck = models.IntegerField()
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    code_verefy = models.IntegerField()
+    recive_pyement = models.FloatField()
+    discount = models.FloatField()
+    # products_retrieved = models.CharField(max_length=100)
+    previous_depts = models.FloatField()
+    # remaining_amount = models.FloatField()
+
+    def __str__(self):
+        return self.id
+    
+class Incoming_Products(models.Model):
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    incoming = models.ForeignKey(Incoming, on_delete=models.CASCADE)
+    num_item = models.IntegerField()
+    purch_price = models.FloatField()
+
+    def __str__(self) -> str:
+        return self.incoming.supplier.name
+    @property
+    def get_items_num(self):
+        return self.products.count()
