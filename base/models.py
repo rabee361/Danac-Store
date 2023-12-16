@@ -242,7 +242,7 @@ class Absence(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     days = models.IntegerField()
-    deduct = models.FloatField()
+    amount = models.FloatField()
 
     def __str__(self) -> str:
         return self.employee.name
