@@ -325,7 +325,7 @@ class Advance_on_SalarySerializer(serializers.ModelSerializer):
         employee = Employee.objects.get(name=employee_name)
         instance.employee = validated_data.get('employee', employee)
         instance.reason = validated_data.get('reason', instance.reason)
-        instance.total = validated_data.get('total', instance.total)
+        instance.amount = validated_data.get('amount', instance.amount)
         instance.save()
         return instance
 
@@ -373,7 +373,7 @@ class AbsenceSerializer(serializers.ModelSerializer):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
         instance.employee = validated_data.get('employee', employee)
-        instance.num_absence = validated_data.get('num_absence', instance.num_absence)
+        instance.days = validated_data.get('days', instance.days)
         instance.amount = validated_data.get('amount', instance.amount)
         instance.save()
         return instance
