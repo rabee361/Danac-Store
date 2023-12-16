@@ -162,7 +162,6 @@ class CodeVerification(models.Model):
 
 class Employee(models.Model):
     name = models.CharField(max_length=30)
-    breath_date = models.DateField()
     phonenumber = PhoneNumberField(region='DZ')
     job_position = models.CharField(max_length=20)
     truck_num = models.IntegerField(null=True)
