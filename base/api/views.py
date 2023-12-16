@@ -313,11 +313,11 @@ class RetUpdDesDicountView(RetrieveUpdateDestroyAPIView):
 
 class ListCreateAdvanceView(ListCreateAPIView):
     queryset = Advance_On_salary.objects.all()
-    serializer_class = AdvanceSerializer
+    serializer_class = Advance_on_SalarySerializer
 
 class RetUpdDesAdvanceView(RetrieveUpdateDestroyAPIView):
     queryset = Advance_On_salary.objects.all()
-    serializer_class = AdvanceSerializer
+    serializer_class = Advance_on_SalarySerializer
 
 class ListCreateExpense(ListCreateAPIView):
     queryset = Extra_Expense.objects.all()
@@ -328,15 +328,6 @@ class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
     serializer_class = ExpenseSerializer
 
 
-# class ListCreateSalary(ListCreateAPIView):
-#     queryset = Salary.objects.all()
-#     serializer_class = SalarySerializer
-
-
-# class RetUpdDesSalary(RetrieveUpdateDestroyAPIView):
-#     queryset = Salary.objects.all()
-#     serializer_class = SalarySerializer
-    
 class RetUpdDelDebt(RetrieveUpdateDestroyAPIView):
     queryset = Debt.objects.all()
     serializer_class = DebtSerializer

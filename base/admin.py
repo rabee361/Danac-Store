@@ -22,4 +22,8 @@ admin.site.register(Supplier)
 admin.site.register(Incoming)
 admin.site.register(Incoming_Products)
 admin.site.register(Employee)
+admin.site.register(Advance_On_salary)
+admin.site.register(Absence)
+admin.site.register(Discount)
+admin.site.register(Bonus)
 

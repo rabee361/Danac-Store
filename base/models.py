@@ -249,7 +249,7 @@ class Absence(models.Model):
     
 class Bonus(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    reason_award = models.CharField(max_length=100)
+    reason = models.CharField(max_length=100)
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
@@ -273,9 +273,9 @@ class Advance_On_salary(models.Model):
     reason = models.CharField(max_length=100)
     amount = models.FloatField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.employee.name
-
+    
 
 
 class Extra_Expense(models.Model):
