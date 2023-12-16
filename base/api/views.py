@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated  ,AllowAny
 from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
-from base.filters import ProductFilter
+from base.filters import ProductFilter , ProductFilterName
 import random
 from django.shortcuts import get_object_or_404
 
@@ -111,6 +111,14 @@ class LogoutAPIView(GenericAPIView):
 
 
 
+class ListCreateEmployee(ListCreateAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
+class RetUpdDesEmployee(RetrieveUpdateDestroyAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
 class ListCreateClient(ListCreateAPIView):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
@@ -164,6 +172,14 @@ class CartProducts(ListAPIView):
         client = Client.objects.get(id=1)
         return Cart_Products.objects.filter(cart__customer=client)
     
+
+
+class CartView(ListAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+
+
 class GetPhonenumberView(APIView):    
     def post(self, request):
         phonenumber = request.data['phonenumber']
@@ -279,13 +295,13 @@ class RetUpdDesAbsenceAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Absence.objects.all()
     serializer_class = AbsenceSerializer
 
-class ListCreateAwardView(ListCreateAPIView):
-    queryset = Award.objects.all()
-    serializer_class = AwardSerializer
+class ListCreateBonus(ListCreateAPIView):
+    queryset = Bonus.objects.all()
+    serializer_class = BonusSerializer
 
-class RetUpdDesAwardView(RetrieveUpdateDestroyAPIView):
-    queryset = Award.objects.all()
-    serializer_class = AwardSerializer
+class RetUpdDesBonusView(RetrieveUpdateDestroyAPIView):
+    queryset = Bonus.objects.all()
+    serializer_class = BonusSerializer
 
 class ListCreateDicountView(ListCreateAPIView):
     queryset = Discount.objects.all()
@@ -295,23 +311,121 @@ class RetUpdDesDicountView(RetrieveUpdateDestroyAPIView):
     queryset = Discount.objects.all()
     serializer_class = DiscountSerializer
 
-# class ListCreateAdvanceView(ListCreateAPIView):
-#     queryset = Advance.objects.all()
-#     serializer_class = AdvanceSerializer
+class ListCreateAdvanceView(ListCreateAPIView):
+    queryset = Advance_On_salary.objects.all()
+    serializer_class = AdvanceSerializer
 
-# class RetUpdDesAdvanceView(RetrieveUpdateDestroyAPIView):
-#     queryset = Advance.objects.all()
-#     serializer_class = AdvanceSerializer
+class RetUpdDesAdvanceView(RetrieveUpdateDestroyAPIView):
+    queryset = Advance_On_salary.objects.all()
+    serializer_class = AdvanceSerializer
 
-# class ListCreateExpenceView(ListCreateAPIView):
-#     queryset = Expense.objects.all()
-#     serializer_class = ExpenseSerializer
+class ListCreateExpense(ListCreateAPIView):
+    queryset = Extra_Expense.objects.all()
+    serializer_class = ExpenseSerializer
 
-# class RetUpdDesExpenceView(RetrieveUpdateDestroyAPIView):
-#     queryset = Expense.objects.all()
-#     serializer_class = ExpenseSerializer
+class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
+    queryset = Extra_Expense.objects.all()
+    serializer_class = ExpenseSerializer
+
+
+# class ListCreateSalary(ListCreateAPIView):
+#     queryset = Salary.objects.all()
+#     serializer_class = SalarySerializer
+
+
+# class RetUpdDesSalary(RetrieveUpdateDestroyAPIView):
+#     queryset = Salary.objects.all()
+#     serializer_class = SalarySerializer
+    
+class RetUpdDelDebt(RetrieveUpdateDestroyAPIView):
+    queryset = Debt.objects.all()
+    serializer_class = DebtSerializer
 
 
 
-# class addToCart
-# class listCart
+
+class CreateOrderView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        client = Client.objects.get(phomnenumber=user.phonenumber)
+        cart = Cart.objects.get(customer=client)
+        cart_products = Cart_Products.objects.filter(cart=cart)
+        products_name = []
+        quantity = 0
+        for cart_product in cart_products:
+            quantity +=cart_product.quantity
+            products_name.append(cart_product.products.name)
+            cart_product.delete()
+        print(products_name)
+        print(quantity)
+
+        order_serializer = OrderSerializer(data= {
+            'clinet':client.id,
+            'products':products_name,
+            'total':quantity,
+            'delivery_date':request.data['date']
+        })
+        if order_serializer.is_valid():
+            order_serializer.save()
+
+            return Response(order_serializer.data)
+        return Response(order_serializer.errors)
+        
+
+class ListOrdersUserView(GenericAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated,]
+
+    def get(self, request):
+        user = request.user
+        client = Client.objects.get(phomnenumber=user.phonenumber)
+        orders = client.order_set.all()
+        serializer = self.get_serializer(orders, many=True)
+        response = serializer.data
+
+        return Response(response)
+
+
+
+
+class ListCreateManualRecieptView(APIView):
+
+    def post(self, request):
+        manual_reciept = request.data
+        manual_reciept_serializer = ManualRecieptSerializer(data=manual_reciept)
+        if manual_reciept_serializer.is_valid():
+            manuals_reciept = manual_reciept_serializer.save()
+            manual_products = request.data['products']
+            for manual_product in manual_products:
+                manual_product['manualreciept'] = manuals_reciept.id
+                manualrecieptser = ManualRecieptProductsSerializer(data=manual_product)
+                if manualrecieptser.is_valid():
+                    manualrecieptser.save()
+                else:
+
+                    return Response(manual_reciept_serializer.errors)
+            return Response(manual_reciept_serializer.data)
+        return Response(manual_reciept_serializer.errors)
+    
+    def get(self, request):
+        manualreciepts = ManualReciept.objects.all()
+        serializer = ManualRecieptSerializer(manualreciepts, many=True)
+        data = serializer.data
+
+        return Response(data)
+    
+
+
+class ListManualRecieptProductsView(ListAPIView):
+    queryset = ManualReciept_Products.objects.all()
+    serializer_class = ManualRecieptProductsSerializer
+
+
+
+class SearchView(ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilterName

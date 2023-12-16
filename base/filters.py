@@ -9,3 +9,11 @@ class ProductFilter(django_filters.FilterSet):
     class Meta: 
         model = Product
         fields = ['category']
+
+
+class ProductFilterName(django_filters.FilterSet):
+    category = django_filters.CharFilter(field_name="name", lookup_expr='iexact')
+
+    class Meta:
+        model = Product
+        fields = ['name']

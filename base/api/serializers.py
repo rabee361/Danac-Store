@@ -122,7 +122,7 @@ class ClientSerializer(serializers.ModelSerializer):
     total_points = serializers.SerializerMethodField()
     class Meta:
         model = Client
-        fields = ['name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points']
+        fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points']
 
     def get_total_points(self,obj):
         total = Point.objects.filter(Q(client=obj)&Q(is_used=False)).aggregate(total_points=models.Sum('number'))['total_points'] or 0
@@ -300,8 +300,6 @@ class IncomingSerializer(serializers.ModelSerializer):
 
 
 class IncomingProductSerializer(serializers.ModelSerializer):
-    products = ProductSerializer(many=False)
-    incoming = IncomingSerializer(many=False)
     class Meta:
         model = Incoming_Products
         fields = '__all__'
@@ -309,9 +307,18 @@ class IncomingProductSerializer(serializers.ModelSerializer):
 
 
 
-class OverTimeSerializer(serializers.ModelSerializer):
+class AdvanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Advance_On_salary
+        fields = '__all__'
 
+
+
+
+
+class OverTimeSerializer(serializers.ModelSerializer):
     employee = serializers.CharField()
+
     class Meta:
         model = OverTime
         fields = '__all__'
@@ -330,6 +337,8 @@ class OverTimeSerializer(serializers.ModelSerializer):
         instance.deserved_amount = validated_data.get('deserved_amount', instance.deserved_amount)
         instance.save()
         return instance
+
+
 
 class AbsenceSerializer(serializers.ModelSerializer):
     employee = serializers.CharField()
@@ -354,17 +363,18 @@ class AbsenceSerializer(serializers.ModelSerializer):
         return instance
     
 
-class AwardSerializer(serializers.ModelSerializer):
+
+class BonusSerializer(serializers.ModelSerializer):
     employee = serializers.CharField()
 
     class Meta:
-        model = Award
+        model = Bonus
         fields = '__all__'
 
     def create(self, validated_data):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
-        award = Award.objects.create(employee=employee, **validated_data)
+        award = Bonus.objects.create(employee=employee, **validated_data)
         return award
 
     def update(self, instance, validated_data):
@@ -376,6 +386,7 @@ class AwardSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
+
 
 class DiscountSerializer(serializers.ModelSerializer):
     employee = serializers.CharField()
@@ -398,11 +409,72 @@ class DiscountSerializer(serializers.ModelSerializer):
         instance.total = validated_data.get('total', instance.total)
         instance.save()
         return instance
- 
+
+
+
+class ExpenseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Extra_Expense
+        fields = '__all__'
+
+
+    
+class SalarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Salary
+        fields = '__all__'
 
 
 
 class Product2Serializer(serializers.ModelSerializer):
     class Meta:
         model = Product
+        fields = '__all__'
+
+
+
+class DebtSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Debt
+        fields = '__all__'
+
+
+
+class PaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethod
+
+
+
+
+class ManualRecieptSerializer(serializers.ModelSerializer):
+    # products = serializers.ListField(child=serializers.CharField(), write_only=True)
+    # products_name = ProductSerializer(source='products', many=True, read_only=True)
+    employee = serializers.CharField()
+    client = serializers.CharField()
+
+    class Meta:
+        model = ManualReciept
+        fields = '__all__'
+
+    def create(self, validated_data):
+        emplyee_name= validated_data.pop('employee')
+        employee = Employee.objects.filter(name=emplyee_name).first()
+        client_name = validated_data.pop('client')
+        client = Client.objects.filter(name=client_name).first()
+        manual_reciept = ManualReciept.objects.create(
+            employee=employee,
+            client = client,
+            **validated_data
+        )
+        manual_reciept.save()
+        return manual_reciept
+    
+
+
+class ManualRecieptProductsSerializer(serializers.ModelSerializer):
+    # products_name = ProductSerializer(source='products', many=True, read_only=True)
+    # manual_name = ManualRecieptSerializer(read_only=True)
+    class Meta :
+        model = ManualReciept_Products
         fields = '__all__'
