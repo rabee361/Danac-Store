@@ -173,14 +173,14 @@ class SupplierSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
-        fields = '__all__'
+        fields = ['id','customer','items','get_items_num','total_cart_price']
 
 
 class Cart_ProductsSerializer(serializers.ModelSerializer):
     products = ProductSerializer()
     class Meta:
         model = Cart_Products
-        fields = fields = ['products', 'quantity']
+        fields = ['id','quantity','cart','products','total_price_of_item']
 
 
 

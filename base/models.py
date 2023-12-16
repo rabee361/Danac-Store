@@ -94,6 +94,7 @@ class Product(models.Model):
         return self.name
 
     
+############################### CART HANDLING ###################################
 
 class Cart(models.Model):
     customer = models.ForeignKey(Client , on_delete=models.CASCADE)
@@ -103,19 +104,37 @@ class Cart(models.Model):
     def get_items_num(self):
         return self.items.count()
 
+    def total_cart_price(self):
+        total = 0
+        for item in self.cart_products_set.all():
+            total += item.total_price_of_item()
+        return total
+
     def __str__(self):
         return f'{self.customer} cart'
-
-
+    
 
 class Cart_Products(models.Model):
     products = models.ForeignKey(Product, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['products__added']
 
+    def add_item(self):
+        self.quantity = self.quantity + 1
+        self.save()
+
+    def sub_item(self):
+        self.quantity = self.quantity - 1
+        self.save()
+
+    def total_price_of_item(self):
+        return (self.quantity * self.products.sale_price)
+
+    def __str__(self):
+        return f'{self.cart.customer} - {self.products.name} - {self.quantity}'
 
 
 

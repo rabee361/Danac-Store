@@ -9,11 +9,13 @@ from rest_framework.permissions import IsAuthenticated  ,AllowAny
 from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
-from base.filters import ProductFilter , ProductFilterName
+from base.filters import ProductFilter 
 import random
 from django.shortcuts import get_object_or_404
+from django.db.models import F
 
 
+######--------- authentication --------#######
 
 class SignUpView(GenericAPIView):
     serializer_class  = SignUpSerializer
@@ -33,24 +35,6 @@ class SignUpView(GenericAPIView):
 
 
 
-
-class test(ListAPIView):
-    permission_classes = (AllowAny,)
-    def get(self,request):
-        return Response(request.data)
-
-
-
-class CurrentUserView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        return CustomUser.objects.filter(id=self.request.user.id)
-
-
-
 class UserLoginApiView(GenericAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserLoginSerilizer
@@ -63,8 +47,40 @@ class UserLoginApiView(GenericAPIView):
         data = serializer.data
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)
-    
 
+
+
+class LogoutAPIView(GenericAPIView):
+    serializer_class = UserLogoutSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+#####-----testing-----#####
+class test(ListAPIView):
+    permission_classes = (AllowAny,)
+    def get(self,request):
+        return Response(request.data)
+    
+class CurrentUserView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return CustomUser.objects.filter(id=self.request.user.id)
+
+
+############-------cart and products -----######################
+    
+class ListCreateClient(ListCreateAPIView):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
 
 
 class listCreateProducts(ListCreateAPIView):
@@ -72,7 +88,6 @@ class listCreateProducts(ListCreateAPIView):
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
-
 
 
 class ListCreateCategory(ListCreateAPIView):
@@ -90,58 +105,138 @@ class ListCreateCategory(ListCreateAPIView):
                 headers=headers
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
+    
 
 class GetProduct(RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+############################ CART HNADLING ######################
+        
+class CartProductsView(ListAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = Cart_Products.objects.select_related('products','cart').all()
+    serializer_class = Cart_ProductsSerializer
+
+    def get_queryset(self):
+        client = Client.objects.get(id=1)
+        return Cart_Products.objects.filter(cart__customer=client)
+    
+
+class CartView(ListAPIView):
+    queryset = Cart.objects.select_related('customer').prefetch_related('items').all()
+    serializer_class = CartSerializer
 
 
-class LogoutAPIView(GenericAPIView):
-    serializer_class = UserLogoutSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+class Quantity_Handler(APIView):
+    def post(self,request,pk,pk2):
+        item = Cart_Products.objects.get(id=pk)
+        if pk2 == 'add':
+            item.add_item()
+            serializer = Cart_ProductsSerializer(item,many=False)
+            return Response(serializer.data)
+        else:
+            item.sub_item()
+            if item.quantity == 1:
+                item.delete()
+            serializer = Cart_ProductsSerializer(item,many=False)
+        return Response(serializer.data)
+            
+
+
+class Add_to_Cart(APIView):
+    def post(self,request,pk,pk2):
+        client = Client.objects.get(id=pk2)
+        item = Product.objects.get(id=pk)
+        cart, created = Cart.objects.get_or_create(customer=client.id)
+        cart_products, created = Cart_Products.objects.get_or_create(products=item, cart=cart)
+        if not created:
+            Cart_Products.objects.filter(products=item, cart=cart).\
+                                    update(quantity=F('quantity') + 1)
+
+            return Response("added to cart")
+        serializer = Cart_ProductsSerializer(cart_products)
+        return Response("تمت اضافة المنتج الى السلة")
+
+##################### END CART ######################
+
+##################### ORDER HANDLING ####################
+class ListCreateOrder(ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+
+class CreateOrder(APIView):
+    def post(self,request):
+        i = request.data
+        serializer = OrderSerializer(data=i)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response("bad")
+    
+
+class CreateOrderView(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        user = request.user
+        client = Client.objects.get(phomnenumber=user.phonenumber)
+        cart = Cart.objects.get(customer=client)
+        cart_products = Cart_Products.objects.filter(cart=cart)
+        products_name = []
+        quantity = 0
+        for cart_product in cart_products:
+            quantity +=cart_product.quantity
+            products_name.append(cart_product.products.name)
+            cart_product.delete()
+        print(products_name)
+        print(quantity)
+
+        order_serializer = OrderSerializer(data= {
+            'clinet':client.id,
+            'products':products_name,
+            'total':quantity,
+            'delivery_date':request.data['date']
+        })
+        if order_serializer.is_valid():
+            order_serializer.save()
+
+            return Response(order_serializer.data)
+        return Response(order_serializer.errors)
+        
+
+class ListOrdersUserView(GenericAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated,]
+
+    def get(self, request):
+        user = request.user
+        client = Client.objects.get(phomnenumber=user.phonenumber)
+        orders = client.order_set.all()
+        serializer = self.get_serializer(orders, many=True)
+        response = serializer.data
+
+        return Response(response)
 
 
+
+
+################---------- -----------############
 
 class ListCreateEmployee(ListCreateAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
+
 class RetUpdDesEmployee(RetrieveUpdateDestroyAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
-class ListCreateClient(ListCreateAPIView):
+
+class RetUpdDesClient(RetrieveAPIView):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
-
-
-class RetrieveClient(RetrieveAPIView):
-    queryset = Client.objects.all()
-    serializer_class = ClientSerializer
-
-
-class UserLoginApiView(GenericAPIView):
-    permission_classes = (permissions.AllowAny,)
-    serializer_class = UserLoginSerilizer
-
-    def post(self, request, *args, **kwargs):
-
-        serializer = self.get_serializer(data = request.data)
-        serializer.is_valid(raise_exception=True)
-        user = CustomUser.objects.get(phonenumber = request.data['phonenumber'])
-        token = RefreshToken.for_user(user)
-        data = serializer.data
-        data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
-        return Response(data, status=status.HTTP_200_OK)
 
 
 
@@ -163,20 +258,6 @@ class ResetPasswordView(GenericAPIView):
 
 
 
-class CartProducts(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Cart_Products.objects.all()
-    serializer_class = Cart_ProductsSerializer
-
-    def get_queryset(self):
-        client = Client.objects.get(id=1)
-        return Cart_Products.objects.filter(cart__customer=client)
-    
-
-
-class CartView(ListAPIView):
-    queryset = Cart.objects.all()
-    serializer_class = CartSerializer
 
 
 
@@ -202,20 +283,6 @@ class GetPhonenumberView(APIView):
         
 
 
-
-class ListCreateOrder(ListCreateAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-
-
-class CreateOrder(APIView):
-    def post(self,request):
-        i = request.data
-        serializer = OrderSerializer(data=i)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response("bad")
 
 
 
@@ -269,7 +336,7 @@ class GetSupplier(RetrieveUpdateDestroyAPIView):
 
 
 
-
+###############----------- HR -------############
 
 class ListCreatEmployeeView(ListCreateAPIView):
     queryset = Employee.objects.all()
@@ -327,56 +394,10 @@ class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
     queryset = Extra_Expense.objects.all()
     serializer_class = ExpenseSerializer
 
-
 class RetUpdDelDebt(RetrieveUpdateDestroyAPIView):
     queryset = Debt.objects.all()
     serializer_class = DebtSerializer
 
-
-
-
-class CreateOrderView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        user = request.user
-        client = Client.objects.get(phomnenumber=user.phonenumber)
-        cart = Cart.objects.get(customer=client)
-        cart_products = Cart_Products.objects.filter(cart=cart)
-        products_name = []
-        quantity = 0
-        for cart_product in cart_products:
-            quantity +=cart_product.quantity
-            products_name.append(cart_product.products.name)
-            cart_product.delete()
-        print(products_name)
-        print(quantity)
-
-        order_serializer = OrderSerializer(data= {
-            'clinet':client.id,
-            'products':products_name,
-            'total':quantity,
-            'delivery_date':request.data['date']
-        })
-        if order_serializer.is_valid():
-            order_serializer.save()
-
-            return Response(order_serializer.data)
-        return Response(order_serializer.errors)
-        
-
-class ListOrdersUserView(GenericAPIView):
-    serializer_class = OrderSerializer
-    permission_classes = [permissions.IsAuthenticated,]
-
-    def get(self, request):
-        user = request.user
-        client = Client.objects.get(phomnenumber=user.phonenumber)
-        orders = client.order_set.all()
-        serializer = self.get_serializer(orders, many=True)
-        response = serializer.data
-
-        return Response(response)
 
 
 
@@ -414,9 +435,3 @@ class ListManualRecieptProductsView(ListAPIView):
     serializer_class = ManualRecieptProductsSerializer
 
 
-
-class SearchView(ListAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = ProductFilterName
