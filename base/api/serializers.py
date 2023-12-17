@@ -161,7 +161,7 @@ class CodeSerializer(serializers.ModelSerializer):
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
-        fields = ['name','company_name','address','phone_number','info']
+        fields = ['id','name','company_name','address','phone_number','info']
     
     def to_representation(self, instance):
         repr = super().to_representation(instance)
