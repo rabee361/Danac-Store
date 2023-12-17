@@ -107,7 +107,7 @@ class ListCreateCategory(ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-class GetProduct(RetrieveAPIView):
+class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
