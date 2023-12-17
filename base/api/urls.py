@@ -24,8 +24,9 @@ urlpatterns = [
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), ##### post/get
     path('get-supplier/<str:pk>' , GetSupplier.as_view() , name="get-supplier"),##### post/get
-    path('orders/' , ListCreateOrder.as_view() ,name="orders"),####
-    path('create/' , CreateOrder.as_view() ),
+    path('orders/' , ListOrders.as_view() ,name="orders"),#####
+    path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),
+    # path('create/' , CreateOrder.as_view() ),
     path('incomings/' , ListIncomings.as_view() , name="incomings"),
     path('create-incoming/' , CreateIncomingView.as_view()),
     path('incoming_product/' , CreateIncomingProducts.as_view() , name=""),

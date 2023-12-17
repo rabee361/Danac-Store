@@ -260,29 +260,19 @@ class UserLoginSerilizer(serializers.ModelSerializer):
         return data
     
 
+class OrderProductsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order_Product
+        fields = ['product','order','quantity','total_price']
+
+
 class OrderSerializer(serializers.ModelSerializer):
-    products = serializers.ListField(child=serializers.CharField(), write_only=True)
-    products_data = ProductSerializer(source='products', many=True, read_only=True)
+    client = ClientSerializer()
+    products = OrderProductsSerializer(source='order_product_set', many=True)
 
     class Meta:
         model = Order
-        fields = '__all__'
-
-    def create(self, validated_data):
-        product_names = validated_data.pop('products', [])
-        order = Order.objects.create(**validated_data)
-
-        for product_name in product_names:
-            try:
-                product = Product.objects.get(name=product_name)
-                order.products.add(product)
-            except Product.DoesNotExist:
-                raise serializers.ValidationError({'error': f'Product with name {product_name} does not exist'})
-
-        order.save()
-        return order
-    
-
+        fields = ['id', 'client', 'products', 'total', 'products_num', 'created', 'delivery_date', 'delivered']
 
 
 

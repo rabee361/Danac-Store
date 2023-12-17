@@ -161,63 +161,26 @@ class Add_to_Cart(APIView):
 ##################### END CART ######################
 
 ##################### ORDER HANDLING ####################
-class ListCreateOrder(ListCreateAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
 
-
-class CreateOrder(APIView):
-    def post(self,request):
-        i = request.data
-        serializer = OrderSerializer(data=i)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response("bad")
-    
 
 class CreateOrderView(APIView):
-    # permission_classes = [permissions.IsAuthenticated]
+    def post(self, request, cart_id):
+        delivery_date = request.data.get('delivery_date')
+        if not delivery_date:
+            return Response({"error": "Delivery date is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request):
-        user = request.user
-        client = Client.objects.get(phomnenumber=user.phonenumber)
-        cart = Cart.objects.get(customer=client)
-        cart_products = Cart_Products.objects.filter(cart=cart)
-        products_name = []
-        quantity = 0
-        for cart_product in cart_products:
-            quantity +=cart_product.quantity
-            products_name.append(cart_product.products.name)
-            cart_product.delete()
-        print(products_name)
-        print(quantity)
+        cart = get_object_or_404(Cart, id=cart_id)
+        order = cart.create_order(delivery_date)
+        order.save()
 
-        order_serializer = OrderSerializer(data= {
-            'clinet':client.id,
-            'products':products_name,
-            'total':quantity,
-            'delivery_date':request.data['date']
-        })
-        if order_serializer.is_valid():
-            order_serializer.save()
+        order_serializer = OrderSerializer(order)
+        return Response(order_serializer.data, status=status.HTTP_201_CREATED)
+     
 
-            return Response(order_serializer.data)
-        return Response(order_serializer.errors)
-        
-
-class ListOrdersUserView(GenericAPIView):
+class ListOrders(ListAPIView):
+    queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [permissions.IsAuthenticated,]
-
-    def get(self, request):
-        user = request.user
-        client = Client.objects.get(phomnenumber=user.phonenumber)
-        orders = client.order_set.all()
-        serializer = self.get_serializer(orders, many=True)
-        response = serializer.data
-
-        return Response(response)
+    # permission_classes = [permissions.IsAuthenticated,]
 
 
 

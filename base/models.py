@@ -79,10 +79,11 @@ class Product(models.Model):
     quantity = models.IntegerField()
     purchasing_price = models.FloatField()
     category = models.ForeignKey(Category , on_delete=models.CASCADE)
-    info = models.TextField(max_length=1000)
-    limit = models.IntegerField()
+    notes = models.TextField(max_length=1000)
+    limit_less = models.IntegerField()
+    limit_more = models.IntegerField()
     num_per_item = models.IntegerField()
-    item_per_carton = models.IntegerField
+    item_per_carton = models.IntegerField()
     sale_price = models.IntegerField(default=50)
     added = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200,default=' ')
@@ -96,27 +97,39 @@ class Product(models.Model):
     
 ############################### CART HANDLING ###################################
 
-class Cart(models.Model):
-    customer = models.ForeignKey(Client , on_delete=models.CASCADE)
-    items = models.ManyToManyField(Product ,through='Cart_Products')
 
-    @property
-    def get_items_num(self):
-        return self.items.count()
 
-    def total_cart_price(self):
-        total = 0
-        for item in self.cart_products_set.all():
-            total += item.total_price_of_item()
-        return total
+
+
+class Order(models.Model):
+    client = models.ForeignKey(Client,on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product,through='Order_Product')
+    total = models.IntegerField()
+    products_num = models.IntegerField(default=0)
+    created = models.DateField(auto_now_add=True)
+    delivery_date = models.DateField()
+    delivered = models.BooleanField(null=True,default=False)
+
 
     def __str__(self):
-        return f'{self.customer} cart'
-    
+        return f'{self.client} : {self.id}'
+
+
+
+class Order_Product(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+
+    def __str__(self):
+        return f'{self.order.client} - {self.product.name} - {self.quantity}'
+
+
 
 class Cart_Products(models.Model):
     products = models.ForeignKey(Product, on_delete=models.CASCADE)
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
     quantity = models.IntegerField(default=0)
 
     class Meta:
@@ -139,16 +152,46 @@ class Cart_Products(models.Model):
 
 
 
-class Order(models.Model):
-    client = models.ForeignKey(Client,on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product)
-    total = models.IntegerField() 
-    created = models.DateField(auto_now_add=True)
-    delivery_date = models.DateField()
-    delivered = models.BooleanField(default=False)
+
+
+class Cart(models.Model):
+    customer = models.ForeignKey(Client , on_delete=models.CASCADE)
+    items = models.ManyToManyField(Product ,through='Cart_Products')
+
+    @property
+    def get_items_num(self):
+        return self.items.count()
+
+    def total_cart_price(self):
+        total = 0
+        for item in self.cart_products_set.all():
+            total += item.total_price_of_item()
+        return total
+    
+    def create_order(self,date):
+        order = Order.objects.create(client=self.customer,total=0,delivery_date=date)
+        for item in self.cart_products_set.all():
+                Order_Product.objects.create(
+                product=item.products,
+                order=order,
+                quantity=item.quantity,
+                total_price=item.total_price_of_item()
+            )
+                order.total += item.total_price_of_item()
+                order.products_num += item.quantity
+                order.save()
+
+        self.items.clear()
+        return order
 
     def __str__(self):
-        return f'{self.client} : {self.id}'
+        return f'{self.customer} cart'
+    
+
+    
+
+
+
 
 
 
