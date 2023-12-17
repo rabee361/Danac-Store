@@ -194,18 +194,17 @@ class ProductSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
- 
-
-class Cart_ProductsSerializer(serializers.ModelSerializer):
-    products = ProductSerializer()
-    class Meta:
-        model = Cart_Products
-        fields = fields = ['products', 'quantity']
-
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = '__all__'
+ 
+
+class Cart_ProductsSerializer(serializers.ModelSerializer):
+    # products = ProductSerializer()
+    class Meta:
+        model = Cart_Products
+        fields = fields = '__all__'
 
 
 class SupplierSerializer(serializers.ModelSerializer):
@@ -414,40 +413,29 @@ class ExpenseSerializer(serializers.ModelSerializer):
 class ManualRecieptSerializer(serializers.ModelSerializer):
     # products = serializers.ListField(child=serializers.CharField(), write_only=True)
     # products_name = ProductSerializer(source='products', many=True, read_only=True)
-    # employee = serializers.CharField()
-    # client = serializers.CharField()
+    employee = serializers.CharField()
+    client = serializers.CharField()
 
     class Meta:
         model = ManualReciept
         fields = '__all__'
 
-    # def create(self, validated_data):
-    #     plapla = validated_data.pop('products')
-    #     emplyee_name= validated_data.pop('employee')
-    #     employee = Employee.objects.filter(name=emplyee_name).first()
-    #     client_name = validated_data.pop('client')
-    #     client = Client.objects.filter(name=client_name).first()
-    #     manual_reciept = ManualReciept.objects.create(
-    #         employee=employee,
-    #         client = client,
-    #         **validated_data
-    #     )
-    #     print(type(plapla))
-    #     for p in plapla:
-    #         print(p['name'])
-    #         product = Product.objects.filter(name="darko").first()
-    #         manualreciept_products = ManualReciept_Products.objects.create(
-    #             product = product,
-    #             manual_reciept=manual_reciept,
-    #             quantity = p['quantity'],
-    #             discount = p['discount']
-    #         )
-    #         manualreciept_products.save()
-    #     manual_reciept.save()
-
-    #     return manual_reciept
+    def create(self, validated_data):
+        emplyee_name= validated_data.pop('employee')
+        employee = Employee.objects.filter(name=emplyee_name).first()
+        client_name = validated_data.pop('client')
+        client = Client.objects.filter(name=client_name).first()
+        manual_reciept = ManualReciept.objects.create(
+            employee=employee,
+            client = client,
+            **validated_data
+        )
+        manual_reciept.save()
+        return manual_reciept
     
 class ManualRecieptProductsSerializer(serializers.ModelSerializer):
+    # products_name = ProductSerializer(source='products', many=True, read_only=True)
+    # manual_name = ManualRecieptSerializer(read_only=True)
     class Meta :
         model = ManualReciept_Products
         fields = '__all__'

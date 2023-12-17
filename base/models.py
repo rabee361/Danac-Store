@@ -127,9 +127,6 @@ class Cart(models.Model):
     customer = models.ForeignKey(Client, on_delete=models.CASCADE)
     items = models.ManyToManyField(Product, through='Cart_Products')
 
-    @property
-    def get_items_num(self):
-        return self.items.count()
     
     def __str__(self):
         return f'{self.customer} cart'
@@ -143,15 +140,15 @@ class Cart_Products(models.Model):
     class Meta:
         ordering = ['-products__added']
 
-    @property
-    def add_item(self):
-        self.quantity += self.quantity  
-        self.save()
+    # @property
+    # def add_item(self):
+    #     self.quantity += self.quantity  
+    #     self.save()
 
-    @property
-    def sub_item(self):
-        self.quantity -= self.quantity
-        self.save()
+    # @property
+    # def sub_item(self):
+    #     self.quantity -= self.quantity
+    #     self.save()
 
     def __str__(self):
         return self.cart.customer.name

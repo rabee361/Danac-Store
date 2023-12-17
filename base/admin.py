@@ -21,12 +21,11 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     def print_user(self, request, queryset):
         queryset.update(is_active=True)
         user = queryset.get(is_active=True)
-        cline = Client.objects.create(
+        client = Client.objects.create(
             name=user.username,
             address = user.address,
             phomnenumber = user.phonenumber
         )
-
         code_verivecation = random.randint(1000,9999)
         serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
@@ -34,7 +33,8 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
             })
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        print(code_verivecation)
+        cart = Cart.objects.create(customer=client)
+        cart.save()
 
     fieldsets = (
         (None, 
@@ -72,6 +72,7 @@ admin.site.register(Product)
 admin.site.register(Category)
 admin.site.register(Order)
 admin.site.register(Cart)
+admin.site.register(Cart_Products)
 admin.site.register(Notifications)
 admin.site.register(Supplier)
 admin.site.register(Point)

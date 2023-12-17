@@ -211,9 +211,39 @@ class ListOrdersUserView(GenericAPIView):
 
         return Response(response)
 
-class ListCreateOrderView(ListCreateAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+# class ListCreateOrderView(ListCreateAPIView):
+#     queryset = Order.objects.all()
+#     serializer_class = OrderSerializer
+
+class CreateOrderView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        client = Client.objects.get(phomnenumber=user.phonenumber)
+        cart = Cart.objects.get(customer=client)
+        cart_products = Cart_Products.objects.filter(cart=cart)
+        products_name = []
+        quantity = 0
+        for cart_product in cart_products:
+            quantity +=cart_product.quantity
+            products_name.append(cart_product.products.name)
+            cart_product.delete()
+        print(products_name)
+        print(quantity)
+
+        order_serializer = OrderSerializer(data= {
+            'clinet':client.id,
+            'products':products_name,
+            'total':quantity,
+            'delivery_date':request.data['date']
+        })
+        if order_serializer.is_valid():
+            order_serializer.save()
+
+            return Response(order_serializer.data)
+        return Response(order_serializer.errors)
+        
 
 class ListCreatEmployeeView(ListCreateAPIView):
     queryset = Employee.objects.all()
@@ -298,21 +328,68 @@ class SearchView(ListAPIView):
 #             serializer.save()
 #             return Response(serializer.data)
 #         return Response(serializer.errors)
-class ListCreateManualRecieptView(ListCreateAPIView):
-    # queryset  = ManualReciept.objects.all()
-    # serializer_class = ManualRecieptSerializer
+class ListCreateManualRecieptView(APIView):
+
     def post(self, request):
-        manualreciept = request.data
-        serializer = ManualRecieptSerializer(data=manualreciept)
-        print
-        if serializer.is_valid():
-            manual_reciept = serializer.save()
-            manual_products = manualreciept.data['products']
+        manual_reciept = request.data
+        manual_reciept_serializer = ManualRecieptSerializer(data=manual_reciept)
+        if manual_reciept_serializer.is_valid():
+            manuals_reciept = manual_reciept_serializer.save()
+            manual_products = request.data['products']
             for manual_product in manual_products:
-                manual_product['manualreciept'] = manual_reciept.id
+                manual_product['manualreciept'] = manuals_reciept.id
                 manualrecieptser = ManualRecieptProductsSerializer(data=manual_product)
                 if manualrecieptser.is_valid():
                     manualrecieptser.save()
-                    return Response(serializer.data)
-                return Response(manualrecieptser.errors)
-            return Response(serializer.errors)
+                else:
+
+                    return Response(manual_reciept_serializer.errors)
+            return Response(manual_reciept_serializer.data)
+        return Response(manual_reciept_serializer.errors)
+    
+    def get(self, request):
+        manualreciepts = ManualReciept.objects.all()
+        serializer = ManualRecieptSerializer(manualreciepts, many=True)
+        data = serializer.data
+
+        return Response(data)
+    
+
+class ListManualRecieptProductsView(ListAPIView):
+    queryset = ManualReciept_Products.objects.all()
+    serializer_class = ManualRecieptProductsSerializer
+
+
+# Add Or Get Products From Cart
+class ListCreateCartProduct(APIView):
+    permission_classes=[permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        client = Client.objects.filter(phomnenumber=user.phonenumber).first()
+        cart = Cart.objects.filter(customer=client).first()
+        product = Product.objects.get(name=request.data['name'])
+        serializer = Cart_ProductsSerializer(data = {
+            'products':product.id,
+            'cart':cart.id,
+            'quantity':request.data['quantity']
+        })
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+
+    def get(self, request):
+        user = request.user
+        client = Client.objects.get(phomnenumber = user.phonenumber)
+        cart = Cart.objects.get(customer=client)
+        print(type(cart.items.all()))
+        cart_serializer = CartSerializer(cart)
+        return Response(cart_serializer.data)
+    
+# Update Or Delete Products Form Cart
+class DesUpdCartProducts(RetrieveUpdateDestroyAPIView):
+    queryset = Cart_Products.objects.all()
+    serializer_class = Cart_ProductsSerializer
+    permission_classes = [permissions.IsAuthenticated]

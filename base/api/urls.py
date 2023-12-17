@@ -21,7 +21,7 @@ urlpatterns = [
     path('get-product/<str:pk>/', GetUdpDesProductView.as_view()),
     path('suppliers/', ListCreateSupplierView.as_view(), name='suppliers'),
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),
-    path('orders/', ListCreateOrderView().as_view(), name='orders'),
+    path('create-order/', CreateOrderView.as_view(), name='create-order'),
     path('points/', ListPointsView.as_view(), name='points'),
     path('orders/user/', ListOrdersUserView.as_view(), name='orders-user'),
     path('employees/', ListCreatEmployeeView.as_view(), name='employee'),
@@ -42,6 +42,10 @@ urlpatterns = [
     # path('incomings/', ListCreateIncomingView.as_view(), name='incoming'),
     # path('incoming-products/<int:id>/', CreateIncomingProductsView.as_view(), name='incoming-produc')
     path('manual-reciepts/', ListCreateManualRecieptView.as_view(), name='manual-reciepts'),
+    path('one/', ListManualRecieptProductsView.as_view()),
+    path('add-product-to-cart/', ListCreateCartProduct.as_view(), name='add-pro-to-cart'),
+    path('list-product-cart/<str:pk>/', DesUpdCartProducts.as_view(), name='list-product-cart'),
+
 
     # path('product/category/', UserListView.as_view()),
 ]
