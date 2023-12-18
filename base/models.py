@@ -389,7 +389,7 @@ class Salary(models.Model):
     
 
 
-#---------- Register Department -------#
+################################### Register Department #######################################################
 
 class Registry(models.Model):
     total = models.FloatField()
@@ -411,7 +411,7 @@ class PaymentMethod(models.Model):
 
 class WithDraw(models.Model):
     details_withdraw = models.CharField(max_length=50)
-    client = models.CharField(max_length= 30)
+    client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
     verify_code = models.IntegerField()
     date = models.DateField(auto_now_add=True)
@@ -419,18 +419,36 @@ class WithDraw(models.Model):
     def __str__(self):
         return self.name_user
     
+    @classmethod
+    def get_total_expenses(cls):
+        return cls.objects.count()
+    
+    @classmethod
+    def get_total_amount(cls):
+        return cls.objects.aggregate(Sum('total'))['amount__sum'] or 0
 
 
 
 class Deposite(models.Model):
     detail_deposite = models.CharField(max_length=50)
-    client = models.CharField(max_length=100)
+    client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
     verify_code = models.IntegerField()
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.client.name
+    
+    @classmethod
+    def get_total_expenses(cls):
+        return cls.objects.count()
+    
+    @classmethod
+    def get_total_amount(cls):
+        return cls.objects.aggregate(Sum('total'))['amount__sum'] or 0
+
+    
+
 
 
 
@@ -439,15 +457,23 @@ class Debt_Client(models.Model):
         ('نقدا','نقدا'),
         ('بنك','بنك')
     )
-    client_name = models.CharField(max_length=50)
+    # client_name = models.ForeignKey(Client,on_delete=models.CASCADE)
+    client_name = models.CharField(max_length=100)
     amount = models.FloatField()
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     receipt_num = models.IntegerField()
     date = models.DateField(auto_now_add=True)
 
-
     def __str__(self):
         return self.client_name
+
+    @classmethod
+    def get_total_expenses(cls):
+        return cls.objects.count()
+    
+    @classmethod
+    def get_total_amount(cls):
+        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 class Debt_Supplier(models.Model):
@@ -455,7 +481,7 @@ class Debt_Supplier(models.Model):
         ('نقدا','نقدا'),
         ('بنك','بنك')
     )
-    supplier_name = models.CharField(max_length=100)
+    supplier_name = models.ForeignKey(Supplier,on_delete=models.CASCADE)
     amount = models.FloatField()
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=50)
@@ -464,6 +490,15 @@ class Debt_Supplier(models.Model):
 
     def __str__(self):
         return self.supplier_name.name
+    
+    @classmethod
+    def get_total_expenses(cls):
+        return cls.objects.count()
+    
+    @classmethod
+    def get_total_amount(cls):
+        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+
 
 
 

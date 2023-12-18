@@ -49,7 +49,9 @@ urlpatterns = [
     path('get-client-debt/<str:pk>' , RetUpdDesClientDebt.as_view() , name="client-debt"),########
     path('get-supplier-debt/<str:pk>' , RetUpdDesSupplierDebt.as_view() , name="supplier-debt"),########
     path('get-registry/' , GetRegistry.as_view() , name="registry"),########## new
-    # path()
-    # path('salaries/' , ListCreateSalary.as_view() , name="salaries"),
+    path('deposites/' , ListCreateDeposite.as_view() , name="deposites"),
+    path('get-deposite/<str:pk>/' , RetUpdDesDeposite.as_view() , name="get-deposite"),
+    path('withdraws/' , ListCreateWithDraw.as_view() , name="withdraws"),
+    path('get-withdraw/<str:pk>/' , RetUpdDesWithDraw.as_view() , name="get-withdraw"),    # path('salaries/' , ListCreateSalary.as_view() , name="salaries"),
     # path('get-salary/<str:pk>/' , RetUpdDesSalary.as_view() , name="get-salary")
 ]

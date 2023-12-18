@@ -418,7 +418,7 @@ class DiscountSerializer(serializers.ModelSerializer):
 
 
 
-class ExpenseSerializer(serializers.ModelSerializer):
+class ExtraExpenseSerializer(serializers.ModelSerializer):
     employee = serializers.CharField()
     class Meta:
         model = Extra_Expense
@@ -505,13 +505,136 @@ class RegistrySerialzier(serializers.ModelSerializer):
 
 
 class Client_DebtSerializer(serializers.ModelSerializer):
+    total_expenses = serializers.SerializerMethodField()
+    total_amount = serializers.SerializerMethodField()
+    client_name = serializers.CharField()
     class Meta :
         model = Debt_Client
         fields = '__all__'
 
+    def create(self, validated_data):
+        client_ = validated_data.pop('client')
+        client = Client.objects.get(name=client_)
+        debt = Debt_Client.objects.create(client=client, **validated_data)
+        return debt
+
+    def update(self, instance, validated_data):
+        client_ = validated_data.pop('client', None)
+        if client_ is not None:
+            client = Client.objects.get(name=client_)
+            instance.client = client
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+    def get_total_expenses(self, obj):
+        return Debt_Client.get_total_expenses()
+
+    def get_total_amount(self, obj):
+        return Debt_Client.get_total_amount()
+
+
+
 
 class Supplier_DebtSerializer(serializers.ModelSerializer):
+    total_expenses = serializers.SerializerMethodField()
+    total_amount = serializers.SerializerMethodField()
+    supplier_name = serializers.CharField()
     class Meta :
         model = Debt_Supplier
         fields = '__all__'
+
+    def create(self, validated_data):
+        supplier_ = validated_data.pop('client')
+        supplier = Client.objects.get(name=supplier_)
+        debt = Debt_Supplier.objects.create(supplier_name=supplier, **validated_data)
+        return debt
+
+    def update(self, instance, validated_data):
+        supplier_ = validated_data.pop('client', None)
+        if supplier_ is not None:
+            supplier = Supplier.objects.get(name=supplier_)
+            instance.supplier_name = supplier
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+    def get_total_expenses(self, obj):
+        return Debt_Supplier.get_total_expenses()
+
+    def get_total_amount(self, obj):
+        return Debt_Supplier.get_total_amount()
+
+
+
+
+
+
+class DepositeSerializer(serializers.ModelSerializer):
+    total_expenses = serializers.SerializerMethodField()
+    total_amount = serializers.SerializerMethodField()
+    client = serializers.CharField()
+    class Meta:
+        model = Deposite
+        fields = '__all__'
+
+    def create(self, validated_data):
+        client_name = validated_data.pop('client')
+        client = Client.objects.get(name=client_name)
+        deposite = Deposite.objects.create(client=client, **validated_data)
+        return deposite
+
+    def update(self, instance, validated_data):
+        client_name = validated_data.pop('client', None)
+        if client_name is not None:
+            client = Client.objects.get(name=client_name)
+            instance.client = client
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+    
+    def get_total_expenses(self, obj):
+        return Deposite.get_total_expenses()
+
+    def get_total_amount(self, obj):
+        return Deposite.get_total_amount()
+
+
+
+
+class WithDrawSerializer(serializers.ModelSerializer):
+    total_expenses = serializers.SerializerMethodField()
+    total_amount = serializers.SerializerMethodField()
+    client = serializers.CharField()
+    class Meta:
+        model = WithDraw
+        fields = '__all__'
+
+    def create(self, validated_data):
+        client_name = validated_data.pop('client')
+        client = Client.objects.get(name=client_name)
+        withdraw = WithDraw.objects.create(client=client, **validated_data)
+        return withdraw
+    
+    def update(self, instance, validated_data):
+        client_name = validated_data.pop('client', None)
+        if client_name is not None:
+            client = Client.objects.get(name=client_name)
+            instance.client = client
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+    def get_total_expenses(self, obj):
+        return WithDraw.get_total_expenses()
+
+    def get_total_amount(self, obj):
+        return WithDraw.get_total_amount()
+
+
+
 

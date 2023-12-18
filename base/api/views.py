@@ -351,11 +351,11 @@ class RetUpdDesAdvanceView(RetrieveUpdateDestroyAPIView):
 
 class ListCreateExtraExpense(ListCreateAPIView):
     queryset = Extra_Expense.objects.all()
-    serializer_class = ExpenseSerializer
+    serializer_class = ExtraExpenseSerializer
 
 class RetUpdDesExtraExpense(RetrieveUpdateDestroyAPIView):
     queryset = Extra_Expense.objects.all()
-    serializer_class = ExpenseSerializer
+    serializer_class = ExtraExpenseSerializer
 
 
 class ListCreateManualRecieptView(APIView):
@@ -414,6 +414,21 @@ class RetUpdDesClientDebt(RetrieveUpdateDestroyAPIView):
     queryset = Debt_Client.objects.all()
     serializer_class = Client_DebtSerializer
 
+class ListCreateDeposite(ListCreateAPIView):
+    queryset = Deposite.objects.all()
+    serializer_class = DepositeSerializer
+
+class RetUpdDesDeposite(RetrieveUpdateDestroyAPIView):
+    queryset = Deposite.objects.all()
+    serializer_class = DepositeSerializer
+
+class ListCreateWithDraw(ListCreateAPIView):
+    queryset = WithDraw.objects.all()
+    serializer_class = WithDrawSerializer
+
+class RetUpdDesWithDraw(RetrieveUpdateDestroyAPIView):
+    queryset = WithDraw.objects.all()
+    serializer_class = WithDrawSerializer
 
 
 # class Medium_Handler(APIView):
