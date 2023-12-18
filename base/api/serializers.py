@@ -419,9 +419,26 @@ class DiscountSerializer(serializers.ModelSerializer):
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
+    employee = serializers.CharField()
     class Meta:
         model = Extra_Expense
         fields = '__all__'
+    
+    def create(self, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        extra_expense = Extra_Expense.objects.create(employee=employee, **validated_data)
+        return extra_expense
+    
+    def update(self, instance, validated_data):
+        employee_name = validated_data.pop('employee')
+        employee = Employee.objects.get(name=employee_name)
+        instance.employee = validated_data.get('employee', employee)
+        instance.reason = validated_data.get('reason', instance.reason)
+        instance.amount = validated_data.get('amount', instance.amount)
+        instance.barcode = validated_data.get('barcode', instance.barcode)
+        instance.save()
+        return instance
 
 
     
@@ -480,6 +497,11 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+class RegistrySerialzier(serializers.ModelSerializer):
+    class Meta :
+        model = Registry
+        fields = ['total']
 
 
 class Client_DebtSerializer(serializers.ModelSerializer):

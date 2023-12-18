@@ -349,18 +349,16 @@ class RetUpdDesAdvanceView(RetrieveUpdateDestroyAPIView):
     queryset = Advance_On_salary.objects.all()
     serializer_class = Advance_on_SalarySerializer
 
-class ListCreateExpense(ListCreateAPIView):
+class ListCreateExtraExpense(ListCreateAPIView):
     queryset = Extra_Expense.objects.all()
     serializer_class = ExpenseSerializer
 
-class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
+class RetUpdDesExtraExpense(RetrieveUpdateDestroyAPIView):
     queryset = Extra_Expense.objects.all()
     serializer_class = ExpenseSerializer
-
 
 
 class ListCreateManualRecieptView(APIView):
-
     def post(self, request):
         manual_reciept = request.data
         manual_reciept_serializer = ManualRecieptSerializer(data=manual_reciept)
@@ -393,6 +391,10 @@ class ListManualRecieptProductsView(ListAPIView):
 
 
 
+class GetRegistry(ListAPIView):
+    serializer_class = RegistrySerialzier
+    def get_queryset(self):
+        return Registry.objects.all().first()
 
 class ListCreateClientDebts(ListCreateAPIView):
     queryset = Debt_Client.objects.all()
@@ -413,3 +415,84 @@ class RetUpdDesClientDebt(RetrieveUpdateDestroyAPIView):
     serializer_class = Client_DebtSerializer
 
 
+
+# class Medium_Handler(APIView):
+#     def post(self,request,pk,pk2):
+#         item = Medium.objects.get(id=pk)
+#         if pk2 == 'add':
+#             item.add_item()
+#             serializer = MediumSerializer(item,many=False)
+#             return Response(serializer.data)
+#         else:
+#             item.sub_item()
+#             if item.quantity == 1:
+#                 item.delete()
+#             serializer = MediumSerializer(item,many=False)
+#         return Response(serializer.data)
+
+
+# class CreateMediumView(APIView):
+#     def post(self, request, order_id):
+#         order = Order.objects.get(id=order_id)
+#         order_produdts = Order_Product.objects.filter(order=order)
+#         for product in order_produdts:
+#             medium = Medium.objects.create(products=product.products, quantity=product.quantity, total=product.total_price)
+#         # mediums = Medium.objects.all()
+#         # medium_serizlizer = MediumSerializer(mediums, many=True)
+#         return Response(status=status.HTTP_200_OK)
+
+
+# class ListMediumView(ListAPIView):
+#     queryset = Medium.objects.all()
+#     serializer_class = MediumSerializer
+#     # permission_classes = [permissions.IsAuthenticated]
+    
+# class GetMediumView(RetrieveAPIView):
+#     queryset = Medium.objects.all()
+#     serializer_class = MediumSerializer
+#     # permission_classes = [permissions.IsAuthenticated]
+
+# class CreateReceiptOrdersView(APIView):
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def post(self, request, **kwargs):
+#         # manual_reciept = request.data
+#         client_id = request.data['client']
+#         client = Client.objects.filter(id=client_id).first()
+#         employee = Employee.objects.get(phonenumber=request.user.phonenumber)
+#         output_serializer = OutputsSerializer(data={
+#             'employee':employee.id,
+#             "client": client.id,
+#             "verify_code": request.data['verify_code'],
+#             "recive_pyement": request.data['recive_pyement'],
+#             "phonenumber":request.data['phonenumber'], 
+#             "discount":request.data['discount'],
+#             "Reclaimed_products": request.data['Reclaimed_products'],
+#             "previous_depts": request.data['previous_depts'],
+#             'remaining_amount':request.data['remaining_amount'],
+            
+#         })
+#         if output_serializer.is_valid():
+#             output = output_serializer.save()
+#             products = Medium.objects.all()
+#             for product in products:
+#                 output_product = Outputs_Products.objects.create(
+#                     products = product.products,
+#                     output = output,
+#                     quantity = product.quantity,
+#                     discount = product.discount,
+#                     total = product.total
+#                 )
+#                 product.delete()
+#             return Response(output_serializer.data)
+#         return Response(output_serializer.errors)
+
+
+
+# class ListReceiptOutput(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
+
+    # def get(self, request, output_id):
+    #     products = Outputs_Products.objects.all()
+    #     output_serializer = ProductsOutputsSerializer(products, many=True)
+    #     return Response(output_serializer.data)

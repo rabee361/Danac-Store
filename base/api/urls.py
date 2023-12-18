@@ -25,29 +25,31 @@ urlpatterns = [
     path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"),
     path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
-    path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), ##### post/get
-    path('get-supplier/<str:pk>' , GetSupplier.as_view() , name="get-supplier"),##### post/get
+    path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), #######
+    path('get-supplier/<str:pk>' , GetSupplier.as_view() , name="get-supplier"),######
     path('orders/' , ListOrders.as_view() ,name="orders"),#####
     # path('create/' , CreateOrder.as_view() ),
-    path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),####get/post
-    path('get-bonus/<str:pk>/', RetUpdDesBonusView.as_view(), name='get-bonus'),####get/post/delete
-    path('discounts/', ListCreateDicountView.as_view(), name='discount'),####get/post
-    path('get-discount/<str:pk>/', RetUpdDesDicountView.as_view(), name='get-discount'),####get/post/delete
-    path('overtimes/', ListCreatOverTimeView.as_view(), name='overtimes'),### post/get
-    path('get-overtime/<str:pk>/', RetUpdDesOverTimeView.as_view(), name='get_overtime'), #####get/post/delete
+    path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),#######
+    path('get-bonus/<str:pk>/', RetUpdDesBonusView.as_view(), name='get-bonus'),######
+    path('discounts/', ListCreateDicountView.as_view(), name='discount'),######
+    path('get-discount/<str:pk>/', RetUpdDesDicountView.as_view(), name='get-discount'),####
+    path('overtimes/', ListCreatOverTimeView.as_view(), name='overtimes'),#######
+    path('get-overtime/<str:pk>/', RetUpdDesOverTimeView.as_view(), name='get_overtime'), #####
     path('absences/', ListCreateAbsenceView.as_view(), name='absence'),####get/post
-    path('get-absence/<str:pk>/', RetUpdDesAbsenceAPIView.as_view(), name='get-absence'),####get
+    path('get-absence/<str:pk>/', RetUpdDesAbsenceAPIView.as_view(), name='get-absence'),####
     path('advances/', ListCreateAdvanceView.as_view(), name='advances'),####
-    path('get-advance/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),####
-    path('expenses/', ListCreateExpense.as_view(), name='expenses'),
-    path('get-expense/<str:pk>/', RetUpdDesExpense.as_view(), name='get-expense'),
+    path('get-advance/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),#### new
+    path('extra-expenses/', ListCreateExtraExpense.as_view(), name='expenses'),###### new
+    path('get-extra-expense/<str:pk>/', RetUpdDesExtraExpense.as_view(), name='get-expense'),#####
     path('incomings/' , ListIncomings.as_view() , name="incomings"),
     path('create-incoming/' , CreateIncomingView.as_view()),
     path('incoming_product/' , CreateIncomingProducts.as_view() , name=""),
-    path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),
-    path('client-debts/' , ListCreateClientDebts.as_view() , name=""),
-    path('get-client-debt/<str:pk>' , RetUpdDesClientDebt.as_view() , name=""),
-    path('get-supplier-debt/<str:pk>' , RetUpdDesSupplierDebt.as_view() , name="")
+    path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),########
+    path('client-debts/' , ListCreateClientDebts.as_view() , name=""),###########
+    path('get-client-debt/<str:pk>' , RetUpdDesClientDebt.as_view() , name="client-debt"),########
+    path('get-supplier-debt/<str:pk>' , RetUpdDesSupplierDebt.as_view() , name="supplier-debt"),########
+    path('get-registry/' , GetRegistry.as_view() , name="registry"),########## new
+    # path()
     # path('salaries/' , ListCreateSalary.as_view() , name="salaries"),
     # path('get-salary/<str:pk>/' , RetUpdDesSalary.as_view() , name="get-salary")
 ]

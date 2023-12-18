@@ -4,6 +4,7 @@ from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Sum
 
 
 class CustomUser(AbstractUser):
@@ -191,23 +192,40 @@ class Cart(models.Model):
     
 
 class Medium(models.Model):
-    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product,through='Medium_Products')
     discount = models.FloatField(default=0.0)
     quantity = models.IntegerField(null = True)
     total = models.FloatField(default=0)
 
-    def __str__(self) -> str:
-        return self.products.name
-    
+    @property
+    def get_items_num(self):
+        return self.items.count()
+
+    def total_cart_price(self):
+        total = 0
+        for item in self.cart_products_set.all():
+            total += item.total_price_of_item()
+        return total
+
+
+
+class Medium_Products(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    medium = models.ForeignKey(Medium,on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
+
     def add_item(self):
         self.quantity = self.quantity + 1
-        self.total += self.products.sale_price
         self.save()
 
     def sub_item(self):
         self.quantity = self.quantity - 1
-        self.total -= self.products.sale_price
         self.save()
+
+    def total_price_of_item(self):
+        return (self.quantity * self.products.sale_price)
+
 
 
 class Notifications(models.Model):
@@ -353,16 +371,12 @@ class Advance_On_salary(models.Model):
     
 
 
-
-
-
-
 class Extra_Expense(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     reason = models.TextField(max_length=100)
     amount = models.FloatField()
     barcode = models.CharField(max_length=200,default=" ")
-    # date = models.DateField(auto_now_add=True,default=timezone.now)
+    date = models.DateField(auto_now_add=True)
 
 
 class Salary(models.Model):
@@ -377,11 +391,11 @@ class Salary(models.Model):
 
 #---------- Register Department -------#
 
-class Registry():
+class Registry(models.Model):
     total = models.FloatField()
 
     def __str__(self):
-        return self.total
+        return f'{self.total}'
     
 
 
@@ -404,7 +418,7 @@ class WithDraw(models.Model):
 
     def __str__(self):
         return self.name_user
-
+    
 
 
 
@@ -462,8 +476,14 @@ class Expense(models.Model):
 
     def __str__(self):
         return self.expense_name
+    
+    @classmethod
+    def get_total_expenses(cls):
+        return cls.objects.count()
 
-
+    @classmethod
+    def get_total_amount(cls):
+        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 class ManualReciept(models.Model):
