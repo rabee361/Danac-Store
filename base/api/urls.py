@@ -46,8 +46,8 @@ urlpatterns = [
     path('incoming_product/' , CreateIncomingProducts.as_view() , name=""),
     path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),
     path('client-debts/' , ListCreateClientDebts.as_view() , name=""),
-    path('get-client-debt/' , RetUpdDesClientDebt.as_view() , name=""),
-    path('get-supplier-debt/' , RetUpdDesSupplierDebt.as_view() , name="")
+    path('get-client-debt/<str:pk>' , RetUpdDesClientDebt.as_view() , name=""),
+    path('get-supplier-debt/<str:pk>' , RetUpdDesSupplierDebt.as_view() , name="")
     # path('salaries/' , ListCreateSalary.as_view() , name="salaries"),
     # path('get-salary/<str:pk>/' , RetUpdDesSalary.as_view() , name="get-salary")
 ]
