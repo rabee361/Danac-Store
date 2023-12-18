@@ -513,13 +513,13 @@ class Client_DebtSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        client_ = validated_data.pop('client')
+        client_ = validated_data.pop('client_name')
         client = Client.objects.get(name=client_)
-        debt = Debt_Client.objects.create(client=client, **validated_data)
+        debt = Debt_Client.objects.create(client_name=client, **validated_data)
         return debt
 
     def update(self, instance, validated_data):
-        client_ = validated_data.pop('client', None)
+        client_ = validated_data.pop('client_name', None)
         if client_ is not None:
             client = Client.objects.get(name=client_)
             instance.client = client
@@ -546,7 +546,7 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        supplier_ = validated_data.pop('client')
+        supplier_ = validated_data.pop('supplier_name')
         supplier = Client.objects.get(name=supplier_)
         debt = Debt_Supplier.objects.create(supplier_name=supplier, **validated_data)
         return debt
@@ -582,7 +582,7 @@ class DepositeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         client_name = validated_data.pop('client')
-        client = Client.objects.get(name=client_name)
+        client = Client.objects.get(client=client_name)
         deposite = Deposite.objects.create(client=client, **validated_data)
         return deposite
 
