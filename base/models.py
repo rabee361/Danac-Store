@@ -190,10 +190,24 @@ class Cart(models.Model):
 
     
 
+class Medium(models.Model):
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    discount = models.FloatField(default=0.0)
+    quantity = models.IntegerField(null = True)
+    total = models.FloatField(default=0)
 
+    def __str__(self) -> str:
+        return self.products.name
+    
+    def add_item(self):
+        self.quantity = self.quantity + 1
+        self.total += self.products.sale_price
+        self.save()
 
-
-
+    def sub_item(self):
+        self.quantity = self.quantity - 1
+        self.total -= self.products.sale_price
+        self.save()
 
 
 class Notifications(models.Model):
@@ -339,11 +353,16 @@ class Advance_On_salary(models.Model):
     
 
 
+
+
+
+
 class Extra_Expense(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     reason = models.TextField(max_length=100)
     amount = models.FloatField()
     barcode = models.CharField(max_length=200,default=" ")
+    # date = models.DateField(auto_now_add=True,default=timezone.now)
 
 
 class Salary(models.Model):
@@ -376,19 +395,73 @@ class PaymentMethod(models.Model):
 
 
 
+class WithDraw(models.Model):
+    details_withdraw = models.CharField(max_length=50)
+    client = models.CharField(max_length= 30)
+    total = models.FloatField()
+    verify_code = models.IntegerField()
+    date = models.DateField(auto_now_add=True)
 
-class Debt(models.Model):
+    def __str__(self):
+        return self.name_user
+
+
+
+
+class Deposite(models.Model):
+    detail_deposite = models.CharField(max_length=50)
+    client = models.CharField(max_length=100)
+    total = models.FloatField()
+    verify_code = models.IntegerField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.client.name
+
+
+
+class Debt_Client(models.Model):
     CHOICES = (
-        ('مورد','مورد'),
-        ('عميل','عميل')
+        ('نقدا','نقدا'),
+        ('بنك','بنك')
     )
-    amount_paid = models.IntegerField()
-    claim_name = models.CharField(max_length=50)
-    operation = models.CharField(max_length=20,choices=CHOICES)
+    client_name = models.CharField(max_length=50)
+    amount = models.FloatField()
+    payment_method = models.CharField(max_length=30,choices=CHOICES)
+    receipt_num = models.IntegerField()
     date = models.DateField(auto_now_add=True)
 
 
-# class Expense(models.Model):
+    def __str__(self):
+        return self.client_name
+
+
+class Debt_Supplier(models.Model):
+    CHOICES = (
+        ('نقدا','نقدا'),
+        ('بنك','بنك')
+    )
+    supplier_name = models.CharField(max_length=100)
+    amount = models.FloatField()
+    payment_method = models.CharField(max_length=30,choices=CHOICES)
+    bank_name = models.CharField(max_length=50)
+    check_num = models.IntegerField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.supplier_name.name
+
+
+
+class Expense(models.Model):
+    expense_name = models.CharField(max_length=100)
+    details = models.TextField(max_length=100)
+    name =  models.CharField(max_length=50)
+    amount = models.IntegerField()
+    receipt_num = models.IntegerField()
+
+    def __str__(self):
+        return self.expense_name
 
 
 

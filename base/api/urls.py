@@ -13,7 +13,7 @@ urlpatterns = [
     path('test/' , test.as_view()),#####
     path('user/' , CurrentUserView.as_view()),######
     path('clients/' , ListCreateClient.as_view() , name="clients"),######post/get
-    path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),
+    path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),########
     path('products/' , listCreateProducts.as_view() , name="products"),######
     path('categories/' , ListCreateCategory.as_view() , name="categories"),##### post/get
     path('get-product/<str:pk>' , RetUpdDesProduct.as_view() , name="product"),##### post/get
@@ -21,15 +21,14 @@ urlpatterns = [
     path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'),#### get/post/delete  
     path('user_items/' , CartProductsView.as_view() , name="user_products"),
     path('cart/' , CartView.as_view()),
+    path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),
+    path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"),
+    path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), ##### post/get
     path('get-supplier/<str:pk>' , GetSupplier.as_view() , name="get-supplier"),##### post/get
     path('orders/' , ListOrders.as_view() ,name="orders"),#####
-    path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),
     # path('create/' , CreateOrder.as_view() ),
-    path('incomings/' , ListIncomings.as_view() , name="incomings"),
-    path('create-incoming/' , CreateIncomingView.as_view()),
-    path('incoming_product/' , CreateIncomingProducts.as_view() , name=""),
     path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),####get/post
     path('get-bonus/<str:pk>/', RetUpdDesBonusView.as_view(), name='get-bonus'),####get/post/delete
     path('discounts/', ListCreateDicountView.as_view(), name='discount'),####get/post
@@ -40,10 +39,15 @@ urlpatterns = [
     path('get-absence/<str:pk>/', RetUpdDesAbsenceAPIView.as_view(), name='get-absence'),####get
     path('advances/', ListCreateAdvanceView.as_view(), name='advances'),####
     path('get-advance/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),####
-    path('expenses/', ListCreateExpense.as_view(), name='expendes'),
+    path('expenses/', ListCreateExpense.as_view(), name='expenses'),
     path('get-expense/<str:pk>/', RetUpdDesExpense.as_view(), name='get-expense'),
-    path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"),
-    path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart")
+    path('incomings/' , ListIncomings.as_view() , name="incomings"),
+    path('create-incoming/' , CreateIncomingView.as_view()),
+    path('incoming_product/' , CreateIncomingProducts.as_view() , name=""),
+    path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),
+    path('client-debts/' , ListCreateClientDebts.as_view() , name=""),
+    path('get-client-debt/' , RetUpdDesClientDebt.as_view() , name=""),
+    path('get-supplier-debt/' , RetUpdDesSupplierDebt.as_view() , name="")
     # path('salaries/' , ListCreateSalary.as_view() , name="salaries"),
     # path('get-salary/<str:pk>/' , RetUpdDesSalary.as_view() , name="get-salary")
 ]

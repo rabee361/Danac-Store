@@ -439,12 +439,6 @@ class Product2Serializer(serializers.ModelSerializer):
 
 
 
-class DebtSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Debt
-        fields = '__all__'
-
-
 
 class PaymentMethodSerializer(serializers.ModelSerializer):
     class Meta:
@@ -484,3 +478,18 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
     class Meta :
         model = ManualReciept_Products
         fields = '__all__'
+
+
+
+
+class Client_DebtSerializer(serializers.ModelSerializer):
+    class Meta :
+        model = Debt_Client
+        fields = '__all__'
+
+
+class Supplier_DebtSerializer(serializers.ModelSerializer):
+    class Meta :
+        model = Debt_Supplier
+        fields = '__all__'
+
