@@ -381,58 +381,24 @@ class ExpenseSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-# class IncomingSerializer(serializers.ModelSerializer):
-# #     # products = serializers.ListField(child=serializers.CharField(), write_only=True)
-# #     products_data = ProductSerializer(source='products', many=True, read_only=True)
-# #     employee = serializers.CharField()
-# #     supplier = serializers.CharField()
-
-#     class Meta:
-#         model = Incoming
-#         fields = '__all__'
+class IncomingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Incoming
+        fields = '__all__'
     
-#     def create(self, validated_data):
-#         # product_names = validated_data.pop('products', [])
-#         employee_name = validated_data.pop('employee')
-#         employee = Employee.objects.filter(name=employee_name).first()
-#         supplier_name = validated_data.pop('supplier')
-#         supplier = Supplier.objects.filter(name=supplier_name).first()
-#         # products = Incoming_Products
-#         incoming = Incoming.objects.create(employee= employee, supplier= supplier, **validated_data)
-#         # products = Incoming_Products.objects.filter(incoming=incoming.pk)
-#         incoming.save()
-
-#         return incoming
     
-# class IncomingProductsSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Incoming_Products
-#         fields = '__all__'
+class IncomingProductsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Incoming_Product
+        fields = '__all__'
 
 
 class ManualRecieptSerializer(serializers.ModelSerializer):
-    # products = serializers.ListField(child=serializers.CharField(), write_only=True)
-    # products_name = ProductSerializer(source='products', many=True, read_only=True)
-    # employee = serializers.CharField()
-    # client = serializers.CharField()
 
     class Meta:
         model = ManualReciept
         fields = '__all__'
 
-    # def create(self, validated_data):
-    #     emplyee_id= validated_data.pop('employee')
-    #     employee = Employee.objects.filter(id=emplyee_id).first()
-    #     client_id = validated_data.pop('client')
-    #     client = Client.objects.get(pk=client_id)
-    #     print(type(client.id))
-    #     manual_reciept = ManualReciept.objects.create(
-    #         employee=employee,
-    #         client = client,
-    #         **validated_data
-    #     )
-    #     manual_reciept.save()
-    #     return manual_reciept
     
 class ManualRecieptProductsSerializer(serializers.ModelSerializer):
     # products_name = ProductSerializer(source='products', many=True, read_only=True)
@@ -442,10 +408,10 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MediumSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Medium
-        fields = '__all__'
+# class MediumSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Medium
+#         fields = '__all__'
 
 class OutputsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -454,8 +420,19 @@ class OutputsSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
 class ProductsOutputsSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Outputs_Products
         fields = '__all__'
 
+
+# --------------------------------------CREATE MEDIUM--------------------------------------
+class MediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        models = Medium
+        fields = '__all__'
+
+class ProductsMediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Products_Medium
+        fields = '__all__'

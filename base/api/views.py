@@ -215,7 +215,7 @@ class ListOrdersUserView(GenericAPIView):
 #     queryset = Order.objects.all()
 #     serializer_class = OrderSerializer
 
-class   CreateOrderView(APIView):
+class CreateOrderView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
@@ -224,9 +224,8 @@ class   CreateOrderView(APIView):
         cart = Cart.objects.get(customer=client)
         cart_products = Cart_Products.objects.filter(cart=cart)
         order = Order.objects.create(clinet=client, delivery_date=request.data['delivery_date'])
-        # quantity = 0
         total = 0.0
-        for products_cart in cart_products:        
+        for products_cart in cart_products:     
             order_Products = Order_Product.objects.create(
                 products= products_cart.products,
                 order = order,
@@ -238,9 +237,6 @@ class   CreateOrderView(APIView):
             order.total += products_cart.products.sale_price * products_cart.quantity
             order.save()
             products_cart.delete()
-        # order.total = total
-        # order.products_num = quantity
-        # order.update()
         order_serializer = OrderSerializer(order)
         return Response(order_serializer.data)
 
@@ -309,65 +305,56 @@ class SearchView(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilterName
 
-# class ListCreateIncomingView(ListCreateAPIView):
-#     queryset = Incoming.objects.all()
-#     serializer_class = IncomingSerializer
 
-# class CreateIncomingProductsView(APIView):
+class CreateMediumIncoming(APIView):
+    def post(self, request, medium_id, product_id):
+        prodcut = Product.objects.get(id=product_id)
+        medium = Medium.objects.get(id=medium_id)
+        medium_products = Products_Medium.objects.create(product=prodcut,
+                                                         medium=medium,
+                                                         num_item=request.data['num_item'],
+                                                         )
+        medium_products.total_price = float(medium_products.num_item) * prodcut.sale_price
+        medium_products.save()
+        pro_med_serializer = ProductsMediumSerializer(medium_products)
+        return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
 
-#     def post(self, request, id):
-#         incoming = Incoming.objects.get_or_create(id=id)
-#         print(incoming)
-#         product_name = request.data['product']
-#         product = Product.objects.get(name=product_name)
-#         serializer = IncomingProductsSerializer(data={
-#             'incoming':incoming.id,
-#             'product':product.id,
-#             'quantity':request.data['quantity']
-#         })
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors)
-# class ListCreateManualRecieptView(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
+class CreateIncomingView(APIView):
 
-#     def post(self, request, **kwargs):
-#         # manual_reciept = request.data
-#         client_id = request.data['client']
-#         client = Client.objects.filter(id=client_id).first()
-#         employee = Employee.objects.get(phonenumber=request.user.phonenumber)
-#         manual_reciept_serializer = ManualRecieptSerializer(data={
-#             'employee':employee.id,
-#             "client": client.id,
-#             "verify_code": request.data['verify_code'],
-#             "phonenumber": request.data['phonenumber'],
-#             "recive_pyement": request.data['recive_pyement'],
-#             "Reclaimed_products": request.data['Reclaimed_products'],
-#             "previous_debts": request.data['previous_debts'],
-#             'remaining_amount':request.data['remaining_amount'],
-#             "products": request.data['products'],
-#         })
-#         if manual_reciept_serializer.is_valid():
-#             manuals_reciept = manual_reciept_serializer.save()
-#             manual_products = request.data['products']
-#             for manual_product in manual_products:
-#                 manual_product['manualreciept'] = manuals_reciept.id
-#                 manualrecieptser = ManualRecieptProductsSerializer(data=manual_product)
-#                 if manualrecieptser.is_valid():
-#                     manualrecieptser.save()
-#                 else:
-
-#                     return Response(manual_reciept_serializer.errors)
-#             return Response(manual_reciept_serializer.data)
-#         return Response(manual_reciept_serializer.errors)
-    
-    def get(self, request):
-        manualreciepts = ManualReciept.objects.all()
-        serializer = ManualRecieptSerializer(manualreciepts, many=True)
-        data = serializer.data
-
-        return Response(data)
+    def post(self, request, medium_id):
+        user = request.user
+        supplier = Supplier.objects.get(id=request.data['supplier'])
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        incoming_serializer = IncomingSerializer(data={
+            "employee":employee.id,
+            "supplier": supplier.id,
+            "agent":request.data['agent'],
+            "num_truck":request.data['num_truck'],
+            "code_verefy": request.data['code_verefy'],
+            "recive_pyement": request.data['recive_pyement'],
+            "phonenumber":request.data['phonenumber'], 
+            "discount":request.data['discount'],
+            "Reclaimed_products": request.data['Reclaimed_products'],
+            "previous_depts": request.data['previous_depts'],
+            "remaining_amount":request.data['remaining_amount'],
+        })
+        if incoming_serializer.is_valid():
+            incoming = incoming_serializer.save()
+            
+            for product in Products_Medium.objects.filter(medium__id=medium_id):
+                print(product.id)
+                update_quantity =Product.objects.get(id=product.product.id)
+                update_quantity.quantity += product.num_item
+                update_quantity.save()
+                income_product = Incoming_Product.objects.create(
+                    product = product.product,
+                    incoming = incoming,
+                    num_item = product.num_item,
+                    total_price = product.total_price,
+                )
+                product.delete()
+            return Response(incoming_serializer.data)
+        return Response(incoming_serializer.errors)
     
 
 class ListManualRecieptProductsView(ListAPIView):
@@ -410,46 +397,38 @@ class DesUpdCartProducts(RetrieveUpdateDestroyAPIView):
     serializer_class = Cart_ProductsSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+class ListReceiptOutput(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, output_id):
+        products = Outputs_Products.objects.all()
+        output_serializer = ProductsOutputsSerializer(products, many=True)
+        return Response(output_serializer.data)
+
+# --------------------------------------CREATE MEDIUM--------------------------------------
+class CreateMedium(APIView):
+    def post(self, request):
+        medium = Medium.objects.create()
+        return Response(status=status.HTTP_200_OK)
 
 class CreateMediumView(APIView):
     def post(self, request, order_id):
         order = Order.objects.get(id=order_id)
+        medium = Medium.objects.create()
         order_produdts = Order_Product.objects.filter(order=order)
         for product in order_produdts:
-            medium = Medium.objects.create(products=product.products, quantity=product.quantity, total=product.total_price)
-        # mediums = Medium.objects.all()
-        # medium_serizlizer = MediumSerializer(mediums, many=True)
+            medium_products = Products_Medium.objects.create(
+                product = product.products,
+                medium = medium,
+                num_item=product.quantity,
+                total_price=product.total_price
+            )
         return Response(status=status.HTTP_200_OK)
-    
-class ListMediumView(ListAPIView):
-    queryset = Medium.objects.all()
-    serializer_class = MediumSerializer
-    # permission_classes = [permissions.IsAuthenticated]
-    
-class GetMediumView(RetrieveAPIView):
-    queryset = Medium.objects.all()
-    serializer_class = MediumSerializer
-    # permission_classes = [permissions.IsAuthenticated]
-
-class Medium_Handler(APIView):
-    def post(self,request,pk,pk2):
-        item = Medium.objects.get(id=pk)
-        if pk2 == 'add':
-            item.add_item()
-            serializer = MediumSerializer(item,many=False)
-            return Response(serializer.data)
-        else:
-            item.sub_item()
-            if item.quantity == 1:
-                item.delete()
-            serializer = MediumSerializer(item,many=False)
-        return Response(serializer.data)
-
-
-class CreateReceiptOrdersView(APIView):
+        
+class ReceiptOrdersView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, **kwargs):
+    def post(self, request, medium_id):
         # manual_reciept = request.data
         client_id = request.data['client']
         client = Client.objects.filter(id=client_id).first()
@@ -468,24 +447,44 @@ class CreateReceiptOrdersView(APIView):
         })
         if output_serializer.is_valid():
             output = output_serializer.save()
-            products = Medium.objects.all()
+            products = Products_Medium.objects.filter(medium__id=medium_id)
             for product in products:
+                quantity_product = Product.objects.get(id=product.product.id)
+                quantity_product.quantity -= product.num_item
+                quantity_product.save()
                 output_product = Outputs_Products.objects.create(
-                    products = product.products,
+                    products = product.product,
                     output = output,
-                    quantity = product.quantity,
+                    quantity = product.num_item,
                     discount = product.discount,
-                    total = product.total
+                    total = product.total_price
                 )
-                product.delete()
+            products.delete()
             return Response(output_serializer.data)
         return Response(output_serializer.errors)
+    
+class Medium_Handler(APIView):
+    def post(self,request,pk,pk2):
+        item = Products_Medium.objects.get(id=pk)
+        if pk2 == 'add':
+            item.add_item()
+            serializer = ProductsMediumSerializer(item,many=False)
+            return Response(serializer.data)
+        else:
+            item.sub_item()
+            if item.num_item == 1:
+                item.delete()
+            serializer = ProductsMediumSerializer(item,many=False)
+        return Response(serializer.data)
+    
+class GetMediumView(RetrieveAPIView):
+    queryset = Medium.objects.all()
+    serializer_class = MediumSerializer
 
-class ListReceiptOutput(APIView):
-    # permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, output_id):
-        products = Outputs_Products.objects.all()
-        output_serializer = ProductsOutputsSerializer(products, many=True)
-        return Response(output_serializer.data)
-
+class ListMediumView(APIView):
+#     # permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request, medium_id):
+        mediums = Products_Medium.objects.filter(medium__id=medium_id)
+        mediums_serializer = ProductsMediumSerializer(mediums, many=True)
+        return Response(mediums_serializer.data)
