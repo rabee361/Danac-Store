@@ -638,3 +638,61 @@ class WithDrawSerializer(serializers.ModelSerializer):
 
 
 
+
+class OutputsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Outputs
+        fields = '__all__'
+    
+class ProductsOutputsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Outputs_Products
+        fields = '__all__'
+
+
+class MediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medium
+        fields = '__all__'
+
+class ProductsMediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medium_Products
+        fields = '__all__'
+
+
+
+
+
+
+
+
+
+class EmployeeSalarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ['id', 'name', 'salary','sale_percentage']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        related_models = [
+            'overtime_set',
+            'absence_set',
+            'bonus_set',
+            'discount_set',
+            'advance_on_salary_set',
+            'extra_expense_set',
+        ]
+
+        totals = {}
+        for related_model in related_models:
+            related_objects = getattr(instance, related_model).all()
+            total = sum(obj.amount for obj in related_objects)
+            totals[related_model] = total
+            representation[related_model] = total
+
+        salary = instance.salary - totals['advance_on_salary_set'] - totals['extra_expense_set'] - totals['absence_set'] - totals['discount_set'] + totals['overtime_set'] + totals['bonus_set'] + (instance.salary * instance.sale_percentage)
+        representation['salary'] = salary
+
+        return representation

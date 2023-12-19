@@ -282,12 +282,6 @@ class CreateIncomingProducts(ListCreateAPIView):
 
 
 
-
-# class ListClients(ListAPIView)
-# class getClients
-# class createClientView()
-
-
 class ListCreateSupplier(ListCreateAPIView):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
@@ -431,41 +425,97 @@ class RetUpdDesWithDraw(RetrieveUpdateDestroyAPIView):
     serializer_class = WithDrawSerializer
 
 
-# class Medium_Handler(APIView):
-#     def post(self,request,pk,pk2):
-#         item = Medium.objects.get(id=pk)
-#         if pk2 == 'add':
-#             item.add_item()
-#             serializer = MediumSerializer(item,many=False)
-#             return Response(serializer.data)
-#         else:
-#             item.sub_item()
-#             if item.quantity == 1:
-#                 item.delete()
-#             serializer = MediumSerializer(item,many=False)
-#         return Response(serializer.data)
 
 
-# class CreateMediumView(APIView):
-#     def post(self, request, order_id):
-#         order = Order.objects.get(id=order_id)
-#         order_produdts = Order_Product.objects.filter(order=order)
-#         for product in order_produdts:
-#             medium = Medium.objects.create(products=product.products, quantity=product.quantity, total=product.total_price)
-#         # mediums = Medium.objects.all()
-#         # medium_serizlizer = MediumSerializer(mediums, many=True)
-#         return Response(status=status.HTTP_200_OK)
 
 
-# class ListMediumView(ListAPIView):
-#     queryset = Medium.objects.all()
-#     serializer_class = MediumSerializer
-#     # permission_classes = [permissions.IsAuthenticated]
-    
-# class GetMediumView(RetrieveAPIView):
-#     queryset = Medium.objects.all()
-#     serializer_class = MediumSerializer
-#     # permission_classes = [permissions.IsAuthenticated]
+class Medium_Handler(APIView):
+    def post(self,request,pk,pk2):
+        item = Medium_Products.objects.get(id=pk)
+        if pk2 == 'add':
+            item.add_item()
+            serializer = ProductsMediumSerializer(item,many=False)
+            return Response(serializer.data)
+        else:
+            item.sub_item()
+            if item.num_item == 1:
+                item.delete()
+            serializer = ProductsMediumSerializer(item,many=False)
+        return Response(serializer.data)
+
+
+class GetMediumView(RetrieveAPIView):
+    queryset = Medium.objects.all()
+    serializer_class = MediumSerializer
+    # permission_classes = [permissions.IsAuthenticated]
+
+
+class CreateMedium(CreateAPIView):
+    queryset = Medium.objects.all()
+    serializer_class = MediumSerializer
+
+
+class Add_to_Medium(APIView):
+    def post(self,request,pk,pk2):
+        medium = Medium.objects.get(id=pk2)
+        item = Product.objects.get(id=pk)
+        medium_products = Medium_Products.objects.get_or_create(product=item, medium=medium)
+        # serializer = Cart_ProductsSerializer(medium_products)
+        return Response("تمت اضافة المنتج الى الجدول الوسيط")    
+
+
+
+class CreateMediumFromOrderView(APIView):
+    def post(self, request, order_id):
+        medium = Medium.objects.create()
+        order = Order.objects.get(id=order_id)
+        order_products = Order_Product.objects.filter(order=order)
+        for order_product in order_products:
+            medium = Medium_Products.objects.create(medium=medium,product=order_product.product, quantity=order_product.quantity)
+        mediums = Medium.objects.all()    
+        serializer = MediumSerializer(mediums, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+class ReceiptOrdersView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, medium_id):
+        # manual_reciept = request.data
+        client_id = request.data['client']
+        client = Client.objects.filter(id=client_id).first()
+        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
+        output_serializer = OutputsSerializer(data={
+            "employee":employee.id,
+            "client": client.id,
+            "verify_code": request.data['verify_code'],
+            "recive_pyement": request.data['recive_pyement'],
+            "phonenumber":request.data['phonenumber'], 
+            "discount":request.data['discount'],
+            "Reclaimed_products": request.data['Reclaimed_products'],
+            "previous_depts": request.data['previous_depts'],
+            "remaining_amount":request.data['remaining_amount'],
+            
+        })
+        if output_serializer.is_valid():
+            output = output_serializer.save()
+            products = Medium_Products.objects.filter(medium__id=medium_id)
+            for product in products:
+                quantity_product = Product.objects.get(id=product.product.id)
+                quantity_product.quantity -= product.num_item
+                quantity_product.save()
+                output_product = Outputs_Products.objects.create(
+                    products = product.product,
+                    output = output,
+                    quantity = product.num_item,
+                    discount = product.discount,
+                    total = product.total_price
+                )
+            products.delete()
+            return Response(output_serializer.data)
+        return Response(output_serializer.errors)
+
+
 
 # class CreateReceiptOrdersView(APIView):
 #     permission_classes = [permissions.IsAuthenticated]
@@ -511,3 +561,8 @@ class RetUpdDesWithDraw(RetrieveUpdateDestroyAPIView):
     #     products = Outputs_Products.objects.all()
     #     output_serializer = ProductsOutputsSerializer(products, many=True)
     #     return Response(output_serializer.data)
+
+
+class GetSalaryEmployee(ListAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSalarySerializer

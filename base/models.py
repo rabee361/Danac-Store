@@ -191,40 +191,6 @@ class Cart(models.Model):
 
     
 
-class Medium(models.Model):
-    products = models.ManyToManyField(Product,through='Medium_Products')
-    discount = models.FloatField(default=0.0)
-    quantity = models.IntegerField(null = True)
-    total = models.FloatField(default=0)
-
-    @property
-    def get_items_num(self):
-        return self.items.count()
-
-    def total_cart_price(self):
-        total = 0
-        for item in self.cart_products_set.all():
-            total += item.total_price_of_item()
-        return total
-
-
-
-class Medium_Products(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE)
-    medium = models.ForeignKey(Medium,on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-
-
-    def add_item(self):
-        self.quantity = self.quantity + 1
-        self.save()
-
-    def sub_item(self):
-        self.quantity = self.quantity - 1
-        self.save()
-
-    def total_price_of_item(self):
-        return (self.quantity * self.products.sale_price)
 
 
 
@@ -320,7 +286,7 @@ class Point(models.Model):
 
 
 
-#------------HR Department------------#
+######################################## HR Department ##################################################################
     
 class OverTime(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE) #### drop down menu ?
@@ -329,7 +295,7 @@ class OverTime(models.Model):
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return self.employee.id
+        return f'{self.employee.id}'
 
 class Absence(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -550,5 +516,73 @@ class ManualReciept_Products(models.Model):
 
 
 
+
+
+
+class Outputs(models.Model):
+    products = models.ManyToManyField(Product, through='Outputs_Products')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    verify_code = models.IntegerField()
+    phonenumber = models.CharField(max_length=30, default='1212231243')
+    recive_pyement = models.FloatField()
+    discount = models.FloatField()
+    Reclaimed_products = models.FloatField()
+    previous_depts = models.FloatField()
+    remaining_amount = models.FloatField()
+
+    def __str__(self):
+        return str(self.id)
+
+
+class Outputs_Products(models.Model):
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    output = models.ForeignKey(Outputs, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total = models.FloatField(default=0)
+    discount = models.FloatField()
+
+    def __str__(self) -> str:
+        return f'{self.products.name} {self.output.id}'
+
+
+class Medium(models.Model):
+    products = models.ManyToManyField(Product,through='Medium_Products')
+
+    @property
+    def get_items_num(self):
+        return self.items.count()
+
+    def total_cart_price(self):
+        total = 0
+        for item in self.cart_products_set.all():
+            total += item.total_price_of_item()
+        return total
+    
+    def __str__(self):
+        return f'{self.id}'
+
+
+class Medium_Products(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    medium = models.ForeignKey(Medium,on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    discount = models.FloatField(default=0.0)
+
+    def add_item(self):
+        self.quantity += 1
+        self.save()
+
+    def sub_item(self):
+        self.quantity -= 1
+        self.save()
+
+    @property
+    def total_price_of_item(self):
+        return (self.quantity * self.products.sale_price)
+    
+
+    def __str__(self):
+        return f'medium {self.medium} - {self.product}'
 
 

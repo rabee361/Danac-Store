@@ -27,20 +27,20 @@ urlpatterns = [
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), #######
     path('get-supplier/<str:pk>' , GetSupplier.as_view() , name="get-supplier"),######
-    path('orders/' , ListOrders.as_view() ,name="orders"),#####
+    path('orders/' , ListOrders.as_view() ,name="orders"),#######
     # path('create/' , CreateOrder.as_view() ),
     path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),#######
     path('get-bonus/<str:pk>/', RetUpdDesBonusView.as_view(), name='get-bonus'),######
     path('discounts/', ListCreateDicountView.as_view(), name='discount'),######
-    path('get-discount/<str:pk>/', RetUpdDesDicountView.as_view(), name='get-discount'),####
+    path('get-discount/<str:pk>/', RetUpdDesDicountView.as_view(), name='get-discount'),######
     path('overtimes/', ListCreatOverTimeView.as_view(), name='overtimes'),#######
-    path('get-overtime/<str:pk>/', RetUpdDesOverTimeView.as_view(), name='get_overtime'), #####
-    path('absences/', ListCreateAbsenceView.as_view(), name='absence'),####get/post
-    path('get-absence/<str:pk>/', RetUpdDesAbsenceAPIView.as_view(), name='get-absence'),####
-    path('advances/', ListCreateAdvanceView.as_view(), name='advances'),####
-    path('get-advance/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),#### new
+    path('get-overtime/<str:pk>/', RetUpdDesOverTimeView.as_view(), name='get_overtime'), #######
+    path('absences/', ListCreateAbsenceView.as_view(), name='absence'),######
+    path('get-absence/<str:pk>/', RetUpdDesAbsenceAPIView.as_view(), name='get-absence'),#######
+    path('advances/', ListCreateAdvanceView.as_view(), name='advances'),#######
+    path('get-advance/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),######
     path('extra-expenses/', ListCreateExtraExpense.as_view(), name='expenses'),###### new
-    path('get-extra-expense/<str:pk>/', RetUpdDesExtraExpense.as_view(), name='get-expense'),#####
+    path('get-extra-expense/<str:pk>/', RetUpdDesExtraExpense.as_view(), name='get-expense'),##### new
     path('incomings/' , ListIncomings.as_view() , name="incomings"),
     path('create-incoming/' , CreateIncomingView.as_view()),
     path('incoming_product/' , CreateIncomingProducts.as_view() , name=""),
@@ -49,9 +49,21 @@ urlpatterns = [
     path('get-client-debt/<str:pk>' , RetUpdDesClientDebt.as_view() , name="client-debt"),########
     path('get-supplier-debt/<str:pk>' , RetUpdDesSupplierDebt.as_view() , name="supplier-debt"),########
     path('get-registry/' , GetRegistry.as_view() , name="registry"),########## new
-    path('deposites/' , ListCreateDeposite.as_view() , name="deposites"),
-    path('get-deposite/<str:pk>/' , RetUpdDesDeposite.as_view() , name="get-deposite"),
-    path('withdraws/' , ListCreateWithDraw.as_view() , name="withdraws"),
-    path('get-withdraw/<str:pk>/' , RetUpdDesWithDraw.as_view() , name="get-withdraw"),    # path('salaries/' , ListCreateSalary.as_view() , name="salaries"),
+    path('deposites/' , ListCreateDeposite.as_view() , name="deposites"),######## new
+    path('get-deposite/<str:pk>/' , RetUpdDesDeposite.as_view() , name="get-deposite"),######## new
+    path('withdraws/' , ListCreateWithDraw.as_view() , name="withdraws"),######## new
+    path('get-withdraw/<str:pk>/' , RetUpdDesWithDraw.as_view() , name="get-withdraw"), ####### new   
+    # path('salaries/' , ListCreateSalary.as_view() , name="salaries"),
     # path('get-salary/<str:pk>/' , RetUpdDesSalary.as_view() , name="get-salary")
-]
+
+
+    path('create-medium/', CreateMedium.as_view()),
+    path('add-order-to-medium/<str:order_id>/', CreateMediumFromOrderView.as_view()),
+    path('create-output-medium/<int:medium_id>/', ReceiptOrdersView.as_view()),
+    path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()), 
+    path('list-medium-products/<str:medium_id>/', GetMediumView.as_view()),
+
+
+    path('employee_salary/<int:employee_id>/', GetSalaryEmployee.as_view()),
+    
+    ]
