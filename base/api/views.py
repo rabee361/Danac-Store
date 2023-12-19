@@ -566,3 +566,5 @@ class ReceiptOrdersView(APIView):
 class GetSalaryEmployee(ListAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSalarySerializer
+
+    

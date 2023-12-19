@@ -44,7 +44,7 @@ urlpatterns = [
     path('incomings/' , ListIncomings.as_view() , name="incomings"),
     path('create-incoming/' , CreateIncomingView.as_view()),
     path('incoming_product/' , CreateIncomingProducts.as_view() , name=""),
-    path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),########
+    path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),########  
     path('client-debts/' , ListCreateClientDebts.as_view() , name=""),###########
     path('get-client-debt/<str:pk>' , RetUpdDesClientDebt.as_view() , name="client-debt"),########
     path('get-supplier-debt/<str:pk>' , RetUpdDesSupplierDebt.as_view() , name="supplier-debt"),########
