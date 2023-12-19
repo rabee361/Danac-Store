@@ -64,6 +64,7 @@ urlpatterns = [
     path('list-medium-products/<str:medium_id>/', GetMediumView.as_view()),
 
 
-    path('employee_salary/<int:employee_id>/', GetSalaryEmployee.as_view()),
+    path('employee_salary/<int:employee_id>/', GetSalaryEmployee.as_view()),########## new
+    path('salaries/' , ListCreateSalary.as_view() , name="create-salary")######## new
     
     ]

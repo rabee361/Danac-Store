@@ -568,3 +568,6 @@ class GetSalaryEmployee(ListAPIView):
     serializer_class = EmployeeSalarySerializer
 
     
+class ListCreateSalary(ListCreateAPIView):
+    queryset = Salary.objects.all()
+    serializer_class = SalarySerializer

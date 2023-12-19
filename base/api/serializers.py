@@ -441,13 +441,6 @@ class ExtraExpenseSerializer(serializers.ModelSerializer):
         return instance
 
 
-    
-class SalarySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Salary
-        fields = '__all__'
-
-
 
 class Product2Serializer(serializers.ModelSerializer):
     class Meta:
@@ -671,7 +664,7 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
 class EmployeeSalarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['id', 'name', 'salary','sale_percentage']
+        fields = ['id','job_position','name', 'salary','sale_percentage']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -692,7 +685,36 @@ class EmployeeSalarySerializer(serializers.ModelSerializer):
             totals[related_model] = total
             representation[related_model] = total
 
-        salary = instance.salary - totals['advance_on_salary_set'] - totals['extra_expense_set'] - totals['absence_set'] - totals['discount_set'] + totals['overtime_set'] + totals['bonus_set'] + (instance.salary * instance.sale_percentage)
-        representation['salary'] = salary
-
+        total = instance.salary - totals['advance_on_salary_set'] - totals['extra_expense_set'] - totals['absence_set'] - totals['discount_set'] + totals['overtime_set'] + totals['bonus_set'] + (instance.salary * instance.sale_percentage)
+        representation['total'] = total
         return representation
+
+
+
+
+class SalarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Salary
+        fields = '__all__'
+
+
+
+
+
+# class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ReturnedGoodsClient
+#         fields = '__all__'
+
+
+# class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ReturnedGoodsSupplier
+#         fields = '__all__'
+
+# # ------------------------------------------DAMAGED PRODUCTS------------------------------------------
+
+# class DamagedProductSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = DamagedProduct
+#         fields  ='__all__'

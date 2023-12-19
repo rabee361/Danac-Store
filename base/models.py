@@ -100,7 +100,7 @@ class Product(models.Model):
 
 
 
-
+###############################
 
 class Order(models.Model):
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
@@ -114,7 +114,7 @@ class Order(models.Model):
 
     def __str__(self):
         return f'{self.client} : {self.id}'
-
+#############################################
 
 
 class Order_Product(models.Model):
@@ -348,7 +348,16 @@ class Extra_Expense(models.Model):
 class Salary(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='employee_salaries')
     hr = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='hr_employee_salaries')
+    barcode = models.CharField(max_length=150,default=' ')
+    overtime = models.FloatField(default=0.0)
+    absence = models.FloatField(default=0.0)
+    bonus = models.FloatField(default=0.0)
+    discout = models.FloatField(default=0.0)
+    advances = models.FloatField(default=0.0)
+    extra_expense = models.FloatField(default=0.0)
     total = models.FloatField()
+    date = models.DateTimeField(default=timezone.now)
+
 
     def __str__(self):
         return self.employee.name
