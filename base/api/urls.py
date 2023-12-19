@@ -41,11 +41,17 @@ urlpatterns = [
     path('search/product/', SearchView.as_view(), name='search-product'),
     # path('incomings/', ListCreateIncomingView.as_view(), name='incoming'),
     # path('incoming-products/<int:id>/', CreateIncomingProductsView.as_view(), name='incoming-produc')
-    path('manual-reciepts/', ListCreateManualRecieptView.as_view(), name='manual-reciepts'),
+    # path('manual-reciepts/', ListCreateManualRecieptView.as_view(), name='manual-reciepts'),
     path('one/', ListManualRecieptProductsView.as_view()),
     path('add-product-to-cart/', ListCreateCartProduct.as_view(), name='add-pro-to-cart'),
     path('list-product-cart/<str:pk>/', DesUpdCartProducts.as_view(), name='list-product-cart'),
-
+    path('create-medium/<str:order_id>/', CreateMediumView.as_view(), name='create-medium'),
+    path('get-mediums/', ListMediumView.as_view(), name='list-medium'),
+    path('medium-handler/<str:pk>/<str:pk2>/', Medium_Handler.as_view(), name='get-medium'),
+    path('get-medium/<str:pk>/', GetMediumView.as_view(), name='get-medium'),
+    path('create-receipt-output/', CreateReceiptOrdersView.as_view(), name='create-output'),
+    path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
+    # path('get-outputs/', GetOutputs.as_view(), name='get-outputs'),
 
     # path('product/category/', UserListView.as_view()),
 ]

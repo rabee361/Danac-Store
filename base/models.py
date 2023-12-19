@@ -159,20 +159,24 @@ class Cart_Products(models.Model):
 
 class Order(models.Model):
     clinet = models.ForeignKey(Client, on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product, related_name='productss')
-    total = models.IntegerField()
+    products = models.ManyToManyField(Product, through='Order_Product')
+    total = models.IntegerField(default=0)
+    products_num = models.IntegerField(default=0)
     created = models.DateField(auto_now_add=True)
     delivery_date = models.DateField()
     deliverd = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f'{self.clinet.name}: {self.id}'
-    # number order 
-    # num prodect
-    # full price 
-    # date
-    # 
-    pass
+    
+class Order_Product(models.Model):
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField(default=0)
+
+    def __str__(self) -> str:
+        return f'{self.order.clinet.name} {str(self.order.id)}'
 
 
 
@@ -379,5 +383,48 @@ class DeptsClients(models.Model):
 
 
 
+class Outputs(models.Model):
+    products = models.ManyToManyField(Product, through='Outputs_Products')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    verify_code = models.IntegerField()
+    phonenumber = models.CharField(max_length=30, default='1212231243')
+    recive_pyement = models.FloatField()
+    discount = models.FloatField()
+    Reclaimed_products = models.FloatField()
+    previous_depts = models.FloatField()
+    remaining_amount = models.FloatField()
 
+    def __str__(self):
+        return str(self.id)
+    
+class Outputs_Products(models.Model):
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    output = models.ForeignKey(Outputs, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total = models.FloatField(default=0)
+    discount = models.FloatField()
 
+    def __str__(self) -> str:
+        return f'{self.products.name} {self.output.id}'
+    
+
+class Medium(models.Model):
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    discount = models.FloatField(default=0.0)
+    quantity = models.IntegerField(null = True)
+    total = models.FloatField(default=0)
+
+    def __str__(self) -> str:
+        return self.products.name
+    
+    def add_item(self):
+        self.quantity = self.quantity + 1
+        self.total += self.products.sale_price
+        self.save()
+
+    def sub_item(self):
+        self.quantity = self.quantity - 1
+        self.total -= self.products.sale_price
+        self.save()
+    

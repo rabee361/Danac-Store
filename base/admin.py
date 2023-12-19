@@ -62,6 +62,11 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     # accept_user.short_descreption = 'Accept User For complet registration'
     print_user.short_descreption = 'print_user'
 
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ['id']
+
+class MediumAdmin(admin.ModelAdmin):
+    list_display = ['id']
 
 admin.site.register(CodeVerivecation)
 admin.site.register(CustomUser, AdminCustomUser)
@@ -70,7 +75,7 @@ admin.site.register(SalesEmployee)
 admin.site.register(Driver)
 admin.site.register(Product)
 admin.site.register(Category)
-admin.site.register(Order)
+admin.site.register(Order, OrderAdmin)
 admin.site.register(Cart)
 admin.site.register(Cart_Products)
 admin.site.register(Notifications)
@@ -82,3 +87,7 @@ admin.site.register(Employee)
 admin.site.register(UserType)
 admin.site.register(ManualReciept)
 admin.site.register(ManualReciept_Products)
+admin.site.register(Medium, MediumAdmin)
+admin.site.register(Outputs)
+admin.site.register(Outputs_Products)
+admin.site.register(Order_Product)

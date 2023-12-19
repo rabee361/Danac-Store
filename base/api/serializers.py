@@ -221,26 +221,26 @@ class SupplierSerializer(serializers.ModelSerializer):
     
 
 class OrderSerializer(serializers.ModelSerializer):
-    products = serializers.ListField(child=serializers.CharField(), write_only=True)
-    products_data = ProductSerializer(source='products', many=True, read_only=True)
+    # products = serializers.ListField(child=serializers.CharField(), write_only=True)
+    # products_data = ProductSerializer(source='products', many=True, read_only=True)
 
     class Meta:
         model = Order
         fields = '__all__'
 
-    def create(self, validated_data):
-        product_names = validated_data.pop('products', [])
-        order = Order.objects.create(**validated_data)
+    # def create(self, validated_data):
+    #     product_names = validated_data.pop('products', [])
+    #     order = Order.objects.create(**validated_data)
 
-        for product_name in product_names:
-            try:
-                product = Product.objects.get(name=product_name)
-                order.products.add(product)
-            except Product.DoesNotExist:
-                raise serializers.ValidationError({'error': f'Product with name {product_name} does not exist'})
+    #     for product_id in product_names:
+    #         try:
+    #             product = Product.objects.get(id=product_id)
+    #             order.products.add(product)
+    #         except Product.DoesNotExist:
+    #             raise serializers.ValidationError({'error': f'Product with name {product_id} does not exist'})
 
-        order.save()
-        return order
+    #     order.save()
+    #     return order
     
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -382,10 +382,10 @@ class ExpenseSerializer(serializers.ModelSerializer):
         return instance
 
 # class IncomingSerializer(serializers.ModelSerializer):
-#     # products = serializers.ListField(child=serializers.CharField(), write_only=True)
-#     products_data = ProductSerializer(source='products', many=True, read_only=True)
-#     employee = serializers.CharField()
-#     supplier = serializers.CharField()
+# #     # products = serializers.ListField(child=serializers.CharField(), write_only=True)
+# #     products_data = ProductSerializer(source='products', many=True, read_only=True)
+# #     employee = serializers.CharField()
+# #     supplier = serializers.CharField()
 
 #     class Meta:
 #         model = Incoming
@@ -413,25 +413,26 @@ class ExpenseSerializer(serializers.ModelSerializer):
 class ManualRecieptSerializer(serializers.ModelSerializer):
     # products = serializers.ListField(child=serializers.CharField(), write_only=True)
     # products_name = ProductSerializer(source='products', many=True, read_only=True)
-    employee = serializers.CharField()
-    client = serializers.CharField()
+    # employee = serializers.CharField()
+    # client = serializers.CharField()
 
     class Meta:
         model = ManualReciept
         fields = '__all__'
 
-    def create(self, validated_data):
-        emplyee_name= validated_data.pop('employee')
-        employee = Employee.objects.filter(name=emplyee_name).first()
-        client_name = validated_data.pop('client')
-        client = Client.objects.filter(name=client_name).first()
-        manual_reciept = ManualReciept.objects.create(
-            employee=employee,
-            client = client,
-            **validated_data
-        )
-        manual_reciept.save()
-        return manual_reciept
+    # def create(self, validated_data):
+    #     emplyee_id= validated_data.pop('employee')
+    #     employee = Employee.objects.filter(id=emplyee_id).first()
+    #     client_id = validated_data.pop('client')
+    #     client = Client.objects.get(pk=client_id)
+    #     print(type(client.id))
+    #     manual_reciept = ManualReciept.objects.create(
+    #         employee=employee,
+    #         client = client,
+    #         **validated_data
+    #     )
+    #     manual_reciept.save()
+    #     return manual_reciept
     
 class ManualRecieptProductsSerializer(serializers.ModelSerializer):
     # products_name = ProductSerializer(source='products', many=True, read_only=True)
@@ -439,3 +440,22 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
     class Meta :
         model = ManualReciept_Products
         fields = '__all__'
+
+
+class MediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medium
+        fields = '__all__'
+
+class OutputsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Outputs
+        # fields = ['client', 'employee', 'discount', 'verify_code', 'phonenumber', 'recive_pyement', 'Reclaimed_products', 'previous_depts','remaining_amount']
+        fields = '__all__'
+    
+class ProductsOutputsSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Outputs_Products
+        fields = '__all__'
+
