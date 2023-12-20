@@ -436,3 +436,24 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Products_Medium
         fields = '__all__'
+
+# ------------------------------------------RETURNED GOODS------------------------------------------
+
+class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReturnedGoodsClient
+        fields = '__all__'
+
+
+class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReturnedGoodsSupplier
+        fields = '__all__'
+
+# ------------------------------------------DAMAGED PRODUCTS------------------------------------------
+
+class DamagedProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DamagedProduct
+        fields  ='__all__'
+

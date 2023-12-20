@@ -425,3 +425,39 @@ class Products_Medium(models.Model):
         self.num_item -= 1
         self.total_price -= self.product.sale_price
         self.save()
+
+# ------------------------------------------RETURNED GOODS------------------------------------------
+        
+class ReturnedGoodsSupplier(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+    reason = models.CharField(max_length=50)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'{self.product.name}:{self.reason}'
+    
+class ReturnedGoodsClient(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    client =  models.ForeignKey(Client, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+    reason = models.CharField(max_length=50)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'{self.product.name}:{self.reason}'
+    
+# ------------------------------------------DAMAGED PRODUCTS------------------------------------------
+
+class DamagedProduct(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+
+    def __str__(self) -> str:
+        return self.product.name

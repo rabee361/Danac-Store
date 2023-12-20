@@ -97,3 +97,6 @@ admin.site.register(Incoming)
 # --------------------------------------CREATE MEDIUM--------------------------------------
 admin.site.register(Medium)
 admin.site.register(Products_Medium)
+admin.site.register(DamagedProduct)
+admin.site.register(ReturnedGoodsClient)
+admin.site.register(ReturnedGoodsSupplier)

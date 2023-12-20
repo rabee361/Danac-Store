@@ -401,7 +401,7 @@ class ListReceiptOutput(APIView):
     # permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, output_id):
-        products = Outputs_Products.objects.all()
+        products = Outputs_Products.objects.filter(output__id=output_id)
         output_serializer = ProductsOutputsSerializer(products, many=True)
         return Response(output_serializer.data)
 
@@ -488,3 +488,96 @@ class ListMediumView(APIView):
         mediums = Products_Medium.objects.filter(medium__id=medium_id)
         mediums_serializer = ProductsMediumSerializer(mediums, many=True)
         return Response(mediums_serializer.data)
+
+# ------------------------------------------RETURNED GOODS------------------------------------------
+
+class ListCreateRetGoodsSupplier(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        supplier = Supplier.objects.get(id = request.data['supplier'])
+        product = Product.objects.get(id=request.data['product'])
+        product.quantity -= int(request.data['quantity'])
+        product.save()
+        return_serializer = ReturnedGoodsSupplierSerializer(data={
+            'product':product.id,
+            'employee':employee.id,
+            'supplier':supplier.id,
+            'quantity':request.data['quantity'],
+            'total_price':request.data['total_price'],
+            'reason':request.data['reason']
+        })
+        if return_serializer.is_valid():
+            return_serializer.save()
+            return Response(return_serializer.data, status=status.HTTP_201_CREATED)
+    
+
+    def get(self, request):
+        products = ReturnedGoodsSupplier.objects.all()
+        serializer = ReturnedGoodsSupplierSerializer(products, many=True)
+        return Response(serializer.data)
+
+class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
+    queryset = ReturnedGoodsSupplier.objects.all()
+    serializer_class = ReturnedGoodsSupplierSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class ListCreateRetGoodsClient(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        client = Client.objects.get(id = request.data['client'])
+        product = Product.objects.get(id=request.data['product'])
+        return_serializer = ReturnedGoodsClientSerializer(data={
+            'product':product.id,
+            'employee':employee.id,
+            'client':client.id,
+            'quantity':request.data['quantity'],
+            'total_price':request.data['total_price'],
+            'reason':request.data['reason']
+        })
+        if return_serializer.is_valid():
+            return_serializer.save()
+            return Response(return_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(return_serializer.errors)
+    
+
+    def get(self, request):
+        products = ReturnedGoodsClient.objects.all()
+        serializer = ReturnedGoodsClientSerializer(products, many=True)
+        return Response(serializer.data)
+
+class RetUpdDesReturnGoodClient(RetrieveUpdateDestroyAPIView):
+    queryset = ReturnedGoodsClient.objects.all()
+    serializer_class = ReturnedGoodsClientSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+# ------------------------------------------DAMAGED PRODUCTS------------------------------------------
+
+
+class CreateDamagedProduct(APIView):
+    def post(self, request):
+        product = Product.objects.get(id=request.data['product'])
+        damaged_product = DamagedProduct.objects.create(
+            product=product,
+            total_price = request.data['total_price'],
+            quantity = request.data['quantity']
+        )
+        serializer = DamagedProductSerializer(damaged_product, many=False)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+
+    def get(self, request):
+        products = DamagedProduct.objects.all()
+        serializer = DamagedProductSerializer(products, many=True)
+        return Response(serializer.data)
+    
+class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
+    queryset = DamagedProduct.objects.all()
+    serializer_class = DamagedProductSerializer
+    # permission_classes = [permissions.IsAuthenticated]

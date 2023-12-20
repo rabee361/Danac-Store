@@ -49,9 +49,26 @@ urlpatterns = [
     path('add-product-to-med-inc/<str:medium_id>/<str:product_id>/', CreateMediumIncoming.as_view()),
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),
     # _____________________________________________CREATE MEDIUM________________________________________
+    
     path('create-medium/', CreateMedium.as_view()),
     path('add-order-to-medium/<str:order_id>/', CreateMediumView.as_view()),
     path('create-output-medium/<int:medium_id>/', ReceiptOrdersView.as_view()),
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()), 
     path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),
+    # _____________________________________________RETURNED PRODUCTS________________________________________
+
+    path('create-return-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),
+    path('get-product-return-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
+    path('delete-product-return-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
+    path('put-product-return-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
+    path('create-return-goods-client/', ListCreateRetGoodsClient.as_view()),
+    path('get-product-return-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
+    path('delete-product-return-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
+    path('put-product-return-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
+# ------------------------------------------DAMAGED PRODUCTS------------------------------------------
+
+    path('create-damaged-goods/', CreateDamagedProduct.as_view()),
+    path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
+    path('delete-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
+    path('put-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
 ]
