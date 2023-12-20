@@ -127,7 +127,7 @@ class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
 
 ############################ CART HNADLING ######################
         
-class CartProductsView(ListAPIView):
+class CartProductsView(ListCreateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Cart_Products.objects.select_related('products','cart').all()
     serializer_class = Cart_ProductsSerializer
@@ -137,7 +137,7 @@ class CartProductsView(ListAPIView):
         return Cart_Products.objects.filter(cart__customer=client)
     
 
-class CartView(ListAPIView):
+class CreateCartView(ListCreateAPIView):
     queryset = Cart.objects.select_related('customer').prefetch_related('items').all()
     serializer_class = CartSerializer
 

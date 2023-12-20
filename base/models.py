@@ -23,7 +23,6 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',) 
     
-    # objects = CustomManagers()
 
     def __str__(self):
         return self.username
@@ -462,7 +461,7 @@ class Recieved_Payment(models.Model):
     CHOICES = (
         ('نقدا','نقدا'),
         ('بنك','بنك')
-    )    
+    )
     employee = models.ForeignKey(Employee , on_delete=models.CASCADE)
     name = models.CharField(max_length=50)####### ???
     payment_method = models.CharField(max_length=30,choices=CHOICES)

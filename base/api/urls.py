@@ -14,18 +14,18 @@ urlpatterns = [
     path('test/' , test.as_view()),#####
     path('user/' , CurrentUserView.as_view()),######
 
-    path('clients/' , ListCreateClient.as_view() , name="clients"),######post/get
+    path('clients/' , ListCreateClient.as_view() , name="clients"),######
     path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),########
     path('products/' , listCreateProducts.as_view() , name="products"),######
-    path('get-product/<str:pk>/' , RetUpdDesProduct.as_view() , name="product"),##### new
+    path('get-product/<str:pk>/' , RetUpdDesProduct.as_view() , name="product"),##### 
     path('categories/' , ListCreateCategory.as_view() , name="categories"),##### 
     path('employees/', ListCreateEmployee.as_view(), name='employee'),######
     path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'),####  
-    path('user_items/' , CartProductsView.as_view() , name="user_products"),
-    path('cart/' , CartView.as_view()),
-    path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),
-    path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"),
-    path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),
+    path('user_items/' , CartProductsView.as_view() , name="user_products"),#### new
+    path('cart/' , CreateCartView.as_view()),##### new
+    path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),#### new
+    path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"), #### new
+    path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),##### new
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), #######
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),######
@@ -48,8 +48,8 @@ urlpatterns = [
     path('get-advance/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),######
     path('extra-expenses/', ListCreateExtraExpense.as_view(), name='expenses'),######
     path('get-extra-expense/<str:pk>/', RetUpdDesExtraExpense.as_view(), name='get-expense'),#####
-    path('employee_salary/<int:employee_id>/', GetSalaryEmployee.as_view()),########## new
-    path('salaries/' , ListCreateSalary.as_view() , name="create-salary"),######## new
+    path('employee_salary/<int:employee_id>/', GetSalaryEmployee.as_view()),########## 
+    path('salaries/' , ListCreateSalary.as_view() , name="create-salary"),######## 
 
     path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),######## 
     path('client-debts/' , ListCreateClientDebts.as_view() , name=""),########### 
@@ -65,16 +65,16 @@ urlpatterns = [
     path('recieved-payments/' , ListCreateRecievedPayment.as_view() , name="payments"),###### 
     path('get-recieved-payment/<str:pk>/' , RetUpdDesRecievedPaymnt.as_view() , name="get-payment"),######
 
-    path('create-medium/', CreateMedium.as_view()),
-    path('add-order-to-medium/<str:order_id>/', CreateMediumFromOrderView.as_view()),
-    path('create-output-medium/<int:medium_id>/', ReceiptOrdersView.as_view()),
-    path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()), 
-    path('list-medium-products/<str:medium_id>/', GetMediumView.as_view()),
+    path('create-medium/', CreateMedium.as_view()),#### new
+    path('add-order-to-medium/<str:order_id>/', CreateMediumFromOrderView.as_view()), #### new
+    path('create-output-medium/<int:medium_id>/', ReceiptOrdersView.as_view()), ##### new
+    path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()), ##### new
+    path('list-medium-products/<str:medium_id>/', GetMediumView.as_view()), ##### new
 
-    path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),##### new
-    path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()), ##### new
-    path('returned-goods-client/', ListCreateRetGoodsClient.as_view()), ##### new
-    path('get-returned-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()), #### new
+    path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),##### 
+    path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()), ##### 
+    path('returned-goods-client/', ListCreateRetGoodsClient.as_view()), ##### 
+    path('get-returned-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()), #### 
 
     path('damaged-product/', ListCreateDamagedProduct.as_view()),####### 
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### 
