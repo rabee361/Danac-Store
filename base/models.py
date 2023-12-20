@@ -7,6 +7,14 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Sum
 
 
+
+class UserType(models.Model):
+    user_type = models.CharField(max_length=20)
+
+    def __str__(self) -> str:
+        return self.user_type
+
+
 class CustomUser(AbstractUser):
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     username = models.CharField(max_length=200)
@@ -90,7 +98,6 @@ class Product(models.Model):
     barcode = models.CharField(max_length=200,default=' ')
     class Meta:
         ordering = ['-added']
-
 
     def __str__(self):
         return self.name
@@ -236,38 +243,6 @@ class Employee(models.Model):
 
 
 
-class Incoming(models.Model):
-    product = models.ManyToManyField(Product, through='Incoming_Products')
-    supplier = models.ForeignKey(Supplier,blank=True, on_delete=models.CASCADE)
-    agent = models.CharField(max_length=30,blank=True)
-    num_truck = models.IntegerField(null=True)
-    employee = models.ForeignKey(Employee,blank=True, on_delete=models.CASCADE)
-    code_verefy = models.IntegerField(null=True)
-    recive_pyement = models.FloatField(null=True)
-    discount = models.FloatField(null=True)
-    # products_retrieved = models.CharField(max_length=100)
-    previous_depts = models.FloatField(null=True)
-    # remaining_amount = models.FloatField()
-
-    def __str__(self):
-        return f'incoming : {self.id}'
-    
-    @property
-    def get_items_num(self):
-        return self.products.count()
-       
-
-class Incoming_Products(models.Model):
-    products = models.ForeignKey(Product, on_delete=models.CASCADE)
-    incoming = models.ForeignKey(Incoming, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
-    # num_item = models.IntegerField()
-    # purch_price = models.FloatField()
-
-    def __str__(self) -> str:
-        return f'{self.incoming.id} : {self.products.name}'
-    
- 
 
 class Point(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
@@ -372,17 +347,7 @@ class Registry(models.Model):
     def __str__(self):
         return f'{self.total}'
     
-
-
-class PaymentMethod(models.Model):
-    name = models.CharField(max_length=20)
-    bank = models.CharField(max_length=60,default='نقدا')
-    reciept_num = models.CharField(max_length=60)
-
-    def __str__(self):
-        return f'{self.name} - {self.bank} - {self.reciept_num}'
-
-
+    
 
 class WithDraw(models.Model):
     details_withdraw = models.CharField(max_length=50)
@@ -395,12 +360,12 @@ class WithDraw(models.Model):
         return self.name_user
     
     @classmethod
-    def get_total_expenses(cls):
+    def get_total_withdraws(cls):
         return cls.objects.count()
     
     @classmethod
-    def get_total_amount(cls):
-        return cls.objects.aggregate(Sum('total'))['amount__sum'] or 0
+    def get_total_sum(cls):
+        return cls.objects.aggregate(Sum('total'))['total__sum'] or 0
 
 
 
@@ -415,27 +380,24 @@ class Deposite(models.Model):
         return self.client.name
     
     @classmethod
-    def get_total_expenses(cls):
+    def get_total_deposites(cls):
         return cls.objects.count()
     
     @classmethod
-    def get_total_amount(cls):
-        return cls.objects.aggregate(Sum('total'))['amount__sum'] or 0
+    def get_total_sum(cls):
+        return cls.objects.aggregate(Sum('total'))['total_sum'] or 0
 
     
-
-
-
 
 class Debt_Client(models.Model):
     CHOICES = (
         ('نقدا','نقدا'),
         ('بنك','بنك')
     )
-    # client_name = models.ForeignKey(Client,on_delete=models.CASCADE)
-    client_name = models.CharField(max_length=100)
+    client_name = models.ForeignKey(Client,on_delete=models.CASCADE)
     amount = models.FloatField()
     payment_method = models.CharField(max_length=30,choices=CHOICES)
+    bank_name = models.CharField(max_length=60,default='_')
     receipt_num = models.IntegerField()
     date = models.DateField(auto_now_add=True)
 
@@ -443,12 +405,13 @@ class Debt_Client(models.Model):
         return self.client_name
 
     @classmethod
-    def get_total_expenses(cls):
+    def get_total_client_debts(cls):
         return cls.objects.count()
     
     @classmethod
-    def get_total_amount(cls):
+    def get_total_sum(cls):
         return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+
 
 
 class Debt_Supplier(models.Model):
@@ -459,7 +422,7 @@ class Debt_Supplier(models.Model):
     supplier_name = models.ForeignKey(Supplier,on_delete=models.CASCADE)
     amount = models.FloatField()
     payment_method = models.CharField(max_length=30,choices=CHOICES)
-    bank_name = models.CharField(max_length=50)
+    bank_name = models.CharField(max_length=60)
     check_num = models.IntegerField()
     date = models.DateField(auto_now_add=True)
 
@@ -467,13 +430,12 @@ class Debt_Supplier(models.Model):
         return self.supplier_name.name
     
     @classmethod
-    def get_total_expenses(cls):
+    def get_total_supplier_debts(cls):
         return cls.objects.count()
     
     @classmethod
-    def get_total_amount(cls):
+    def get_total_sum(cls):
         return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
-
 
 
 
@@ -483,6 +445,7 @@ class Expense(models.Model):
     name =  models.CharField(max_length=50)
     amount = models.IntegerField()
     receipt_num = models.IntegerField()
+    date = models.DateField(default=timezone.now) ######### new
 
     def __str__(self):
         return self.expense_name
@@ -494,6 +457,39 @@ class Expense(models.Model):
     @classmethod
     def get_total_amount(cls):
         return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+
+
+
+class Recieved_Payment(models.Model):
+    CHOICES = (
+        ('نقدا','نقدا'),
+        ('بنك','بنك')
+    )    
+    employee = models.ForeignKey(Employee , on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)####### ???
+    payment_method = models.CharField(max_length=30,choices=CHOICES)
+    bank_name = models.CharField(max_length=60,default='_')
+    receipt_num = models.IntegerField()
+    amount = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+
+
+class Payment(models.Model):
+    CHOICES = (
+        ('نقدا','نقدا'),
+        ('بنك','بنك')
+    )    
+    employee = models.ForeignKey(Employee , on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)####### ???
+    payment_method = models.CharField(max_length=30,choices=CHOICES)
+    bank_name = models.CharField(max_length=60,default='_')
+    receipt_num = models.IntegerField()
+    amount = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+
+
+
+#############################################################################################################################
 
 
 class ManualReciept(models.Model):
@@ -522,6 +518,38 @@ class ManualReciept_Products(models.Model):
 
 
 
+class Incoming(models.Model):
+    product = models.ManyToManyField(Product, through='Incoming_Products')
+    supplier = models.ForeignKey(Supplier,blank=True, on_delete=models.CASCADE)
+    agent = models.CharField(max_length=30,blank=True)
+    num_truck = models.IntegerField(null=True)
+    employee = models.ForeignKey(Employee,blank=True, on_delete=models.CASCADE)
+    code_verefy = models.IntegerField(null=True)
+    recive_pyement = models.FloatField(null=True)
+    discount = models.FloatField(null=True)
+    # products_retrieved = models.CharField(max_length=100)
+    previous_depts = models.FloatField(null=True)
+    # remaining_amount = models.FloatField()
+
+    def __str__(self):
+        return f'incoming : {self.id}'
+    
+    @property
+    def get_items_num(self):
+        return self.products.count()
+       
+
+class Incoming_Products(models.Model):
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    incoming = models.ForeignKey(Incoming, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    # num_item = models.IntegerField()
+    # purch_price = models.FloatField()
+
+    def __str__(self) -> str:
+        return f'{self.incoming.id} : {self.products.name}'
+    
+ 
 
 
 
@@ -595,3 +623,75 @@ class Medium_Products(models.Model):
         return f'medium {self.medium} - {self.product}'
 
 
+
+
+
+
+
+
+# --------------------------------------CREATE MEDIUM--------------------------------------
+
+# class Medium(models.Model):
+#     products = models.ManyToManyField(Product, through='Products_Medium')
+
+#     def __str__(self) -> str:
+#         return str(self.id)
+
+# class Products_Medium(models.Model):
+#     medium = models.ForeignKey(Medium, on_delete=models.CASCADE)
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+#     discount = models.FloatField(default=0)
+#     num_item = models.IntegerField()
+#     # total_price = models.FloatField(default=0)
+
+#     def __str__(self) -> str:
+#         return f'{self.product.name} : {str(self.id)}'
+    
+#     def add_item(self):
+#         self.num_item += 1
+#         # self.total_price += self.product.sale_price
+#         self.save()
+    
+#     def sub_item(self):
+#         self.num_item -= 1
+#         # self.total_price -= self.product.sale_price
+#         self.save()
+    
+#     # def get
+
+# ------------------------------------------RETURNED GOODS------------------------------------------
+        
+class ReturnedGoodsSupplier(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+    reason = models.CharField(max_length=50)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'{self.product.name}:{self.reason}'
+    
+class ReturnedGoodsClient(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    client =  models.ForeignKey(Client, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+    reason = models.CharField(max_length=50)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'{self.product.name}:{self.reason}'
+    
+# ------------------------------------------DAMAGED PRODUCTS------------------------------------------
+
+class DamagedProduct(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.product.name

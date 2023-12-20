@@ -9,28 +9,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
 
-
-
 def modify_name(name):
-    return  name
-
-# class signupSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model=CustomUser
-#         fields = ['phonenumber','username', 'password']
-
-#     def save(self, **kwargs):
-#         user = CustomUser(
-#             phonenumber=self.validated_data['phonenumber'],
-#             username = self.validated_data['username']
-#         )
-#         password = self.validated_data['password']
-#         user.set_password(password)
-#         user.is_active = False
-#         user.save()
-    
-#         return user
-
+    return name
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -130,26 +110,10 @@ class ClientSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = serializers.CharField()
     class Meta:
         model = Product
         fields = '__all__'
-
-    def create(self, validated_data):
-        category_name = validated_data.pop('category')
-        category = Category.objects.get(name=category_name)
-        product = Product.objects.create(category=category, **validated_data)
-        return product
-
-    def to_representation(self, instance):
-        repr = super().to_representation(instance)
-        repr['name'] = modify_name(repr['name'])
-        repr['category'] = instance.category.name
-        return repr
-
-
-
-
+        
 
 class CodeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -295,166 +259,89 @@ class IncomingProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
+################################# HR ##################################################################
 
 class Advance_on_SalarySerializer(serializers.ModelSerializer):
-    employee = serializers.CharField()
-
     class Meta:
         model = Advance_On_salary
         fields = '__all__'
 
-    def create(self, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        advance = Advance_On_salary.objects.create(employee=employee, **validated_data)
-        return advance
-
-    def update(self, instance, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        instance.employee = validated_data.get('employee', employee)
-        instance.reason = validated_data.get('reason', instance.reason)
-        instance.amount = validated_data.get('amount', instance.amount)
-        instance.save()
-        return instance
-
-
 
 
 class OverTimeSerializer(serializers.ModelSerializer):
-    employee = serializers.CharField()
-
     class Meta:
         model = OverTime
         fields = '__all__'
 
-    def create(self, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        overtime = OverTime.objects.create(employee=employee, **validated_data)
-        return overtime
-
-    def update(self, instance, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        instance.employee = validated_data.get('employee', employee)
-        instance.num_hours = validated_data.get('num_hours', instance.num_hours)
-        instance.amount = validated_data.get('amount', instance.amount)
-        instance.save()
-        return instance
-
-
 
 class AbsenceSerializer(serializers.ModelSerializer):
-    employee = serializers.CharField()
-
     class Meta:
         model = Absence
         fields = '__all__'
 
-    def create(self, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        absence = Absence.objects.create(employee=employee, **validated_data)
-        return absence
-    
-    def update(self, instance, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        instance.employee = validated_data.get('employee', employee)
-        instance.days = validated_data.get('days', instance.days)
-        instance.amount = validated_data.get('amount', instance.amount)
-        instance.save()
-        return instance
-    
-
-
 
 class BonusSerializer(serializers.ModelSerializer):
-    employee = serializers.CharField()
-
     class Meta:
         model = Bonus
         fields = '__all__'
-
-    def create(self, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        bonus = Bonus.objects.create(employee=employee, **validated_data)
-        return bonus
-
-    def update(self, instance, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        instance.employee = validated_data.get('employee', employee)
-        instance.reason = validated_data.get('reason', instance.reason)
-        instance.amount = validated_data.get('amount', instance.amount)
-        instance.save()
-        return instance
     
 
 class DiscountSerializer(serializers.ModelSerializer):
-    employee = serializers.CharField()
-
     class Meta:
         model = Discount
         fields = '__all__'
 
-    def create(self, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        discount = Discount.objects.create(employee=employee, **validated_data)
-        return discount
-    
-    def update(self, instance, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        instance.employee = validated_data.get('employee', employee)
-        instance.reason = validated_data.get('reason', instance.reason)
-        instance.amount = validated_data.get('amount', instance.amount)
-        instance.save()
-        return instance
-
-
 
 class ExtraExpenseSerializer(serializers.ModelSerializer):
-    employee = serializers.CharField()
     class Meta:
         model = Extra_Expense
         fields = '__all__'
-    
-    def create(self, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        extra_expense = Extra_Expense.objects.create(employee=employee, **validated_data)
-        return extra_expense
-    
-    def update(self, instance, validated_data):
-        employee_name = validated_data.pop('employee')
-        employee = Employee.objects.get(name=employee_name)
-        instance.employee = validated_data.get('employee', employee)
-        instance.reason = validated_data.get('reason', instance.reason)
-        instance.amount = validated_data.get('amount', instance.amount)
-        instance.barcode = validated_data.get('barcode', instance.barcode)
-        instance.save()
-        return instance
 
 
+
+class SalarySerializer(serializers.ModelSerializer):
+    employee = EmployeeSerializer(many=False)
+    class Meta:
+        model = Salary
+        fields = '__all__'
+
+
+
+
+class EmployeeSalarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ['id','job_position','name', 'salary','sale_percentage']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        related_models = [
+            'overtime_set',
+            'absence_set',
+            'bonus_set',
+            'discount_set',
+            'advance_on_salary_set',
+            'extra_expense_set',
+        ]
+
+        totals = {}
+        for related_model in related_models:
+            related_objects = getattr(instance, related_model).all()
+            total = sum(obj.amount for obj in related_objects)
+            totals[related_model] = total
+            representation[related_model] = total
+
+        total = instance.salary - totals['advance_on_salary_set'] - totals['extra_expense_set'] - totals['absence_set'] - totals['discount_set'] + totals['overtime_set'] + totals['bonus_set'] + (instance.salary * instance.sale_percentage)
+        representation['total'] = total
+        return representation
+
+#########################################################################################################
 
 class Product2Serializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
-
-
-
-
-class PaymentMethodSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PaymentMethod
-
-
 
 
 class ManualRecieptSerializer(serializers.ModelSerializer):
@@ -489,7 +376,7 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
         model = ManualReciept_Products
         fields = '__all__'
 
-
+################################### Registry ##############################################################
 
 class RegistrySerialzier(serializers.ModelSerializer):
     class Meta :
@@ -498,139 +385,77 @@ class RegistrySerialzier(serializers.ModelSerializer):
 
 
 class Client_DebtSerializer(serializers.ModelSerializer):
-    total_expenses = serializers.SerializerMethodField()
-    total_amount = serializers.SerializerMethodField()
-    client_name = serializers.CharField()
+    total_client_debts = serializers.SerializerMethodField()
+    total_sum = serializers.SerializerMethodField()
     class Meta :
         model = Debt_Client
         fields = '__all__'
 
-    def create(self, validated_data):
-        client_ = validated_data.pop('client_name')
-        client = Client.objects.get(name=client_)
-        debt = Debt_Client.objects.create(client_name=client, **validated_data)
-        return debt
+    def get_total_client_debts(self, obj):
+        return Debt_Client.get_total_client_debts()
 
-    def update(self, instance, validated_data):
-        client_ = validated_data.pop('client_name', None)
-        if client_ is not None:
-            client = Client.objects.get(name=client_)
-            instance.client = client
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
-
-    def get_total_expenses(self, obj):
-        return Debt_Client.get_total_expenses()
-
-    def get_total_amount(self, obj):
-        return Debt_Client.get_total_amount()
-
+    def get_total_sum(self, obj):
+        return Debt_Client.get_total_sum()
 
 
 
 class Supplier_DebtSerializer(serializers.ModelSerializer):
-    total_expenses = serializers.SerializerMethodField()
-    total_amount = serializers.SerializerMethodField()
-    supplier_name = serializers.CharField()
+    total_supplier_debts = serializers.SerializerMethodField()
+    total_sum = serializers.SerializerMethodField()
     class Meta :
         model = Debt_Supplier
         fields = '__all__'
 
-    def create(self, validated_data):
-        supplier_ = validated_data.pop('supplier_name')
-        supplier = Client.objects.get(name=supplier_)
-        debt = Debt_Supplier.objects.create(supplier_name=supplier, **validated_data)
-        return debt
+    def get_total_supplier_debts(self, obj):
+        return Debt_Supplier.get_total_supplier_debts()
 
-    def update(self, instance, validated_data):
-        supplier_ = validated_data.pop('client', None)
-        if supplier_ is not None:
-            supplier = Supplier.objects.get(name=supplier_)
-            instance.supplier_name = supplier
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
-
-    def get_total_expenses(self, obj):
-        return Debt_Supplier.get_total_expenses()
-
-    def get_total_amount(self, obj):
-        return Debt_Supplier.get_total_amount()
-
-
-
+    def get_total_sum(self, obj):
+        return Debt_Supplier.get_total_sum()
 
 
 
 class DepositeSerializer(serializers.ModelSerializer):
-    total_expenses = serializers.SerializerMethodField()
-    total_amount = serializers.SerializerMethodField()
-    client = serializers.CharField()
+    total_deposites = serializers.SerializerMethodField()
+    total_sum = serializers.SerializerMethodField()
     class Meta:
         model = Deposite
         fields = '__all__'
 
-    def create(self, validated_data):
-        client_name = validated_data.pop('client')
-        client = Client.objects.get(client=client_name)
-        deposite = Deposite.objects.create(client=client, **validated_data)
-        return deposite
+    def get_total_deposites(self, obj):
+        return Deposite.get_total_deposites()
 
-    def update(self, instance, validated_data):
-        client_name = validated_data.pop('client', None)
-        if client_name is not None:
-            client = Client.objects.get(name=client_name)
-            instance.client = client
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
-    
-    def get_total_expenses(self, obj):
-        return Deposite.get_total_expenses()
-
-    def get_total_amount(self, obj):
-        return Deposite.get_total_amount()
-
+    def get_total_sum(self, obj):
+        return Deposite.get_total_sum()
 
 
 
 class WithDrawSerializer(serializers.ModelSerializer):
-    total_expenses = serializers.SerializerMethodField()
-    total_amount = serializers.SerializerMethodField()
-    client = serializers.CharField()
+    total_withdraws = serializers.SerializerMethodField()
+    total_sum = serializers.SerializerMethodField()
     class Meta:
         model = WithDraw
         fields = '__all__'
 
-    def create(self, validated_data):
-        client_name = validated_data.pop('client')
-        client = Client.objects.get(name=client_name)
-        withdraw = WithDraw.objects.create(client=client, **validated_data)
-        return withdraw
-    
-    def update(self, instance, validated_data):
-        client_name = validated_data.pop('client', None)
-        if client_name is not None:
-            client = Client.objects.get(name=client_name)
-            instance.client = client
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
+    def get_total_withdraws(self, obj):
+        return WithDraw.get_total_withdraws()
 
-    def get_total_expenses(self, obj):
-        return WithDraw.get_total_expenses()
-
-    def get_total_amount(self, obj):
-        return WithDraw.get_total_amount()
+    def get_total_sum(self, obj):
+        return WithDraw.get_total_sum()
 
 
 
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = '__all__'
 
+
+class RecievedPaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recieved_Payment
+        fields = '__all__'
+
+#######################################################################################################3###
 
 class OutputsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -656,65 +481,67 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
 
 
 
-
-
-
-
-
-class EmployeeSalarySerializer(serializers.ModelSerializer):
+class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Employee
-        fields = ['id','job_position','name', 'salary','sale_percentage']
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-
-        related_models = [
-            'overtime_set',
-            'absence_set',
-            'bonus_set',
-            'discount_set',
-            'advance_on_salary_set',
-            'extra_expense_set',
-        ]
-
-        totals = {}
-        for related_model in related_models:
-            related_objects = getattr(instance, related_model).all()
-            total = sum(obj.amount for obj in related_objects)
-            totals[related_model] = total
-            representation[related_model] = total
-
-        total = instance.salary - totals['advance_on_salary_set'] - totals['extra_expense_set'] - totals['absence_set'] - totals['discount_set'] + totals['overtime_set'] + totals['bonus_set'] + (instance.salary * instance.sale_percentage)
-        representation['total'] = total
-        return representation
+        model = ReturnedGoodsClient
+        fields = '__all__'
 
 
-
-
-class SalarySerializer(serializers.ModelSerializer):
+class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Salary
+        model = ReturnedGoodsSupplier
         fields = '__all__'
 
 
 
 
 
-# class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
+
+# --------------------------------------CREATE MEDIUM--------------------------------------
+# class MediumSerializer(serializers.ModelSerializer):
 #     class Meta:
-#         model = ReturnedGoodsClient
+#         models = Medium
+#         fields = '__all__'
+
+# class ProductsMediumSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Products_Medium
 #         fields = '__all__'
 
 
-# class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ReturnedGoodsSupplier
-#         fields = '__all__'
+# ------------------------------------------RETURNED GOODS------------------------------------------
+    
+class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReturnedGoodsSupplier
+        fields = '__all__'
+
+class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReturnedGoodsClient
+        fields = '__all__'
 
 # # ------------------------------------------DAMAGED PRODUCTS------------------------------------------
 
-# class DamagedProductSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = DamagedProduct
-#         fields  ='__all__'
+class DamagedProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DamagedProduct
+        fields  ='__all__'
+
+    def update(self, instance, validated_data):
+        original_quantity = instance.quantity
+        super().update(instance, validated_data)
+        quantity_diff = original_quantity - instance.quantity
+        product = instance.product
+        product.quantity += quantity_diff
+        product.save()
+
+        return instance
+    
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        product = instance.product
+        product.quantity -= instance.quantity
+        product.save()
+
+        return instance
