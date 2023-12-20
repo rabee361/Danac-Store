@@ -58,13 +58,13 @@ urlpatterns = [
     # _____________________________________________RETURNED PRODUCTS________________________________________
 
     path('create-return-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),
-    path('get-product-return-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
-    path('delete-product-return-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
-    path('put-product-return-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
+    path('get-product-return-supplier/<str:pk>/', RetDesReturnGoodSupplier.as_view()),
+    path('delete-product-return-supplier/<str:pk>/', RetDesReturnGoodSupplier.as_view()),
+    path('put-product-return-supplier/<str:pk>/', UpdateReturnGoodSupplier.as_view()),
     path('create-return-goods-client/', ListCreateRetGoodsClient.as_view()),
-    path('get-product-return-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
-    path('delete-product-return-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
-    path('put-product-return-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
+    path('get-product-return-client/<str:pk>/', RetDesReturnGoodClient.as_view()),
+    path('delete-product-return-client/<str:pk>/', RetDesReturnGoodClient.as_view()),
+    path('put-product-return-client/<str:pk>/', UpdateReturnGoodClient.as_view()),
 # ------------------------------------------DAMAGED PRODUCTS------------------------------------------
 
     path('create-damaged-goods/', CreateDamagedProduct.as_view()),

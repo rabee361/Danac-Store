@@ -438,17 +438,66 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 # ------------------------------------------RETURNED GOODS------------------------------------------
-
-class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReturnedGoodsClient
-        fields = '__all__'
-
-
+    
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReturnedGoodsSupplier
         fields = '__all__'
+
+class UpdateReturnGoodSupplierSerializer(serializers.ModelSerializer):
+    product = serializers.CharField()
+    supplier = serializers.CharField()
+
+    class Meta:
+        model = ReturnedGoodsSupplier
+        fields = ['product', 'supplier', 'quantity', 'total_price', 'reason']
+
+    def update(self, instance, validated_data):
+        product_id = validated_data.pop('product')
+        product = Product.objects.get(id=product_id)
+        # product.quantity -= validated_data.pop('quantity')
+        # product.save()
+        supplier_id = validated_data.pop('supplier')
+        supplier = Supplier.objects.get(id=supplier_id)
+        instance.prodcut = product
+        instance.clinet = supplier
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
+    
+
+class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ReturnedGoodsClient
+        fields = '__all__'
+
+class UpdateReturnedGoodsClientSerializer(serializers.ModelSerializer):
+
+    product = serializers.CharField()
+    client = serializers.CharField()
+    quantity = serializers.IntegerField()
+
+    class Meta:
+        model = ReturnedGoodsClient
+        fields = ['product', 'client', 'quantity', 'total_price', 'reason']
+
+    def update(self, instance, validated_data):
+        product_id = validated_data.pop('product')
+        product = Product.objects.get(id=product_id)
+        # product.quantity += validated_data.pop('quantity')
+        # product.save()
+        client_id = validated_data.pop('client')
+        client = Client.objects.get(id=client_id)
+        instance.prodcut = product
+        instance.clinet = client
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
 
 # ------------------------------------------DAMAGED PRODUCTS------------------------------------------
 

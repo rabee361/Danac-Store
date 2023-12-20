@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from base.models import *
 from .serializers import *
-from rest_framework.generics import ListAPIView, RetrieveAPIView , CreateAPIView, GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView , GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, RetrieveDestroyAPIView
 from .validation import custom_validation
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -371,7 +371,6 @@ class ListCreateCartProduct(APIView):
         client = Client.objects.filter(phomnenumber=user.phonenumber).first()
         cart = Cart.objects.filter(customer=client).first()
         product = Product.objects.get(id=request.data['id'])
-        # cart_products = Cart_Products.objects.get_or_create(products=product.id, cart=cart.id)
         serializer = Cart_ProductsSerializer(data = {
             'products':product.id,
             'cart':cart.id,
@@ -519,9 +518,15 @@ class ListCreateRetGoodsSupplier(APIView):
         serializer = ReturnedGoodsSupplierSerializer(products, many=True)
         return Response(serializer.data)
 
-class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
+class RetDesReturnGoodSupplier(RetrieveDestroyAPIView):
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class UpdateReturnGoodSupplier(RetrieveUpdateAPIView):
+    queryset = ReturnedGoodsSupplier.objects.all()
+    serializer_class = UpdateReturnGoodSupplierSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
@@ -533,6 +538,8 @@ class ListCreateRetGoodsClient(APIView):
         employee = Employee.objects.get(phonenumber=user.phonenumber)
         client = Client.objects.get(id = request.data['client'])
         product = Product.objects.get(id=request.data['product'])
+        product.quantity += int(request.data['quantity'])
+        product.save()
         return_serializer = ReturnedGoodsClientSerializer(data={
             'product':product.id,
             'employee':employee.id,
@@ -552,9 +559,16 @@ class ListCreateRetGoodsClient(APIView):
         serializer = ReturnedGoodsClientSerializer(products, many=True)
         return Response(serializer.data)
 
-class RetUpdDesReturnGoodClient(RetrieveUpdateDestroyAPIView):
+
+
+class RetDesReturnGoodClient(RetrieveDestroyAPIView):
     queryset = ReturnedGoodsClient.objects.all()
     serializer_class = ReturnedGoodsClientSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class UpdateReturnGoodClient(RetrieveUpdateAPIView):
+    queryset = ReturnedGoodsClient.objects.all()
+    serializer_class = UpdateReturnedGoodsClientSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 # ------------------------------------------DAMAGED PRODUCTS------------------------------------------
@@ -563,6 +577,8 @@ class RetUpdDesReturnGoodClient(RetrieveUpdateDestroyAPIView):
 class CreateDamagedProduct(APIView):
     def post(self, request):
         product = Product.objects.get(id=request.data['product'])
+        product.quantity -= int(request.data['quantity'])
+        product.save()
         damaged_product = DamagedProduct.objects.create(
             product=product,
             total_price = request.data['total_price'],
