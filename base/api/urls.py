@@ -35,7 +35,6 @@ urlpatterns = [
     path('incomings/' , ListIncomings.as_view() , name="incomings"),
     path('create-incoming/' , CreateIncomingView.as_view()),
     path('incoming_product/' , CreateIncomingProducts.as_view() , name=""),
-#____________________________________________ HR _______________________________________________________
 
     path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),#######
     path('get-bonus/<str:pk>/', RetUpdDesBonusView.as_view(), name='get-bonus'),######
@@ -52,7 +51,6 @@ urlpatterns = [
     path('employee_salary/<int:employee_id>/', GetSalaryEmployee.as_view()),########## new
     path('salaries/' , ListCreateSalary.as_view() , name="create-salary"),######## new
 
-#____________________________________________ Registry _________________________________________________
     path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),########  
     path('client-debts/' , ListCreateClientDebts.as_view() , name=""),###########
     path('get-client-debt/<str:pk>/' , RetUpdDesClientDebt.as_view() , name="client-debt"),########
@@ -67,16 +65,26 @@ urlpatterns = [
     path('recieved-payments/' , ListCreateRecievedPayment.as_view() , name="payments"),###### new 
     path('get-recieved-payment/<str:pk>/' , RetUpdDesRecievedPaymnt.as_view() , name="get-payment"),###### new
 
-
     path('create-medium/', CreateMedium.as_view()),
     path('add-order-to-medium/<str:order_id>/', CreateMediumFromOrderView.as_view()),
     path('create-output-medium/<int:medium_id>/', ReceiptOrdersView.as_view()),
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()), 
     path('list-medium-products/<str:medium_id>/', GetMediumView.as_view()),
 
+    path('create-return-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),
+    path('get-product-return-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
+    path('create-return-goods-client/', ListCreateRetGoodsClient.as_view()),
+    path('get-product-return-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
+
+    path('damaged-product/', ListCreateDamagedProduct.as_view()),####### new
+    path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### new
+    
+    ]
+
+#____________________________________________ HR _______________________________________________________
 
 
-
+#____________________________________________ Registry _________________________________________________
 
      # _____________________________________________CREATE MEDIUM________________________________________
     
@@ -87,13 +95,4 @@ urlpatterns = [
     # path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),
     # _____________________________________________RETURNED PRODUCTS________________________________________
 
-    path('create-return-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),
-    path('get-product-return-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
-    path('create-return-goods-client/', ListCreateRetGoodsClient.as_view()),
-    path('get-product-return-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
 # ------------------------------------------DAMAGED PRODUCTS------------------------------------------
-
-    path('damaged-product/', ListCreateDamagedProduct.as_view()),####### new
-    path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### new
-    
-    ]
