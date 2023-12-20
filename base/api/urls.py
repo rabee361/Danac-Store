@@ -46,24 +46,24 @@ urlpatterns = [
     path('get-absence/<str:pk>/', RetUpdDesAbsenceAPIView.as_view(), name='get-absence'),#######
     path('advances/', ListCreateAdvanceView.as_view(), name='advances'),#######
     path('get-advance/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),######
-    path('extra-expenses/', ListCreateExtraExpense.as_view(), name='expenses'),###### new
-    path('get-extra-expense/<str:pk>/', RetUpdDesExtraExpense.as_view(), name='get-expense'),##### new
+    path('extra-expenses/', ListCreateExtraExpense.as_view(), name='expenses'),######
+    path('get-extra-expense/<str:pk>/', RetUpdDesExtraExpense.as_view(), name='get-expense'),#####
     path('employee_salary/<int:employee_id>/', GetSalaryEmployee.as_view()),########## new
     path('salaries/' , ListCreateSalary.as_view() , name="create-salary"),######## new
 
-    path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),########  
-    path('client-debts/' , ListCreateClientDebts.as_view() , name=""),###########
-    path('get-client-debt/<str:pk>/' , RetUpdDesClientDebt.as_view() , name="client-debt"),########
-    path('get-supplier-debt/<str:pk>/' , RetUpdDesSupplierDebt.as_view() , name="supplier-debt"),########
-    path('get-registry/' , GetRegistry.as_view() , name="registry"),########## new
+    path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),######## 
+    path('client-debts/' , ListCreateClientDebts.as_view() , name=""),########### 
+    path('get-client-debt/<str:pk>/' , RetUpdDesClientDebt.as_view() , name="client-debt"),######## 
+    path('get-supplier-debt/<str:pk>/' , RetUpdDesSupplierDebt.as_view() , name="supplier-debt"),######## 
+    path('get-registry/' , GetRegistry.as_view() , name="registry"),##########
     path('deposites/' , ListCreateDeposite.as_view() , name="deposites"),######## new
     path('get-deposite/<str:pk>/' , RetUpdDesDeposite.as_view() , name="get-deposite"),######## new
-    path('withdraws/' , ListCreateWithDraw.as_view() , name="withdraws"),######## new
-    path('get-withdraw/<str:pk>/' , RetUpdDesWithDraw.as_view() , name="get-withdraw"), ####### new
-    path('payments/' , ListCreatePayment.as_view() , name="payments"),###### new
-    path('get-payment/<str:pk>/' , RetUpdDesPayment.as_view() , name="get-payment"), ####### new
-    path('recieved-payments/' , ListCreateRecievedPayment.as_view() , name="payments"),###### new 
-    path('get-recieved-payment/<str:pk>/' , RetUpdDesRecievedPaymnt.as_view() , name="get-payment"),###### new
+    path('withdraws/' , ListCreateWithDraw.as_view() , name="withdraws"),########
+    path('get-withdraw/<str:pk>/' , RetUpdDesWithDraw.as_view() , name="get-withdraw"), #######
+    path('payments/' , ListCreatePayment.as_view() , name="payments"),######
+    path('get-payment/<str:pk>/' , RetUpdDesPayment.as_view() , name="get-payment"), #######
+    path('recieved-payments/' , ListCreateRecievedPayment.as_view() , name="payments"),###### 
+    path('get-recieved-payment/<str:pk>/' , RetUpdDesRecievedPaymnt.as_view() , name="get-payment"),######
 
     path('create-medium/', CreateMedium.as_view()),
     path('add-order-to-medium/<str:order_id>/', CreateMediumFromOrderView.as_view()),
@@ -76,8 +76,8 @@ urlpatterns = [
     path('create-return-goods-client/', ListCreateRetGoodsClient.as_view()),
     path('get-product-return-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
 
-    path('damaged-product/', ListCreateDamagedProduct.as_view()),####### new
-    path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### new
+    path('damaged-product/', ListCreateDamagedProduct.as_view()),####### 
+    path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### 
     
     ]
 

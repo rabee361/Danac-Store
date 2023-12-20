@@ -306,6 +306,7 @@ class Advance_On_salary(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     reason = models.CharField(max_length=100)
     amount = models.FloatField()
+    date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.employee.name
@@ -385,7 +386,7 @@ class Deposite(models.Model):
     
     @classmethod
     def get_total_sum(cls):
-        return cls.objects.aggregate(Sum('total'))['total_sum'] or 0
+        return cls.objects.aggregate(Sum('total'))['total__sum'] or 0
 
     
 
@@ -422,7 +423,7 @@ class Debt_Supplier(models.Model):
     supplier_name = models.ForeignKey(Supplier,on_delete=models.CASCADE)
     amount = models.FloatField()
     payment_method = models.CharField(max_length=30,choices=CHOICES)
-    bank_name = models.CharField(max_length=60)
+    bank_name = models.CharField(max_length=60,default='_')
     check_num = models.IntegerField()
     date = models.DateField(auto_now_add=True)
 
