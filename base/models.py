@@ -318,6 +318,7 @@ class Extra_Expense(models.Model):
 class Salary(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='employee_salaries')
     employee_name = models.CharField(max_length=100)
+    job_position = models.CharField(max_length=50)
     salary = models.FloatField()
     percentage = models.FloatField()
     hr = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='hr_employee_salaries')
@@ -325,7 +326,7 @@ class Salary(models.Model):
     overtime = models.FloatField(default=0.0)
     absence = models.FloatField(default=0.0)
     bonus = models.FloatField(default=0.0)
-    discout = models.FloatField(default=0.0)
+    discount = models.FloatField(default=0.0)
     advances = models.FloatField(default=0.0)
     extra_expense = models.FloatField(default=0.0)
     total = models.FloatField()
