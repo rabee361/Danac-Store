@@ -21,11 +21,11 @@ urlpatterns = [
     path('categories/' , ListCreateCategory.as_view() , name="categories"),##### 
     path('employees/', ListCreateEmployee.as_view(), name='employee'),######
     path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'),####  
-    path('user_items/' , CartProductsView.as_view() , name="user_products"),#### new
-    path('cart/' , CreateCartView.as_view()),##### new
-    path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),#### new
-    path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"), #### new
-    path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),##### new
+    path('user_items/' , CartProductsView.as_view() , name="user_products"),#### 
+    path('cart/' , CreateCartView.as_view()),##### 
+    path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),#### 
+    path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"), #### 
+    path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),##### 
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), #######
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),######
