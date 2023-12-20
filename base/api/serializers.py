@@ -60,10 +60,8 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerilizer(serializers.ModelSerializer):
-
     phonenumber = serializers.CharField()
     password = serializers.CharField(max_length=55, min_length=6,write_only = True)
-
     class Meta:
         model = CustomUser
         fields = ['phonenumber', 'password']
@@ -110,10 +108,34 @@ class ClientSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    category = serializers.CharField()
     class Meta:
         model = Product
         fields = '__all__'
         
+    def create(self, validated_data):
+        category_name = validated_data.pop('category')
+        category = Category.objects.get(name=category_name)
+        product = Product.objects.create(category=category, **validated_data)
+        return product
+    
+    def update(self, instance, validated_data):
+        category_name = validated_data.pop('category', None)
+        if category_name:
+            try:
+                category = Category.objects.get(name=category_name)
+                validated_data['category'] = category
+            except Category.DoesNotExist:
+                raise serializers.ValidationError({"category": "Object with name does not exist."})
+        return super(ProductSerializer, self).update(instance, validated_data)
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['name'] = modify_name(repr['name'])
+        repr['category'] = instance.category.name
+        return repr
+
+
 
 class CodeSerializer(serializers.ModelSerializer):
     class Meta:
