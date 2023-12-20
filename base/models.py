@@ -317,6 +317,9 @@ class Extra_Expense(models.Model):
 
 class Salary(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='employee_salaries')
+    employee_name = models.CharField(max_length=100)
+    salary = models.FloatField()
+    percentage = models.FloatField()
     hr = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='hr_employee_salaries')
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
     overtime = models.FloatField(default=0.0)
@@ -327,7 +330,6 @@ class Salary(models.Model):
     extra_expense = models.FloatField(default=0.0)
     total = models.FloatField()
     date = models.DateTimeField(default=timezone.now)
-
 
     def __str__(self):
         return self.employee.name

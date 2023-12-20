@@ -321,12 +321,11 @@ class ExtraExpenseSerializer(serializers.ModelSerializer):
 
 
 
+
 class SalarySerializer(serializers.ModelSerializer):
-    employee = EmployeeSerializer(many=False)
     class Meta:
         model = Salary
         fields = '__all__'
-
 
 
 
