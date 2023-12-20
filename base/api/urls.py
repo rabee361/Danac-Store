@@ -71,10 +71,10 @@ urlpatterns = [
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()), 
     path('list-medium-products/<str:medium_id>/', GetMediumView.as_view()),
 
-    path('create-return-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),
-    path('get-product-return-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
-    path('create-return-goods-client/', ListCreateRetGoodsClient.as_view()),
-    path('get-product-return-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
+    path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),##### new
+    path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()), ##### new
+    path('returned-goods-client/', ListCreateRetGoodsClient.as_view()), ##### new
+    path('get-returned-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()), #### new
 
     path('damaged-product/', ListCreateDamagedProduct.as_view()),####### 
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### 

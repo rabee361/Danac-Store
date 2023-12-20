@@ -5,7 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Sum
-
+import uuid
 
 
 class UserType(models.Model):
@@ -101,13 +101,10 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-
     
-############################### CART HANDLING ###################################
+    
+##############################################CART HANDLING ###########################################################################################################
 
-
-
-###############################
 
 class Order(models.Model):
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
@@ -121,7 +118,6 @@ class Order(models.Model):
 
     def __str__(self):
         return f'{self.client} : {self.id}'
-#############################################
 
 
 class Order_Product(models.Model):
@@ -156,8 +152,6 @@ class Cart_Products(models.Model):
 
     def __str__(self):
         return f'{self.cart.customer} - {self.products.name} - {self.quantity}'
-
-
 
 
 
@@ -197,7 +191,7 @@ class Cart(models.Model):
     
 
     
-
+##################################################################################################################
 
 
 
@@ -324,7 +318,7 @@ class Extra_Expense(models.Model):
 class Salary(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='employee_salaries')
     hr = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='hr_employee_salaries')
-    barcode = models.CharField(max_length=150,default=' ')
+    barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
     overtime = models.FloatField(default=0.0)
     absence = models.FloatField(default=0.0)
     bonus = models.FloatField(default=0.0)
@@ -591,7 +585,7 @@ class Medium(models.Model):
     def get_items_num(self):
         return self.items.count()
 
-    def total_cart_price(self):
+    def total_medium_price(self):
         total = 0
         for item in self.cart_products_set.all():
             total += item.total_price_of_item()
@@ -618,11 +612,9 @@ class Medium_Products(models.Model):
     @property
     def total_price_of_item(self):
         return (self.quantity * self.products.sale_price)
-    
 
     def __str__(self):
         return f'medium {self.medium} - {self.product}'
-
 
 
 
@@ -685,8 +677,6 @@ class ReturnedGoodsClient(models.Model):
 
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
-    
-# ------------------------------------------DAMAGED PRODUCTS------------------------------------------
 
 class DamagedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
