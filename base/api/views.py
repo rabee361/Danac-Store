@@ -409,7 +409,7 @@ class CreateMedium(APIView):
         medium = Medium.objects.create()
         return Response(status=status.HTTP_200_OK)
 
-class CreateMediumView(APIView):
+class CreateMediumForOrderView(APIView):
     def post(self, request, order_id):
         order = Order.objects.get(id=order_id)
         medium = Medium.objects.create()

@@ -45,16 +45,18 @@ urlpatterns = [
     path('one/', ListManualRecieptProductsView.as_view()),
     path('add-product-to-cart/', ListCreateCartProduct.as_view(), name='add-pro-to-cart'),
     path('list-product-cart/<str:pk>/', DesUpdCartProducts.as_view(), name='list-product-cart'),
-    path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
+
+    path('create-medium/', CreateMedium.as_view()),
     path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),
+
+    # _____________________________________________CREATE RECEIPT________________________________________
+
+    path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
     path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),
-    # _____________________________________________CREATE MEDIUM________________________________________
-    
-    path('create-medium/', CreateMedium.as_view()),
-    path('add-order-to-medium/<str:order_id>/', CreateMediumView.as_view()),
-    path('create-output-medium/<int:medium_id>/', ReceiptOrdersView.as_view()), 
+    path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),
+    path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), 
     path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),
     # _____________________________________________RETURNED PRODUCTS________________________________________
 
