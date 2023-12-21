@@ -623,7 +623,7 @@ class CreateIncomingView(APIView):
             "agent":request.data['agent'],
             "num_truck":request.data['num_truck'],
             "code_verefy": request.data['code_verefy'],
-            "recive_payment": request.data['recive_payment'],
+            "recive_pyement": request.data['recive_pyement'],
             "phonenumber":request.data['phonenumber'], 
             "discount":request.data['discount'],
             "Reclaimed_products": request.data['Reclaimed_products'],
