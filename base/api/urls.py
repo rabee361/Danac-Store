@@ -89,6 +89,8 @@ urlpatterns = [
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
 
+    path('list-outputs/' , ListOutputs.as_view()),
+
 
 
     ]

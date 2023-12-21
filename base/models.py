@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Sum
 import uuid
+from django.contrib.gis.geos import Point
 
 
 class UserType(models.Model):
@@ -237,7 +238,7 @@ class Employee(models.Model):
 
 
 
-class Point(models.Model):
+class Points(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     number = models.FloatField()
     expire_date = models.DateField()
@@ -626,6 +627,7 @@ class Output(models.Model):
     remaining_amount = models.FloatField()
     date = models.DateField(auto_now_add=True, null=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
+    location = models.PointField(default=Point(0.0,0.0))
 
     def __str__(self):
         return str(self.id)
@@ -647,9 +649,6 @@ class DelievaryArrived(models.Model):
     def __str__(self) -> str:
         return f'{self.employee.name} - {str(self.output_receipt.id)}'
     
-
-
-
 
 
 

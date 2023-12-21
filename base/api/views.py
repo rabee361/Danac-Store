@@ -500,7 +500,7 @@ class Medium_Handler(APIView):
                 item.delete()
             else:
                 item.sub_item()
-                 
+
             serializer = ProductsMediumSerializer(item,many=False)
         return Response(serializer.data)
     
@@ -552,6 +552,10 @@ class ListReceiptOutput(APIView):
         return Response(output_serializer.data)
 
 
+class ListOutputs(ListAPIView):
+    queryset = Output.objects.all()
+    serializer_class = OutputSerializer2
+
 
 class ReceiptOrdersView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -560,7 +564,7 @@ class ReceiptOrdersView(APIView):
         client_id = request.data['client']
         client = Client.objects.filter(id=client_id).first()
         employee = Employee.objects.get(phonenumber=request.user.phonenumber)
-        output_serializer = OutputSerializer(data={
+        output_serializer = OutputSerializer2(data={
             'employee':employee.id,
             "client": client.id,
             "verify_code": request.data['verify_code'],

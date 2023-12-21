@@ -103,7 +103,7 @@ class ClientSerializer(serializers.ModelSerializer):
         fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points']
 
     def get_total_points(self,obj):
-        total = Point.objects.filter(Q(client=obj)&Q(is_used=False)).aggregate(total_points=models.Sum('number'))['total_points'] or 0
+        total = Points.objects.filter(Q(client=obj)&Q(is_used=False)).aggregate(total_points=models.Sum('number'))['total_points'] or 0
         return total
 
 
@@ -552,10 +552,38 @@ class OutputSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
 
+
+class SpecialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id','name','num_per_item','sale_price']
+
+
 class ProductsOutputSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='products.id')
+    name = serializers.CharField(source='products.name')
+    num_per_item = serializers.IntegerField(source='products.num_per_item')
+    sale_price = serializers.FloatField(source='products.sale_price')
+
     class Meta:
         model = Output_Products
-        fields = '__all__'
+        fields = ['id', 'name', 'num_per_item', 'sale_price', 'quantity', 'total', 'discount', 'output']
+
+
+class OutputSerializer2(serializers.ModelSerializer):
+    products = ProductsOutputSerializer(source='output_products_set', many=True,read_only=True)
+    longitude = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Output
+        fields = ['id', 'client', 'employee', 'verify_code', 'phonenumber', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date', 'barcode','longitude','latitude', 'products']
+
+    def get_longitude(self, obj):
+        return obj.location.x
+
+    def get_latitude(self, obj):
+        return obj.location.y
 
 
 class DelievaryArrivedSerializer(serializers.ModelSerializer):
@@ -568,5 +596,4 @@ class DelievaryArrivedSerializer(serializers.ModelSerializer):
 
 
 
-# --------------------------------------CREATE MEDIUM--------------------------------------
         
