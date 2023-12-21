@@ -306,16 +306,16 @@ class SearchView(ListAPIView):
     filterset_class = ProductFilterName
 
 
-class CreateMediumIncoming(APIView):
+class Add_To_Medium(APIView):
     def post(self, request, medium_id, product_id):
         prodcut = Product.objects.get(id=product_id)
         medium = Medium.objects.get(id=medium_id)
-        medium_products = Products_Medium.objects.create(product=prodcut,
-                                                         medium=medium,
-                                                         num_item=request.data['num_item'],
-                                                         )
-        medium_products.total_price = float(medium_products.num_item) * prodcut.sale_price
-        medium_products.save()
+        medium_products, created = Products_Medium.objects.get_or_create(product=prodcut, medium=medium)
+        if created:
+            medium_products.add_num_item()
+            medium_products.total_price = medium_products.total_price_of_item
+            medium_products.save()
+
         pro_med_serializer = ProductsMediumSerializer(medium_products)
         return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
 
@@ -386,7 +386,6 @@ class ListCreateCartProduct(APIView):
         user = request.user
         client = Client.objects.get(phomnenumber = user.phonenumber)
         cart = Cart.objects.get(customer=client)
-        print(type(cart.items.all()))
         cart_serializer = CartSerializer(cart)
         return Response(cart_serializer.data)
     
@@ -463,7 +462,7 @@ class ReceiptOrdersView(APIView):
         return Response(output_serializer.errors)
     
 class Medium_Handler(APIView):
-    def post(self,request,pk,pk2):
+    def post(self, request, pk, pk2):
         item = Products_Medium.objects.get(id=pk)
         if pk2 == 'add':
             item.add_item()
@@ -479,6 +478,10 @@ class Medium_Handler(APIView):
 class GetMediumView(RetrieveAPIView):
     queryset = Medium.objects.all()
     serializer_class = MediumSerializer
+
+class UpdateProductsMedium(RetrieveUpdateAPIView):
+    queryset = Products_Medium.objects.all()
+    serializer_class = UpdateProductMediumSerializer
 
 class ListMediumView(APIView):
 #     # permission_classes = [permissions.IsAuthenticated]

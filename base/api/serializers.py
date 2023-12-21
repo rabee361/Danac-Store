@@ -437,6 +437,10 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
         model = Products_Medium
         fields = '__all__'
 
+class UpdateProductMediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Products_Medium
+        fields = ['discount']
 # ------------------------------------------RETURNED GOODS------------------------------------------
     
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
