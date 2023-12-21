@@ -296,30 +296,35 @@ class Incoming_Product(models.Model):
         return f'{self.incoming.supplier.name}:{str(self.incoming.id)}'
 
 
-class ManualReciept(models.Model):
-    products = models.ManyToManyField(Product, through='ManualReciept_Products')
+class ManualReceipt(models.Model):
+    products = models.ManyToManyField(Product, through='ManualReceipt_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     verify_code = models.IntegerField()
     phonenumber = PhoneNumberField(region='DZ')
-    recive_pyement = models.FloatField()
-    Reclaimed_products = models.FloatField()
-    previous_debts = models.FloatField()
-    remaining_amount = models.FloatField()
-
-    def __str__(self) -> str:
-        return self.client.name
-    
-class ManualReciept_Products(models.Model):
-    products = models.ForeignKey(Product, on_delete= models.CASCADE)
-    manualreciept = models.ForeignKey(ManualReciept, on_delete= models.CASCADE)
-    quantity = models.IntegerField()
+    recive_payment = models.FloatField()
     discount = models.FloatField()
+    reclaimed_products = models.FloatField()
+    previous_depts = models.FloatField()
+    remaining_amount = models.FloatField(default=0)
+    date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return str(self.id)
+        return f'{self.client.name} - {str(self.id)}'
+    
+    # def get_remaining_amount(self):
+    #     self.remaining_amount = (self.recive_payment + self.discount + self.reclaimed_products) - self.previous_depts
+    #     self.save()
+    
+class ManualReceipt_Products(models.Model):
+    product = models.ForeignKey(Product, on_delete= models.CASCADE)
+    manualreceipt = models.ForeignKey(ManualReceipt, on_delete= models.CASCADE)
+    discount = models.FloatField()
+    num_item = models.IntegerField(default=0)
+    total_price = models.FloatField(default=0)
 
-
+    def __str__(self) -> str:
+        return f'{self.manualreciept.client.name} - {str(self.manualreciept.id)}'
 
 
 class Deposite(models.Model):
@@ -384,6 +389,7 @@ class Outputs(models.Model):
     Reclaimed_products = models.FloatField()
     previous_depts = models.FloatField()
     remaining_amount = models.FloatField()
+    date = models.DateField(auto_now_add=True, null=True)
 
     def __str__(self):
         return str(self.id)
@@ -398,6 +404,13 @@ class Outputs_Products(models.Model):
     def __str__(self) -> str:
         return f'{self.products.name} {self.output.id}'
 
+class DelevaryArrived(models.Model):
+    output_receipt = models.OneToOneField(Outputs, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f'{self.employee.name} - {str(self.output_receipt.id)}'
+    
 # --------------------------------------CREATE MEDIUM--------------------------------------
 
 class Medium(models.Model):

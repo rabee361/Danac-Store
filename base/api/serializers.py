@@ -394,17 +394,14 @@ class IncomingProductsSerializer(serializers.ModelSerializer):
 
 
 class ManualRecieptSerializer(serializers.ModelSerializer):
-
     class Meta:
-        model = ManualReciept
+        model = ManualReceipt
         fields = '__all__'
 
     
 class ManualRecieptProductsSerializer(serializers.ModelSerializer):
-    # products_name = ProductSerializer(source='products', many=True, read_only=True)
-    # manual_name = ManualRecieptSerializer(read_only=True)
     class Meta :
-        model = ManualReciept_Products
+        model = ManualReceipt_Products
         fields = '__all__'
 
 
@@ -416,13 +413,19 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
 class OutputsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Outputs
-        # fields = ['client', 'employee', 'discount', 'verify_code', 'phonenumber', 'recive_pyement', 'Reclaimed_products', 'previous_depts','remaining_amount']
         fields = '__all__'
     
+
 class ProductsOutputsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Outputs_Products
+        fields = '__all__'
+
+
+class DelevaryArrivedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DelevaryArrived
         fields = '__all__'
 
 

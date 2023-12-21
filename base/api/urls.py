@@ -42,7 +42,7 @@ urlpatterns = [
     # path('incomings/', ListCreateIncomingView.as_view(), name='incoming'),
     # path('incoming-products/<int:id>/', CreateIncomingProductsView.as_view(), name='incoming-produc')
     # path('manual-reciepts/', ListCreateManualRecieptView.as_view(), name='manual-reciepts'),
-    path('one/', ListManualRecieptProductsView.as_view()),
+    # path('one/', ListManualRecieptProductsView.as_view()),
     path('add-product-to-cart/', ListCreateCartProduct.as_view(), name='add-pro-to-cart'),
     path('list-product-cart/<str:pk>/', DesUpdCartProducts.as_view(), name='list-product-cart'),
 
@@ -74,4 +74,9 @@ urlpatterns = [
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
     path('delete-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
     path('put-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
+
+# ------------------------------------------DAMAGED PRODUCTS------------------------------------------
+    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
+    path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
+    path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
 ]

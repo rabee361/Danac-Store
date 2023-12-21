@@ -340,8 +340,8 @@ class CreateIncomingView(APIView):
         })
         if incoming_serializer.is_valid():
             incoming = incoming_serializer.save()
-            
-            for product in Products_Medium.objects.filter(medium__id=medium_id):
+            products = Products_Medium.objects.filter(medium__id=medium_id)
+            for product in products:
                 print(product.id)
                 update_quantity =Product.objects.get(id=product.product.id)
                 update_quantity.quantity += product.num_item
@@ -352,14 +352,10 @@ class CreateIncomingView(APIView):
                     num_item = product.num_item,
                     total_price = product.total_price,
                 )
-                product.delete()
+            products.delete()
             return Response(incoming_serializer.data)
         return Response(incoming_serializer.errors)
     
-
-class ListManualRecieptProductsView(ListAPIView):
-    queryset = ManualReciept_Products.objects.all()
-    serializer_class = ManualRecieptProductsSerializer
 
 
 # Add Or Get Products From Cart
@@ -461,6 +457,26 @@ class ReceiptOrdersView(APIView):
             return Response(output_serializer.data)
         return Response(output_serializer.errors)
     
+
+class ListCreateDeliveryArrived(APIView):
+    
+    def post(self, request, pk):
+        output = Outputs.objects.filter(id=pk).first()
+        employee = Employee.objects.filter(id=request.data['employee']).first()
+        delivery_arrived = DelevaryArrived.objects.create(
+            output_receipt=output,
+            employee = employee
+        )
+        del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=False)
+        return Response(del_arr_serializer.data)
+    
+
+    def get(self, request):
+        delivery_arrived = DelevaryArrived.objects.all()
+        del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=True)
+        return Response(del_arr_serializer.data)
+    
+
 class Medium_Handler(APIView):
     def post(self, request, pk, pk2):
         item = Products_Medium.objects.get(id=pk)
@@ -600,3 +616,48 @@ class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
     queryset = DamagedProduct.objects.all()
     serializer_class = DamagedProductSerializer
     # permission_classes = [permissions.IsAuthenticated]
+
+
+# -------------------------------------MANUAL RECEIPT-------------------------------------
+    
+class CreateManualReceiptView(APIView):
+
+    def post(self, request, medium_id):
+        user = request.user
+        client = Client.objects.get(id=request.data['client'])
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        manual_receipt_serializer = ManualRecieptSerializer(data={
+            "employee":employee.id,
+            "client": client.id,
+            "verify_code": request.data['verify_code'],
+            "phonenumber":request.data['phonenumber'], 
+            "recive_payment": request.data['recive_payment'],
+            "discount":request.data['discount'],
+            "reclaimed_products": request.data['reclaimed_products'],
+            "previous_depts": request.data['previous_depts'],
+            "remaining_amount":request.data['remaining_amount'],
+        })
+        if manual_receipt_serializer.is_valid():
+            manual_receipt = manual_receipt_serializer.save()
+            products = Products_Medium.objects.filter(medium__id=medium_id)
+            for product in products:
+                update_quantity =Product.objects.get(id=product.product.id)
+                update_quantity.quantity -= product.num_item
+                update_quantity.save()
+                manual_eceipt_products = ManualReceipt_Products.objects.create(
+                    product = product.product,
+                    manualreceipt = manual_receipt,
+                    num_item = product.num_item,
+                    discount=product.discount,
+                    total_price = product.total_price,
+                )
+            products.delete()
+            return Response(manual_receipt_serializer.data)
+        return Response(manual_receipt_serializer.errors)
+    
+# class GetManualReceiptView(APIView):
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get(self, request, receipt_id):
+#         man
+    
