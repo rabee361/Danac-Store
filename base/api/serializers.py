@@ -268,18 +268,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-    
-class IncomingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Incoming
-        fields = '__all__'
-
-
-class IncomingProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Incoming_Products
-        fields = '__all__'
-
 
 ################################# HR ##################################################################
 
@@ -365,38 +353,6 @@ class Product2Serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ManualRecieptSerializer(serializers.ModelSerializer):
-    # products = serializers.ListField(child=serializers.CharField(), write_only=True)
-    # products_name = ProductSerializer(source='products', many=True, read_only=True)
-    employee = serializers.CharField()
-    client = serializers.CharField()
-
-    class Meta:
-        model = ManualReciept
-        fields = '__all__'
-
-    def create(self, validated_data):
-        emplyee_name= validated_data.pop('employee')
-        employee = Employee.objects.filter(name=emplyee_name).first()
-        client_name = validated_data.pop('client')
-        client = Client.objects.filter(name=client_name).first()
-        manual_reciept = ManualReciept.objects.create(
-            employee=employee,
-            client = client,
-            **validated_data
-        )
-        manual_reciept.save()
-        return manual_reciept
-    
-
-
-class ManualRecieptProductsSerializer(serializers.ModelSerializer):
-    # products_name = ProductSerializer(source='products', many=True, read_only=True)
-    # manual_name = ManualRecieptSerializer(read_only=True)
-    class Meta :
-        model = ManualReciept_Products
-        fields = '__all__'
-
 ################################### Registry ##############################################################
 
 class RegistrySerialzier(serializers.ModelSerializer):
@@ -478,26 +434,7 @@ class RecievedPaymentSerializer(serializers.ModelSerializer):
 
 #######################################################################################################3###
 
-class OutputsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Outputs
-        fields = '__all__'
-    
-class ProductsOutputsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Outputs_Products
-        fields = '__all__'
 
-
-class MediumSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Medium
-        fields = '__all__'
-
-class ProductsMediumSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Medium_Products
-        fields = '__all__'
 
 
 
@@ -514,20 +451,6 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
-
-
-
-# --------------------------------------CREATE MEDIUM--------------------------------------
-# class MediumSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         models = Medium
-#         fields = '__all__'
-
-# class ProductsMediumSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Products_Medium
-#         fields = '__all__'
 
 
 # ------------------------------------------RETURNED GOODS------------------------------------------
@@ -566,3 +489,76 @@ class DamagedProductSerializer(serializers.ModelSerializer):
         product.save()
 
         return instance
+    
+
+
+
+
+class IncomingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Incoming
+        fields = '__all__'
+    
+    
+class IncomingProductsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Incoming_Product
+        fields = '__all__'
+
+
+
+class ManualRecieptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ManualReceipt
+        fields = '__all__'
+
+    
+class ManualRecieptProductsSerializer(serializers.ModelSerializer):
+    class Meta :
+        model = ManualReceipt_Products
+        fields = '__all__'
+
+
+
+
+class OutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Output
+        fields = '__all__'
+    
+
+class ProductsOutputSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Output_Products
+        fields = '__all__'
+
+
+class DelievaryArrivedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DelievaryArrived
+        fields = '__all__'
+
+
+
+
+
+
+
+
+
+# --------------------------------------CREATE MEDIUM--------------------------------------
+class MediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medium
+        fields = '__all__'
+
+class ProductsMediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Products_Medium
+        fields = '__all__'
+
+class UpdateProductMediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Products_Medium
+        fields = ['discount']

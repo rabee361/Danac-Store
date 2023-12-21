@@ -4,7 +4,6 @@ from rest_framework_simplejwt import views as jwt_views
 
 
 urlpatterns = [
-#____________________________________________ AUTHENTICATION _______________________________________________________
     path('auth/sign-up/' , SignUpView.as_view()),#####
     path('auth/log-in/', UserLoginApiView.as_view(), name='sign-in'),#####
     path('auth/logout/', LogoutAPIView.as_view(), name='logout'),#####
@@ -31,10 +30,6 @@ urlpatterns = [
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),######
     path('orders/' , ListOrders.as_view() ,name="orders"),#######
     # path('create/' , CreateOrder.as_view() ),
-
-    path('incomings/' , ListIncomings.as_view() , name="incomings"),
-    path('create-incoming/' , CreateIncomingView.as_view()),
-    path('incoming_product/' , CreateIncomingProducts.as_view() , name=""),
 
     path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),#######
     path('get-bonus/<str:pk>/', RetUpdDesBonusView.as_view(), name='get-bonus'),######
@@ -65,11 +60,6 @@ urlpatterns = [
     path('recieved-payments/' , ListCreateRecievedPayment.as_view() , name="payments"),###### 
     path('get-recieved-payment/<str:pk>/' , RetUpdDesRecievedPaymnt.as_view() , name="get-payment"),######
 
-    path('create-medium/', CreateMedium.as_view()),#### new
-    path('add-order-to-medium/<str:order_id>/', CreateMediumFromOrderView.as_view()), #### new
-    path('create-output-medium/<int:medium_id>/', ReceiptOrdersView.as_view()), ##### new
-    path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()), ##### new
-    path('list-medium-products/<str:medium_id>/', GetMediumView.as_view()), ##### new
 
     path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),##### 
     path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()), ##### 
@@ -79,20 +69,27 @@ urlpatterns = [
     path('damaged-product/', ListCreateDamagedProduct.as_view()),####### 
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### 
     
+
+
+    path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
+    path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), 
+
+
+    path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),###### new
+    path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),#### new
+    path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),###### new
+    path('create-medium/', CreateMedium.as_view()),##### new
+    path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),##### new
+    path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),#### new
+    path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),#### new
+
+    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
+
+
+    path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
+    path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
+
+
+
     ]
 
-#____________________________________________ HR _______________________________________________________
-
-
-#____________________________________________ Registry _________________________________________________
-
-     # _____________________________________________CREATE MEDIUM________________________________________
-    
-    # path('create-medium/', CreateMedium.as_view()),
-    # path('add-order-to-medium/<str:order_id>/', CreateMediumView.as_view()),
-    # path('create-output-medium/<int:medium_id>/', ReceiptOrdersView.as_view()),
-    # path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()), 
-    # path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),
-    # _____________________________________________RETURNED PRODUCTS________________________________________
-
-# ------------------------------------------DAMAGED PRODUCTS------------------------------------------

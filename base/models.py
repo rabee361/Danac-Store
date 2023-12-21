@@ -489,72 +489,47 @@ class Payment(models.Model):
 #############################################################################################################################
 
 
-class ManualReciept(models.Model):
-    products = models.ManyToManyField(Product, through='ManualReciept_Products')
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    verify_code = models.IntegerField()
-    phonenumber = PhoneNumberField(region='DZ')
-    recive_pyement = models.FloatField()
-    Reclaimed_products = models.FloatField()
-    previous_debts = models.FloatField()
-    remaining_amount = models.FloatField()
-
-    def __str__(self) -> str:
-        return self.client.name
-    
-class ManualReciept_Products(models.Model):
-    products = models.ForeignKey(Product, on_delete= models.CASCADE)
-    manualreciept = models.ForeignKey(ManualReciept, on_delete= models.CASCADE)
-    quantity = models.IntegerField()
-    discount = models.FloatField()
-
-    def __str__(self) -> str:
-        return str(self.id)
-
-
-
 
 class Incoming(models.Model):
-    product = models.ManyToManyField(Product, through='Incoming_Products')
-    supplier = models.ForeignKey(Supplier,blank=True, on_delete=models.CASCADE)
-    agent = models.CharField(max_length=30,blank=True)
+    products = models.ManyToManyField(Product, through='Incoming_Product')
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    agent = models.CharField(max_length=30)
     num_truck = models.IntegerField(null=True)
-    employee = models.ForeignKey(Employee,blank=True, on_delete=models.CASCADE)
-    code_verefy = models.IntegerField(null=True)
-    recive_pyement = models.FloatField(null=True)
-    discount = models.FloatField(null=True)
-    # products_retrieved = models.CharField(max_length=100)
-    previous_depts = models.FloatField(null=True)
-    # remaining_amount = models.FloatField()
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    code_verefy = models.IntegerField()
+    phonenumber = PhoneNumberField(region='DZ')
+    recive_pyement = models.FloatField()
+    discount = models.FloatField()
+    Reclaimed_products = models.FloatField(default=0)
+    previous_depts = models.FloatField()
+    remaining_amount = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+    barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
 
     def __str__(self):
-        return f'incoming : {self.id}'
-    
-    @property
-    def get_items_num(self):
-        return self.products.count()
-       
+        return str(self.id)
+        
 
-class Incoming_Products(models.Model):
-    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+class Incoming_Product(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     incoming = models.ForeignKey(Incoming, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
-    # num_item = models.IntegerField()
-    # purch_price = models.FloatField()
+    num_item = models.IntegerField()
+    total_price = models.FloatField()
+
+    def all_item(self):
+        pass
+    def total(self):
+        pass
 
     def __str__(self) -> str:
-        return f'{self.incoming.id} : {self.products.name}'
-    
- 
+        return f'{self.incoming.supplier.name}:{str(self.incoming.id)}'
 
 
 
 
 
-
-class Outputs(models.Model):
-    products = models.ManyToManyField(Product, through='Outputs_Products')
+class Output(models.Model):
+    products = models.ManyToManyField(Product, through='Output_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     verify_code = models.IntegerField()
@@ -564,14 +539,15 @@ class Outputs(models.Model):
     Reclaimed_products = models.FloatField()
     previous_depts = models.FloatField()
     remaining_amount = models.FloatField()
+    date = models.DateField(auto_now_add=True, null=True)
+    barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
 
     def __str__(self):
         return str(self.id)
-
-
-class Outputs_Products(models.Model):
+    
+class Output_Products(models.Model):
     products = models.ForeignKey(Product, on_delete=models.CASCADE)
-    output = models.ForeignKey(Outputs, on_delete=models.CASCADE)
+    output = models.ForeignKey(Output, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total = models.FloatField(default=0)
     discount = models.FloatField()
@@ -579,46 +555,13 @@ class Outputs_Products(models.Model):
     def __str__(self) -> str:
         return f'{self.products.name} {self.output.id}'
 
+class DelievaryArrived(models.Model):
+    output_receipt = models.OneToOneField(Output, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
-class Medium(models.Model):
-    products = models.ManyToManyField(Product,through='Medium_Products')
-
-    @property
-    def get_items_num(self):
-        return self.items.count()
-
-    def total_medium_price(self):
-        total = 0
-        for item in self.cart_products_set.all():
-            total += item.total_price_of_item()
-        return total
+    def __str__(self) -> str:
+        return f'{self.employee.name} - {str(self.output_receipt.id)}'
     
-    def __str__(self):
-        return f'{self.id}'
-
-
-class Medium_Products(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE)
-    medium = models.ForeignKey(Medium,on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    discount = models.FloatField(default=0.0)
-
-    def add_item(self):
-        self.quantity += 1
-        self.save()
-
-    def sub_item(self):
-        self.quantity -= 1
-        self.save()
-
-    @property
-    def total_price_of_item(self):
-        return (self.quantity * self.products.sale_price)
-
-    def __str__(self):
-        return f'medium {self.medium} - {self.product}'
-
-
 
 
 
@@ -626,33 +569,43 @@ class Medium_Products(models.Model):
 
 # --------------------------------------CREATE MEDIUM--------------------------------------
 
-# class Medium(models.Model):
-#     products = models.ManyToManyField(Product, through='Products_Medium')
+class Medium(models.Model):
+    products = models.ManyToManyField(Product, through='Products_Medium')
 
-#     def __str__(self) -> str:
-#         return str(self.id)
+    def __str__(self) -> str:
+        return str(self.id)
 
-# class Products_Medium(models.Model):
-#     medium = models.ForeignKey(Medium, on_delete=models.CASCADE)
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-#     discount = models.FloatField(default=0)
-#     num_item = models.IntegerField()
-#     # total_price = models.FloatField(default=0)
+class Products_Medium(models.Model):
+    medium = models.ForeignKey(Medium, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    discount = models.FloatField(default=0)
+    num_item = models.IntegerField(default=0)
+    total_price = models.FloatField(default=0)
 
-#     def __str__(self) -> str:
-#         return f'{self.product.name} : {str(self.id)}'
+    def __str__(self) -> str:
+        return f'{self.product.name} : {str(self.id)}'
     
-#     def add_item(self):
-#         self.num_item += 1
-#         # self.total_price += self.product.sale_price
-#         self.save()
+    def add_item(self):
+        self.num_item += 1
+        self.total_price += self.product.sale_price
+        self.save()
     
-#     def sub_item(self):
-#         self.num_item -= 1
-#         # self.total_price -= self.product.sale_price
-#         self.save()
+    def sub_item(self):
+        self.num_item -= 1
+        self.total_price -= self.product.sale_price
+        self.save()
+
+    @property
+    def total_price_of_item(self):
+        return (self.num_item * self.product.sale_price)
     
-#     # def get
+    def add_num_item(self):
+        self.num_item  +=1
+        self.save()
+    
+
+
+
 
 # ------------------------------------------RETURNED GOODS------------------------------------------
         
@@ -688,3 +641,43 @@ class DamagedProduct(models.Model):
 
     def __str__(self) -> str:
         return self.product.name
+    
+
+
+
+
+
+
+
+
+class ManualReceipt(models.Model):
+    products = models.ManyToManyField(Product, through='ManualReceipt_Products')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    verify_code = models.IntegerField()
+    phonenumber = PhoneNumberField(region='DZ')
+    recive_payment = models.FloatField()
+    discount = models.FloatField()
+    reclaimed_products = models.FloatField()
+    previous_depts = models.FloatField()
+    remaining_amount = models.FloatField(default=0)
+    date = models.DateField(auto_now_add=True)
+    barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
+
+
+    def __str__(self) -> str:
+        return f'{self.client.name} - {str(self.id)}'
+    
+    # def get_remaining_amount(self):
+    #     self.remaining_amount = (self.recive_payment + self.discount + self.reclaimed_products) - self.previous_depts
+    #     self.save()
+    
+class ManualReceipt_Products(models.Model):
+    product = models.ForeignKey(Product, on_delete= models.CASCADE)
+    manualreceipt = models.ForeignKey(ManualReceipt, on_delete= models.CASCADE)
+    discount = models.FloatField()
+    num_item = models.IntegerField(default=0)
+    total_price = models.FloatField(default=0)
+
+    def __str__(self) -> str:
+        return f'{self.manualreciept.client.name} - {str(self.manualreciept.id)}'
