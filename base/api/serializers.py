@@ -424,6 +424,8 @@ class ProductsOutputsSerializer(serializers.ModelSerializer):
 
 
 class DelevaryArrivedSerializer(serializers.ModelSerializer):
+    output_receipt = OutputsSerializer(read_only=True)
+    employee = EmployeeSerializer(read_only=True)
     class Meta:
         model = DelevaryArrived
         fields = '__all__'

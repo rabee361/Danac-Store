@@ -395,6 +395,7 @@ class ListReceiptOutput(APIView):
     # permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, output_id):
+        output = Outputs.objects.get(id=output_id)
         products = Outputs_Products.objects.filter(output__id=output_id)
         output_serializer = ProductsOutputsSerializer(products, many=True)
         return Response(output_serializer.data)
@@ -473,6 +474,8 @@ class ListCreateDeliveryArrived(APIView):
 
     def get(self, request):
         delivery_arrived = DelevaryArrived.objects.all()
+        for delivery in delivery_arrived:
+            print(delivery.output_receipt)
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=True)
         return Response(del_arr_serializer.data)
     
@@ -491,9 +494,9 @@ class Medium_Handler(APIView):
             serializer = ProductsMediumSerializer(item,many=False)
         return Response(serializer.data)
     
-class GetMediumView(RetrieveAPIView):
-    queryset = Medium.objects.all()
-    serializer_class = MediumSerializer
+class DeleteProductsMediumView(RetrieveDestroyAPIView):
+    queryset = Products_Medium.objects.all()
+    serializer_class = ProductsMediumSerializer
 
 class UpdateProductsMedium(RetrieveUpdateAPIView):
     queryset = Products_Medium.objects.all()
@@ -661,3 +664,14 @@ class CreateManualReceiptView(APIView):
 #     def get(self, request, receipt_id):
 #         man
     
+from .send_sms import send_sms
+# def send(request):
+#     sms_body = "Thank you for registering!"
+#     send_sms('+963957322954', sms_body)
+class SendSms(APIView):
+
+    def post(self, request):
+        sms_body = "Thank you for registering"
+        send_sms('0502062445', sms_body)
+
+        return Response(status=status.HTTP_200_OK)

@@ -49,6 +49,7 @@ urlpatterns = [
     path('create-medium/', CreateMedium.as_view()),
     path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),
+    path('delete-product-from-medium/<str:pk>/', DeleteProductsMediumView.as_view()),
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),
 
     # _____________________________________________CREATE RECEIPT________________________________________
@@ -79,4 +80,6 @@ urlpatterns = [
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
+
+    path('send-sms/', SendSms.as_view()),
 ]
