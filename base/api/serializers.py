@@ -555,7 +555,7 @@ class MediumSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductsMediumSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(many=False,read_only=True)
+    prodcut = ProductSerializer(many=False,read_only=True)
     class Meta:
         model = Products_Medium
         fields = '__all__'
