@@ -14,12 +14,11 @@ urlpatterns = [
     path('user/' , CurrentUserView.as_view()),######
 
     path('clients/' , ListCreateClient.as_view() , name="clients"),######
-    path('get-client/' , ListCreateClient.as_view() , name="get-client"),######
     path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),########
     path('products/' , listCreateProducts.as_view() , name="products"),######
     path('get-product/<str:pk>/' , RetUpdDesProduct.as_view() , name="product"),##### 
     path('categories/' , ListCreateCategory.as_view() , name="categories"),##### 
-    path('get-category/' , ListCreateCategory.as_view() , name="get-category"),##### 
+    path('get-category/<str:pk>/' , ListCreateCategory.as_view() , name="get-category"),##### 
     path('employees/', ListCreateEmployee.as_view(), name='employee'),######
     path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'),####  
     path('user_items/' , CartProductsView.as_view() , name="user_products"),#### 
