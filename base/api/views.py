@@ -93,7 +93,7 @@ class listCreateProducts(ListCreateAPIView):
 class SpecialProducts(APIView):
     def get(self,request):
         products = Product.objects.all().order_by('?')
-        serializer = Product2Serializer(products)
+        serializer = Product2Serializer(products,many=True)
         return Response(serializer.data)
 
 
