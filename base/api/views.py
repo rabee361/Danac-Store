@@ -638,6 +638,7 @@ class ListMediumView(APIView):
 
 
 class CreateManualReceiptView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, medium_id):
         user = request.user
         client = Client.objects.get(id=request.data['client'])
