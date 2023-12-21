@@ -456,7 +456,15 @@ class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
 
 
 
+
+
 #################################################################### MEDIUM ################################################################# 
+
+class CreateMedium(CreateAPIView):
+    queryset = Medium.objects.all()
+    serializer_class = MediumSerializer
+
+
 
 class RetDesMedium(RetrieveDestroyAPIView):
     queryset = Medium.objects.all()
@@ -479,58 +487,42 @@ class Add_To_Medium(APIView):
 
 
 
-
-class CreateIncomingView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request, medium_id):
-        user = request.user
-        supplier = Supplier.objects.get(id=request.data['supplier'])
-        employee = Employee.objects.get(phonenumber=user.phonenumber)
-        incoming_serializer = IncomingSerializer(data={
-            "employee":employee.id,
-            "supplier": supplier.id,
-            "agent":request.data['agent'],
-            "num_truck":request.data['num_truck'],
-            "code_verefy": request.data['code_verefy'],
-            "recive_pyement": request.data['recive_pyement'],
-            "phonenumber":request.data['phonenumber'], 
-            "discount":request.data['discount'],
-            "Reclaimed_products": request.data['Reclaimed_products'],
-            "previous_depts": request.data['previous_depts'],
-            "remaining_amount":request.data['remaining_amount'],
-        })
-        if incoming_serializer.is_valid():
-            incoming = incoming_serializer.save()
-            products = Products_Medium.objects.filter(medium__id=medium_id)
-            for product in products:
-                print(product.id)
-                update_quantity =Product.objects.get(id=product.product.id)
-                update_quantity.quantity += product.num_item
-                update_quantity.save()
-                income_product = Incoming_Product.objects.create(
-                    product = product.product,
-                    incoming = incoming,
-                    num_item = product.num_item,
-                    total_price = product.total_price,
-                )
-            products.delete()
-            return Response(incoming_serializer.data)
-        return Response(incoming_serializer.errors)
+class Medium_Handler(APIView):
+    def post(self, request, pk, pk2):
+        item = Products_Medium.objects.get(id=pk)
+        if pk2 == 'add':
+            item.add_item()
+            serializer = ProductsMediumSerializer(item,many=False)
+            return Response(serializer.data)
+        else:
+            if item.num_item == 1:
+                item.sub_item()
+                item.delete()
+            else:
+                item.sub_item()
+                 
+            serializer = ProductsMediumSerializer(item,many=False)
+        return Response(serializer.data)
     
 
-
-class ListReceiptOutput(APIView):
-    # permission_classes = [permissions.IsAuthenticated]
-    def get(self, request, output_id):
-        products = Output_Products.objects.filter(output__id=output_id)
-        output_serializer = ProductsOutputSerializer(products, many=True)
-        return Response(output_serializer.data)
-
-
-# --------------------------------------CREATE MEDIUM--------------------------------------
-class CreateMedium(CreateAPIView):
+class GetMediumView(RetrieveAPIView):
     queryset = Medium.objects.all()
     serializer_class = MediumSerializer
+
+
+class UpdateProductsMedium(RetrieveUpdateAPIView):
+    queryset = Products_Medium.objects.all()
+    serializer_class = UpdateProductMediumSerializer
+
+
+class ListMediumView(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, medium_id):
+        mediums = Products_Medium.objects.filter(medium__id=medium_id)
+        mediums_serializer = ProductsMediumSerializer(mediums, many=True)
+        
+        return Response(mediums_serializer.data)
+    
 
 class CreateMediumForOrderView(APIView):
     def post(self, request, order_id):
@@ -545,10 +537,24 @@ class CreateMediumForOrderView(APIView):
                 total_price=product.total_price
             )
         return Response(status=status.HTTP_200_OK)
+       
+
+ 
+
+ ##################################################RECEIPTS ######################################################################
         
+
+class ListReceiptOutput(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, output_id):
+        products = Output_Products.objects.filter(output__id=output_id)
+        output_serializer = ProductsOutputSerializer(products, many=True)
+        return Response(output_serializer.data)
+
+
+
 class ReceiptOrdersView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-
     def post(self, request, medium_id):
         # manual_reciept = request.data
         client_id = request.data['client']
@@ -603,37 +609,6 @@ class ListCreateDeliveryArrived(APIView):
         return Response(del_arr_serializer.data)
     
 
-class Medium_Handler(APIView):
-    def post(self, request, pk, pk2):
-        item = Products_Medium.objects.get(id=pk)
-        if pk2 == 'add':
-            item.add_item()
-            serializer = ProductsMediumSerializer(item,many=False)
-            return Response(serializer.data)
-        else:
-            item.sub_item()
-            if item.num_item == 0:
-                item.delete()
-            serializer = ProductsMediumSerializer(item,many=False)
-        return Response(serializer.data)
-    
-class GetMediumView(RetrieveAPIView):
-    queryset = Medium.objects.all()
-    serializer_class = MediumSerializer
-
-class UpdateProductsMedium(RetrieveUpdateAPIView):
-    queryset = Products_Medium.objects.all()
-    serializer_class = UpdateProductMediumSerializer
-
-class ListMediumView(APIView):
-    # permission_classes = [permissions.IsAuthenticated]
-    def get(self, request, medium_id):
-        mediums = Products_Medium.objects.filter(medium__id=medium_id)
-        mediums_serializer = ProductsMediumSerializer(mediums, many=True)
-        return Response(mediums_serializer.data)
-
-
-
 
 
 
@@ -672,3 +647,46 @@ class CreateManualReceiptView(APIView):
             return Response(manual_receipt_serializer.data)
         return Response(manual_receipt_serializer.errors)
     
+
+
+
+
+class CreateIncomingView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, medium_id):
+        user = request.user
+        supplier = Supplier.objects.get(id=request.data['supplier'])
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        incoming_serializer = IncomingSerializer(data={
+            "employee":employee.id,
+            "supplier": supplier.id,
+            "agent":request.data['agent'],
+            "num_truck":request.data['num_truck'],
+            "code_verefy": request.data['code_verefy'],
+            "recive_pyement": request.data['recive_pyement'],
+            "phonenumber":request.data['phonenumber'], 
+            "discount":request.data['discount'],
+            "Reclaimed_products": request.data['Reclaimed_products'],
+            "previous_depts": request.data['previous_depts'],
+            "remaining_amount":request.data['remaining_amount'],
+        })
+        if incoming_serializer.is_valid():
+            incoming = incoming_serializer.save()
+            products = Products_Medium.objects.filter(medium__id=medium_id)
+            for product in products:
+                print(product.id)
+                update_quantity =Product.objects.get(id=product.product.id)
+                update_quantity.quantity += product.num_item
+                update_quantity.save()
+                income_product = Incoming_Product.objects.create(
+                    product = product.product,
+                    incoming = incoming,
+                    num_item = product.num_item,
+                    total_price = product.total_price,
+                )
+            products.delete()
+            return Response(incoming_serializer.data)
+        return Response(incoming_serializer.errors)
+    
+
+

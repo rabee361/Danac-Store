@@ -36,3 +36,6 @@ admin.site.register(Deposite)
 admin.site.register(Medium)
 admin.site.register(Products_Medium)
 admin.site.register(ManualReceipt)
+admin.site.register(Output)
+admin.site.register(Output_Products)
+

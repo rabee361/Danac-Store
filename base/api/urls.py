@@ -71,8 +71,8 @@ urlpatterns = [
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### 
 
 
-    path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),#######
-    path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), 
+    path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
+    path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), ####
 
 
     path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),######
@@ -84,7 +84,7 @@ urlpatterns = [
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),####
     path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),####
 
-    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
+    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),####
 
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),

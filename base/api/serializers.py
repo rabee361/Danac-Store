@@ -439,6 +439,33 @@ class RecievedPaymentSerializer(serializers.ModelSerializer):
 
 
 
+class MediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medium
+        fields = '__all__'
+
+class ProductsMediumSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(many=False,read_only=True)
+    class Meta:
+        model = Products_Medium
+        fields = '__all__'
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['num_per_item'] = instance.product.num_per_item
+        repr['sale_price'] = instance.product.sale_price
+        repr['product'] = instance.product.name
+        return repr
+
+class UpdateProductMediumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Products_Medium
+        fields = ['discount']
+
+
+
+
+# ------------------------------------------RETURNED GOODS-----------------------------------------
+
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReturnedGoodsClient
@@ -451,10 +478,6 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
-
-# ------------------------------------------RETURNED GOODS------------------------------------------
-    
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReturnedGoodsSupplier
@@ -494,6 +517,9 @@ class DamagedProductSerializer(serializers.ModelSerializer):
 
 
 
+#################################################### RECIEPTS ###################################################################
+
+
 class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Incoming
@@ -520,7 +546,6 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
 
 
 
-
 class OutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Output
@@ -528,7 +553,6 @@ class OutputSerializer(serializers.ModelSerializer):
     
 
 class ProductsOutputSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Output_Products
         fields = '__all__'
@@ -544,29 +568,5 @@ class DelievaryArrivedSerializer(serializers.ModelSerializer):
 
 
 
-
-
-
 # --------------------------------------CREATE MEDIUM--------------------------------------
         
-class MediumSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Medium
-        fields = '__all__'
-
-class ProductsMediumSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(many=False,read_only=True)
-    class Meta:
-        model = Products_Medium
-        fields = '__all__'
-    def to_representation(self, instance):
-        repr = super().to_representation(instance)
-        repr['num_per_item'] = instance.product.num_per_item
-        repr['sale_price'] = instance.product.sale_price
-        repr['product'] = instance.product.name
-        return repr
-
-class UpdateProductMediumSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Products_Medium
-        fields = ['discount']
