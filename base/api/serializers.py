@@ -555,7 +555,7 @@ class MediumSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductsMediumSerializer(serializers.ModelSerializer):
-    prodcut = ProductSerializer(many=False,read_only=True)
+    product = ProductSerializer(many=False,read_only=True)
     class Meta:
         model = Products_Medium
         fields = '__all__'
@@ -563,7 +563,7 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
         repr = super().to_representation(instance)
         repr['num_per_item'] = instance.product.num_per_item
         repr['sale_price'] = instance.product.sale_price
-        repr['prodcut'] = instance.prodcut.name
+        repr['product'] = instance.product.name
         return repr
 
 class UpdateProductMediumSerializer(serializers.ModelSerializer):

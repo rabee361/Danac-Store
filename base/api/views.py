@@ -466,9 +466,9 @@ class RetDesMedium(RetrieveDestroyAPIView):
 
 class Add_To_Medium(APIView):
     def post(self, request, medium_id, product_id):
-        prodcut = Product.objects.get(id=product_id)
+        product = Product.objects.get(id=product_id)
         medium = Medium.objects.get(id=medium_id)
-        medium_products, created = Products_Medium.objects.get_or_create(product=prodcut, medium=medium)
+        medium_products, created = Products_Medium.objects.get_or_create(product=product, medium=medium)
         if created:
             medium_products.add_num_item()
             medium_products.total_price = medium_products.total_price_of_item
