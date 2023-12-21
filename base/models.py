@@ -486,6 +486,92 @@ class Payment(models.Model):
 
 
 
+
+
+
+############################################-RETURNED GOODS-----###############################################################################
+        
+class ReturnedGoodsSupplier(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+    reason = models.CharField(max_length=50)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'{self.product.name}:{self.reason}'
+    
+class ReturnedGoodsClient(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    client =  models.ForeignKey(Client, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+    reason = models.CharField(max_length=50)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'{self.product.name}:{self.reason}'
+
+class DamagedProduct(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.product.name
+    
+
+
+
+
+
+
+#########################################--------CREATE MEDIUM---------###########################################################
+
+class Medium(models.Model):
+    products = models.ManyToManyField(Product, through='Products_Medium')
+
+    def __str__(self) -> str:
+        return str(self.id)
+
+class Products_Medium(models.Model):
+    medium = models.ForeignKey(Medium, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    discount = models.FloatField(default=0)
+    num_item = models.IntegerField(default=0)
+    total_price = models.FloatField(default=0)
+
+    def __str__(self) -> str:
+        return f'{self.product.name} : {str(self.id)}'
+    
+    def add_item(self):
+        self.num_item += 1
+        self.total_price += self.product.sale_price
+        self.save()
+    
+    def sub_item(self):
+        self.num_item -= 1
+        self.total_price -= self.product.sale_price
+        self.save()
+
+    @property
+    def total_price_of_item(self):
+        return (self.num_item * self.product.sale_price)
+    
+    def add_num_item(self):
+        self.num_item  +=1
+        self.save()
+    
+
+
+
+
+
+
 #############################################################################################################################
 
 
@@ -523,7 +609,6 @@ class Incoming_Product(models.Model):
 
     def __str__(self) -> str:
         return f'{self.incoming.supplier.name}:{str(self.incoming.id)}'
-
 
 
 
@@ -567,86 +652,8 @@ class DelievaryArrived(models.Model):
 
 
 
-# --------------------------------------CREATE MEDIUM--------------------------------------
 
-class Medium(models.Model):
-    products = models.ManyToManyField(Product, through='Products_Medium')
-
-    def __str__(self) -> str:
-        return str(self.id)
-
-class Products_Medium(models.Model):
-    medium = models.ForeignKey(Medium, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    discount = models.FloatField(default=0)
-    num_item = models.IntegerField(default=0)
-    total_price = models.FloatField(default=0)
-
-    def __str__(self) -> str:
-        return f'{self.product.name} : {str(self.id)}'
-    
-    def add_item(self):
-        self.num_item += 1
-        self.total_price += self.product.sale_price
-        self.save()
-    
-    def sub_item(self):
-        self.num_item -= 1
-        self.total_price -= self.product.sale_price
-        self.save()
-
-    @property
-    def total_price_of_item(self):
-        return (self.num_item * self.product.sale_price)
-    
-    def add_num_item(self):
-        self.num_item  +=1
-        self.save()
-    
-
-
-
-
-# ------------------------------------------RETURNED GOODS------------------------------------------
-        
-class ReturnedGoodsSupplier(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    total_price = models.FloatField()
-    reason = models.CharField(max_length=50)
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return f'{self.product.name}:{self.reason}'
-    
-class ReturnedGoodsClient(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    client =  models.ForeignKey(Client, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    total_price = models.FloatField()
-    reason = models.CharField(max_length=50)
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return f'{self.product.name}:{self.reason}'
-
-class DamagedProduct(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    total_price = models.FloatField()
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return self.product.name
-    
-
-
-
-
-
+####################################################### MANUAL RECEIPT #############################################################333333
 
 
 
@@ -668,10 +675,7 @@ class ManualReceipt(models.Model):
     def __str__(self) -> str:
         return f'{self.client.name} - {str(self.id)}'
     
-    # def get_remaining_amount(self):
-    #     self.remaining_amount = (self.recive_payment + self.discount + self.reclaimed_products) - self.previous_depts
-    #     self.save()
-    
+
 class ManualReceipt_Products(models.Model):
     product = models.ForeignKey(Product, on_delete= models.CASCADE)
     manualreceipt = models.ForeignKey(ManualReceipt, on_delete= models.CASCADE)

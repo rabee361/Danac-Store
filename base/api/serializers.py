@@ -548,6 +548,7 @@ class DelievaryArrivedSerializer(serializers.ModelSerializer):
 
 
 # --------------------------------------CREATE MEDIUM--------------------------------------
+        
 class MediumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medium
@@ -562,7 +563,7 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
         repr = super().to_representation(instance)
         repr['num_per_item'] = instance.product.num_per_item
         repr['sale_price'] = instance.product.sale_price
-        repr['product'] = instance.prodcut.name
+        repr['prodcut'] = instance.prodcut.name
         return repr
 
 class UpdateProductMediumSerializer(serializers.ModelSerializer):

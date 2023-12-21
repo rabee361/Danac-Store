@@ -159,8 +159,9 @@ class Quantity_Handler(APIView):
             return Response(serializer.data)
         else:
             item.sub_item()
-            if item.quantity == 1:
+            if item.quantity == 0:
                 item.delete()
+
             serializer = Cart_ProductsSerializer(item,many=False)
         return Response(serializer.data)
             
@@ -419,158 +420,7 @@ class RetUpdDesRecievedPaymnt(RetrieveUpdateDestroyAPIView):
 #####################################################################################################################
 
 
-
-
-
-# --------------------------------------CREATE MEDIUM--------------------------------------
-# class CreateMedium(APIView):
-#     def post(self, request):
-#         medium = Medium.objects.create()
-#         return Response(status=status.HTTP_200_OK)
-
-# class CreateMediumView(APIView):
-#     def post(self, request, order_id):
-#         order = Order.objects.get(id=order_id)
-#         medium = Medium.objects.create()
-#         order_produdts = Order_Product.objects.filter(order=order)
-#         for product in order_produdts:
-#             medium_products = Products_Medium.objects.create(
-#                 product = product.products,
-#                 medium = medium,
-#                 num_item=product.quantity,
-#                 total_price=product.total_price
-#             )
-#         return Response(status=status.HTTP_200_OK)
-        
-# class ReceiptOrdersView(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def post(self, request, medium_id):
-#         # manual_reciept = request.data
-#         client_id = request.data['client']
-#         client = Client.objects.filter(id=client_id).first()
-#         employee = Employee.objects.get(phonenumber=request.user.phonenumber)
-#         output_serializer = OutputsSerializer(data={
-#             'employee':employee.id,
-#             "client": client.id,
-#             "verify_code": request.data['verify_code'],
-#             "recive_pyement": request.data['recive_pyement'],
-#             "phonenumber":request.data['phonenumber'], 
-#             "discount":request.data['discount'],
-#             "Reclaimed_products": request.data['Reclaimed_products'],
-#             "previous_depts": request.data['previous_depts'],
-#             'remaining_amount':request.data['remaining_amount'],
-            
-#         })
-#         if output_serializer.is_valid():
-#             output = output_serializer.save()
-#             products = Products_Medium.objects.filter(medium__id=medium_id)
-#             for product in products:
-#                 quantity_product = Product.objects.get(id=product.product.id)
-#                 quantity_product.quantity -= product.num_item
-#                 quantity_product.save()
-#                 output_product = Outputs_Products.objects.create(
-#                     products = product.product,
-#                     output = output,
-#                     quantity = product.num_item,
-#                     discount = product.discount,
-#                     total = product.total_price
-#                 )
-#             products.delete()
-#             return Response(output_serializer.data)
-#         return Response(output_serializer.errors)
-    
-# class Medium_Handler(APIView):
-#     def post(self,request,pk,pk2):
-#         item = Products_Medium.objects.get(id=pk)
-#         if pk2 == 'add':
-#             item.add_item()
-#             serializer = ProductsMediumSerializer(item,many=False)
-#             return Response(serializer.data)
-#         else:
-#             item.sub_item()
-#             if item.num_item == 1:
-#                 item.delete()
-#             serializer = ProductsMediumSerializer(item,many=False)
-#         return Response(serializer.data)
-    
-# class GetMediumView(RetrieveAPIView):
-#     queryset = Medium.objects.all()
-#     serializer_class = MediumSerializer
-
-# class ListMediumView(APIView):
-# #     # permission_classes = [permissions.IsAuthenticated]
-    
-#     def get(self, request, medium_id):
-#         mediums = Products_Medium.objects.filter(medium__id=medium_id)
-#         mediums_serializer = ProductsMediumSerializer(mediums, many=True)
-#         return Response(mediums_serializer.data)
-
-
-
-
-# ------------------------------------------RETURNED GOODS------------------------------------------
-
-# class ListCreateRetGoodsSupplier(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def post(self, request):
-#         user = request.user
-#         employee = Employee.objects.get(phonenumber=user.phonenumber)
-#         supplier = Supplier.objects.get(id = request.data['supplier'])
-#         product = Product.objects.get(id=request.data['product'])
-#         product.quantity -= int(request.data['quantity'])
-#         product.save()
-#         return_serializer = ReturnedGoodsSupplierSerializer(data={
-#             'product':product.id,
-#             'employee':employee.id,
-#             'supplier':supplier.id,
-#             'quantity':request.data['quantity'],
-#             'total_price':request.data['total_price'],
-#             'reason':request.data['reason']
-#         })
-#         if return_serializer.is_valid():
-#             return_serializer.save()
-#             return Response(return_serializer.data, status=status.HTTP_201_CREATED)
-#     def get(self, request):
-#         products = ReturnedGoodsSupplier.objects.all()
-#         serializer = ReturnedGoodsSupplierSerializer(products, many=True)
-#         return Response(serializer.data)
-
-
-# class ListCreateRetGoodsClient(APIView):
-#     # permission_classes = [permissions.IsAuthenticated]
-#     def post(self, request):
-#         user = request.user
-#         employee = Employee.objects.get(phonenumber=user.phonenumber)
-#         client = Client.objects.get(id = request.data['client'])
-#         product = Product.objects.get(id=request.data['product'])
-#         product.quantity += int(request.data['quantity'])
-#         product.save()
-#         return_serializer = ReturnedGoodsClientSerializer(data={
-#             'product':product.id,
-#             'employee':employee.id,
-#             'client':client.id,
-#             'quantity':request.data['quantity'],
-#             'total_price':request.data['total_price'],
-#             'reason':request.data['reason']
-#         })
-#         if return_serializer.is_valid():
-#             return_serializer.save()
-#             return Response(return_serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(return_serializer.errors)
-    
-
-#     def get(self, request):
-#         products = ReturnedGoodsClient.objects.all()
-#         serializer = ReturnedGoodsClientSerializer(products, many=True)
-#         return Response(serializer.data)
-
-
-
-
-# ------------------------------------------DAMAGED PRODUCTS------------------------------------------
-
+# ------------------------------------------DAMAGED & RETURNED PRODUCTS------------------------------------------
 
 
 class ListCreateRetGoodsSupplier(ListCreateAPIView):
@@ -603,12 +453,14 @@ class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
 
 
 
+
+
+
+#################################################################### MEDIUM ################################################################# 
+
 class RetDesMedium(RetrieveDestroyAPIView):
     queryset = Medium.objects.all()
     serializer_class = MediumSerializer
-
-
-
 
 
 
@@ -665,8 +517,6 @@ class CreateIncomingView(APIView):
             return Response(incoming_serializer.data)
         return Response(incoming_serializer.errors)
     
-
-
 
 
 class ListReceiptOutput(APIView):
@@ -762,7 +612,7 @@ class Medium_Handler(APIView):
             return Response(serializer.data)
         else:
             item.sub_item()
-            if item.num_item == 1:
+            if item.num_item == 0:
                 item.delete()
             serializer = ProductsMediumSerializer(item,many=False)
         return Response(serializer.data)
@@ -788,7 +638,6 @@ class ListMediumView(APIView):
 
 
 class CreateManualReceiptView(APIView):
-
     def post(self, request, medium_id):
         user = request.user
         client = Client.objects.get(id=request.data['client'])

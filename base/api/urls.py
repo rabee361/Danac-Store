@@ -62,7 +62,6 @@ urlpatterns = [
     path('recieved-payments/' , ListCreateRecievedPayment.as_view() , name="payments"),###### 
     path('get-recieved-payment/<str:pk>/' , RetUpdDesRecievedPaymnt.as_view() , name="get-payment"),######
 
-
     path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),##### 
     path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()), ##### 
     path('returned-goods-client/', ListCreateRetGoodsClient.as_view()), ##### 
@@ -70,10 +69,9 @@ urlpatterns = [
 
     path('damaged-product/', ListCreateDamagedProduct.as_view()),####### 
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### 
-    
 
 
-    path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
+    path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),#######
     path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), 
 
 
@@ -87,7 +85,6 @@ urlpatterns = [
     path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),####
 
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
-
 
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
