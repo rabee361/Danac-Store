@@ -270,7 +270,13 @@ class GetSupplier(RetrieveUpdateDestroyAPIView):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
 
+class RetUpdDesClient(RetrieveUpdateDestroyAPIView):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
 
+class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 ########################################### HR ######################################################################
 
