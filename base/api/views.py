@@ -90,6 +90,14 @@ class listCreateProducts(ListCreateAPIView):
     filterset_class = ProductFilter
 
 
+class SpecialProducts(APIView):
+    def get(self,request):
+        products = Product.objects.all().order_by('?')
+        serializer = Product2Serializer(products)
+        return Response(serializer.data)
+
+
+
 class ListCreateCategory(ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -591,6 +599,15 @@ class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
     queryset = DamagedProduct.objects.all()
     serializer_class = DamagedProductSerializer
     # permission_classes = [permissions.IsAuthenticated]
+
+
+
+
+class RetDesMedium(RetrieveDestroyAPIView):
+    queryset = Medium.objects.all()
+    serializer_class = MediumSerializer
+
+
 
 
 

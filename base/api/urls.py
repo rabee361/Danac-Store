@@ -16,6 +16,7 @@ urlpatterns = [
     path('clients/' , ListCreateClient.as_view() , name="clients"),######
     path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),########
     path('products/' , listCreateProducts.as_view() , name="products"),######
+    path('special-products/' , SpecialProducts.as_view() , name="special-products")######
     path('get-product/<str:pk>/' , RetUpdDesProduct.as_view() , name="product"),##### 
     path('categories/' , ListCreateCategory.as_view() , name="categories"),##### 
     path('get-category/<str:pk>/' , RetUpdDesCategory.as_view() , name="get-category"),##### 
@@ -77,12 +78,13 @@ urlpatterns = [
 
 
     path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),######
-    path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),#### new
+    path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),#### 
     path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),###### 
     path('create-medium/', CreateMedium.as_view()),##### 
     path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),####
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),####
-    path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),#### new
+    path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),####
+    path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),####
 
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
 
