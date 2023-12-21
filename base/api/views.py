@@ -620,7 +620,7 @@ class CreateIncomingView(APIView):
         incoming_serializer = IncomingSerializer(data={
             "employee":employee.id,
             "supplier": supplier.id,
-            "client":request.data['client'],
+            "agent":request.data['agent'],
             "num_truck":request.data['num_truck'],
             "code_verefy": request.data['code_verefy'],
             "recive_payment": request.data['recive_payment'],
