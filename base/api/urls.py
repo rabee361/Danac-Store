@@ -22,7 +22,7 @@ urlpatterns = [
     path('get-category/<str:pk>/' , RetUpdDesCategory.as_view() , name="get-category"),##### 
     path('employees/', ListCreateEmployee.as_view(), name='employee'),######
     path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'),####  
-    path('cart_items/' , Cart_Items.as_view() , name="cart_products"),#### 
+    path('cart_items/<str:pk>' , Cart_Items.as_view() , name="cart_products"),#### 
     path('cart/' , CreateCartView.as_view()),##### 
     path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),#### 
     path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"), #### 
