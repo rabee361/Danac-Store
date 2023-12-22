@@ -151,7 +151,7 @@ class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
 class Cart_Items(APIView):
     def get(self,request,pk):
         products = Cart_Products.objects.filter(cart=pk)
-        serializer = Cart_ProductsSerializer(products,many=True)
+        serializer = Cart_ProductsSerializer(products,many=True, context={'request': request})
         return Response(serializer.data)
 
 

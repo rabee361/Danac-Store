@@ -107,6 +107,22 @@ class ClientSerializer(serializers.ModelSerializer):
         return total
 
 
+
+
+
+class Product2Serializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.image.url)
+
+
+
+
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.CharField()
     class Meta:
@@ -136,15 +152,18 @@ class ProductSerializer(serializers.ModelSerializer):
         return repr
 
 
-class Product2Serializer(serializers.ModelSerializer):
+
+class Product3Serializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['id','name','image','description','sale_price']
 
     def get_image(self, obj):
         request = self.context.get('request')
         return request.build_absolute_uri(obj.image.url)
+
+
 
 class CodeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -172,7 +191,7 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class Cart_ProductsSerializer(serializers.ModelSerializer):
-    # products = ProductSerializer()
+    products = Product3Serializer()
     class Meta:
         model = Cart_Products
         fields = ['id','quantity','cart','products','total_price_of_item']
