@@ -137,15 +137,24 @@ class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
 
 #################################################### CART HNADLING #####################################################################
 
-class CartProductsView(ListCreateAPIView):
-    # permission_classes = [IsAuthenticated]
-    queryset = Cart_Products.objects.select_related('products','cart').all()
-    serializer_class = Cart_ProductsSerializer
-
-    def get_queryset(self):
-        client = Client.objects.get(id=1)
-        return Cart_Products.objects.filter(cart__customer=client)
+# class CartProductsView(ListCreateAPIView):
+#     # permission_classes = [IsAuthenticated]
+#     queryset = Cart_Products.objects.select_related('products','cart').all()
+#     serializer_class = Cart_ProductsSerializer
+#     def get_queryset(self):
+#         client = Client.objects.get(id=1)
+#         return Cart_Products.objects.filter(cart__customer=client)
     
+
+
+
+class Cart_Items(APIView):
+    def get(self,request,pk):
+        products = Cart_Products.objects.filter(cart=pk)
+        serializer = Cart_ProductsSerializer(products,many=True)
+        return Response(serializer.data)
+
+
 
 class CreateCartView(ListCreateAPIView):
     queryset = Cart.objects.select_related('customer').prefetch_related('items').all()
