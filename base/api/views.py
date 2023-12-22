@@ -15,7 +15,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import F
 
 
-######--------- authentication --------#######
+####################################### AUTHENTICATION ###################################################################3#######
 
 class SignUpView(GenericAPIView):
     serializer_class  = SignUpSerializer
@@ -61,7 +61,8 @@ class LogoutAPIView(GenericAPIView):
 
 
 
-#####-----testing-----#####
+################################################### TESTING #############################################################################
+    
 class test(ListAPIView):
     permission_classes = (AllowAny,)
     def get(self,request):
@@ -76,12 +77,7 @@ class CurrentUserView(ListAPIView):
         return CustomUser.objects.filter(id=self.request.user.id)
 
 
-############-------cart and products -----######################
-    
-class ListCreateClient(ListCreateAPIView):
-    queryset = Client.objects.all()
-    serializer_class = ClientSerializer
-
+######################################### CART & PRODUCTS ##########################################################################
 
 class listCreateProducts(ListCreateAPIView):
     queryset = Product.objects.all()
@@ -96,24 +92,6 @@ class SpecialProducts(APIView):
         serializer = Product2Serializer(products,many=True)
         return Response(serializer.data)
 
-
-
-class ListCreateCategory(ListCreateAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(
-                {"message": "تمت الإضافة بنجاح"},
-                status=status.HTTP_201_CREATED,
-                headers=headers
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
@@ -133,7 +111,30 @@ class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         serializer.save()
 
-############################ CART HNADLING ######################
+
+class ListCreateCategory(ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                {"message": "تمت الإضافة بنجاح"},
+                status=status.HTTP_201_CREATED,
+                headers=headers
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+#################################################### CART HNADLING #####################################################################
         
 class CartProductsView(ListCreateAPIView):
     # permission_classes = [IsAuthenticated]
@@ -181,9 +182,8 @@ class Add_to_Cart(APIView):
         serializer = Cart_ProductsSerializer(cart_products)
         return Response("تمت اضافة المنتج الى السلة")
 
-##################### END CART ######################
 
-##################### ORDER HANDLING ####################
+###################################### ORDER HANDLING #######################################################################
 
 
 class CreateOrderView(APIView):
@@ -225,6 +225,10 @@ class RetUpdDesClient(RetrieveAPIView):
     serializer_class = ClientSerializer
 
 
+    
+class ListCreateClient(ListCreateAPIView):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
 
 
 
@@ -241,9 +245,6 @@ class ResetPasswordView(GenericAPIView):
             'message':'Password Changed Successfully.'
         }
         return Response(messages, status=status.HTTP_200_OK)
-
-
-
 
 
 
@@ -283,9 +284,6 @@ class RetUpdDesClient(RetrieveUpdateDestroyAPIView):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
 
-class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
 
 ########################################### HR ######################################################################
 
@@ -545,7 +543,7 @@ class CreateMediumForOrderView(APIView):
         
 
 class GetOutput(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
     def get(self, request, output_id):
         products = Output_Products.objects.filter(output__id=output_id)
         output_serializer = ProductsOutputSerializer(products, many=True)
@@ -660,7 +658,7 @@ class CreateIncomingView(APIView):
 
 
 class GetIncoming(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
     def get(self, request, incoming_id):
         products = Incoming_Product.objects.filter(incoming__id=incoming_id)
         incoming_serializer = IncomingProductsSerializer(products, many=True)
@@ -714,13 +712,12 @@ class CreateManualReceiptView(APIView):
         return Response(manual_receipt_serializer.errors)
     
 
-class GetMaualReceipt(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+class GetManualReceipt(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
     def get(self, request, manual_id):
         products = ManualReceipt_Products.objects.filter(manualreceipt_id=manual_id)
         manual_serializer = ManualRecieptProductsSerializer(products, many=True)
         return Response(manual_serializer.data)
-
 
 
 

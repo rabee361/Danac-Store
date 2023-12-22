@@ -87,7 +87,7 @@ urlpatterns = [
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),####
     path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),#### 
 
-    path('get-manual-receipt/<str:medium_id>/', ListManualReceipt.as_view(), name="list-manuals"),##### new
+    path('get-receipt-manual/<str:medium_id>/', GetManualReceipt.as_view(), name="list-manuals"),##### new
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),#### new
     path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),##### new
 
