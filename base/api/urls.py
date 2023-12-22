@@ -30,8 +30,8 @@ urlpatterns = [
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), #######
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),######
-    path('orders/' , ListOrders.as_view() ,name="orders"),####### new
-    path('order/<str:pk>/' , GetOrder.as_view() , name="get-order"),#### new
+    path('orders/' , ListOrders.as_view() ,name="orders"),#######
+    path('order/<str:pk>/' , GetOrder.as_view() , name="get-order"),####
 
     path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),#######
     path('get-bonus/<str:pk>/', RetUpdDesBonusView.as_view(), name='get-bonus'),######
@@ -47,6 +47,10 @@ urlpatterns = [
     path('get-extra-expense/<str:pk>/', RetUpdDesExtraExpense.as_view(), name='get-expense'),#####
     path('employee_salary/<int:employee_id>/', GetSalaryEmployee.as_view()),########## 
     path('salaries/' , ListCreateSalary.as_view() , name="create-salary"),######## 
+
+    path('sales-employees/' , SalesEmployee.as_view() , name="sale-employees"),###### new
+    path('get-sales-employee/<str:pk>' , RetSalesEmployee.as_view() , name="get-sales-employee"), ##### new
+
 
     path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),######## 
     path('client-debts/' , ListCreateClientDebts.as_view() , name=""),########### 
@@ -90,8 +94,8 @@ urlpatterns = [
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),####
     path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),#### 
 
-    path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()), ###### new
-    path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),###### new
+    path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()), ###### 
+    path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),###### 
 
     ]
 

@@ -268,6 +268,18 @@ class EmployeeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SalesEmployeeSerializer(serializers.ModelSerializer):
+    longitude = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+    class Meta:
+        model = Employee
+        fields = ['id','name','notes','truck_num','phonenumber','longitude','latitude']
+
+    def get_longitude(self, obj):
+        return obj.location.x
+
+    def get_latitude(self, obj):
+        return obj.location.y
 
 ################################# HR ##################################################################
 
@@ -318,6 +330,7 @@ class SalarySerializer(serializers.ModelSerializer):
 
 
 class EmployeeSalarySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Employee
         fields = ['id','job_position','name', 'salary','sale_percentage']

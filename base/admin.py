@@ -9,8 +9,6 @@ class EstateAdmin(GISModelAdmin):
 
 admin.site.register(CodeVerification)
 admin.site.register(CustomUser)
-admin.site.register(SalesEmployee)
-admin.site.register(Driver)
 admin.site.register(Product)
 admin.site.register(Category)
 admin.site.register(Order)

@@ -13,6 +13,7 @@ from base.filters import ProductFilter
 import random
 from django.shortcuts import get_object_or_404
 from django.db.models import F
+from rest_framework.exceptions import NotFound
 
 
 ####################################### AUTHENTICATION ###################################################################3#######
@@ -213,6 +214,27 @@ class GetOrder(RetrieveAPIView):
 
 
 ################---------- -----------############
+
+
+class SalesEmployee(APIView):
+    def get(self,request):
+        sales_employees = Employee.objects.filter(Q(truck_num__gt=0) & Q(truck_num__isnull=False))
+        serializer = SalesEmployeeSerializer(sales_employees,many=True)
+        return Response(serializer.data)
+
+
+class RetSalesEmployee(RetrieveAPIView):
+    queryset = Employee.objects.filter(truck_num__gt=0)
+    serializer_class = SalesEmployeeSerializer
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        try:
+            employee = queryset.get(pk=self.kwargs['pk'])
+        except Employee.DoesNotExist:
+            raise NotFound("No sales employee matches the given query.")
+        return employee
+
 
 class ListCreateEmployee(ListCreateAPIView):
     queryset = Employee.objects.all()
