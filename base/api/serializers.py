@@ -618,9 +618,21 @@ class OutputSerializer2(serializers.ModelSerializer):
 ##########################################
 
 class DelievaryArrivedSerializer(serializers.ModelSerializer):
+    # output_receipt = OutputSerializer2(many=False,read_only=True)
+    employee_name = serializers.CharField(source='output_receipt.employee.name')
+    employee_phone = serializers.CharField(source='output_receipt.employee.phonenumber')
+    output_id = serializers.IntegerField(source='output_receipt.id')
+    phonenumber = serializers.CharField(source='output_receipt.client.phonenumber')
+    address = serializers.CharField(source='output_receipt.client.address')
+    client_id = serializers.CharField(source='output_receipt.client.id')
+    client_name = serializers.CharField(source='output_receipt.client.name')
+    customer_service = serializers.CharField(source='output_receipt.phonenumber')
+    products = ProductsOutputSerializer(source='output_receipt.output_products_set', many=True)
+    barcode = serializers.CharField(source='output_receipt.barcode')
+    date = serializers.DateField(source='output_receipt.date')
     class Meta:
         model = DelievaryArrived
-        fields = '__all__'
+        fields = ['employee_name','employee_phone','date','output_id','phonenumber','barcode','address','client_id','client_name','customer_service','products']
 
 
 

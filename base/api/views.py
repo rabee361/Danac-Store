@@ -206,6 +206,10 @@ class ListOrders(ListAPIView):
     # permission_classes = [permissions.IsAuthenticated,]
 
 
+class GetOrder(RetrieveAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
 
 
 ################---------- -----------############
@@ -542,12 +546,10 @@ class CreateMediumForOrderView(APIView):
  ##################################################RECEIPTS ######################################################################
         
 
-class GetOutput(APIView):
+class GetOutput(RetrieveAPIView):
     # permission_classes = [permissions.IsAuthenticated]
-    def get(self, request, output_id):
-        products = Output_Products.objects.filter(output__id=output_id)
-        output_serializer = ProductsOutputSerializer(products, many=True)
-        return Response(output_serializer.data)
+    queryset = Output.objects.all()
+    serializer_class = OutputSerializer2
 
 
 class ListOutputs(ListAPIView):
@@ -604,7 +606,6 @@ class ListCreateDeliveryArrived(APIView):
         del_arr_serializer = DelievaryArrivedSerializer(delivery_arrived, many=False)
         return Response(del_arr_serializer.data)
     
-
     def get(self, request):
         delivery_arrived = DelievaryArrived.objects.all()
         del_arr_serializer = DelievaryArrivedSerializer(delivery_arrived, many=True)
@@ -657,13 +658,10 @@ class CreateIncomingView(APIView):
 
 
 
-class GetIncoming(APIView):
+class GetIncoming(RetrieveAPIView):
     # permission_classes = [permissions.IsAuthenticated]
-    def get(self, request, incoming_id):
-        products = Incoming_Product.objects.filter(incoming__id=incoming_id)
-        incoming_serializer = IncomingProductsSerializer(products, many=True)
-        return Response(incoming_serializer.data)
-
+    queryset = Incoming.objects.all()
+    serializer_class = IncomingSerializer2
 
 
 class ListIncomings(ListAPIView):
