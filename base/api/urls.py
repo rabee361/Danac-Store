@@ -56,6 +56,7 @@ urlpatterns = [
     # _____________________________________________CREATE RECEIPT________________________________________
 
     path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
+    path('get-product-for-receipt-output/<str:output_id>/', GetProductsOutputsView.as_view()),
     path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),
     path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),
     path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), 

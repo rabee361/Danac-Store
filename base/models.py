@@ -61,7 +61,7 @@ class Client(models.Model):
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=100)
     category = models.CharField(max_length=75, choices=CHOICES, null=True)
-    phomnenumber = PhoneNumberField(region='DZ')
+    phonenumber = PhoneNumberField(region='DZ')
     info = models.TextField(null=True)
 
     def __str__(self):
@@ -514,7 +514,7 @@ class Product_Order_Envoy(models.Model):
         return f'{self.product.name} - {str(self.order_envoy.id)}'
     
 class Num(models.Model):
-    number = models.BigIntegerField()
+    number = PhoneNumberField(region='DZ')
 
     def __str__(self) -> str:
         return str(self.number)

@@ -423,6 +423,30 @@ class OutputsSerializer(serializers.ModelSerializer):
         model = Outputs
         fields = '__all__'
 
+class GetOutputsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Outputs
+        fields = ['client', 'employee', 'verify_code', 'phonenumber', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['client'] = instance.client.name
+        repr['id'] = instance.client.id
+        repr['employee'] = instance.employee.name
+        return repr
+    
+class GetProductsOutputsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Outputs_Products
+        fields = ['products', 'quantity', 'total', 'discount']
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['num_per_item '] = instance.products.num_per_item
+        repr['sale_price'] = instance.products.sale_price
+        repr['product'] = instance.products.name
+        return repr
+
 
 class DelevaryArrivedSerializer(serializers.ModelSerializer):
     output_receipt = OutputsSerializer(read_only=True)
@@ -439,9 +463,17 @@ class MediumSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductsMediumSerializer(serializers.ModelSerializer):
+    # product = ProductSerializer(many=False, read_only=True)
     class Meta:
         model = Products_Medium
         fields = '__all__'
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['num_per_item '] = instance.product.num_per_item
+        repr['sale_price'] = instance.product.sale_price
+        repr['product'] = instance.product.name
+        return repr
 
 class UpdateProductMediumSerializer(serializers.ModelSerializer):
     class Meta:

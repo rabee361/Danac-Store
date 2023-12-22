@@ -175,7 +175,7 @@ class ListPointsView(GenericAPIView):
 
     def get(self, request):
         user = request.user
-        clinet = Client.objects.get(phomnenumber=user.phonenumber)
+        clinet = Client.objects.get(phonenumber=user.phonenumber)
         points = clinet.point_set.all()
         serializer = PointSerializer(points, many=True)
         response = serializer.data
@@ -205,7 +205,7 @@ class ListOrdersUserView(GenericAPIView):
 
     def get(self, request):
         user = request.user
-        client = Client.objects.get(phomnenumber=user.phonenumber)
+        client = Client.objects.get(phonenumber=user.phonenumber)
         orders = client.order_set.all()
         serializer = self.get_serializer(orders, many=True)
         response = serializer.data
@@ -221,7 +221,7 @@ class CreateOrderView(APIView):
 
     def post(self, request):
         user = request.user
-        client = Client.objects.get(phomnenumber=user.phonenumber)
+        client = Client.objects.get(phonenumber=user.phonenumber)
         cart = Cart.objects.get(customer=client)
         cart_products = Cart_Products.objects.filter(cart=cart)
         order = Order.objects.create(clinet=client, delivery_date=request.data['delivery_date'])
@@ -311,9 +311,9 @@ class Add_To_Medium(APIView):
     
 
     def post(self, request, medium_id, product_id):
-        prodcut = Product.objects.get(id=product_id)
+        product = Product.objects.get(id=product_id)
         medium = Medium.objects.get(id=medium_id)
-        medium_products, created = Products_Medium.objects.get_or_create(product=prodcut, medium=medium)
+        medium_products, created = Products_Medium.objects.get_or_create(product=product, medium=medium)
         if created:
             medium_products.add_num_item()
             medium_products.total_price = medium_products.total_price_of_item
@@ -367,7 +367,7 @@ class ListCreateCartProduct(APIView):
 
     def post(self, request):
         user = request.user
-        client = Client.objects.filter(phomnenumber=user.phonenumber).first()
+        client = Client.objects.filter(phonenumber=user.phonenumber).first()
         cart = Cart.objects.filter(customer=client).first()
         product = Product.objects.get(id=request.data['id'])
         serializer = Cart_ProductsSerializer(data = {
@@ -383,7 +383,7 @@ class ListCreateCartProduct(APIView):
 
     def get(self, request):
         user = request.user
-        client = Client.objects.get(phomnenumber = user.phonenumber)
+        client = Client.objects.get(phonenumber = user.phonenumber)
         cart = Cart.objects.get(customer=client)
         cart_serializer = CartSerializer(cart)
         return Response(cart_serializer.data)
@@ -399,10 +399,18 @@ class ListReceiptOutput(APIView):
 
     def get(self, request, output_id):
         # output = Outputs.objects.get(id=output_id)
-        products = Outputs.objects.get(id=output_id)
-        output_serializer = OutputsSerializer(products)
-        return Response(output_serializer.data)
+        receipt = Outputs.objects.get(id=output_id)
+        products = Outputs_Products.objects.filter(output__id= output_id)
+        products_serializer = GetProductsOutputsSerializer(products, many=True)
+        receipt_serializer = GetOutputsSerializer(receipt)
+        return Response({'receipt':receipt_serializer.data, 'products':products_serializer.data})
 
+class GetProductsOutputsView(APIView):
+
+    def get(self, request, output_id):
+        products_one = Outputs_Products.objects.filter(output__id= output_id)
+        output_serializer = GetProductsOutputsSerializer(products_one, many=True)
+        return Response(output_serializer.data, status=status.HTTP_200_OK)
 # --------------------------------------CREATE MEDIUM--------------------------------------
 class CreateMedium(APIView):
     # permission_classes = [permissions.IsAuthenticated, IsManager]
@@ -684,17 +692,11 @@ class SendSms(APIView):
     # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        body = "Thank you for registering"
+        body = 123
         # to = "+213660030002"
-        user = request.user
-        # client = Client.objects.get(phomnenumber=user.phonenumber)
-        # client_serializer = ClientSerializer(client, many=False)
-        # serializer = client_serializer.data
-        # print(serializer['phomnenumber'])
-        serializer ={
-            'phomnenumber':213660020003
-        }
-        print(type(serializer['phomnenumber']))
-        send_sms(serializer['phomnenumber'], body)
+        num = Num.objects.all().first()
+        serializer = NumSer(num, many=False)
+        data = serializer.data
+        send_sms(data['number'], body)
 
         return Response(status=status.HTTP_200_OK)
