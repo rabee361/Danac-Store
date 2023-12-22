@@ -46,7 +46,7 @@ class Client(models.Model):
 
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 
 
@@ -111,7 +111,7 @@ class Order_Product(models.Model):
 class Cart_Products(models.Model):
     products = models.ForeignKey(Product, on_delete=models.CASCADE)
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=0)
+    quantity = models.IntegerField(default=1)
 
     class Meta:
         ordering = ['products__added']

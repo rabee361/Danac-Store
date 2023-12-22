@@ -28,8 +28,23 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class SignUpSerializer(serializers.ModelSerializer):
 
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['image']
+
+    def update(self, instance, validated_data):
+        instance.image = validated_data['image']
+        instance.save()
+        return instance
+
+
+
+
+
+class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['phonenumber','username', 'password']
@@ -184,17 +199,23 @@ class SupplierSerializer(serializers.ModelSerializer):
 
 
 
-class CartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cart
-        fields = ['id','customer','items','get_items_num','total_cart_price']
-
-
 class Cart_ProductsSerializer(serializers.ModelSerializer):
     products = Product3Serializer()
     class Meta:
         model = Cart_Products
         fields = ['id','quantity','cart','products','total_price_of_item']
+
+class Cart_ProductsSerializer2(serializers.ModelSerializer):
+    class Meta:
+        model = Cart_Products
+        fields = '__all__'
+
+
+
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = ['id','customer','items','get_items_num','total_cart_price']
 
 
 

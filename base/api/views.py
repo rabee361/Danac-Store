@@ -51,6 +51,28 @@ class UserLoginApiView(GenericAPIView):
 
 
 
+
+class UpdateImageUserView(APIView):
+
+    permission_classes=[permissions.IsAuthenticated]
+
+    def put(self, requset, user_pk):
+
+        user_pk = requset.user.id
+        user = CustomUser.objects.get(id=user_pk)
+        serializer = UpdateUserSerializer(user, data=requset.data, many=False, context={'request':requset})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+
+                {'success':"The changed image Profile has been successfully."},
+                status=status.HTTP_200_OK
+            )
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
 class LogoutAPIView(GenericAPIView):
     serializer_class = UserLogoutSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -156,24 +178,20 @@ class Cart_Items(APIView):
 
 
 
-class CreateCartView(ListCreateAPIView):
-    queryset = Cart.objects.select_related('customer').prefetch_related('items').all()
-    serializer_class = CartSerializer
-
 
 class Quantity_Handler(APIView):
     def post(self,request,pk,pk2):
         item = Cart_Products.objects.get(id=pk)
         if pk2 == 'add':
             item.add_item()
-            serializer = Cart_ProductsSerializer(item,many=False)
+            serializer = Cart_ProductsSerializer2(item,many=False)
             return Response(serializer.data)
         else:
             item.sub_item()
             if item.quantity == 0:
                 item.delete()
 
-            serializer = Cart_ProductsSerializer(item,many=False)
+            serializer = Cart_ProductsSerializer2(item,many=False)
         return Response(serializer.data)
             
 
@@ -182,15 +200,17 @@ class Add_to_Cart(APIView):
     def post(self,request,pk,pk2):
         client = Client.objects.get(id=pk2)
         item = Product.objects.get(id=pk)
-        cart, created = Cart.objects.get_or_create(customer=client.id)
+        cart, created = Cart.objects.get_or_create(customer=client)
         cart_products, created = Cart_Products.objects.get_or_create(products=item, cart=cart)
         if not created:
             Cart_Products.objects.filter(products=item, cart=cart).\
                                     update(quantity=F('quantity') + 1)
-
-            return Response("added to cart")
-        serializer = Cart_ProductsSerializer(cart_products)
-        return Response("تمت اضافة المنتج الى السلة")
+            product = Cart_Products.objects.get(products=item, cart=cart)
+            serializer = Cart_ProductsSerializer2(product,many=False)
+            return Response(serializer.data)
+        product = Cart_Products.objects.get(products=item, cart=cart)
+        serializer = Cart_ProductsSerializer2(product,many=False)
+        return Response(serializer.data)
 
 
 ###################################### ORDER HANDLING #######################################################################
@@ -750,3 +770,7 @@ class GetManualReceipt(RetrieveAPIView):
 class ListManualReceipt(ListAPIView):
     queryset = ManualReceipt.objects.all()
     serializer_class = ManualRecieptSerializer2
+
+
+
+# class 
