@@ -436,9 +436,6 @@ class RecievedPaymentSerializer(serializers.ModelSerializer):
 
 
 
-
-
-
 class MediumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medium
@@ -460,7 +457,6 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Products_Medium
         fields = ['discount']
-
 
 
 
@@ -520,35 +516,13 @@ class DamagedProductSerializer(serializers.ModelSerializer):
 #################################################### RECIEPTS ###################################################################
 
 
+
+################################# INCOMING ############################################# 
+
+
 class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Incoming
-        fields = '__all__'
-    
-    
-class IncomingProductsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Incoming_Product
-        fields = '__all__'
-
-
-
-class ManualRecieptSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ManualReceipt
-        fields = '__all__'
-
-    
-class ManualRecieptProductsSerializer(serializers.ModelSerializer):
-    class Meta :
-        model = ManualReceipt_Products
-        fields = '__all__'
-
-
-
-class OutputSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Output
         fields = '__all__'
     
 
@@ -558,6 +532,61 @@ class SpecialSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id','name','num_per_item','sale_price']
 
+
+
+class IncomingProductsSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='product.id')
+    name = serializers.CharField(source='product.name')
+    num_per_item = serializers.IntegerField(source='product.num_per_item')
+    sale_price = serializers.FloatField(source='product.sale_price')
+
+    class Meta:
+        model = Incoming_Product
+        fields = ['id', 'name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'incoming']
+
+
+
+class IncomingSerializer2(serializers.ModelSerializer):
+    products = IncomingProductsSerializer(source='incoming_product_set', many=True,read_only=True)
+    class Meta:
+        model = Incoming
+        fields = ['id','agent','supplier','num_truck','employee','code_verefy','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+    
+
+############################# 
+
+
+class ManualRecieptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ManualReceipt
+        fields = '__all__'
+
+    
+class ManualRecieptProductsSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='product.id')
+    name = serializers.CharField(source='product.name')
+    num_per_item = serializers.IntegerField(source='product.num_per_item')
+    sale_price = serializers.FloatField(source='product.sale_price')
+    
+    class Meta :
+        model = ManualReceipt_Products
+        fields = ['id', 'name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'manualreceipt']
+
+
+class ManualRecieptSerializer2(serializers.ModelSerializer):
+    products = ManualRecieptProductsSerializer(source='manualreceipt_products_set', many=True,read_only=True)
+    class Meta:
+        model = ManualReceipt
+        fields = ['id','client','employee','verify_code','phonenumber','recive_payment','discount','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+
+
+########################################## OUTPUT ##############################################
+        
+class OutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Output
+        fields = '__all__'
+    
 
 class ProductsOutputSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='products.id')
@@ -585,6 +614,8 @@ class OutputSerializer2(serializers.ModelSerializer):
     def get_latitude(self, obj):
         return obj.location.y
 
+
+##########################################
 
 class DelievaryArrivedSerializer(serializers.ModelSerializer):
     class Meta:

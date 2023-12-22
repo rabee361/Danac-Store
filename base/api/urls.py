@@ -71,9 +71,13 @@ urlpatterns = [
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### 
 
 
-    path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
-    path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), ####
+    path('get-receipt-output/<int:output_id>/', GetOutput.as_view(), name='get-output'),##### new
+    path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), #### new
+    path('list-outputs/' , ListOutputs.as_view() , name="list-outputs"),##### new
 
+    path('get-receipt-incoming/<str:pk>/' , GetIncoming.as_view() , name="get-incoming"),##### new
+    path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),#### new
+    path('list-incoming/' , ListIncomings.as_view() , name="list-incomings"),##### new
 
     path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),######
     path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),#### 
@@ -81,10 +85,11 @@ urlpatterns = [
     path('create-medium/', CreateMedium.as_view()),##### 
     path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),####
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),####
-    path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),####
-    path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),####
+    path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),#### 
 
-    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),####
+    path('get-manual-receipt/<str:medium_id>/', ListManualReceipt.as_view(), name="list-manuals"),##### new
+    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),#### new
+    path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),##### new
 
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),

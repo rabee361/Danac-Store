@@ -544,7 +544,7 @@ class CreateMediumForOrderView(APIView):
  ##################################################RECEIPTS ######################################################################
         
 
-class ListReceiptOutput(APIView):
+class GetOutput(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request, output_id):
         products = Output_Products.objects.filter(output__id=output_id)
@@ -616,44 +616,8 @@ class ListCreateDeliveryArrived(APIView):
 
 
 
-class CreateManualReceiptView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request, medium_id):
-        user = request.user
-        client = Client.objects.get(id=request.data['client'])
-        employee = Employee.objects.get(phonenumber=user.phonenumber)
-        manual_receipt_serializer = ManualRecieptSerializer(data={
-            "employee":employee.id,
-            "client": client.id,
-            "verify_code": request.data['verify_code'],
-            "phonenumber":request.data['phonenumber'], 
-            "recive_payment": request.data['recive_payment'],
-            "discount":request.data['discount'],
-            "reclaimed_products": request.data['reclaimed_products'],
-            "previous_depts": request.data['previous_depts'],
-            "remaining_amount":request.data['remaining_amount'],
-        })
-        if manual_receipt_serializer.is_valid():
-            manual_receipt = manual_receipt_serializer.save()
-            products = Products_Medium.objects.filter(medium__id=medium_id)
-            for product in products:
-                update_quantity =Product.objects.get(id=product.product.id)
-                update_quantity.quantity -= product.num_item
-                update_quantity.save()
-                manual_eceipt_products = ManualReceipt_Products.objects.create(
-                    product = product.product,
-                    manualreceipt = manual_receipt,
-                    num_item = product.num_item,
-                    discount=product.discount,
-                    total_price = product.total_price,
-                )
-            products.delete()
-            return Response(manual_receipt_serializer.data)
-        return Response(manual_receipt_serializer.errors)
-    
 
-
-
+########################################## INCOMING ####################################### 
 
 class CreateIncomingView(APIView):
     permission_classes = [IsAuthenticated]
@@ -661,7 +625,7 @@ class CreateIncomingView(APIView):
         user = request.user
         supplier = Supplier.objects.get(id=request.data['supplier'])
         employee = Employee.objects.get(phonenumber=user.phonenumber)
-        incoming_serializer = IncomingSerializer(data={
+        incoming_serializer = IncomingSerializer2(data={
             "employee":employee.id,
             "supplier": supplier.id,
             "agent":request.data['agent'],
@@ -694,3 +658,72 @@ class CreateIncomingView(APIView):
     
 
 
+
+class GetIncoming(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, incoming_id):
+        products = Incoming_Product.objects.filter(incoming__id=incoming_id)
+        incoming_serializer = IncomingProductsSerializer(products, many=True)
+        return Response(incoming_serializer.data)
+
+
+
+class ListIncomings(ListAPIView):
+    queryset = Incoming.objects.all()
+    serializer_class = IncomingSerializer2
+
+
+
+############################### MANUAL RECEIPT #####################################################
+    
+
+
+class CreateManualReceiptView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, medium_id):
+        user = request.user
+        client = Client.objects.get(id=request.data['client'])
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        manual_receipt_serializer = ManualRecieptSerializer2(data={
+            "employee":employee.id,
+            "client": client.id,
+            "verify_code": request.data['verify_code'],
+            "phonenumber":request.data['phonenumber'], 
+            "recive_payment": request.data['recive_payment'],
+            "discount":request.data['discount'],
+            "reclaimed_products": request.data['reclaimed_products'],
+            "previous_depts": request.data['previous_depts'],
+            "remaining_amount":request.data['remaining_amount'],
+        })
+        if manual_receipt_serializer.is_valid():
+            manual_receipt = manual_receipt_serializer.save()
+            products = Products_Medium.objects.filter(medium__id=medium_id)
+            for product in products:
+                update_quantity =Product.objects.get(id=product.product.id)
+                update_quantity.quantity -= product.num_item
+                update_quantity.save()
+                manual_eceipt_products = ManualReceipt_Products.objects.create(
+                    product = product.product,
+                    manualreceipt = manual_receipt,
+                    num_item = product.num_item,
+                    discount=product.discount,
+                    total_price = product.total_price,
+                )
+            products.delete()
+            return Response(manual_receipt_serializer.data)
+        return Response(manual_receipt_serializer.errors)
+    
+
+class GetMaualReceipt(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, manual_id):
+        products = ManualReceipt_Products.objects.filter(manualreceipt_id=manual_id)
+        manual_serializer = ManualRecieptProductsSerializer(products, many=True)
+        return Response(manual_serializer.data)
+
+
+
+
+class ListManualReceipt(ListAPIView):
+    queryset = ManualReceipt.objects.all()
+    serializer_class = ManualRecieptSerializer2

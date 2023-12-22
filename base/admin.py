@@ -38,4 +38,6 @@ admin.site.register(Products_Medium)
 admin.site.register(ManualReceipt)
 admin.site.register(Output)
 admin.site.register(Output_Products)
-
+admin.site.register(Incoming)
+admin.site.register(Incoming_Product)
+admin.site.register(ManualReceipt_Products)

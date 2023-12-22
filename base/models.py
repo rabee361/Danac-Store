@@ -227,7 +227,7 @@ class Employee(models.Model):
     job_position = models.CharField(max_length=20)
     truck_num = models.IntegerField(null=True)
     salary = models.FloatField()
-    sale_percentage = models.FloatField()
+    sale_percentage = models.FloatField(null=True)
     address = models.CharField(max_length=100)
     notes = models.TextField(max_length=150,default=' ')
     birthday = models.DateField(auto_now_add=True)
@@ -573,8 +573,7 @@ class Products_Medium(models.Model):
 
 
 
-#############################################################################################################################
-
+############################################################################### INCOMING ################################################################
 
 
 class Incoming(models.Model):
@@ -611,7 +610,7 @@ class Incoming_Product(models.Model):
     def __str__(self) -> str:
         return f'{self.incoming.supplier.name}:{str(self.incoming.id)}'
 
-
+####################################### OUTPUT #################################################################################
 
 
 class Output(models.Model):
@@ -651,7 +650,6 @@ class DelievaryArrived(models.Model):
     
 
 
-
 ####################################################### MANUAL RECEIPT #############################################################333333
 
 
@@ -683,4 +681,4 @@ class ManualReceipt_Products(models.Model):
     total_price = models.FloatField(default=0)
 
     def __str__(self) -> str:
-        return f'{self.manualreciept.client.name} - {str(self.manualreciept.id)}'
+        return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
