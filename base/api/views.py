@@ -712,12 +712,9 @@ class CreateManualReceiptView(APIView):
         return Response(manual_receipt_serializer.errors)
     
 
-class GetManualReceipt(APIView):
-    # permission_classes = [permissions.IsAuthenticated]
-    def get(self, request, manual_id):
-        products = ManualReceipt_Products.objects.filter(manualreceipt_id=manual_id)
-        manual_serializer = ManualRecieptProductsSerializer(products, many=True)
-        return Response(manual_serializer.data)
+class GetManualReceipt(RetrieveAPIView):
+    queryset = ManualReceipt.objects.all()
+    serializer_class = ManualRecieptSerializer2
 
 
 

@@ -70,12 +70,15 @@ urlpatterns = [
     path('damaged-product/', ListCreateDamagedProduct.as_view()),####### 
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### 
 
+    path('get-receipt-manual/<str:pk>/', GetManualReceipt.as_view(), name="list-manuals"),##### new
+    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),#### new
+    path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),##### new
 
-    path('get-receipt-output/<int:output_id>/', GetOutput.as_view(), name='get-output'),##### new
+    path('get-receipt-output/<str:pk>/', GetOutput.as_view(), name='get-output'),##### new
     path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), #### new
     path('list-outputs/' , ListOutputs.as_view() , name="list-outputs"),##### new
 
-    path('get-receipt-incoming/<str:incoming_id>/' , GetIncoming.as_view() , name="get-incoming"),##### new
+    path('get-receipt-incoming/<str:pk>/' , GetIncoming.as_view() , name="get-incoming"),##### new
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),#### new
     path('list-incoming/' , ListIncomings.as_view() , name="list-incomings"),##### new
 
@@ -87,16 +90,8 @@ urlpatterns = [
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),####
     path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),#### 
 
-    path('get-receipt-manual/<str:manual_id>/', GetManualReceipt.as_view(), name="list-manuals"),##### new
-    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),#### new
-    path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),##### new
-
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
-
-    path('list-outputs/' , ListOutputs.as_view()),
-
-
 
     ]
 
