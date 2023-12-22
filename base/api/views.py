@@ -90,7 +90,7 @@ class listCreateProducts(ListCreateAPIView):
 class SpecialProducts(APIView):
     def get(self,request):
         products = Product.objects.all().order_by('?')
-        serializer = Product2Serializer(products,many=True)
+        serializer = Product2Serializer(products,many=True,context={'request': request})
         return Response(serializer.data)
 
 
@@ -136,7 +136,7 @@ class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
     serializer_class = CategorySerializer
 
 #################################################### CART HNADLING #####################################################################
-        
+
 class CartProductsView(ListCreateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Cart_Products.objects.select_related('products','cart').all()
