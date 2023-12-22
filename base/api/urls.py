@@ -75,7 +75,7 @@ urlpatterns = [
     path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), #### new
     path('list-outputs/' , ListOutputs.as_view() , name="list-outputs"),##### new
 
-    path('get-receipt-incoming/<str:pk>/' , GetIncoming.as_view() , name="get-incoming"),##### new
+    path('get-receipt-incoming/<str:incoming_id>/' , GetIncoming.as_view() , name="get-incoming"),##### new
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),#### new
     path('list-incoming/' , ListIncomings.as_view() , name="list-incomings"),##### new
 
@@ -87,7 +87,7 @@ urlpatterns = [
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),####
     path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),#### 
 
-    path('get-receipt-manual/<str:medium_id>/', GetManualReceipt.as_view(), name="list-manuals"),##### new
+    path('get-receipt-manual/<str:manual_id>/', GetManualReceipt.as_view(), name="list-manuals"),##### new
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),#### new
     path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),##### new
 
