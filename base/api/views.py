@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 import random
 from rest_framework import filters
+from .permissions import IsManager, IsDriver
 
 
 
@@ -307,6 +308,8 @@ class SearchView(ListAPIView):
 
 
 class Add_To_Medium(APIView):
+    
+
     def post(self, request, medium_id, product_id):
         prodcut = Product.objects.get(id=product_id)
         medium = Medium.objects.get(id=medium_id)
@@ -395,16 +398,25 @@ class ListReceiptOutput(APIView):
     # permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, output_id):
-        output = Outputs.objects.get(id=output_id)
-        products = Outputs_Products.objects.filter(output__id=output_id)
-        output_serializer = ProductsOutputsSerializer(products, many=True)
+        # output = Outputs.objects.get(id=output_id)
+        products = Outputs.objects.get(id=output_id)
+        output_serializer = OutputsSerializer(products)
         return Response(output_serializer.data)
 
 # --------------------------------------CREATE MEDIUM--------------------------------------
 class CreateMedium(APIView):
+    # permission_classes = [permissions.IsAuthenticated, IsManager]
+
     def post(self, request):
         medium = Medium.objects.create()
+
         return Response(status=status.HTTP_200_OK)
+    
+
+class RetDesMedium(RetrieveDestroyAPIView):
+    queryset = Medium.objects.all()
+    serializer_class = MediumSerializer
+
 
 class CreateMediumForOrderView(APIView):
     def post(self, request, order_id):
@@ -669,9 +681,20 @@ from .send_sms import send_sms
 #     sms_body = "Thank you for registering!"
 #     send_sms('+963957322954', sms_body)
 class SendSms(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        sms_body = "Thank you for registering"
-        send_sms('0502062445', sms_body)
+        body = "Thank you for registering"
+        # to = "+213660030002"
+        user = request.user
+        # client = Client.objects.get(phomnenumber=user.phonenumber)
+        # client_serializer = ClientSerializer(client, many=False)
+        # serializer = client_serializer.data
+        # print(serializer['phomnenumber'])
+        serializer ={
+            'phomnenumber':213660020003
+        }
+        print(type(serializer['phomnenumber']))
+        send_sms(serializer['phomnenumber'], body)
 
         return Response(status=status.HTTP_200_OK)

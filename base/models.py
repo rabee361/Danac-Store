@@ -191,12 +191,12 @@ class Department(models.Model):
 
 class Employee(models.Model):
     name = models.CharField(max_length=30)
-    breath_date = models.DateField()
+    birth_date = models.DateField()
     phonenumber = PhoneNumberField(region='DZ')
     type_employee = models.CharField(max_length=20) 
-    number_track = models.IntegerField()
+    number_track = models.IntegerField(null=True)
     salery = models.FloatField()
-    sale_perce = models.FloatField()
+    sale_perce = models.FloatField(null=True)
     address = models.CharField(max_length=100)
     info = models.TextField(max_length=1000)
     date = models.DateField(auto_now_add=True)
@@ -484,3 +484,40 @@ class DamagedProduct(models.Model):
 
     def __str__(self) -> str:
         return self.product.name
+    
+
+# ----------------------------------------------ORDER ENVOY----------------------------------------------
+
+class OrderEnvoy(models.Model):
+    client = models.CharField(max_length=50)
+    phonenumber = PhoneNumberField(region='DZ')
+    products = models.ManyToManyField(Product, through='Product_Order_Envoy')
+    products_num = models.IntegerField(default=0)
+    created = models.DateField(auto_now_add=True)
+    delivery_date = models.DateField()
+    is_accepted = models.BooleanField(null=True, default=False)
+    delivered = models.BooleanField(null=True, default=False)
+
+    # location = 
+
+    def __str__(self) -> str:
+        return f'{self.client} - {str(self.id)}'
+    
+
+class Product_Order_Envoy(models.Model):
+    order_envoy = models.ForeignKey(OrderEnvoy, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    num_item = models.IntegerField(default=0)
+    total_price = models.FloatField(default=0)
+
+    def __str__(self):
+        return f'{self.product.name} - {str(self.order_envoy.id)}'
+    
+class Num(models.Model):
+    number = models.BigIntegerField()
+
+    def __str__(self) -> str:
+        return str(self.number)
+    
+
+    

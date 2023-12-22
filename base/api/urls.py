@@ -47,6 +47,7 @@ urlpatterns = [
     path('list-product-cart/<str:pk>/', DesUpdCartProducts.as_view(), name='list-product-cart'),
 
     path('create-medium/', CreateMedium.as_view()),
+    path('delete-medium/<str:pk>/', RetDesMedium.as_view()),
     path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),
     path('delete-product-from-medium/<str:pk>/', DeleteProductsMediumView.as_view()),

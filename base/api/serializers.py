@@ -410,16 +410,17 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
 #         model = Medium
 #         fields = '__all__'
 
-class OutputsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Outputs
-        fields = '__all__'
-    
 
 class ProductsOutputsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Outputs_Products
+        fields = '__all__'
+
+class OutputsSerializer(serializers.ModelSerializer):
+    # products = ProductsOutputsSerializer(read_only=True)
+    class Meta:
+        model = Outputs
         fields = '__all__'
 
 
@@ -515,3 +516,22 @@ class DamagedProductSerializer(serializers.ModelSerializer):
         model = DamagedProduct
         fields  ='__all__'
 
+
+# ---------------------------------------------ORDER ENVOY---------------------------------------------
+
+class OrderEnvoySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OrderEnvoy
+        fields = '__aLL__'
+
+
+class ProductOrderEnvoySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product_Order_Envoy
+        fields = '__all__'
+class NumSer(serializers.ModelSerializer):
+    class Meta:
+        model = Num
+        fields = ['number']

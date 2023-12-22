@@ -8,19 +8,23 @@ import random
 from base.api.serializers import CodeVerivecationSerializer
 # from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from .froms import CustomUserCreationForm, CustomUserChangeForm
+from base.api.send_sms import send_sms
 
 
 class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
-    actions = ['accept_user', 'print_user']
+    actions = ['accept_user']
 
     # def accept_user(self, request, queryset):
         
 
-    def print_user(self, request, queryset):
+    def accept_user(self, request, queryset):
         queryset.update(is_active=True)
         user = queryset.get(is_active=True)
+        # body = "Thank you for registering"
+        # send_sms(user.phonenumber, body)
+        # print(user)
         client = Client.objects.create(
             name=user.username,
             address = user.address,
@@ -60,7 +64,7 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     )
 
     # accept_user.short_descreption = 'Accept User For complet registration'
-    print_user.short_descreption = 'print_user'
+    accept_user.short_descreption = 'print_user'
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id']
@@ -97,3 +101,5 @@ admin.site.register(Products_Medium)
 admin.site.register(DamagedProduct)
 admin.site.register(ReturnedGoodsClient)
 admin.site.register(ReturnedGoodsSupplier)
+
+admin.site.register(Num)
