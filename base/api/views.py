@@ -309,7 +309,7 @@ class ExpiredClientPointsView(ListAPIView):
     serializer_class = PointsSerializer
     def get_queryset(self):
         client_id = self.kwargs['client_id']
-        return Points.objects.filter(Q(client__id=client_id)&Q(expire_date__lt=timezone.now()))
+        return Points.objects.filter(Q(client__id=client_id)&Q(expire_date__lt=timezone.now())).distinct()
 
 
 class UsedClientPointsView(ListAPIView):
@@ -317,7 +317,7 @@ class UsedClientPointsView(ListAPIView):
     serializer_class = PointsSerializer
     def get_queryset(self):
         client_id = self.kwargs['client_id']
-        return Points.objects.filter(Q(client__id=client_id)&Q(is_used=True))
+        return Points.objects.filter(Q(client__id=client_id)&Q(is_used=True)).distinct()
 
 
 class ClientPointsView(ListAPIView):
@@ -325,7 +325,7 @@ class ClientPointsView(ListAPIView):
     serializer_class = PointsSerializer
     def get_queryset(self):
         client_id = self.kwargs['client_id']
-        return Points.objects.filter(Q(client__id=client_id)&Q(is_used=False)&Q(expire_date__gt=timezone.now()))
+        return Points.objects.filter(Q(client__id=client_id)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).distinct()
 
 
 ######################################  ###########
