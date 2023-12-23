@@ -55,18 +55,13 @@ class UserLoginApiView(GenericAPIView):
 
 
 class UpdateImageUserView(APIView):
-
-    permission_classes=[permissions.IsAuthenticated]
-
     def put(self, requset, user_pk):
-
         user_pk = requset.user.id
         user = CustomUser.objects.get(id=user_pk)
         serializer = UpdateUserSerializer(user, data=requset.data, many=False, context={'request':requset})
         if serializer.is_valid():
             serializer.save()
             return Response(
-
                 {'success':"The changed image Profile has been successfully."},
                 status=status.HTTP_200_OK
             )
@@ -89,7 +84,7 @@ class LogoutAPIView(GenericAPIView):
 class ListInformationUserView(RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class= CustomUserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
 
 

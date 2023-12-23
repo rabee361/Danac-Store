@@ -21,6 +21,7 @@ class CustomUser(AbstractUser):
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='images/users', null=True)
     location = models.PointField(default=Point(0,0))
     user_type = models.ForeignKey(UserType,on_delete=models.CASCADE,null=True)
 
@@ -56,6 +57,7 @@ class Client(models.Model):
     category = models.CharField(max_length=75,choices=CHOICES,default=' ')
     notes = models.TextField(max_length=150,default='note')
     location = models.PointField(null=True)
+    
 
 
     def __str__(self):

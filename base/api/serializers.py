@@ -195,7 +195,7 @@ class ClientSerializer(serializers.ModelSerializer):
         fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points']
 
     def get_total_points(self,obj):
-        total = Points.objects.filter(Q(client=obj)&Q(is_used=False)).aggregate(total_points=models.Sum('number'))['total_points'] or 0
+        total = Points.objects.filter(Q(client=obj)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).aggregate(total_points=models.Sum('number'))['total_points'] or 0
         return total
 
 
