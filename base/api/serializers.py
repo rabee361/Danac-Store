@@ -677,10 +677,11 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
 
 
 class ManualRecieptSerializer2(serializers.ModelSerializer):
+    client_name = serializers.CharField(source='client.name')
     products = ManualRecieptProductsSerializer(source='manualreceipt_products_set', many=True,read_only=True)
     class Meta:
         model = ManualReceipt
-        fields = ['id','client','employee','verify_code','phonenumber','recive_payment','discount','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','client_name','employee','verify_code','phonenumber','recive_payment','discount','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
 
 
 ########################################## OUTPUT ##############################################
