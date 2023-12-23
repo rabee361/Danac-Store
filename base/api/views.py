@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from base.models import *
 from .serializers import *
-from rest_framework.generics import ListAPIView, RetrieveAPIView ,RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView , ListCreateAPIView , RetrieveUpdateAPIView , RetrieveDestroyAPIView
+from rest_framework.generics import ListAPIView, DestroyAPIView ,RetrieveAPIView ,RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView , ListCreateAPIView , RetrieveUpdateAPIView , RetrieveDestroyAPIView
 from .validation import custom_validation
 from rest_framework import permissions
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -9,13 +9,13 @@ from rest_framework.permissions import IsAuthenticated  ,AllowAny
 from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
-from base.filters import ProductFilter 
+from base.filters import ProductFilter , PointFilter
 import random
 from django.shortcuts import get_object_or_404
 from django.db.models import F
 from rest_framework.exceptions import NotFound
-
-
+# from .utils import send_email
+from .utils import Utlil
 ####################################### AUTHENTICATION ###################################################################3#######
 
 class SignUpView(GenericAPIView):
@@ -38,17 +38,19 @@ class SignUpView(GenericAPIView):
 
 class UserLoginApiView(GenericAPIView):
     permission_classes = (permissions.AllowAny,)
-    serializer_class = UserLoginSerilizer
+    serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
+
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        user = CustomUser.objects.get(phonenumber = request.data['phonenumber'])
+        user = CustomUser.objects.filter(email = request.data['username']).first()
+        if not user:
+            user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
         data = serializer.data
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)
-
 
 
 
@@ -84,20 +86,48 @@ class LogoutAPIView(GenericAPIView):
 
 
 
-################################################### TESTING #############################################################################
-    
-class test(ListAPIView):
-    permission_classes = (AllowAny,)
-    def get(self,request):
-        return Response(request.data)
-    
-class CurrentUserView(ListAPIView):
-    permission_classes = [IsAuthenticated]
+class ListInformationUserView(RetrieveAPIView):
     queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
+    serializer_class= CustomUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return CustomUser.objects.filter(id=self.request.user.id)
+
+
+class GetPhonenumberView(APIView):
+    # serializer_class = CustomUserSerializer
+    def post(self, request):
+        email = request.data['email']
+
+        try: 
+            user = get_object_or_404(CustomUser, email=email)
+            existing_code = CodeVerivecation.objects.filter(user=user).first()
+            if existing_code:
+                existing_code.delete()
+
+            code_verivecation = random.randint(1000,9999)
+            email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
+            data= {'email_body':email_body, 'to_email':user.email, 'email_subject':'Verify your email'}
+            Utlil.send_eamil(data)
+            serializer = CodeVerivecationSerializer(data ={
+                'user':user.id,
+                'code':code_verivecation
+            })
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({'message':'تم ارسال رمز التحقق'})
+        except:
+            raise serializers.ValidationError({'error':'pleace enter valid email'})
+
+
+class VerefyCodeView(APIView):
+    def post(self, request):
+        code = request.data['code']
+
+        code_ver = CodeVerivecation.objects.filter(code=code).first()
+        if code_ver:
+            return Response({"message":"تم التحقق من الرمز"},status=status.HTTP_200_OK)
+        else:
+            raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
 
 
 ######################################### CART & PRODUCTS ##########################################################################
@@ -213,7 +243,13 @@ class Add_to_Cart(APIView):
         return Response(serializer.data)
 
 
-###################################### ORDER HANDLING #######################################################################
+
+class Delete_From_Cart(DestroyAPIView):
+    queryset = Cart_Products.objects.all()
+    serializer_class = Cart_Products
+
+
+###################################### ORDER HANDLING ############################################################################################
 
 
 class CreateOrderView(APIView):
@@ -236,13 +272,63 @@ class ListOrders(ListAPIView):
     # permission_classes = [permissions.IsAuthenticated,]
 
 
+class ListSimpleOrders(ListAPIView):
+    queryset = Order.objects.all()
+    serializer_class = SimpleOrderSerializer
+
+# class ListDeliveredOrders(APIView):
+#     def get(self,request):
+#         orders = Order.objects.filter(delivered=True)
+#         serializer = SimpleOrderSerializer(orders,many=True)
+#         return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+# class ListNotDeliveredOrders(APIView):
+#     def get(self,request):
+#         orders = Order.objects.filter(delivered=False)
+#         serializer = SimpleOrderSerializer(orders,many=True)
+#         return Response(serializer.data,status=status.HTTP_200_OK)
+
+
 class GetOrder(RetrieveAPIView):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+    serializer_class = OrderSerializer2
 
 
 
-################---------- -----------############
+class TotalClientPointsView(ListAPIView):
+    queryset = Points.objects.all()
+    serializer_class = PointsSerializer
+    def get_queryset(self):
+        client_id = self.kwargs['client_id']
+        return Points.objects.filter(client__id=client_id)
+
+
+class ExpiredClientPointsView(ListAPIView):
+    queryset = Points.objects.all()
+    serializer_class = PointsSerializer
+    def get_queryset(self):
+        client_id = self.kwargs['client_id']
+        return Points.objects.filter(Q(client__id=client_id)&Q(expire_date__lt=timezone.now()))
+
+
+class UsedClientPointsView(ListAPIView):
+    queryset = Points.objects.all()
+    serializer_class = PointsSerializer
+    def get_queryset(self):
+        client_id = self.kwargs['client_id']
+        return Points.objects.filter(Q(client__id=client_id)&Q(is_used=True))
+
+
+class ClientPointsView(ListAPIView):
+    queryset = Points.objects.all()
+    serializer_class = PointsSerializer
+    def get_queryset(self):
+        client_id = self.kwargs['client_id']
+        return Points.objects.filter(Q(client__id=client_id)&Q(is_used=False)&Q(expire_date__gt=timezone.now()))
+
+
+######################################  ###########
 
 
 class SalesEmployee(APIView):
@@ -302,27 +388,6 @@ class ResetPasswordView(GenericAPIView):
         return Response(messages, status=status.HTTP_200_OK)
 
 
-
-class GetPhonenumberView(APIView):    
-    def post(self, request):
-        phonenumber = request.data['phonenumber']
-        if phonenumber is None:
-            return Response({'error': 'Phone number is required'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            user = get_object_or_404(CustomUser, phonenumber=phonenumber)
-            print(user)
-            existing_code = CodeVerification.objects.filter(user=user).first()
-
-            if existing_code:
-                existing_code.delete()
-
-            code_verification = random.randint(1000,9999)
-            code = CodeVerification.objects.create(user=user, code=code_verification)
-            serializer = CodeSerializer(code)
-            return Response({'message':'تم ارسال رمز التحقق', 'data': serializer.data})
-        except:
-            raise serializers.ValidationError({'error':'Please enter a valid phone number'})
-        
 
 
 
@@ -417,7 +482,7 @@ class RetUpdDesSalary(RetrieveUpdateDestroyAPIView):
 
 class GetRegistry(ListAPIView):
     queryset = Registry.objects.all()
-    serializer_class = RegistrySerialzier
+    serializer_class = RegistrySerializer
 
 class ListCreateClientDebts(ListCreateAPIView):
     queryset = Debt_Client.objects.all()
@@ -549,10 +614,11 @@ class Medium_Handler(APIView):
             return Response(serializer.data)
         else:
             if item.num_item == 1:
-                item.sub_item()
+                # item.sub_item()
                 item.delete()
             else:
                 item.sub_item()
+                
 
             serializer = ProductsMediumSerializer(item,many=False)
         return Response(serializer.data)

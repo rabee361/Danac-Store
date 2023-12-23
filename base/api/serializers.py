@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from base.models import *
-from django.contrib.auth import login , authenticate
+from django.contrib.auth import login , authenticate , get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -9,25 +9,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
 
+
+############################################################## AUTHENTICATION ###################################################
+
 def modify_name(name):
     return name
 
-class UserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['phonenumber','username', 'password']
-
-    def validate(self, data):
-        validate_password(data['password'])
-        return data
-
-    def create(self, validated_data):
-        user = CustomUser.objects.create_user(**validated_data)
-        user.is_active = False
-        user.save()
-        return user
-
-
+        fields = ['id', 'email', 'username', 'phonenumber', 'password', 'image']
 
 
 class UpdateUserSerializer(serializers.ModelSerializer):
@@ -39,7 +30,39 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         instance.image = validated_data['image']
         instance.save()
         return instance
+    
 
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only = True)
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+
+        if username and password:
+            user = authenticate(request=self.context.get('request'), username=username, password=password)
+            if not user:
+                try:
+                    User = get_user_model()
+                    if '@' in username:
+                        kwargs = {'email': username}
+                    else:
+                        kwargs = {'phonenumber': username}
+                    user = User.objects.get(**kwargs)
+                    if user.check_password(password):
+                        return user
+                except User.DoesNotExist:
+                    pass
+
+            if not user or not user.is_active:
+                raise serializers.ValidationError("Incorrect Credentials")
+        else:
+            raise serializers.ValidationError('Must include "username" and "password".')
+
+        data['user'] = user
+        return data
 
 
 
@@ -73,35 +96,89 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 
-
-class UserLoginSerilizer(serializers.ModelSerializer):
-    phonenumber = serializers.CharField()
-    password = serializers.CharField(max_length=55, min_length=6,write_only = True)
-    class Meta:
-        model = CustomUser
-        fields = ['phonenumber', 'password']
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only = True)
 
     def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
 
-        phonenumber = data.get('phonenumber', )
-        password = data.get('password',)
+        if username and password:
+            user = authenticate(request=self.context.get('request'), username=username, password=password)
 
-        if phonenumber is None:
-                raise serializers.ValidationError({'message_error':'An phonenubmer address is required to log in.'})
-        
-        if password is None:
-            raise serializers.ValidationError({'message_error':'A password is required to log in.'})
-        
-        user = authenticate(username= phonenumber, password= password)
+            if not user:
+                try:
+                    User = get_user_model()
+                    if '@' in username:
+                        kwargs = {'email': username}
+                    else:
+                        kwargs = {'phonenumber': username}
+                    user = User.objects.get(**kwargs)
+                    if user.check_password(password):
+                        return user
+                except User.DoesNotExist:
+                    pass
 
-        if user is None:
-            raise serializers.ValidationError({'message_error':'A user with this phonenumber and password was not found.'})
-        
-        if not user.is_active:
-            raise serializers.ValidationError({'message_error':'This user is not currently activated.'})
-        
+            if not user or not user.is_active:
+                raise serializers.ValidationError("Incorrect Credentials")
+        else:
+            raise serializers.ValidationError('Must include "username" and "password".')
+
+        data['user'] = user
         return data
 
+
+
+
+class UserLogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+    def validate(self, attrs):
+        self.token = attrs['refresh']
+        return attrs
+    def save(self, **kwargs):
+        try:
+            RefreshToken(self.token).blacklist()
+        except TokenError:
+            self.fail('bad_token')
+
+
+
+class ResetPasswordSerializer(serializers.ModelSerializer):
+    new_password = serializers.CharField(style={"input_type":"password"}, write_only=True)
+    class Meta:
+        model = CustomUser
+        fields = ['password', 'new_password']
+        extra_kwargs = {
+            'password':{'write_only':True,}
+        }
+
+    def validate(self, attrs):
+        password = attrs.get('password', '')
+        newpassword = attrs.get('newpassword', '')
+        validate_password(password)
+        validate_password(newpassword)
+        
+        if password != newpassword:
+            raise serializers.ValidationError({'message_error':'The password and newpassword didnt matched.'})
+        
+        return attrs
+    
+    def save(self, **kwargs):
+        request = self.context.get('request')
+        user = CustomUser.objects.get(id=request.user.id)
+        password = self.validated_data['password']
+        user.set_password(password)
+        user.save()
+        return user
+
+
+class CodeVerivecationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CodeVerivecation
+        fields = '__all__'
+
+############################################################### PRODUCT AND CLIENTS AND ORDERS ###########################################
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -120,20 +197,6 @@ class ClientSerializer(serializers.ModelSerializer):
     def get_total_points(self,obj):
         total = Points.objects.filter(Q(client=obj)&Q(is_used=False)).aggregate(total_points=models.Sum('number'))['total_points'] or 0
         return total
-
-
-
-
-
-class Product2Serializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-    class Meta:
-        model = Product
-        fields = '__all__'
-
-    def get_image(self, obj):
-        request = self.context.get('request')
-        return request.build_absolute_uri(obj.image.url)
 
 
 
@@ -168,6 +231,19 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 
+class Product2Serializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.image.url)
+
+
+
+
 class Product3Serializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
@@ -178,24 +254,6 @@ class Product3Serializer(serializers.ModelSerializer):
         request = self.context.get('request')
         return request.build_absolute_uri(obj.image.url)
 
-
-
-class CodeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CodeVerification
-        fields = '__all__'
-
-
-
-class SupplierSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Supplier
-        fields = ['id','name','company_name','address','phone_number','info']
-    
-    def to_representation(self, instance):
-        repr = super().to_representation(instance)
-        repr['name'] = modify_name(repr['name'])
-        return repr
 
 
 
@@ -220,85 +278,11 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 
-class ResetPasswordSerializer(serializers.ModelSerializer):
-    new_password = serializers.CharField(style={"input_type":"password"}, write_only=True)
-    class Meta:
-        model = CustomUser
-        fields = ['password', 'new_password']
-        extra_kwargs = {
-            'password':{'write_only':True,}
-        }
-
-    def validate(self, attrs):
-        password = attrs.get('password', '')
-        newpassword = attrs.get('newpassword', '')
-        validate_password(password)
-        validate_password(newpassword)
-        
-        if password != newpassword:
-            raise serializers.ValidationError({'message_error':'The password and newpassword didnt matched.'})
-        
-        return attrs
-    
-    def save(self, **kwargs):
-        request = self.context.get('request')
-        user = CustomUser.objects.get(id=request.user.id)
-        password = self.validated_data['password']
-        user.set_password(password)
-        user.save()
-        return user
-    
-
-
-
-class UserLogoutSerializer(serializers.Serializer):
-    refresh = serializers.CharField()
-    def validate(self, attrs):
-        self.token = attrs['refresh']
-        return attrs
-    def save(self, **kwargs):
-        try:
-            RefreshToken(self.token).blacklist()
-        except TokenError:
-            self.fail('bad_token')
-
-
-
-
-
-
-class UserLoginSerilizer(serializers.ModelSerializer):
-    phonenumber = serializers.CharField()
-    password = serializers.CharField(max_length=55, min_length=6,write_only = True)
-
-    class Meta:
-        model = CustomUser
-        fields = ['phonenumber', 'password']
-
-    def validate(self, data):
-        phonenumber = data.get('phonenumber', )
-        password = data.get('password',)
-        if phonenumber is None:
-                raise serializers.ValidationError({'message_error':'An phonenubmer address is required to log in.'})
-        
-        if password is None:
-            raise serializers.ValidationError({'message_error':'A password is required to log in.'})
-        
-        user = authenticate(username= phonenumber, password= password)
-
-        if user is None:
-            raise serializers.ValidationError({'message_error':'A user with this phonenumber and password was not found.'})
-        
-        if not user.is_active:
-            raise serializers.ValidationError({'message_error':'This user is not currently activated.'})
-        
-        return data
-    
-
 class OrderProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order_Product
         fields = ['product','order','quantity','total_price']
+
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -310,6 +294,46 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ['id', 'client', 'products', 'total', 'products_num', 'created', 'delivery_date', 'delivered']
 
 
+
+class OrderProductsSerializer2(serializers.ModelSerializer):
+    image = serializers.ImageField(source='product.image')
+    description = serializers.CharField(source='product.description')
+    class Meta:
+        model = Order_Product
+        fields = ['product','order','quantity','total_price','image','description']
+
+
+
+class OrderSerializer2(serializers.ModelSerializer):
+    client_id = serializers.IntegerField(source='client.id')
+    name = serializers.CharField(source='client.name')
+    address = serializers.CharField(source='client.address')
+    phonenumber = serializers.CharField(source='client.phonenumber')
+    products = OrderProductsSerializer2(source='order_product_set', many=True)
+    longitude = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ['client_id','address','name','phonenumber','products','total','products_num','created','longitude','latitude']
+
+    def get_longitude(self, obj):
+        return obj.client.location.x or 0
+
+    def get_latitude(self, obj):
+        return obj.client.location.y or 0
+    
+
+
+class SimpleOrderSerializer(serializers.ModelSerializer):
+    client_id = serializers.IntegerField(source='client.id')
+    name = serializers.CharField(source='client.name')
+    class Meta:
+        model = Order
+        fields = ['client_id','id','name','total','products_num']
+
+
+################################################################################################################
 
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -330,7 +354,21 @@ class SalesEmployeeSerializer(serializers.ModelSerializer):
     def get_latitude(self, obj):
         return obj.location.y
 
-################################# HR ##################################################################
+
+
+
+class SupplierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Supplier
+        fields = ['id','name','company_name','address','phone_number','info']
+    
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['name'] = modify_name(repr['name'])
+        return repr
+    
+
+############################################################## HR ##################################################################
 
 class Advance_on_SalarySerializer(serializers.ModelSerializer):
     class Meta:
@@ -412,9 +450,9 @@ class EmployeeSalarySerializer(serializers.ModelSerializer):
 
 
 
-################################### Registry ##############################################################
+############################################################# Registry ##############################################################
 
-class RegistrySerialzier(serializers.ModelSerializer):
+class RegistrySerializer(serializers.ModelSerializer):
     class Meta :
         model = Registry
         fields = ['total']
@@ -491,7 +529,7 @@ class RecievedPaymentSerializer(serializers.ModelSerializer):
         model = Recieved_Payment
         fields = '__all__'
 
-#######################################################################################################3###
+#################################################### Medium #######################################################################3###
 
 
 
@@ -519,7 +557,7 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
 
 
 
-# ------------------------------------------RETURNED GOODS-----------------------------------------
+######################################## RETURNED GOODS #####################################################################
 
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -543,7 +581,7 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
         model = ReturnedGoodsClient
         fields = '__all__'
 
-# # ------------------------------------------DAMAGED PRODUCTS------------------------------------------
+############################################# DAMAGED PRODUCTS #########################################################
 
 class DamagedProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -568,6 +606,12 @@ class DamagedProductSerializer(serializers.ModelSerializer):
 
         return instance
     
+
+
+class PointsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Points
+        fields = '__all__'
 
 
 

@@ -10,10 +10,14 @@ urlpatterns = [
     path('auth/reset-password/' , ResetPasswordView.as_view(), name='reset-password'),####
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),#########
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),######
-    path('test/' , test.as_view()),#####
-    path('user/' , CurrentUserView.as_view()),######
+    path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
+    path('verefy-code/', VerefyCodeView.as_view(), name='verefy-code'),
 
     path('clients/' , ListCreateClient.as_view() , name="clients"),######
+    path('total-points/<int:client_id>/', TotalClientPointsView.as_view(), name='total-points'),
+    path('used-points/<int:client_id>/', UsedClientPointsView.as_view(), name='used-points'),
+    path('expired-points/<int:client_id>/', ExpiredClientPointsView.as_view(), name='expired-points'),
+    path('points/<int:client_id>/', ClientPointsView.as_view(), name='client-points'),
     path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),########
     path('products/' , listCreateProducts.as_view() , name="products"),######
     path('special-products/' , SpecialProducts.as_view() , name="special-products"),######
@@ -22,15 +26,20 @@ urlpatterns = [
     path('get-category/<str:pk>/' , RetUpdDesCategory.as_view() , name="get-category"),##### 
     path('employees/', ListCreateEmployee.as_view(), name='employee'),######
     path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'),####  
+
     path('cart_items/<str:pk>' , Cart_Items.as_view() , name="cart_products"),#### 
     path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),#### 
     path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"), #### 
     path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),##### 
+    path('delete-item/' , Delete_From_Cart.as_view() , name="delete-item"),##### new
+
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), #######
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),######
     path('orders/' , ListOrders.as_view() ,name="orders"),#######
     path('order/<str:pk>/' , GetOrder.as_view() , name="get-order"),####
+    # path('delivered-orders/' , ListDeliveredOrders.as_view() , name="delivered-orders"),
+    # path('not-delivered-orders/' , ListNotDeliveredOrders.as_view() , name="not-delivered-orders"),
 
     path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),#######
     path('get-bonus/<str:pk>/', RetUpdDesBonusView.as_view(), name='get-bonus'),######
@@ -95,6 +104,14 @@ urlpatterns = [
 
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()), ###### 
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),###### 
+
+    # path('create-medium-two/', CreateMediumTwo.as_view(), name='create-mediumtwo'),
+    # path('add-to-medium-two/<str:mediumtwo_id>/<str:product_id>/', AddToMediumTwo.as_view(), name='add-to-mediumtwo'),
+    # path('medium-two-handler/<str:mediumtwo_id>/<str:pk2>/', MediumTow_Handler.as_view()),
+    # path('delete-product-from-medium-two/<str:pk>/', DesMediumTwo.as_view()),
+    # path('list-products-form-medium-two/', ListProductsMediumTwo.as_view()),
+    # path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
+    # path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view())
 
     ]
 

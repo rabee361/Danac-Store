@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'base'
 ]
 
+AUTHENTICATION_BACKENDS = ['base.api.backend.EmailBackend']
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
        'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -196,3 +198,12 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Replace with your preferred backend
+EMAIL_HOST = 'smtp.gmail.com' # Replace with your email host for gmail -> 'smtp.gmail.com'
+EMAIL_PORT = 587  # Replace with your email port
+EMAIL_USE_TLS = True  # Set to False if your email server doesn't use TLS
+EMAIL_HOST_USER = 'jacoubakizi@gmail.com'  # Replace with your email username
+EMAIL_HOST_PASSWORD = 'rdedzduyncjjyhgs'  

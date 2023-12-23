@@ -17,16 +17,29 @@ class UserType(models.Model):
 
 
 class CustomUser(AbstractUser):
+    email = models.EmailField(max_length=50, unique=True)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
     location = models.PointField(default=Point(0,0))
+    user_type = models.ForeignKey(UserType,on_delete=models.CASCADE,null=True)
 
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',) 
     
     def __str__(self):
         return self.username
+
+
+
+class CodeVerivecation(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    code = models.IntegerField(validators=[MinValueValidator(1000,9999),])
+
+    def __str__(self) -> str:
+        return f'{self.user.username} {self.code}'
+
+
 
 
 
@@ -79,6 +92,8 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     
+
+    
     
 ##############################################CART HANDLING ###########################################################################################################
 
@@ -122,7 +137,7 @@ class Cart_Products(models.Model):
 
     def sub_item(self):
         self.quantity = self.quantity - 1
-        self.save()
+        self.save() 
 
     def total_price_of_item(self):
         return (self.quantity * self.products.sale_price)

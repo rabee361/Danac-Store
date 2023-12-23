@@ -10,3 +10,13 @@ class ProductFilter(django_filters.FilterSet):
         model = Product
         fields = ['category','name','barcode']
 
+
+
+
+class PointFilter(django_filters.FilterSet):
+    is_used = django_filters.BooleanFilter(field_name="is_used")
+
+    class Meta: 
+        model = Product
+        fields = ['is_used']
+
