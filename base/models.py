@@ -16,6 +16,7 @@ class UserType(models.Model):
     
 
 class CustomUser(AbstractUser):
+    email = models.EmailField(max_length=50, unique=True)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
@@ -30,6 +31,30 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    @property
+    def inventory_manager(self):
+        return self.user_type.user_type == 'مدير مخزن'
+    
+    @property
+    def registry_manager(self):
+        return self.user_type.user_type == 'مدير صندوق'
+    
+    @property
+    def HR_manager(self):
+        return self.user_type.user_type == 'مدير موارد بشرية'
+    
+    @property
+    def order_manager(self):
+        return self.user_type.user_type == 'مدير الطلبات'
+    
+    @property
+    def sales_employee_manager(self):
+        return self.user_type.user_type == 'مدير مندوبين'
+    
+    @property
+    def manual_sales_manager(self):
+        return self.user_type.user_type == 'مدير مبيعات يدوية'
     
     # def tokens(self):
     #     refresh = RefreshToken.for_user(self)
@@ -104,7 +129,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=50)
-    iamge = models.ImageField(upload_to='images/product')
+    image = models.ImageField(upload_to='images/product')
     description = models.TextField(max_length=2000)
     quantity = models.IntegerField()
     purch_price = models.FloatField()
@@ -512,12 +537,28 @@ class Product_Order_Envoy(models.Model):
 
     def __str__(self):
         return f'{self.product.name} - {str(self.order_envoy.id)}'
+
     
-class Num(models.Model):
-    number = PhoneNumberField(region='DZ')
+
+class MediumTwo(models.Model):
+    products = models.ManyToManyField(Product, through='MediumTwo_Products')
 
     def __str__(self) -> str:
-        return str(self.number)
-    
+        return f'medium_two - {str(self.id)}'
 
-    
+class MediumTwo_Products(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    mediumtwo = models.ForeignKey(MediumTwo, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default= 0)
+    # total_price = models.FloatField()
+
+    def add_item(self):
+        self.quantity += 1
+        self.save()
+
+    def sub_item(self):
+        self.quantity -= 1
+        self.save()
+
+    def __str__(self) -> str:
+        return f'{self.product.name} - {str(self.mediumtwo.id)}'

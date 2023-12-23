@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from base.models import *
 from .serializers import *
-from rest_framework.generics import ListAPIView, RetrieveAPIView , GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import ListAPIView,CreateAPIView, RetrieveAPIView , GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, RetrieveDestroyAPIView
 from .validation import custom_validation
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -12,7 +12,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 import random
 from rest_framework import filters
-from .permissions import IsManager, IsDriver
+from .permissions import *
+from .utils import Utlil
 
 
 
@@ -39,13 +40,15 @@ class UserLoginApiView(GenericAPIView):
     An endpoint to authenticate existing users their email and passowrd.
     """
     permission_classes = (permissions.AllowAny,)
-    serializer_class = UserLoginSerilizer
+    serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
 
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        user = CustomUser.objects.get(phonenumber = request.data['phonenumber'])
+        user = CustomUser.objects.filter(email = request.data['username']).first()
+        if not user:
+            user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
         data = serializer.data
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
@@ -106,15 +109,18 @@ class LogoutAPIView(GenericAPIView):
 class GetPhonenumberView(APIView):
     # serializer_class = CustomUserSerializer
     def post(self, request):
-        phonenumber = request.data['phonenumber']
+        email = request.data['email']
 
         try: 
-            user = get_object_or_404(CustomUser, phonenumber=phonenumber)
+            user = get_object_or_404(CustomUser, email=email)
             existing_code = CodeVerivecation.objects.filter(user=user).first()
             if existing_code:
                 existing_code.delete()
 
             code_verivecation = random.randint(1000,9999)
+            email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
+            data= {'email_body':email_body, 'to_email':user.email, 'email_subject':'Verify your email'}
+            Utlil.send_eamil(data)
             serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
                 'code':code_verivecation
@@ -123,7 +129,7 @@ class GetPhonenumberView(APIView):
             serializer.save()
             return Response({'message':'تم ارسال رمز التحقق'})
         except:
-            raise serializers.ValidationError({'error':'pleace enter valid phone number'})
+            raise serializers.ValidationError({'error':'pleace enter valid email'})
 
 class VerefyCodeView(APIView):
     def post(self, request):
@@ -131,7 +137,7 @@ class VerefyCodeView(APIView):
 
         code_ver = CodeVerivecation.objects.filter(code=code).first()
         if code_ver:
-            return Response(status=status.HTTP_200_OK)
+            return Response({"message":"تم التحقق من الرمز"},status=status.HTTP_200_OK)
         else:
             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
 
@@ -413,11 +419,10 @@ class GetProductsOutputsView(APIView):
         return Response(output_serializer.data, status=status.HTTP_200_OK)
 # --------------------------------------CREATE MEDIUM--------------------------------------
 class CreateMedium(APIView):
-    # permission_classes = [permissions.IsAuthenticated, IsManager]
+    permission_classes = [permissions.IsAuthenticated, OrderManager]
 
     def post(self, request):
         medium = Medium.objects.create()
-
         return Response(status=status.HTTP_200_OK)
     
 
@@ -684,19 +689,39 @@ class CreateManualReceiptView(APIView):
 #     def get(self, request, receipt_id):
 #         man
     
-from .send_sms import send_sms
-# def send(request):
-#     sms_body = "Thank you for registering!"
-#     send_sms('+963957322954', sms_body)
-class SendSms(APIView):
+
+
+class CreateMediumTwo(ListCreateAPIView):
+    queryset = Medium.objects.all()
+    serializer_class = MediumTwoSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request):
-        body = 123
-        # to = "+213660030002"
-        num = Num.objects.all().first()
-        serializer = NumSer(num, many=False)
-        data = serializer.data
-        send_sms(data['number'], body)
 
-        return Response(status=status.HTTP_200_OK)
+class AddToMediumTwo(APIView):
+    def post(self, request, mediumtwo_id, product_id):
+        medium_two = MediumTwo.objects.get(id=mediumtwo_id)
+        product = Product.objects.get(id = product_id)
+        mediumtwo_products, created = MediumTwo_Products.objects.get_or_create(
+            product = product,
+            mediumtwo= medium_two,
+        )
+        if created:
+            mediumtwo_products.quantity=1
+            mediumtwo_products.save()
+        mediumtwo_serializer = MediumTwo_ProductsSerializer(mediumtwo_products)
+        return Response(mediumtwo_serializer.data, status=status.HTTP_201_CREATED)
+    
+
+class MediumTow_Handler(APIView):
+    def post(self, request, mediumtwo_id, pk2):
+        item = MediumTwo_Products.objects.get(id=mediumtwo_id)
+        if pk2 == 'add':
+            item.add_item()
+            serializer = MediumTwo_ProductsSerializer(item,many=False)
+            return Response(serializer.data)
+        else:
+            item.sub_item()
+            if item.quantity == 1:
+                item.delete()
+            serializer = MediumTwo_ProductsSerializer(item,many=False)
+        return Response(serializer.data)

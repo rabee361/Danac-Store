@@ -83,5 +83,9 @@ urlpatterns = [
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
 
-    path('send-sms/', SendSms.as_view()),
+    # -----------------------------------------------MEDIUM TWO-----------------------------------------------
+    path('create-medium-two/', CreateMediumTwo.as_view(), name='create-mediumtwo'),
+    path('add-to-medium-two/<str:mediumtwo_id>/<str:product_id>/', AddToMediumTwo.as_view(), name='add-to-mediumtwo'),
+    path('medium-two-handler/<str:mediumtwo_id>/<str:pk2>/', MediumTow_Handler.as_view()),
+
 ]

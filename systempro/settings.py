@@ -52,6 +52,7 @@ REST_FRAMEWORK = {
     ],
 }
 
+AUTHENTICATION_BACKENDS = ['base.api.backend.EmailBackend']
 
 AUTH_USER_MODEL = 'base.CustomUser'
 
@@ -187,3 +188,10 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Replace with your preferred backend
+EMAIL_HOST = 'smtp.gmail.com' # Replace with your email host for gmail -> 'smtp.gmail.com'
+EMAIL_PORT = 587  # Replace with your email port
+EMAIL_USE_TLS = True  # Set to False if your email server doesn't use TLS
+EMAIL_HOST_USER = 'jacoubakizi@gmail.com'  # Replace with your email username
+EMAIL_HOST_PASSWORD = 'rdedzduyncjjyhgs'  # Replace with your email password

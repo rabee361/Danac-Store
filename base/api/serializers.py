@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from base.models import *
 from django.contrib.auth import login
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
 
 from django.contrib.auth.password_validation import validate_password
@@ -14,7 +14,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'phonenumber', 'password', 'image']
+        fields = ['id', 'email', 'username', 'phonenumber', 'password', 'image']
 
 
 class CodeVerivecationSerializer(serializers.ModelSerializer):
@@ -37,7 +37,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['phonenumber','username', 'password']
+        fields = ['phonenumber', 'email', 'username', 'password']
 
         extra_kwargs = {
             'password':{'write_only':True,}
@@ -53,6 +53,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     def save(self, **kwargs):
         user = CustomUser(
             phonenumber=self.validated_data['phonenumber'],
+            email = self.validated_data['email'],
             username = self.validated_data['username']
         )
         password = self.validated_data['password']
@@ -94,35 +95,73 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserLoginSerilizer(serializers.ModelSerializer):
+# from django.contrib.auth import get_user_model, authenticate
+# from rest_framework import serializers
 
-    phonenumber = serializers.CharField()
-    password = serializers.CharField(max_length=55, min_length=6,write_only = True)
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only = True)
 
-    class Meta:
-        model = CustomUser
-        fields = ['phonenumber', 'password']
+    # class Meta:
+        
 
     def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
 
-        phonenumber = data.get('phonenumber', )
-        password = data.get('password',)
+        if username and password:
+            user = authenticate(request=self.context.get('request'), username=username, password=password)
 
-        if phonenumber is None:
-                raise serializers.ValidationError({'message_error':'An phonenubmer address is required to log in.'})
-        
-        if password is None:
-            raise serializers.ValidationError({'message_error':'A password is required to log in.'})
-        
-        user = authenticate(username= phonenumber, password= password)
+            if not user:
+                try:
+                    User = get_user_model()
+                    if '@' in username:
+                        kwargs = {'email': username}
+                    else:
+                        kwargs = {'phonenumber': username}
+                    user = User.objects.get(**kwargs)
+                    if user.check_password(password):
+                        return user
+                except User.DoesNotExist:
+                    pass
 
-        if user is None:
-            raise serializers.ValidationError({'message_error':'A user with this phonenumber and password was not found.'})
-        
-        if not user.is_active:
-            raise serializers.ValidationError({'message_error':'This user is not currently activated.'})
-        
+            if not user or not user.is_active:
+                raise serializers.ValidationError("Incorrect Credentials")
+        else:
+            raise serializers.ValidationError('Must include "username" and "password".')
+
+        data['user'] = user
         return data
+
+# class UserLoginSerilizer(serializers.ModelSerializer):
+
+#     phonenumber = serializers.CharField()
+#     password = serializers.CharField(max_length=55, min_length=6,write_only = True)
+
+#     class Meta:
+#         model = CustomUser
+#         fields = ['phonenumber', 'password']
+
+#     def validate(self, data):
+
+#         phonenumber = data.get('phonenumber', )
+#         password = data.get('password',)
+
+#         if phonenumber is None:
+#                 raise serializers.ValidationError({'message_error':'An phonenubmer address is required to log in.'})
+        
+#         if password is None:
+#             raise serializers.ValidationError({'message_error':'A password is required to log in.'})
+        
+#         user = authenticate(username= phonenumber, password= password)
+
+#         if user is None:
+#             raise serializers.ValidationError({'message_error':'A user with this phonenumber and password was not found.'})
+        
+#         if not user.is_active:
+#             raise serializers.ValidationError({'message_error':'This user is not currently activated.'})
+        
+#         return data
     
 
 class LogoutSerializer(serializers.Serializer):
@@ -563,7 +602,27 @@ class ProductOrderEnvoySerializer(serializers.ModelSerializer):
     class Meta:
         model = Product_Order_Envoy
         fields = '__all__'
-class NumSer(serializers.ModelSerializer):
+
+
+class MediumTwoSerializer(serializers.ModelSerializer):
+
     class Meta:
-        model = Num
-        fields = ['number']
+        model = MediumTwo
+        fields = '__all__'
+
+
+class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MediumTwo_Products
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        reper = super().to_representation(instance)
+        request = self.context.get('request')
+        reper['product'] = instance.product.name
+        reper['image'] = instance.product.image.url
+        reper['sale_price'] = instance.product.sale_price
+        reper['description'] = instance.product.description
+
+        return reper

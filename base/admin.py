@@ -8,8 +8,7 @@ import random
 from base.api.serializers import CodeVerivecationSerializer
 # from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from .froms import CustomUserCreationForm, CustomUserChangeForm
-from base.api.send_sms import send_sms
-
+from base.api.utils import Utlil
 
 class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     add_form = CustomUserCreationForm
@@ -22,13 +21,14 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     def accept_user(self, request, queryset):
         queryset.update(is_active=True)
         user = queryset.get(is_active=True)
-        # body = "Thank you for registering"
-        # send_sms(user.phonenumber, body)
-        # print(user)
+        rand_num = random.randint(1,10000)
+        email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(rand_num)
+        data = {'email_body':email_body, 'to_email':user.email, 'email_subject':'Verify your email'}
+        Utlil.send_eamil(data)
         client = Client.objects.create(
             name=user.username,
             address = user.address,
-            phomnenumber = user.phonenumber
+            phonenumber = user.phonenumber
         )
         code_verivecation = random.randint(1000,9999)
         serializer = CodeVerivecationSerializer(data ={
@@ -42,7 +42,7 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
 
     fieldsets = (
         (None, 
-                {'fields':('phonenumber', 'password',)}
+                {'fields':('phonenumber','email', 'password',)}
             ),
             ('User Information',
                 {'fields':('username', 'first_name', 'last_name',)}
@@ -101,5 +101,5 @@ admin.site.register(Products_Medium)
 admin.site.register(DamagedProduct)
 admin.site.register(ReturnedGoodsClient)
 admin.site.register(ReturnedGoodsSupplier)
-
-admin.site.register(Num)
+admin.site.register(MediumTwo)
+admin.site.register(MediumTwo_Products)

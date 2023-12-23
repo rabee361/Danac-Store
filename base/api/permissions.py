@@ -2,12 +2,27 @@ from rest_framework.permissions import BasePermission
 from base.models import Employee
 
 
-class IsManager(BasePermission):
+class InventoryManager(BasePermission):
     def has_permission(self, request, view):
-        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
-        return bool(request.user and request.user.user_type.user_type == employee.type_employee )
+        return bool(request.user and request.user.inventory_manager)
+
     
-class IsDriver(BasePermission):
+class RegistryManager(BasePermission):
     def has_permission(self, request, view):
-        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
-        return bool(request.user and request.user.user_type == employee.type_employee)
+        return bool(request.user and request.user.registry_manager)
+    
+class HRManager(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.HR_manager)
+    
+class OrderManager(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.order_manager)
+    
+class SalesEmployeeManager(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.sales_employee_manager)
+    
+class ManualSalesManager(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.manual_sales_manager)
