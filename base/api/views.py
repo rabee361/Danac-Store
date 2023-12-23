@@ -56,7 +56,6 @@ class UserLoginApiView(GenericAPIView):
 
 class UpdateImageUserView(APIView):
     def put(self, requset, user_pk):
-        user_pk = requset.user.id
         user = CustomUser.objects.get(id=user_pk)
         serializer = UpdateUserSerializer(user, data=requset.data, many=False, context={'request':requset})
         if serializer.is_valid():
@@ -67,6 +66,11 @@ class UpdateImageUserView(APIView):
             )
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+
+class users(ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
 
 
 
