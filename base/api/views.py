@@ -796,7 +796,7 @@ class CreateManualReceiptView(APIView):
         user = request.user
         client = Client.objects.get(id=request.data['client'])
         employee = Employee.objects.get(phonenumber=user.phonenumber)
-        manual_receipt_serializer = ManualRecieptSerializer2(data={
+        manual_receipt_serializer = ManualRecieptSerializer(data={
             "employee":employee.id,
             "client": client.id,
             "verify_code": request.data['verify_code'],
