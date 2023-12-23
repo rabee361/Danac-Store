@@ -349,7 +349,7 @@ class ManualReceipt_Products(models.Model):
     total_price = models.FloatField(default=0)
 
     def __str__(self) -> str:
-        return f'{self.manualreciept.client.name} - {str(self.manualreciept.id)}'
+        return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
 
 
 class Deposite(models.Model):
@@ -518,9 +518,10 @@ class OrderEnvoy(models.Model):
     phonenumber = PhoneNumberField(region='DZ')
     products = models.ManyToManyField(Product, through='Product_Order_Envoy')
     products_num = models.IntegerField(default=0)
+    total_price = models.FloatField(default=0)
     created = models.DateField(auto_now_add=True)
     delivery_date = models.DateField()
-    is_accepted = models.BooleanField(null=True, default=False)
+    # is_accepted = models.BooleanField(null=True, default=False)
     delivered = models.BooleanField(null=True, default=False)
 
     # location = 
@@ -532,8 +533,8 @@ class OrderEnvoy(models.Model):
 class Product_Order_Envoy(models.Model):
     order_envoy = models.ForeignKey(OrderEnvoy, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    num_item = models.IntegerField(default=0)
-    total_price = models.FloatField(default=0)
+    # num_item = models.IntegerField(default=0)
+    # total_price = models.FloatField(default=0)
 
     def __str__(self):
         return f'{self.product.name} - {str(self.order_envoy.id)}'
