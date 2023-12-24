@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from base.models import *
 from .serializers import *
-from rest_framework.generics import DestroyAPIView, ListAPIView,CreateAPIView, RetrieveAPIView , GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import UpdateAPIView, DestroyAPIView, ListAPIView,CreateAPIView, RetrieveAPIView , GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, RetrieveDestroyAPIView
 from .validation import custom_validation
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -60,7 +60,7 @@ class UpdateImageUserView(APIView):
 
     def put(self, requset, user_pk):
 
-        user_pk = requset.user.id
+        user_pk= requset.user.id
         user = CustomUser.objects.get(id=user_pk)
         serializer = UpdateUserSerializer(user, data=requset.data, many=False, context={'request':requset})
         if serializer.is_valid():
@@ -77,14 +77,14 @@ class ListInformationUserView(RetrieveAPIView):
     serializer_class= CustomUserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    
-class ResetPasswordView(GenericAPIView):
+#################################### 
+class ResetPasswordView(UpdateAPIView):
     serializer_class = ResetPasswordSerializer
     permission_classes = [permissions.AllowAny,]
 
-    def post(self, request):
+    def put(self, request, user_id):
         data = request.data
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(data=data, context={'user_id':user_id})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         messages = {
@@ -131,6 +131,8 @@ class GetPhonenumberView(APIView):
         except:
             raise serializers.ValidationError({'error':'pleace enter valid email'})
 
+
+# ##############################
 class VerefyCodeView(APIView):
     def post(self, request):
         code = request.data['code']
@@ -140,7 +142,7 @@ class VerefyCodeView(APIView):
         if code_ver:
             if timezone.now() > code_ver.expires_at:
                 return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
-            return Response({"message":"تم التحقق من الرمز"},status=status.HTTP_200_OK)
+            return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
         else:
             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
 

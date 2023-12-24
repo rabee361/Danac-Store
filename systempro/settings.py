@@ -52,7 +52,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-AUTHENTICATION_BACKENDS = ['base.api.backend.EmailBackend']
+AUTHENTICATION_BACKENDS = ['base.api.backend.CustomUserModelBackend']
 
 AUTH_USER_MODEL = 'base.CustomUser'
 

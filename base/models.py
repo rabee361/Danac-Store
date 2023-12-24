@@ -162,7 +162,7 @@ class Cart_Products(models.Model):
 
 
 class Order(models.Model):
-    clinet = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, through='Order_Product')
     total = models.IntegerField(default=0)
     products_num = models.IntegerField(default=0)
@@ -171,7 +171,7 @@ class Order(models.Model):
     deliverd = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return f'{self.clinet.name}: {self.id}'
+        return f'{self.client.name}: {self.id}'
     
 class Order_Product(models.Model):
     products = models.ForeignKey(Product, on_delete=models.CASCADE)

@@ -7,12 +7,12 @@ from django.urls import path
 from .views import *
 urlpatterns = [
     path('sign-up/' ,SingupView.as_view(), name='sign-up'),
-    path('auth/reset-password/' , ResetPasswordView.as_view(), name='reset-password'),
+    path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),####
     path('sign-in/', UserLoginApiView.as_view(), name='sign-in'),
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('settings/<str:pk>/', ListInformationUserView.as_view(), name='settings'),
-    path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
+    path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'), 
     path('logout/', LogoutAPIView.as_view(), name='logout'),
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('verefy-code/', VerefyCodeView.as_view(), name='verefy-code'),

@@ -62,11 +62,10 @@ class SignUpSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-
+################################
 class ResetPasswordSerializer(serializers.ModelSerializer):
 
     newpassword = serializers.CharField(style={"input_type":"password"}, write_only=True)
-
     class Meta:
         model = CustomUser
         fields = ['password', 'newpassword']
@@ -87,9 +86,9 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         return attrs
     
     def save(self, **kwargs):
-        request = self.context.get('request')
-        user = CustomUser.objects.get(id=request.user.id)
-        password = self.validated_data['password']
+        user_id = self.context.get('user_id')
+        user = CustomUser.objects.get(id=user_id)
+        password = self.validated_data['newpassword']
         user.set_password(password)
         user.save()
         return user
@@ -111,19 +110,8 @@ class LoginSerializer(serializers.Serializer):
 
         if username and password:
             user = authenticate(request=self.context.get('request'), username=username, password=password)
-
-            if not user:
-                try:
-                    User = get_user_model()
-                    if '@' in username:
-                        kwargs = {'email': username}
-                    else:
-                        kwargs = {'phonenumber': username}
-                    user = User.objects.get(**kwargs)
-                    if user.check_password(password):
-                        return user
-                except User.DoesNotExist:
-                    pass
+            # if not user:
+            #     raise serializers.ValidationError("Incorrect Credentials")
 
             if not user or not user.is_active:
                 raise serializers.ValidationError("Incorrect Credentials")
