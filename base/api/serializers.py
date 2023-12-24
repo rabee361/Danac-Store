@@ -833,7 +833,6 @@ class MediumTwoSerializer(serializers.ModelSerializer):
 
 
 class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = MediumTwo_Products
         fields = '__all__'
@@ -842,7 +841,7 @@ class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
         reper = super().to_representation(instance)
         request = self.context.get('request')
         reper['product'] = instance.product.name
-        reper['image'] = instance.product.image.url
+        reper['image'] = request.build_absolute_uri(instance.product.image.url)
         reper['sale_price'] = instance.product.sale_price
         reper['description'] = instance.product.description
 
