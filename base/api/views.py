@@ -130,7 +130,8 @@ class GetPhonenumberView(APIView):
             })
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response({'message':'تم ارسال رمز التحقق'})
+            return Response({'message':'تم ارسال رمز التحقق',
+                             'user_id' : user.id})
         except:
             raise serializers.ValidationError({'error':'pleace enter valid email'})
 
@@ -536,7 +537,6 @@ class ListCreateRecievedPayment(ListCreateAPIView):
 class RetUpdDesRecievedPaymnt(RetrieveUpdateDestroyAPIView):
     queryset = Recieved_Payment.objects.all()
     serializer_class = RecievedPaymentSerializer
-
 
 class ListCreateExpense(ListCreateAPIView):
     queryset = Expense.objects.all()
