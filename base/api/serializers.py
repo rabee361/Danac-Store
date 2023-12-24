@@ -781,3 +781,69 @@ class DelievaryArrivedSerializer(serializers.ModelSerializer):
 
 
         
+
+###########################################################################################################
+        
+
+
+
+
+
+
+
+
+
+
+
+
+# ---------------------------------------------ORDER ENVOY---------------------------------------------
+
+class OrderEnvoySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OrderEnvoy
+        fields = '__all__'
+
+class ListOrderEnvoySerialzier(serializers.ModelSerializer):
+    class Meta : 
+        model = OrderEnvoy
+        fields = ['client', 'phonenumber', 'products_num', 'total_price', 'delivery_date']
+
+
+class ProductOrderEnvoySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product_Order_Envoy
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        reper = super().to_representation(instance)
+        reper['product'] = instance.product.name
+        reper['image'] = instance.product.image.url
+        reper['sale_price'] = instance.product.sale_price
+        reper['description'] = instance.product.description
+
+        return reper
+
+
+class MediumTwoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MediumTwo
+        fields = '__all__'
+
+
+class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MediumTwo_Products
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        reper = super().to_representation(instance)
+        request = self.context.get('request')
+        reper['product'] = instance.product.name
+        reper['image'] = instance.product.image.url
+        reper['sale_price'] = instance.product.sale_price
+        reper['description'] = instance.product.description
+
+        return reper

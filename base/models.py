@@ -681,3 +681,66 @@ class ManualReceipt_Products(models.Model):
 
     def __str__(self) -> str:
         return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
+
+
+
+
+
+
+
+
+
+
+
+# ----------------------------------------------ORDER ENVOY----------------------------------------------
+
+class OrderEnvoy(models.Model):
+    client = models.CharField(max_length=50)
+    phonenumber = PhoneNumberField(region='DZ')
+    products = models.ManyToManyField(Product, through='Product_Order_Envoy')
+    products_num = models.IntegerField(default=0)
+    total_price = models.FloatField(default=0)
+    created = models.DateField(auto_now_add=True)
+    delivery_date = models.DateField()
+    # is_accepted = models.BooleanField(null=True, default=False)
+    delivered = models.BooleanField(null=True, default=False)
+
+    # location = 
+
+    def __str__(self) -> str:
+        return f'{self.client} - {str(self.id)}'
+    
+
+class Product_Order_Envoy(models.Model):
+    order_envoy = models.ForeignKey(OrderEnvoy, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    # num_item = models.IntegerField(default=0)
+    # total_price = models.FloatField(default=0)
+
+    def __str__(self):
+        return f'{self.product.name} - {str(self.order_envoy.id)}'
+
+    
+
+class MediumTwo(models.Model):
+    products = models.ManyToManyField(Product, through='MediumTwo_Products')
+
+    def __str__(self) -> str:
+        return f'medium_two - {str(self.id)}'
+
+class MediumTwo_Products(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    mediumtwo = models.ForeignKey(MediumTwo, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default= 0)
+    # total_price = models.FloatField()
+
+    def add_item(self):
+        self.quantity += 1
+        self.save()
+
+    def sub_item(self):
+        self.quantity -= 1
+        self.save()
+
+    def __str__(self) -> str:
+        return f'{self.product.name} - {str(self.mediumtwo.id)}'

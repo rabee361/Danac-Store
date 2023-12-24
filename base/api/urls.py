@@ -107,13 +107,13 @@ urlpatterns = [
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()), ###### 
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),###### 
 
-    # path('create-medium-two/', CreateMediumTwo.as_view(), name='create-mediumtwo'),
-    # path('add-to-medium-two/<str:mediumtwo_id>/<str:product_id>/', AddToMediumTwo.as_view(), name='add-to-mediumtwo'),
-    # path('medium-two-handler/<str:mediumtwo_id>/<str:pk2>/', MediumTow_Handler.as_view()),
-    # path('delete-product-from-medium-two/<str:pk>/', DesMediumTwo.as_view()),
-    # path('list-products-form-medium-two/', ListProductsMediumTwo.as_view()),
-    # path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
-    # path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view())
+    path('create-medium-two/', CreateMediumTwo.as_view(), name='create-mediumtwo'),
+    path('add-to-medium-two/<str:mediumtwo_id>/<str:product_id>/', AddToMediumTwo.as_view(), name='add-to-mediumtwo'),
+    path('medium-two-handler/<str:mediumtwo_id>/<str:pk2>/', MediumTow_Handler.as_view()),
+    path('delete-product-from-medium-two/<str:pk>/', DesMediumTwo.as_view()),
+    path('list-products-form-medium-two/', ListProductsMediumTwo.as_view()),
+    path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
+    path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view())
 
     ]
 

@@ -855,4 +855,92 @@ class ListManualReceipt(ListAPIView):
 
 
 
-# class 
+
+
+
+
+
+
+class CreateMediumTwo(ListCreateAPIView):
+    queryset = MediumTwo.objects.all()
+    serializer_class = MediumTwoSerializer
+    # permission_classes = [permissions.IsAuthenticated]
+
+class DesMediumTwo(DestroyAPIView):
+    queryset = MediumTwo_Products.objects.all()
+    serializer_class = MediumTwo_ProductsSerializer
+    # permission_classe = [permissions.IsAuthenticated]
+
+
+class ListProductsMediumTwo(ListAPIView):
+    queryset = MediumTwo_Products.objects.all()
+    serializer_class = MediumTwo_ProductsSerializer
+
+
+class AddToMediumTwo(APIView):
+    def post(self, request, mediumtwo_id, product_id):
+        medium_two = MediumTwo.objects.get(id=mediumtwo_id)
+        product = Product.objects.get(id = product_id)
+        mediumtwo_products, created = MediumTwo_Products.objects.get_or_create(
+            product = product,
+            mediumtwo= medium_two,
+        )
+        if created:
+            mediumtwo_products.quantity=1
+            mediumtwo_products.save()
+        mediumtwo_serializer = MediumTwo_ProductsSerializer(mediumtwo_products)
+        return Response(mediumtwo_serializer.data, status=status.HTTP_201_CREATED)
+    
+
+class MediumTow_Handler(APIView):
+    def post(self, request, mediumtwo_id, pk2):
+        item = MediumTwo_Products.objects.get(id=mediumtwo_id)
+        if pk2 == 'add':
+            item.add_item()
+            serializer = MediumTwo_ProductsSerializer(item,many=False)
+            return Response(serializer.data)
+        else:
+            if item.quantity == 1:
+                item.delete()
+            else:
+                item.sub_item()
+            serializer = MediumTwo_ProductsSerializer(item,many=False)
+        return Response(serializer.data)
+    
+class CreateOrderEnvoyView(APIView):
+
+    def post(self, request, mediumtwo_id):
+        mediumtwo = MediumTwo_Products.objects.filter(mediumtwo__id = mediumtwo_id)
+        order_envoy_ser = OrderEnvoySerializer(data={
+            'client':request.data['client'],
+            'phonenumber': request.data['phonenumber'],
+            'delivery_date':request.data['delivery_date']
+        })
+        if order_envoy_ser.is_valid():
+            order_envoy = order_envoy_ser.save()
+            for medium in mediumtwo:
+                product_order_envoy = Product_Order_Envoy.objects.create(
+                    order_envoy = order_envoy,
+                    product = medium.product,   
+                )
+
+                order_envoy.products_num += medium.quantity
+                order_envoy.total_price += (medium.quantity * medium.product.sale_price)
+                order_envoy.save()
+            MediumTwo.objects.get(id=mediumtwo_id).delete()
+            return Response(order_envoy_ser.data, status=status.HTTP_201_CREATED)
+        return Response(order_envoy_ser.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class ListOrderEnvoy(APIView):
+
+    def get(self, request, pk):
+        order_envoy = OrderEnvoy.objects.get(id=pk)
+        serializer = ListOrderEnvoySerialzier(order_envoy, many=False)
+        product_order_envoy = Product_Order_Envoy.objects.filter(order_envoy__id = pk)
+        serializer_two = ProductOrderEnvoySerializer(product_order_envoy, many=True)
+
+        return Response({
+            'order_envoy':serializer.data,
+            'products_order_envoy':serializer_two.data
+        })
