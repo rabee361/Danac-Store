@@ -892,6 +892,14 @@ class AddToMediumTwo(APIView):
         return Response(mediumtwo_serializer.data, status=status.HTTP_201_CREATED)
     
 
+
+
+class DeleteMediumTwo(DestroyAPIView):
+    queryset = MediumTwo.objects.all()
+    serializer_class = MediumTwoSerializer
+
+
+
 class MediumTow_Handler(APIView):
     def post(self, request, mediumtwo_id, pk2):
         item = MediumTwo_Products.objects.get(id=mediumtwo_id)
