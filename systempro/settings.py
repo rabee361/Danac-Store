@@ -208,4 +208,4 @@ EMAIL_HOST = 'smtp.gmail.com' # Replace with your email host for gmail -> 'smtp.
 EMAIL_PORT = 587  # Replace with your email port
 EMAIL_USE_TLS = True  # Set to False if your email server doesn't use TLS
 EMAIL_HOST_USER = 'jacoubakizi@gmail.com'  # Replace with your email username
-EMAIL_HOST_PASSWORD = 'rdedzduyncjjyhgs'  
+EMAIL_HOST_PASSWORD = 'rdedzduyncjjyhgs'     
