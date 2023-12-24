@@ -213,6 +213,8 @@ class Supplier(models.Model):
 class CodeVerification(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     code = models.IntegerField(validators=[MinValueValidator(1000), MaxValueValidator(9999)])
+    created_at = models.DateField(auto_now_add=True)
+    expires_at = models.DateField(default=timezone.now() + timedelta(minutes=10))
 
     def __str__(self):
         return f'{self.user} code:{self.code}'
