@@ -513,6 +513,13 @@ class WithDrawSerializer(serializers.ModelSerializer):
 
 
 
+class ExpenseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Expense
+        fields = '__all__'
+
+
+
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment

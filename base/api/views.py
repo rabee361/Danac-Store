@@ -538,6 +538,15 @@ class RetUpdDesRecievedPaymnt(RetrieveUpdateDestroyAPIView):
     serializer_class = RecievedPaymentSerializer
 
 
+class ListCreateExpense(ListCreateAPIView):
+    queryset = Expense.objects.all()
+    serializer_class = ExpenseSerializer
+
+class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
+    queryset = Expense.objects.all()
+    serializer_class = ExpenseSerializer
+
+
 #####################################################################################################################
 
 

@@ -75,6 +75,8 @@ urlpatterns = [
     path('get-payment/<str:pk>/' , RetUpdDesPayment.as_view() , name="get-payment"), #######
     path('recieved-payments/' , ListCreateRecievedPayment.as_view() , name="payments"),###### 
     path('get-recieved-payment/<str:pk>/' , RetUpdDesRecievedPaymnt.as_view() , name="get-payment"),######
+    path('expenses/' , ListCreateExpense.as_view() , name="expenses"),###### 
+    path('get-expense/<str:pk>/' , RetUpdDesExpense.as_view() , name="get-expense"),######
 
     path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),##### 
     path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()), ##### 
