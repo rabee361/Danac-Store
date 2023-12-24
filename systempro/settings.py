@@ -200,6 +200,8 @@ SIMPLE_JWT = {
 }
 
 
+# EMAIL_BACKEND = 'django_smtp_ssl_SSLEmailBackend'  # Replace with your preferred backend
+# EMAIL_USE_SSL = True
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Replace with your preferred backend
 EMAIL_HOST = 'smtp.gmail.com' # Replace with your email host for gmail -> 'smtp.gmail.com'
