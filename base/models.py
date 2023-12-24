@@ -7,6 +7,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Sum
 import uuid
 from django.contrib.gis.geos import Point
+from django.utils import timezone
+from datetime import timedelta
 
 
 class UserType(models.Model):
@@ -36,6 +38,8 @@ class CustomUser(AbstractUser):
 class CodeVerivecation(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     code = models.IntegerField(validators=[MinValueValidator(1000,9999),])
+    created_at = models.DateTimeField(auto_now_add=True,)
+    expires_at = models.DateTimeField(default=timezone.now() + timedelta(minutes=10))
 
     def __str__(self) -> str:
         return f'{self.user.username} {self.code}'
@@ -201,7 +205,7 @@ class Supplier(models.Model):
     info = models.TextField(max_length=500)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 
 
@@ -227,8 +231,8 @@ class Employee(models.Model):
     notes = models.TextField(max_length=150,default=' ')
     birthday = models.DateField(auto_now_add=True)
 
-    def __str__(self) -> str:
-        return self.name
+    def __str__(self):
+        return f'{self.name}'
 
 
 

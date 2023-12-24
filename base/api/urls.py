@@ -7,9 +7,7 @@ urlpatterns = [
     path('auth/sign-up/' , SignUpView.as_view()),#####
     path('auth/log-in/', UserLoginApiView.as_view(), name='sign-in'),#####
     path('auth/logout/', LogoutAPIView.as_view(), name='logout'),#####
-    path('auth/reset-password/' , ResetPasswordView.as_view(), name='reset-password'),####
-    path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),#########
-    path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),######
+    path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),####
     path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
     path('verefy-code/', VerefyCodeView.as_view(), name='verefy-code'),
     path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),

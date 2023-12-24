@@ -64,6 +64,7 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
 class EstateAdmin(GISModelAdmin):
     list_display = ('location',)
 
+admin.site.register(UserType)
 admin.site.register(CodeVerification)
 admin.site.register(CustomUser,AdminCustomUser)
 admin.site.register(Product)
@@ -96,3 +97,6 @@ admin.site.register(Output_Products)
 admin.site.register(Incoming)
 admin.site.register(Incoming_Product)
 admin.site.register(ManualReceipt_Products)
+admin.site.register(ReturnedGoodsSupplier)
+admin.site.register(ReturnedGoodsClient)
+admin.site.register(DamagedProduct)

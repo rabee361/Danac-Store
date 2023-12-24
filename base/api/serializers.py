@@ -68,9 +68,10 @@ class LoginSerializer(serializers.Serializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = CustomUser
-        fields = ['phonenumber','username', 'password']
+        fields = ['phonenumber', 'email', 'username', 'password']
 
         extra_kwargs = {
             'password':{'write_only':True,}
@@ -86,6 +87,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     def save(self, **kwargs):
         user = CustomUser(
             phonenumber=self.validated_data['phonenumber'],
+            email = self.validated_data['email'],
             username = self.validated_data['username']
         )
         password = self.validated_data['password']
@@ -100,25 +102,17 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only = True)
 
+    # class Meta:
+        
+
     def validate(self, data):
         username = data.get('username')
         password = data.get('password')
 
         if username and password:
             user = authenticate(request=self.context.get('request'), username=username, password=password)
-
-            if not user:
-                try:
-                    User = get_user_model()
-                    if '@' in username:
-                        kwargs = {'email': username}
-                    else:
-                        kwargs = {'phonenumber': username}
-                    user = User.objects.get(**kwargs)
-                    if user.check_password(password):
-                        return user
-                except User.DoesNotExist:
-                    pass
+            # if not user:
+            #     raise serializers.ValidationError("Incorrect Credentials")
 
             if not user or not user.is_active:
                 raise serializers.ValidationError("Incorrect Credentials")
@@ -127,7 +121,6 @@ class LoginSerializer(serializers.Serializer):
 
         data['user'] = user
         return data
-
 
 
 
@@ -145,10 +138,12 @@ class UserLogoutSerializer(serializers.Serializer):
 
 
 class ResetPasswordSerializer(serializers.ModelSerializer):
-    new_password = serializers.CharField(style={"input_type":"password"}, write_only=True)
+
+    newpassword = serializers.CharField(style={"input_type":"password"}, write_only=True)
     class Meta:
         model = CustomUser
-        fields = ['password', 'new_password']
+        fields = ['password', 'newpassword']
+
         extra_kwargs = {
             'password':{'write_only':True,}
         }
@@ -165,9 +160,9 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         return attrs
     
     def save(self, **kwargs):
-        request = self.context.get('request')
-        user = CustomUser.objects.get(id=request.user.id)
-        password = self.validated_data['password']
+        user_id = self.context.get('user_id')
+        user = CustomUser.objects.get(id=user_id)
+        password = self.validated_data['newpassword']
         user.set_password(password)
         user.save()
         return user
@@ -559,34 +554,70 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
 
 ######################################## RETURNED GOODS #####################################################################
 
+
+
+
+# class ProductSerializerGoods(serializers.ModelSerializer):
+#     class Meta:
+#         model = Product
+#         fields = ['name']  # include other fields if needed
+
+# class SupplierSerializerGoods(serializers.ModelSerializer):
+#     class Meta:
+#         model = Supplier
+#         fields = ['name']  # include other fields if needed
+
+# class EmployeeSerializerGoods(serializers.ModelSerializer):
+#     class Meta:
+#         model = Employee
+#         fields = ['name'] 
+
+# class ClientSerializerGoods(serializers.ModelSerializer):
+#     class Meta:
+#         model = Client
+#         fields = ['name'] 
+
+
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    client = serializers.PrimaryKeyRelatedField(queryset=Client.objects.all())
+    employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all())
     class Meta:
         model = ReturnedGoodsClient
-        fields = '__all__'
+        fields = ['id','client','product','employee','quantity','total_price','reason','date']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['product'] = instance.product.name
+        representation['client'] = instance.client.name
+        representation['employee'] = instance.employee.name
+        return representation
+
 
 
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
+    employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all())
     class Meta:
         model = ReturnedGoodsSupplier
-        fields = '__all__'
+        fields = ['id', 'supplier', 'product', 'employee', 'quantity', 'total_price', 'reason', 'date']
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['product'] = instance.product.name
+        representation['supplier'] = instance.supplier.name
+        representation['employee'] = instance.employee.name
+        return representation
 
-
-class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReturnedGoodsSupplier
-        fields = '__all__'
-
-class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReturnedGoodsClient
-        fields = '__all__'
-
+    
 ############################################# DAMAGED PRODUCTS #########################################################
 
 class DamagedProductSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     class Meta:
         model = DamagedProduct
-        fields  ='__all__'
+        fields  = ['id','product','quantity','total_price','date','product_id']
 
     def update(self, instance, validated_data):
         original_quantity = instance.quantity
@@ -605,6 +636,12 @@ class DamagedProductSerializer(serializers.ModelSerializer):
         product.save()
 
         return instance
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['product'] = instance.product.name
+        return representation
+
     
 
 

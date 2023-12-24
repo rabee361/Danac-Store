@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'base'
 ]
 
-AUTHENTICATION_BACKENDS = ['base.api.backend.EmailBackend']
+AUTHENTICATION_BACKENDS = ['base.api.backend.CustomUserModelBackend']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

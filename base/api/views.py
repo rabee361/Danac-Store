@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from base.models import *
 from .serializers import *
-from rest_framework.generics import ListAPIView, DestroyAPIView ,RetrieveAPIView ,RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView , ListCreateAPIView , RetrieveUpdateAPIView , RetrieveDestroyAPIView
+from rest_framework.generics import ListAPIView, DestroyAPIView ,RetrieveAPIView,UpdateAPIView ,RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView , ListCreateAPIView , RetrieveUpdateAPIView , RetrieveDestroyAPIView
 from .validation import custom_validation
 from rest_framework import permissions
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -33,6 +33,7 @@ class SignUpView(GenericAPIView):
             'accsess':str(token.access_token)
         }
         return Response({'information_user':user_data,'tokens':tokens})
+
 
 
 
@@ -68,6 +69,23 @@ class UpdateImageUserView(APIView):
 
 
 
+class ResetPasswordView(UpdateAPIView):
+    serializer_class = ResetPasswordSerializer
+    permission_classes = [permissions.AllowAny,]
+
+    def put(self, request, user_id):
+        data = request.data
+        serializer = self.get_serializer(data=data, context={'user_id':user_id})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        messages = {
+            'message':'Password Changed Successfully.'
+        }
+        return Response(messages, status=status.HTTP_200_OK)
+
+
+
+
 class users(ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
@@ -93,7 +111,6 @@ class ListInformationUserView(RetrieveAPIView):
 
 
 class GetPhonenumberView(APIView):
-    # serializer_class = CustomUserSerializer
     def post(self, request):
         email = request.data['email']
 
@@ -121,10 +138,11 @@ class GetPhonenumberView(APIView):
 class VerefyCodeView(APIView):
     def post(self, request):
         code = request.data['code']
-
         code_ver = CodeVerivecation.objects.filter(code=code).first()
         if code_ver:
-            return Response({"message":"تم التحقق من الرمز"},status=status.HTTP_200_OK)
+            if timezone.now() > code_ver.expires_at:
+                return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
         else:
             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
 
@@ -372,20 +390,6 @@ class ListCreateClient(ListCreateAPIView):
 
 
 
-class ResetPasswordView(GenericAPIView):
-    serializer_class = ResetPasswordSerializer
-    permission_classes = [permissions.IsAuthenticated,]
-
-    def post(self, request):
-        data = request.data
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        messages = {
-            'message':'Password Changed Successfully.'
-        }
-        return Response(messages, status=status.HTTP_200_OK)
-
 
 
 
@@ -544,14 +548,27 @@ class ListCreateRetGoodsSupplier(ListCreateAPIView):
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
 
+
+# class ListCreateRetGoodsSupplier(ListAPIView):
+#     queryset = ReturnedGoodsSupplier.objects.all()
+#     serializer_class = ReturnedGoodsSupplierSerializer2
+
+
 class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
     # permission_classes = [permissions.IsAuthenticated]    
 
+
 class ListCreateRetGoodsClient(ListCreateAPIView):
     queryset = ReturnedGoodsClient.objects.all()
     serializer_class = ReturnedGoodsClientSerializer
+
+
+# class ListRetGoodsClient(ListAPIView):
+#     queryset = ReturnedGoodsClient.objects.all()
+#     serializer_class = ReturnedGoodsClientSerializer2
+
 
 class RetUpdDesReturnGoodClient(RetrieveUpdateDestroyAPIView):
     queryset = ReturnedGoodsClient.objects.all()
