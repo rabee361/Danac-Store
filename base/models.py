@@ -6,6 +6,8 @@ from phonenumber_field.modelfields import PhoneNumberField
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
+from django.utils import timezone
+from datetime import timedelta
 
 
 class UserType(models.Model):
@@ -56,25 +58,16 @@ class CustomUser(AbstractUser):
     def manual_sales_manager(self):
         return self.user_type.user_type == 'مدير مبيعات يدوية'
     
-    # def tokens(self):
-    #     refresh = RefreshToken.for_user(self)
-    #     return {
-    #         'refresh':str(refresh),
-    #         'access':str(refresh.access_token)
-    #     }
 
 class CodeVerivecation(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     code = models.IntegerField(validators=[MinValueValidator(1000,9999),])
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(default=timezone.now() + timedelta(minutes=10))
 
     def __str__(self) -> str:
         return f'{self.user.username} {self.code}'
 
-
-# class Client(models.Model):
-#     # user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-#     name = models.CharField(max_length=30)
-#     # location = 
 
 class Client(models.Model):
     CHOICES = (

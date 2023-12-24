@@ -136,7 +136,10 @@ class VerefyCodeView(APIView):
         code = request.data['code']
 
         code_ver = CodeVerivecation.objects.filter(code=code).first()
+        
         if code_ver:
+            if timezone.now() > code_ver.expires_at:
+                return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
             return Response({"message":"تم التحقق من الرمز"},status=status.HTTP_200_OK)
         else:
             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
