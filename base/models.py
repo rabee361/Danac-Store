@@ -35,18 +35,6 @@ class CustomUser(AbstractUser):
 
 
 
-class CodeVerivecation(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    code = models.IntegerField(validators=[MinValueValidator(1000,9999),])
-    created_at = models.DateTimeField(auto_now_add=True,)
-    expires_at = models.DateTimeField(default=timezone.now() + timedelta(minutes=10))
-
-    def __str__(self) -> str:
-        return f'{self.user.username} {self.code}'
-
-
-
-
 
 class Client(models.Model):
     CHOICES = (
@@ -215,7 +203,7 @@ class CodeVerification(models.Model):
     expires_at = models.DateField(default=timezone.now() + timedelta(minutes=10))
 
     def __str__(self):
-        return f'{self.user} code:{self.code}'
+        return f'{self.user.username} code:{self.code}'
 
 
 

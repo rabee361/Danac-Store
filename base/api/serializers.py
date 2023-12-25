@@ -68,15 +68,12 @@ class LoginSerializer(serializers.Serializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = CustomUser
         fields = ['phonenumber', 'email', 'username', 'password']
-
         extra_kwargs = {
             'password':{'write_only':True,}
         }
-
         def validate(self, validated_data):
             validate_password(validated_data['password'])
             return validated_data
@@ -101,10 +98,6 @@ class SignUpSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only = True)
-
-    # class Meta:
-        
-
     def validate(self, data):
         username = data.get('username')
         password = data.get('password')
@@ -170,7 +163,7 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
 
 class CodeVerivecationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CodeVerivecation
+        model = CodeVerification
         fields = '__all__'
 
 ############################################################### PRODUCT AND CLIENTS AND ORDERS ###########################################

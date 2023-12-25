@@ -116,7 +116,7 @@ class GetPhonenumberView(APIView):
 
         try: 
             user = get_object_or_404(CustomUser, email=email)
-            existing_code = CodeVerivecation.objects.filter(user=user).first()
+            existing_code = CodeVerification.objects.filter(user=user).first()
             if existing_code:
                 existing_code.delete()
 
@@ -139,7 +139,7 @@ class GetPhonenumberView(APIView):
 class VerefyCodeView(APIView):
     def post(self, request):
         code = request.data['code']
-        code_ver = CodeVerivecation.objects.filter(code=code).first()
+        code_ver = CodeVerification.objects.filter(code=code).first()
         if code_ver:
             if timezone.now() > code_ver.expires_at:
                 return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
