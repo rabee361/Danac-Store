@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import *
-from django.contrib.gis.admin import GISModelAdmin
+from leaflet.admin import LeafletGeoAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.admin import UserAdmin
 
@@ -61,8 +61,8 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
 
 
 @admin.register(Client)
-class EstateAdmin(GISModelAdmin):
-    list_display = ('location',)
+class ClientAdmin(LeafletGeoAdmin):
+    list_display = ('name','location','address','phonenumber','category','notes')
 
 admin.site.register(UserType)
 admin.site.register(CodeVerification)

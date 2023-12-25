@@ -45,9 +45,20 @@ INSTALLED_APPS = [
     'rest_framework',   
     'phonenumber_field',
     'django_filters',
+    'leaflet',
     'rest_framework_simplejwt.token_blacklist',
     'base'
 ]
+
+
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (39.694819, -8.130229),
+    'DEFAULT_ZOOM': 6,
+    'MAX_ZOOM': 20,
+    'MIN_ZOOM':3,
+    'SCALE': 'both'
+}
+
 
 AUTHENTICATION_BACKENDS = ['base.api.backend.CustomUserModelBackend']
 
@@ -144,7 +155,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR , 'staticfiles')
 STATIC_URL = '/static/'
 
