@@ -30,6 +30,12 @@ class SignUpView(GenericAPIView):
         serializer.save()
         user_data = serializer.data
         user = CustomUser.objects.get(phonenumber=user_data['phonenumber'])
+
+        device_token = request.data.get('device_token')
+        device_type = request.data.get('device_type')
+        if device_token:
+            FCMDevice.objects.update_or_create(user=user, defaults={'registration_id': device_token ,'type' : device_type})        
+    
         token = RefreshToken.for_user(user)
         tokens = {
             'refresh':str(token),
@@ -46,11 +52,7 @@ class UserLoginApiView(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
 
-        token = request.data.get('token')
-        device_type = request.data.get('device_type')
-        if token:
-            user1 = CustomUser.objects.get(id=2)
-            FCMDevice.objects.update_or_create(user=user1, defaults={'registration_id': token ,'type' : device_type})
+
         
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
@@ -286,8 +288,20 @@ class CreateOrderView(APIView):
             return Response({"error": "Delivery date is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         cart = get_object_or_404(Cart, id=cart_id)
+        user = CustomUser.objects.get(phonenumber=cart.customer.phonenumber)
         order = cart.create_order(delivery_date)
+        devices = FCMDevice.objects.filter(user=user.id)
+        devices.send_message(
+                message =Message(
+                    notification=Notification(
+                        title='انشاء طلب',
+                        body=f'تم ارسال طلبك بنجاح'
+                    ),
+                ),
+            ) 
+        
         order.save()
+        
 
         order_serializer = OrderSerializer(order)
         return Response(order_serializer.data, status=status.HTTP_201_CREATED)
@@ -727,16 +741,16 @@ class ReceiptOrdersView(APIView):
             'remaining_amount':request.data['remaining_amount'],
             
         })
-        user = CustomUser.objects.get(phonumber=client.phonenumber)
-        devices = FCMDevice.objects.filter(user=user.id)
-        devices.send_message(
-                message =Message(
-                    notification=Notification(
-                        title='testing',
-                        body=f'Success'
-                    ),
-                ),
-            ) 
+        # user = CustomUser.objects.get(phonumber=client.phonenumber)
+        # devices = FCMDevice.objects.filter(user=user.id)
+        # devices.send_message(
+        #         message =Message(
+        #             notification=Notification(
+        #                 title='testing',
+        #                 body=f'Success'
+        #             ),
+        #         ),
+        #     ) 
         
         if output_serializer.is_valid():
             output = output_serializer.save()
