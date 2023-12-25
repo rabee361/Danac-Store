@@ -192,7 +192,7 @@ class Notifications(models.Model):
 class Supplier(models.Model):
     name = models.CharField(max_length=30)
     company = models.CharField(max_length=50)
-    phonenubmer = PhoneNumberField(region='DZ')
+    phonenumber = PhoneNumberField(region='DZ')
     address = models.CharField(max_length=100)
     info = models.TextField(max_length=500)
 
@@ -502,7 +502,6 @@ class DamagedProduct(models.Model):
 
     def __str__(self) -> str:
         return self.product.name
-    
 
 # ----------------------------------------------ORDER ENVOY----------------------------------------------
 

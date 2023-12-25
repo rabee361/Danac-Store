@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from base.models import *
 from .serializers import *
-from rest_framework.generics import UpdateAPIView, DestroyAPIView, ListAPIView,CreateAPIView, RetrieveAPIView , GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import UpdateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView , GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, RetrieveDestroyAPIView
 from .validation import custom_validation
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -701,6 +701,11 @@ class CreateMediumTwo(ListCreateAPIView):
     serializer_class = MediumTwoSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
+class DeleteMediumTwo(DestroyAPIView):
+    queryset = MediumTwo.objects.all()
+    serializer_class = MediumTwoSerializer
+
+    
 class DesMediumTwo(DestroyAPIView):
     queryset = MediumTwo_Products.objects.all()
     serializer_class = MediumTwo_ProductsSerializer

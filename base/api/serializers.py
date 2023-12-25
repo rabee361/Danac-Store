@@ -93,26 +93,15 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-
-# from django.contrib.auth import get_user_model, authenticate
-# from rest_framework import serializers
-
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only = True)
 
-    # class Meta:
-        
-
     def validate(self, data):
         username = data.get('username')
         password = data.get('password')
-
         if username and password:
             user = authenticate(request=self.context.get('request'), username=username, password=password)
-            # if not user:
-            #     raise serializers.ValidationError("Incorrect Credentials")
-
             if not user or not user.is_active:
                 raise serializers.ValidationError("Incorrect Credentials")
         else:
@@ -120,37 +109,6 @@ class LoginSerializer(serializers.Serializer):
 
         data['user'] = user
         return data
-
-# class UserLoginSerilizer(serializers.ModelSerializer):
-
-#     phonenumber = serializers.CharField()
-#     password = serializers.CharField(max_length=55, min_length=6,write_only = True)
-
-#     class Meta:
-#         model = CustomUser
-#         fields = ['phonenumber', 'password']
-
-#     def validate(self, data):
-
-#         phonenumber = data.get('phonenumber', )
-#         password = data.get('password',)
-
-#         if phonenumber is None:
-#                 raise serializers.ValidationError({'message_error':'An phonenubmer address is required to log in.'})
-        
-#         if password is None:
-#             raise serializers.ValidationError({'message_error':'A password is required to log in.'})
-        
-#         user = authenticate(username= phonenumber, password= password)
-
-#         if user is None:
-#             raise serializers.ValidationError({'message_error':'A user with this phonenumber and password was not found.'})
-        
-#         if not user.is_active:
-#             raise serializers.ValidationError({'message_error':'This user is not currently activated.'})
-        
-#         return data
-    
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
@@ -228,7 +186,6 @@ class CartSerializer(serializers.ModelSerializer):
  
 
 class Cart_ProductsSerializer(serializers.ModelSerializer):
-    # products = ProductSerializer()
     class Meta:
         model = Cart_Products
         fields = fields = '__all__'
@@ -241,33 +198,14 @@ class SupplierSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
-        # return [repr['name'], repr['company']]
         repr['name'] = modify_name(repr['name'])
-        # supplier_data = repr.pop('name', 'company')
         return repr
     
 
 class OrderSerializer(serializers.ModelSerializer):
-    # products = serializers.ListField(child=serializers.CharField(), write_only=True)
-    # products_data = ProductSerializer(source='products', many=True, read_only=True)
-
     class Meta:
         model = Order
         fields = '__all__'
-
-    # def create(self, validated_data):
-    #     product_names = validated_data.pop('products', [])
-    #     order = Order.objects.create(**validated_data)
-
-    #     for product_id in product_names:
-    #         try:
-    #             product = Product.objects.get(id=product_id)
-    #             order.products.add(product)
-    #         except Product.DoesNotExist:
-    #             raise serializers.ValidationError({'error': f'Product with name {product_id} does not exist'})
-
-    #     order.save()
-    #     return order
     
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -432,12 +370,6 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class MediumSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Medium
-#         fields = '__all__'
-
-
 class ProductsOutputsSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -445,7 +377,6 @@ class ProductsOutputsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class OutputsSerializer(serializers.ModelSerializer):
-    # products = ProductsOutputsSerializer(read_only=True)
     class Meta:
         model = Outputs
         fields = '__all__'
@@ -490,7 +421,6 @@ class MediumSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductsMediumSerializer(serializers.ModelSerializer):
-    # product = ProductSerializer(many=False, read_only=True)
     class Meta:
         model = Products_Medium
         fields = '__all__'
@@ -531,8 +461,6 @@ class UpdateReturnGoodSupplierSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         product_id = validated_data.pop('product')
         product = Product.objects.get(id=product_id)
-        # product.quantity -= validated_data.pop('quantity')
-        # product.save()
         supplier_id = validated_data.pop('supplier')
         supplier = Supplier.objects.get(id=supplier_id)
         instance.prodcut = product
@@ -542,13 +470,26 @@ class UpdateReturnGoodSupplierSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-    
+
+    def to_representation(self, instance):
+        reper = super().to_representation(instance)
+        reper['supplier'] = instance.supplier.name
+        reper['employee'] = instance.employee.name
+        reper['product'] = instance.product.name
+        return reper
 
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReturnedGoodsClient
         fields = '__all__'
+
+    def to_representation(self, instance):
+        reper = super().to_representation(instance)
+        reper['client'] = instance.client.name
+        reper['employee'] = instance.employee.name
+        reper['product'] = instance.product.name
+        return reper
 
 class UpdateReturnedGoodsClientSerializer(serializers.ModelSerializer):
 
@@ -563,8 +504,6 @@ class UpdateReturnedGoodsClientSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         product_id = validated_data.pop('product')
         product = Product.objects.get(id=product_id)
-        # product.quantity += validated_data.pop('quantity')
-        # product.save()
         client_id = validated_data.pop('client')
         client = Client.objects.get(id=client_id)
         instance.prodcut = product
@@ -574,6 +513,13 @@ class UpdateReturnedGoodsClientSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+    
+    def to_representation(self, instance):
+        reper = super().to_representation(instance)
+        reper['client'] = instance.client.name
+        reper['employee'] = instance.employee.name
+        reper['product'] = instance.product.name
+        return reper
 
 # ------------------------------------------DAMAGED PRODUCTS------------------------------------------
 

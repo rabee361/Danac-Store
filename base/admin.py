@@ -1,12 +1,8 @@
-from collections import OrderedDict
-from typing import Any
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.http.request import HttpRequest
 from .models import *
 import random
 from base.api.serializers import CodeVerivecationSerializer
-# from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from .froms import CustomUserCreationForm, CustomUserChangeForm
 from base.api.utils import Utlil
 
@@ -110,37 +106,140 @@ class CodeVerivecationAdmin(admin.ModelAdmin):
 
 
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'phonenumber']
+    list_display = ['id', 'name', 'phonenumber', 'type_employee', 'salery', 'address', 'date']
+    search_fields = ['name', 'phonenumber']
+    list_filter = ['type_employee']
+    list_per_page = 25
 
-admin.site.register(Client)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ['id', 'customer']
+
+class CartProductsAdmin(admin.ModelAdmin):
+    list_display = ['id', 'get_name_product', 'cart', 'quantity']
+
+    def get_name_product(self, obj):
+        return obj.products.name
+    get_name_product.short_descreption = 'product'
+
+class SupplierAdmin(admin.ModelAdmin):
+    list_display = ['name', 'company', 'phonenumber', 'address']
+    search_fields = ['name', 'phonenumber']
+
+class ClientAdmin(admin.ModelAdmin):
+
+    list_display = ['name', 'address', 'category', 'phonenumber', 'info']
+    search_fields = ['name', 'phonenumber']
+    list_filter =['category']
+
+class DamagedProductAdmin(admin.ModelAdmin):
+    list_display = ['id', 'get_name_product', 'quantity', 'total_price']
+
+    def get_name_product(self, obj):
+        return obj.product.name
+    get_name_product.short_descreption = 'product'
+
+    search_fields = ['product__name']
+
+class UserTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user_type']
+
+class OrderProductAdmin(admin.ModelAdmin):
+    list_display = ['id', 'get_name_product', 'order', 'quantity', 'total_price']
+    search_fields = ['order__client__name']
+    list_per_page = 25
+    def get_name_product(self, obj):
+        return obj.products.name
+    get_name_product.short_descreption = 'product'
+
+class IncomingProductAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name_product', 'employee', 'num_item', 'total_price']
+    search_fields = ['incoming__employee__name']
+    def name_product(self, obj):
+        return obj.product.name
+    
+    def employee(self, obj):
+        return obj.incoming.employee.name
+
+    name_product.short_descreption = 'product_name'
+    employee.short_descreption = 'employee'
+
+class IncomingAdmin(admin.ModelAdmin):
+    list_display = ['id', 'supplier', 'agent', 'employee', 'code_verefy', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date']
+    search_fields = ['supplier__name', 'employee__name']
+    def get_name_supplier(self, obj):
+        return obj.supplier.name
+    
+    def get_name_employee(self, obj):
+        return obj.employee.name
+    
+    get_name_employee.short_descreption = 'employee'
+    get_name_supplier.short_descreption = 'supplier'
+
+class ManualReceiptProductAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name_product', 'num_manul_receipt', 'name_client', 'discount', 'num_item', 'total_price']
+    search_fields = ['manualreceipt__client__name']
+    def name_product(self, obj):
+        return obj.product.name
+    def name_client(self, obj):
+        return obj.manualreceipt.client.name
+    def num_manul_receipt(self, obj):
+        return obj.manualreceipt.id
+
+class ManualReceiptAdmin(admin.ModelAdmin):
+    list_display = ['id', 'client', 'employee', 'verify_code', 'recive_payment', 'reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
+    search_fields = ['client__name', 'employee__name']
+
+
+class OutputsproductAdmin(admin.ModelAdmin):
+    list_display = ['id', 'client', 'employee', 'verify_code', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
+    search_fields = ['client__name', 'employee__name']
+
+class OutputProductAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name_product', 'output', 'quantity', 'total', 'discount']
+
+    def name_product(self, obj):
+        return obj.products.name
+    
+    def num_output(self, obj):
+        return obj.output.id
+
+class DElevaryArrivedAdmin(admin.ModelAdmin):
+    list_display = ['id', 'output_receipt', 'employee']
+
+class ReturnedGoodsClientAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name_product', 'client', 'employee', 'quantity', 'total_price', 'reason', 'date']
+    search_fields = ['client__name']
+    def name_product(self, obj):
+        return obj.product.name
+    
+class ReturnedGoodsSupplierAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name_product', 'supplier', 'employee', 'quantity', 'total_price', 'reason', 'date']
+    search_fields = ['supplier__name']
+    def name_product(self, obj):
+        return obj.product.name
+
+class OrderEnvoyAdmin(admin.ModelAdmin):
+    list_display = ['id', 'client', 'phonenumber', 'products_num', 'total_price', 'created', 'delivery_date', 'delivered']
+    list_filter = ['delivered']
+
+class ProductOrderEnvoyAdmin(admin.ModelAdmin):
+    list_display = ['id', 'order_envoy', 'name_product']
+    def name_product(self, obj):
+        return obj.product.name
+    
+class OverTimeAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(OverTime)
+
+
+# ---------------------------------------------------AFTER---------------------------------------------------
 admin.site.register(SalesEmployee)
 admin.site.register(Driver)
-
-admin.site.register(Cart)
-admin.site.register(Cart_Products)
 admin.site.register(Notifications)
-admin.site.register(Supplier)
 admin.site.register(Point)
-admin.site.register(Employee, EmployeeAdmin)
-admin.site.register(Incoming_Product)
-admin.site.register(UserType)
-admin.site.register(ManualReceipt)
-admin.site.register(ManualReceipt_Products)
-admin.site.register(Outputs)
-admin.site.register(Outputs_Products)
-admin.site.register(Order_Product)
-admin.site.register(Incoming)
-admin.site.register(DelevaryArrived)
-# --------------------------------------CREATE MEDIUM--------------------------------------
-admin.site.register(DamagedProduct)
-admin.site.register(ReturnedGoodsClient)
-admin.site.register(ReturnedGoodsSupplier)
 admin.site.register(MediumTwo)
 admin.site.register(MediumTwo_Products)
-admin.site.register(OrderEnvoy)
-admin.site.register(Product_Order_Envoy)
-
-
 # ---------------------------------------------------DONE---------------------------------------------------
 
 admin.site.register(Order, OrderAdmin)
@@ -150,3 +249,22 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(CodeVerivecation, CodeVerivecationAdmin)
 admin.site.register(CustomUser, AdminCustomUser)
+admin.site.register(Employee, EmployeeAdmin)
+admin.site.register(Cart, CartAdmin)
+admin.site.register(Cart_Products, CartProductsAdmin)
+admin.site.register(Supplier, SupplierAdmin)
+admin.site.register(Client, ClientAdmin)
+admin.site.register(DamagedProduct, DamagedProductAdmin)
+admin.site.register(UserType, UserTypeAdmin)
+admin.site.register(Order_Product, OrderProductAdmin)
+admin.site.register(Incoming_Product, IncomingProductAdmin)
+admin.site.register(Incoming, IncomingAdmin)
+admin.site.register(ManualReceipt_Products, ManualReceiptProductAdmin)
+admin.site.register(ManualReceipt, ManualReceiptAdmin)
+admin.site.register(Outputs, OutputsproductAdmin)
+admin.site.register(Outputs_Products, OutputProductAdmin)
+admin.site.register(DelevaryArrived, DElevaryArrivedAdmin)
+admin.site.register(ReturnedGoodsClient, ReturnedGoodsClientAdmin)
+admin.site.register(ReturnedGoodsSupplier, ReturnedGoodsSupplierAdmin)
+admin.site.register(OrderEnvoy, OrderEnvoyAdmin)
+admin.site.register(Product_Order_Envoy, ProductOrderEnvoyAdmin)
