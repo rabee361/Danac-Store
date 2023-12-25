@@ -47,8 +47,10 @@ class UserLoginApiView(GenericAPIView):
     def post(self, request, *args, **kwargs):
 
         token = request.data.get('token')
+        device_type = request.data.get('device_type')
         if token:
-            FCMDevice.objects.update_or_create(user=1, defaults={'registration_id': token})
+            user1 = CustomUser.objects.get(id=2)
+            FCMDevice.objects.update_or_create(user=user1, defaults={'registration_id': token ,'type' : device_type})
         
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
