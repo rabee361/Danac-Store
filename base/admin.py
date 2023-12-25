@@ -333,20 +333,20 @@ class Recieved_PaymentAdmin(admin.ModelAdmin):
 admin.site.register(OverTime,OverTimeAdmin)
 admin.site.register(Bonus,BounsAdmin)
 admin.site.register(Advance_On_salary,Advance_On_salaryAdmin)
-admin.site.register(Salary)
+admin.site.register(Salary,SalarAdmin)
 admin.site.register(Absence,AbsenceAdmin)
 admin.site.register(Extra_Expense,Extra_ExpenseAdmin)
 admin.site.register(Discount,DiscountAdmin)
 
 #### Registry ####
-admin.site.register(Registry)
+admin.site.register(Registry,RegistryAdmin)
 admin.site.register(WithDraw,WithDrawAdmin)
 admin.site.register(Deposite,DepositeAdmin)
 admin.site.register(Debt_Client,Debt_ClientAdmin)
 admin.site.register(Debt_Supplier,Debt_SupplierAdmin)
 admin.site.register(Expense,ExpenseAdmin)
-admin.site.register(Payment)
-admin.site.register(Recieved_Payment)
+admin.site.register(Payment,PaymentAdmin)
+admin.site.register(Recieved_Payment,Recieved_PaymentAdmin)
 
 ##### Goods ###
 admin.site.register(ReturnedGoodsClient, ReturnedGoodsClientAdmin)
