@@ -145,7 +145,7 @@ class OrderProductAdmin(admin.ModelAdmin):
     search_fields = ['order__client__name']
     list_per_page = 25
     def get_name_product(self, obj):
-        return obj.products.name
+        return obj.product.name
     get_name_product.short_descreption = 'product'
 
 
@@ -264,19 +264,16 @@ class Advance_On_salaryAdmin(admin.ModelAdmin):
 class Extra_ExpenseAdmin(admin.ModelAdmin):
     list_display = ['id', 'employee','reason', 'amount', 'barcode', 'date']
     search_fields = ['employee__name']
-
     list_per_page = 50
 
 class DepositeAdmin(admin.ModelAdmin):
     list_display = ['id', 'client', 'detail_deposite', 'total', 'verify_code', 'date']
     search_fields = ['client__name']
-
     list_per_page = 50
 
 class WithDrawAdmin(admin.ModelAdmin):
     list_display = ['id', 'details_withdraw', 'client', 'total', 'verify_code', 'date']
     search_fields = ['client__name']
-
     list_per_page = 50
 
 class ExpenseAdmin(admin.ModelAdmin):

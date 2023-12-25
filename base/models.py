@@ -342,7 +342,7 @@ class WithDraw(models.Model):
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.name_user
+        return self.client.name
     
     @classmethod
     def get_total_withdraws(cls):
