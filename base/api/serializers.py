@@ -513,6 +513,13 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
         model = ReturnedGoodsSupplier
         fields = '__all__'
 
+    def to_representation(self, instance):
+        reper = super().to_representation(instance)
+        reper['supplier'] = instance.supplier.name
+        reper['employee'] = instance.employee.name
+        reper['product'] = instance.product.name
+        return reper
+
 class UpdateReturnGoodSupplierSerializer(serializers.ModelSerializer):
     product = serializers.CharField()
     supplier = serializers.CharField()

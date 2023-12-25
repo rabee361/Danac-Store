@@ -109,6 +109,9 @@ class CodeVerivecationAdmin(admin.ModelAdmin):
     get_user_name.short_descreption = 'username'
 
 
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'phonenumber']
+
 admin.site.register(Client)
 admin.site.register(SalesEmployee)
 admin.site.register(Driver)
@@ -118,7 +121,7 @@ admin.site.register(Cart_Products)
 admin.site.register(Notifications)
 admin.site.register(Supplier)
 admin.site.register(Point)
-admin.site.register(Employee)
+admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Incoming_Product)
 admin.site.register(UserType)
 admin.site.register(ManualReceipt)
