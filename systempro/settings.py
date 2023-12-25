@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+from firebase_admin import initialize_app, credentials
+from google.auth import load_credentials_from_file
 import os
 from datetime import timedelta
 
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'django_filters',
     'leaflet',
+    'fcm_django',
     'rest_framework_simplejwt.token_blacklist',
     'base'
 ]
@@ -219,3 +221,32 @@ EMAIL_PORT = 587  # Replace with your email port
 EMAIL_USE_TLS = True  # Set to False if your email server doesn't use TLS
 EMAIL_HOST_USER = 'jacoubakizi81@gmail.com'  # Replace with your email username
 EMAIL_HOST_PASSWORD = 'eabqhwegdhezskam'     
+
+
+class CustomFirebaseCredentials(credentials.ApplicationDefault):
+    def __init__(self, account_file_path: str):
+        super().__init__()
+        self._account_file_path = account_file_path
+
+    def _load_credential(self):
+        if not self._g_credential:
+            self._g_credential, self._project_id = load_credentials_from_file(self._account_file_path,
+                                                                              scopes=credentials._scopes)
+            
+FCM_DJANGO_SETTINGS = {
+     # an instance of firebase_admin.App to be used as default for all fcm-django requests
+     # default: None (the default Firebase app)
+     # default: _('FCM Django')
+    "APP_VERBOSE_NAME": "test",
+     # true if you want to have only one active device per registered user at a time
+     # default: False
+    "ONE_DEVICE_PER_USER": False,
+     # devices to which notifications cannot be sent,
+     # are deleted upon receiving error response from FCM
+     # default: False
+    "DELETE_INACTIVE_DEVICES": False,
+}
+
+custom_credentials = CustomFirebaseCredentials('C:/Users/eng.Rabee/systempro/storeapp-8cc25-firebase-adminsdk-63jeh-3a5b5e4884.json')
+FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, name='messaging')
+

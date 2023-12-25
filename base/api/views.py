@@ -16,6 +16,9 @@ from django.db.models import F
 from rest_framework.exceptions import NotFound
 # from .utils import send_email
 from .utils import Utlil
+from fcm_django.models import FCMDevice
+from firebase_admin.messaging import Message, Notification
+
 ####################################### AUTHENTICATION ###################################################################3#######
 
 class SignUpView(GenericAPIView):
@@ -43,6 +46,10 @@ class UserLoginApiView(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
 
+        token = request.data.get('token')
+        if token:
+            FCMDevice.objects.update_or_create(user=1, defaults={'registration_id': token})
+        
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
         user = CustomUser.objects.filter(email = request.data['username']).first()
@@ -718,6 +725,17 @@ class ReceiptOrdersView(APIView):
             'remaining_amount':request.data['remaining_amount'],
             
         })
+        user = CustomUser.objects.get(phonumber=client.phonenumber)
+        devices = FCMDevice.objects.filter(user=user.id)
+        devices.send_message(
+                message =Message(
+                    notification=Notification(
+                        title='testing',
+                        body=f'Success'
+                    ),
+                ),
+            ) 
+        
         if output_serializer.is_valid():
             output = output_serializer.save()
             products = Products_Medium.objects.filter(medium__id=medium_id)
@@ -961,3 +979,6 @@ class ListOrderEnvoy(APIView):
             'order_envoy':serializer.data,
             'products_order_envoy':serializer_two.data
         })
+    
+
+

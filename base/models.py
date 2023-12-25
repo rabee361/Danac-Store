@@ -9,7 +9,8 @@ import uuid
 from django.contrib.gis.geos import Point
 from django.utils import timezone
 from datetime import timedelta
-
+from fcm_django.models import FCMDevice
+from firebase_admin.messaging import Message, Notification
 
 class UserType(models.Model):
     user_type = models.CharField(max_length=20)
