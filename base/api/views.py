@@ -144,7 +144,8 @@ class GetPhonenumberView(APIView):
             serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
                 'code':code_verivecation,
-                'is_verified':False
+                'is_verified':False,
+                'expires_at' : timezone.now() + timedelta(minutes=10)
             })
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -852,6 +853,21 @@ class ReceiptOrdersView(APIView):
             return Response(output_serializer.data)
         return Response(output_serializer.errors)
     
+
+
+
+class DeliverOutput(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request,output_id):
+        user = request.user
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        output = Output.objects.get(id=output_id)
+        output.delivered = True
+        output.save()
+
+        return Response({'message':'order delivered'})
+
+
 
 class ListCreateDeliveryArrived(APIView):
     def post(self, request, pk):
