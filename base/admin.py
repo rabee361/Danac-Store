@@ -15,7 +15,8 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
 
     def Accept_User(self, request, queryset):
         queryset.update(is_active=True)
-        queryset.update(is_accepted=True)
+        user_type = UserType.objects.get(user_type='عميل')
+        queryset.update(is_accepted=True, user_type=user_type)
         user = queryset.get(is_active=True)
         rand_num = random.randint(1,10000)
         client = Client.objects.create(

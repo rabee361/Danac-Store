@@ -15,7 +15,10 @@ urlpatterns = [
     path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'), 
     path('logout/', LogoutAPIView.as_view(), name='logout'),
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
-    path('verefy-code/', VerefyCodeView.as_view(), name='verefy-code'),
+    path('verefy-code/', VerifyCodeView.as_view(), name='verefy-code'),
+    # new
+    path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
+    # 
     path('categorys/', ListCreatCategoryView.as_view(), name='catogorys'),
     path('products/', ListCreateProductView().as_view(), name='products'),
     path('get-product/<str:pk>/', GetUdpDesProductView.as_view()),

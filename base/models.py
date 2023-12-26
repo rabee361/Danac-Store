@@ -183,7 +183,7 @@ class Order_Product(models.Model):
     total_price = models.FloatField(default=0)
 
     def __str__(self) -> str:
-        return f'{self.order.clinet.name} {str(self.order.id)}'
+        return f'{self.order.client.name} {str(self.order.id)}'
 
 
 
