@@ -38,7 +38,7 @@ urlpatterns = [
     path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),#### 
     path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"), #### 
     path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),##### 
-    path('delete-item/' , Delete_From_Cart.as_view() , name="delete-item"),##### new
+    path('delete-item/<str:pk>/' , Delete_From_Cart.as_view() , name="delete-item"),##### new
 
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"), #######
