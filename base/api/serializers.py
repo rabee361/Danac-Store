@@ -40,24 +40,16 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         username = data.get('username')
         password = data.get('password')
-
         if username and password:
             user = authenticate(request=self.context.get('request'), username=username, password=password)
             if not user:
-                try:
-                    User = get_user_model()
-                    if '@' in username:
-                        kwargs = {'email': username}
-                    else:
-                        kwargs = {'phonenumber': username}
-                    user = User.objects.get(**kwargs)
-                    if user.check_password(password):
-                        return user
-                except User.DoesNotExist:
-                    pass
-
-            if not user or not user.is_active:
                 raise serializers.ValidationError("Incorrect Credentials")
+            if not user.is_active:
+                raise serializers.ValidationError({'message_error':'this account is not active'})
+            if not user.is_verified:
+                raise serializers.ValidationError({'message_error':'this account is not verified'})
+            if not user.is_accepted:
+                raise serializers.ValidationError({'message_error':'this account is not accepted'})
         else:
             raise serializers.ValidationError('Must include "username" and "password".')
 
@@ -95,7 +87,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         password = self.validated_data['password']
 
         user.set_password(password)
-        # user.is_active = False
+        user.is_active = False
         user.save()
         return user
 

@@ -27,6 +27,7 @@ class CustomUser(AbstractUser):
     image = models.ImageField(upload_to='images/users', null=True)
     location = models.PointField(default=Point(0,0))
     user_type = models.ForeignKey(UserType,on_delete=models.CASCADE,null=True)
+    is_accepted = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',) 
