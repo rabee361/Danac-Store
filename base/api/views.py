@@ -14,6 +14,8 @@ import random
 from rest_framework import filters
 from .permissions import *
 from .utils import Utlil
+from fcm_django.models import FCMDevice
+from firebase_admin.messaging import Message, Notification
 
 
 
@@ -250,6 +252,16 @@ class CreateOrderView(APIView):
             order.save()
             products_cart.delete()
         order_serializer = OrderSerializer(order)
+        user = CustomUser.objects.get(phonenumber=client.phonenumber)
+        devices = FCMDevice.objects.filter(user=user.id)
+        devices.send_message(
+            message=Message(
+                notification=Notification(
+                    title='create order',
+                    boody='تم انشاء طلبك بنجاح بانتظار الموافقة في قسم ادارة الطلبات'
+                ),
+            ),
+        )
         return Response(order_serializer.data)
 
         
