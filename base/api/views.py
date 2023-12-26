@@ -90,7 +90,7 @@ class UpdateImageUserView(APIView):
 
 class GetNotificationView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get(self, request):
         user = request.user
         notification = Notifications.objects.filter(user__id=user.id)
