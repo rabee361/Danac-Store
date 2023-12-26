@@ -66,7 +66,6 @@ urlpatterns = [
     path('sales-employees/' , SalesEmployee.as_view() , name="sale-employees"),###### new
     path('get-sales-employee/<str:pk>' , RetSalesEmployee.as_view() , name="get-sales-employee"), ##### new
 
-
     path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name=""),######## 
     path('client-debts/' , ListCreateClientDebts.as_view() , name=""),########### 
     path('get-client-debt/<str:pk>/' , RetUpdDesClientDebt.as_view() , name="client-debt"),######## 
@@ -111,8 +110,9 @@ urlpatterns = [
     path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),####
     path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),#### 
 
-    path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()), ###### 
-    path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),###### 
+    path('get-delivery-arrived/<str:pk>/', RetdeliveryArrived.as_view()), ###### 
+    path('delivery-arrived/', ListCreateDeliveryArrived.as_view()),###### 
+    path('create-delivery-arrived/<str:pk>', ListCreateDeliveryArrived.as_view()),###### 
 
     path('create-medium-two/', CreateMediumTwo.as_view(), name='create-mediumtwo'),
     path('add-to-medium-two/<str:mediumtwo_id>/<str:product_id>/', AddToMediumTwo.as_view(), name='add-to-mediumtwo'),

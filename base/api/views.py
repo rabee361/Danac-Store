@@ -79,7 +79,8 @@ class UpdateImageUserView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {'success':"The changed image Profile has been successfully."},
+                {'success':"The changed image Profile has been successfully.",
+                 'image' : serializer.data},
                 status=status.HTTP_200_OK
             )
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -891,19 +892,23 @@ class ListCreateDeliveryArrived(APIView):
     def get(self, request):
         delivery_arrived = DelievaryArrived.objects.all()
         del_arr_serializer = DelievaryArrivedSerializer(delivery_arrived, many=True)
-        # user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
-        # devices = FCMDevice.objects.filter(user=user.id)
-        # devices.send_message(
-        #     message=Message(
-        #         notification=Notification(
-        #             title='create order',
-        #             body= "لديك طلب توصيل جديد"
-        #         ),
-        #     ),
-        # )
+        user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
+        devices = FCMDevice.objects.filter(user=user.id)
+        devices.send_message(
+            message=Message(
+                notification=Notification(
+                    title='create order',
+                    body= "لديك طلب توصيل جديد"
+                ),
+            ),
+        )
         return Response(del_arr_serializer.data)
     
 
+
+class RetdeliveryArrived(RetrieveAPIView):
+    serializer_class = DelievaryArrivedSerializer
+    queryset = DelievaryArrived.objects.all()
 
 
 
