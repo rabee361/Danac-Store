@@ -58,7 +58,7 @@ class Client(models.Model):
 
 
 class CodeVerification(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     is_verified = models.BooleanField(default=False)
     code = models.IntegerField(validators=[MinValueValidator(1000), MaxValueValidator(9999)])
     created_at = models.DateTimeField(auto_now_add=True)

@@ -51,9 +51,6 @@ class UserLoginApiView(GenericAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
-
-
-        
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
         user = CustomUser.objects.filter(email = request.data['username']).first()
@@ -86,7 +83,7 @@ class ResetPasswordView(UpdateAPIView):
     def put(self, request, user_id):
         user = CustomUser.objects.get(id=user_id)
         try:
-            ver_user = user.codeverification
+            ver_user = user.codeverification_set.filter(user__id=user_id).first()
             if ver_user.is_verified:
                 data = request.data
                 serializer = self.get_serializer(data=data, context={'user_id':user_id})
