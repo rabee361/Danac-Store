@@ -581,7 +581,7 @@ class RetUpdDesExtraExpense(RetrieveUpdateDestroyAPIView):
     queryset = Extra_Expense.objects.all()
     serializer_class = ExtraExpenseSerializer
 
-class GetSalaryEmployee(ListAPIView):
+class GetSalaryEmployee(RetrieveAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSalarySerializer
     
@@ -1006,7 +1006,7 @@ class CreateManualReceiptView(APIView):
                                 body=f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج إلى أقل من 10{update_quantity.name}'
                             ),
                         ),
-                    )
+                    )   
                     manual_eceipt_products = ManualReceipt_Products.objects.create(
                         product = product.product,
                         manualreceipt = manual_receipt,
@@ -1131,3 +1131,7 @@ class ListOrderEnvoy(APIView):
     
 
 
+
+
+# class Notifications(APIView):
+#     def get

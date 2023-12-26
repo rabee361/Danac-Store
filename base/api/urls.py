@@ -60,7 +60,7 @@ urlpatterns = [
     path('get-advance/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),######
     path('extra-expenses/', ListCreateExtraExpense.as_view(), name='expenses'),######
     path('get-extra-expense/<str:pk>/', RetUpdDesExtraExpense.as_view(), name='get-expense'),#####
-    path('employee_salary/<int:employee_id>/', GetSalaryEmployee.as_view()),########## 
+    path('employee_salary/<str:pk>/', RetUpdDesSalary.as_view()),########## 
     path('salaries/' , ListCreateSalary.as_view() , name="create-salary"),######## 
 
     path('sales-employees/' , SalesEmployee.as_view() , name="sale-employees"),###### new

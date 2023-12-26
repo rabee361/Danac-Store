@@ -394,7 +394,17 @@ class ExtraExpenseSerializer(serializers.ModelSerializer):
 
 
 
+
+
+
+class SimpleEmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ['name']
+
+
 class SalarySerializer(serializers.ModelSerializer):
+    hr = SimpleEmployeeSerializer(many=False,read_only=True)
     class Meta:
         model = Salary
         fields = '__all__'
