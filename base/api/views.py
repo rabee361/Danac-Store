@@ -46,11 +46,17 @@ class SignUpView(GenericAPIView):
 
 
 
+
+
 class UserLoginApiView(GenericAPIView):
+    """
+    An endpoint to authenticate existing users their email and passowrd.
+    """
     permission_classes = (permissions.AllowAny,)
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
+
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
         user = CustomUser.objects.filter(email = request.data['username']).first()
@@ -58,11 +64,9 @@ class UserLoginApiView(GenericAPIView):
             user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
         data = serializer.data
-        data['images'] = request.build_absolute_uri(user.image.url)
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)
-
-
+    
 
 class UpdateImageUserView(APIView):
     def put(self, requset, user_pk):

@@ -32,7 +32,6 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         return instance
     
 
-
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only = True)
@@ -55,7 +54,6 @@ class LoginSerializer(serializers.Serializer):
 
         data['user'] = user
         return data
-
 
 
 
