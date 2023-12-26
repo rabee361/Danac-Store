@@ -387,39 +387,38 @@ class ListClientOrders(GenericAPIView):
         
 
 
-# class ListDeliveredDriverOutputs(ListAPIView):
-#     queryset = Order.objects.all()
-#     permission_classes = [IsAuthenticated]
-#     serializer_class = SimpleOrderSerializer
-#     def get_queryset(self,request):
-#         user = request.user
-#         employee = Employee.objects.get(phonnumber=user.phonenumber)
-#         return Output.objects.filter(employee=employee,delivered)
+class DelevaryArrivedForEmployee(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, state):
+        user = request.user             
+        delevary_arrived = DelievaryArrived.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
+        serializer = DelevaryArrivedSerializer(delevary_arrived, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetDelevaryArrivedForEmployee(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
+        serializer = DelevaryArrivedSerializer(delevary_arrived, many=False)
+        output = Output.objects.filter(id=delevary_arrived.output_receipt.id).first()
+        print(output.id)
+        products = Output_Products.objects.filter(output__id= output.id)
+        products_serializer = ProductsOutputSerializer(products, many=True)
+        receipt_serializer = OutputSerializer(output)
+        return Response({'receipt':receipt_serializer.data, 'products':products_serializer.data , 'is_delivered':serializer.data['is_delivered']})
     
 
+class AcceptDelevaryArrived(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-# class ListNotDeliveredDriverOutputs(ListAPIView):
-#     queryset = Order.objects.all()
-#     permission_classes = [IsAuthenticated]
-#     serializer_class = SimpleOrderSerializer
-#     def get_queryset(self,request):
-#         user = request.user
-#         return super().get_queryset()
-
-
-
-class ListDeliveredOrders(APIView):
-    def get(self,request):
-        orders = Order.objects.filter(delivered=True)
-        serializer = SimpleOrderSerializer(orders,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-
-
-class ListNotDeliveredOrders(APIView):
-    def get(self,request):
-        orders = Order.objects.filter(delivered=False)
-        serializer = SimpleOrderSerializer(orders,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+    def post(self, request, pk):
+        delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
+        delevary_arrived.is_delivered = request.data['state']
+        delevary_arrived.save()
+        return Response(status=status.HTTP_200_OK)
+    
 
 
 class GetOrder(RetrieveAPIView):
@@ -502,11 +501,6 @@ class RetUpdDesClient(RetrieveAPIView):
 class ListCreateClient(ListCreateAPIView):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
-
-
-
-
-
 
 
 class ListCreateSupplier(ListCreateAPIView):
@@ -887,12 +881,12 @@ class ListCreateDeliveryArrived(APIView):
             output_receipt=output,
             employee = employee
         )
-        del_arr_serializer = DelievaryArrivedSerializer(delivery_arrived, many=False)
+        del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=False)
         return Response(del_arr_serializer.data)
     
     def get(self, request):
         delivery_arrived = DelievaryArrived.objects.all()
-        del_arr_serializer = DelievaryArrivedSerializer(delivery_arrived, many=True)
+        del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=True)
         user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
         devices = FCMDevice.objects.filter(user=user.id)
         devices.send_message(
@@ -908,7 +902,7 @@ class ListCreateDeliveryArrived(APIView):
 
 
 class RetdeliveryArrived(RetrieveAPIView):
-    serializer_class = DelievaryArrivedSerializer
+    serializer_class = DelevaryArrivedSerializer
     queryset = DelievaryArrived.objects.all()
 
 

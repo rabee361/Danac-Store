@@ -63,6 +63,10 @@ urlpatterns = [
     path('employee_salary/<str:pk>/', RetUpdDesSalary.as_view()),########## 
     path('salaries/' , ListCreateSalary.as_view() , name="create-salary"),######## 
 
+    path('get-delivery-arrived-for-employee/<str:state>/', DelevaryArrivedForEmployee.as_view()),
+    path('get-delivery/<str:pk>/', GetDelevaryArrivedForEmployee.as_view()),
+    path('accept-delevary-arrived/<str:pk>/', AcceptDelevaryArrived.as_view()),
+
     path('sales-employees/' , SalesEmployee.as_view() , name="sale-employees"),###### new
     path('get-sales-employee/<str:pk>' , RetSalesEmployee.as_view() , name="get-sales-employee"), ##### new
 

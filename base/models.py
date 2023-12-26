@@ -637,6 +637,7 @@ class Output_Products(models.Model):
 class DelievaryArrived(models.Model):
     output_receipt = models.OneToOneField(Output, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    is_delivered = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f'{self.employee.name} - {str(self.output_receipt.id)}'
