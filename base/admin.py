@@ -51,7 +51,7 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
                 {'fields':('phonenumber','email', 'password',)}
             ),
             ('User Information',
-                {'fields':('username', 'first_name', 'last_name','image')}
+                {'fields':('username', 'first_name', 'last_name','image','location')}
             ),
             ('Permissions', 
                 {'fields':('is_verified', 'is_accepted', 'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type')}
