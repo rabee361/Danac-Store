@@ -95,7 +95,7 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display= ['id', 'name']
 
 class CodeVerivecationAdmin(admin.ModelAdmin):
-    list_display = ['get_user_name', 'code', 'created_at', 'expires_at']
+    list_display = ['get_user_name', 'code', 'is_verified','created_at', 'expires_at']
 
     def get_user_name(self, obj):
         return obj.user.username
