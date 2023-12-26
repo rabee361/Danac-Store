@@ -58,6 +58,7 @@ class UserLoginApiView(GenericAPIView):
             user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
         data = serializer.data
+        data['images'] = user.image.url
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)
 
