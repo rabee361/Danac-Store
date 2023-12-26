@@ -55,14 +55,16 @@ class UserLoginApiView(GenericAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = LoginSerializer
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  
 
         serializer = self.get_serializer(data = request.data)
+
         serializer.is_valid(raise_exception=True)
         user = CustomUser.objects.filter(email = request.data['username']).first()
         if not user:
             user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
+        
         data = serializer.data
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)
