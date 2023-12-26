@@ -23,6 +23,7 @@ class CustomUser(AbstractUser):
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
+    is_accepted = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True)
     address = models.CharField(max_length=100, default='one')
     user_type = models.ForeignKey(UserType, on_delete=models.CASCADE, null=True)

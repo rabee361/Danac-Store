@@ -9,11 +9,13 @@ from base.api.utils import Utlil
 class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
-    actions = ['accept_user']
-    list_display = ['id', 'email', 'is_staff']        
+    list_filter = ['is_accepted']
+    actions = ['Accept_User', 'Refusal_User']
+    list_display = ['id', 'email', 'is_staff', 'is_accepted']        
 
-    def accept_user(self, request, queryset):
+    def Accept_User(self, request, queryset):
         queryset.update(is_active=True)
+        queryset.update(is_accepted=True)
         user = queryset.get(is_active=True)
         rand_num = random.randint(1,10000)
         client = Client.objects.create(
@@ -34,6 +36,14 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
         cart = Cart.objects.create(customer=client)
         cart.save()
 
+
+    def Refusal_User(self, request, queryset):
+        user = queryset.get(is_accepted=False)
+        email_body = 'Hi '+user.username+' نعتذر منك لقد تم رفض حسابك لأن موقعك بعيد ولا يمكن توصيل طلباتك \n'
+        data = {'email_body':email_body, 'to_email':user.email, 'email_subject':'Refusal Account'}
+        Utlil.send_eamil(data)
+        user.delete()
+
     fieldsets = (
         (None, 
                 {'fields':('phonenumber','email', 'password',)}
@@ -42,7 +52,7 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
                 {'fields':('username', 'first_name', 'last_name',)}
             ),
             ('Permissions', 
-                {'fields':('is_verified', 'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type')}
+                {'fields':('is_verified', 'is_accepted', 'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type')}
             ),
             ('Registration', 
                 {'fields':('date_joined', 'last_login',)}
@@ -58,7 +68,7 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     )
 
     # accept_user.short_descreption = 'Accept User For complet registration'
-    accept_user.short_descreption = 'print_user'
+    # accept_user.short_descreption = 'print_user'
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'get_client_name','products_num' ,'total' , 'delivery_date', 'deliverd']
