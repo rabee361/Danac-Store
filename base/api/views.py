@@ -1070,7 +1070,7 @@ class AddToMediumTwo(APIView):
         if created:
             mediumtwo_products.quantity=1
             mediumtwo_products.save()
-        mediumtwo_serializer = MediumTwo_ProductsSerializer(mediumtwo_products)
+        mediumtwo_serializer = MediumTwo_ProductsSerializer(mediumtwo_products, context={'request': request})
         return Response(mediumtwo_serializer.data, status=status.HTTP_201_CREATED)
     
 

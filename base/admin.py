@@ -7,7 +7,7 @@ import random
 from base.api.utils import Utlil
 from base.api.serializers import CodeVerivecationSerializer
 
-class AdminCustomUser(UserAdmin, admin.ModelAdmin):
+class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     list_filter = ['is_accepted']
