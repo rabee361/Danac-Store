@@ -4,7 +4,7 @@ from leaflet.admin import LeafletGeoAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.admin import UserAdmin
 import random
-from api.utils import Utlil
+from base.api.utils import Utlil
 from base.api.serializers import CodeVerivecationSerializer
 
 class AdminCustomUser(UserAdmin, admin.ModelAdmin):
