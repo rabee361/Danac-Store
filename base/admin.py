@@ -5,8 +5,7 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.admin import UserAdmin
 
 
-
-class AdminCustomUser(UserAdmin, admin.ModelAdmin):
+class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     actions = ['accept_user']
