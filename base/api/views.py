@@ -170,6 +170,26 @@ class VerefyCodeView(APIView):
             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
 
 
+
+
+class UpdateLocationView(APIView):
+    def put(self, request, user_id):
+        x = request.data.get('x')
+        y = request.data.get('y')
+        if x is None or y is None:
+            return Response({"error": "Both 'longitude' and 'latitude' coordinates are required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            employee = Employee.objects.get(id=user_id)
+        except Employee.DoesNotExist:
+            return Response({"error": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
+        employee.location = Point(float(x), float(y))
+        employee.save()
+
+        return Response({"message": "Location updated successfully."}, status=status.HTTP_200_OK)
+
+
+
+
 ######################################### CART & PRODUCTS ##########################################################################
 
 class listCreateProducts(ListCreateAPIView):
@@ -752,17 +772,6 @@ class ReceiptOrdersView(APIView):
             'remaining_amount':request.data['remaining_amount'],
             
         })
-        # user = CustomUser.objects.get(phonumber=client.phonenumber)
-        # devices = FCMDevice.objects.filter(user=user.id)
-        # devices.send_message(
-        #         message =Message(
-        #             notification=Notification(
-        #                 title='testing',
-        #                 body=f'Success'
-        #             ),
-        #         ),
-        #     ) 
-        
         if output_serializer.is_valid():
             output = output_serializer.save()
             products = Products_Medium.objects.filter(medium__id=medium_id)
@@ -770,6 +779,19 @@ class ReceiptOrdersView(APIView):
                 quantity_product = Product.objects.get(id=product.product.id)
                 quantity_product.quantity -= product.num_item
                 quantity_product.save()
+
+                if quantity_product.quantity < quantity_product.limit_less:
+                    user = CustomUser.objects.get(id=request.user.id)
+                    devices = FCMDevice.objects.filter(user=user.id)
+                    devices.send_message(
+                        message=Message(
+                            notification=Notification(
+                                title='create order',
+                                body=f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج إلى أقل من 10{quantity_product.name}'
+                            ),
+                        ),
+                    )
+
                 output_product = Output_Products.objects.create(
                     products = product.product,
                     output = output,
@@ -796,6 +818,16 @@ class ListCreateDeliveryArrived(APIView):
     def get(self, request):
         delivery_arrived = DelievaryArrived.objects.all()
         del_arr_serializer = DelievaryArrivedSerializer(delivery_arrived, many=True)
+        # user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
+        # devices = FCMDevice.objects.filter(user=user.id)
+        # devices.send_message(
+        #     message=Message(
+        #         notification=Notification(
+        #             title='create order',
+        #             body= "لديك طلب توصيل جديد"
+        #         ),
+        #     ),
+        # )
         return Response(del_arr_serializer.data)
     
 
@@ -885,13 +917,24 @@ class CreateManualReceiptView(APIView):
                 update_quantity =Product.objects.get(id=product.product.id)
                 update_quantity.quantity -= product.num_item
                 update_quantity.save()
-                manual_eceipt_products = ManualReceipt_Products.objects.create(
-                    product = product.product,
-                    manualreceipt = manual_receipt,
-                    num_item = product.num_item,
-                    discount=product.discount,
-                    total_price = product.total_price,
-                )
+                if update_quantity.quantity < update_quantity.limit_less:
+                    user = CustomUser.objects.get(id=request.user.id)
+                    devices = FCMDevice.objects.filter(user=user.id)
+                    devices.send_message(
+                        message=Message(
+                            notification=Notification(
+                                title='create order',
+                                body=f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج إلى أقل من 10{update_quantity.name}'
+                            ),
+                        ),
+                    )
+                    manual_eceipt_products = ManualReceipt_Products.objects.create(
+                        product = product.product,
+                        manualreceipt = manual_receipt,
+                        num_item = product.num_item,
+                        discount=product.discount,
+                        total_price = product.total_price,
+                    )
             products.delete()
             return Response(manual_receipt_serializer.data)
         return Response(manual_receipt_serializer.errors)
