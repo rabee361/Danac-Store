@@ -195,6 +195,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class Product2Serializer(serializers.ModelSerializer):
+    category = serializers.CharField()
     image = serializers.SerializerMethodField()
     class Meta:
         model = Product
@@ -204,6 +205,27 @@ class Product2Serializer(serializers.ModelSerializer):
         request = self.context.get('request')
         return request.build_absolute_uri(obj.image.url)
 
+    def create(self, validated_data):
+        category_name = validated_data.pop('category')
+        category = Category.objects.get(name=category_name)
+        product = Product.objects.create(category=category, **validated_data)
+        return product
+    
+    def update(self, instance, validated_data):
+        category_name = validated_data.pop('category', None)
+        if category_name:
+            try:
+                category = Category.objects.get(name=category_name)
+                validated_data['category'] = category
+            except Category.DoesNotExist:
+                raise serializers.ValidationError({"category": "Object with name does not exist."})
+        return super(ProductSerializer, self).update(instance, validated_data)
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['name'] = modify_name(repr['name'])
+        repr['category'] = instance.category.name
+        return repr
 
 
 
