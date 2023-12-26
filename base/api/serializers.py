@@ -91,27 +91,6 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField(write_only = True)
-    def validate(self, data):
-        username = data.get('username')
-        password = data.get('password')
-
-        if username and password:
-            user = authenticate(request=self.context.get('request'), username=username, password=password)
-            # if not user:
-            #     raise serializers.ValidationError("Incorrect Credentials")
-
-            if not user or not user.is_active:
-                raise serializers.ValidationError("Incorrect Credentials")
-        else:
-            raise serializers.ValidationError('Must include "username" and "password".')
-
-        data['user'] = user
-        return data
-
-
 
 class UserLogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
