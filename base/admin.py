@@ -22,8 +22,8 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
         rand_num = random.randint(1,10000)
         client = Client.objects.create(
             name=user.username,
-            address = user.address,
-            phonenumber = user.phonenumber
+            address = "syria/homs",
+            phonenumber = user.phonenumber,
         )
         code_verivecation = random.randint(1000,9999)
         email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
