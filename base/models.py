@@ -53,7 +53,7 @@ class Client(models.Model):
     location = models.PointField(null=True)
 
     def __str__(self):
-        return f'{self.name}'
+        return self.name
 
 
 
