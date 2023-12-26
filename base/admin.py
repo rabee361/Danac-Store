@@ -38,7 +38,6 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
         cart = Cart.objects.create(customer=client)
         cart.save()
 
-
     def Refusal_User(self, request, queryset):
         user = queryset.get(is_accepted=False)
         email_body = 'Hi '+user.username+' نعتذر منك لقد تم رفض حسابك لأن موقعك بعيد ولا يمكن توصيل طلباتك \n'
