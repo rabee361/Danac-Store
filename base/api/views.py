@@ -82,22 +82,22 @@ class ListInformationUserView(RetrieveAPIView):
 #################################### 
 class ResetPasswordView(UpdateAPIView):
     serializer_class = ResetPasswordSerializer
-    permission_classes = [permissions.AllowAny,]
-
+    
     def put(self, request, user_id):
-        data = request.data
-        serializer = self.get_serializer(data=data, context={'user_id':user_id})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        messages = {
-            'message':'Password Changed Successfully.'
-        }
-        return Response(messages, status=status.HTTP_200_OK)
-
-class test(ListAPIView):
-    permission_classes = (IsAuthenticated,)
-    def get(self,request):
-        return Response("hi")
+        user = CustomUser.objects.get(id=user_id)
+        ver_user = user.codeverivecation_set.filter(user__id=user_id).first()
+        if ver_user.is_verified:
+            data = request.data
+            serializer = self.get_serializer(data=data, context={'user_id':user_id})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            messages = {
+                'message':'Password Changed Successfully.'
+            }
+            ver_user.delete()
+            return Response(messages, status=status.HTTP_200_OK)
+        else:
+            return Response({'error':'please verivecation code'})
 
 class LogoutAPIView(GenericAPIView):
     serializer_class = LogoutSerializer
@@ -125,7 +125,8 @@ class GetPhonenumberView(APIView):
             Utlil.send_eamil(data)
             serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
-                'code':code_verivecation
+                'code':code_verivecation,
+                'is_verified':False
             })
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -143,7 +144,10 @@ class VerefyCodeView(APIView):
         
         if code_ver:
             if timezone.now() > code_ver.expires_at:
+
                 return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
+            code_ver.is_verified = True
+            code_ver.save()
             return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
         else:
             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
@@ -237,7 +241,7 @@ class CreateOrderView(APIView):
         client = Client.objects.get(phonenumber=user.phonenumber)
         cart = Cart.objects.get(customer=client)
         cart_products = Cart_Products.objects.filter(cart=cart)
-        order = Order.objects.create(clinet=client, delivery_date=request.data['delivery_date'])
+        order = Order.objects.create(client=client, delivery_date=request.data['delivery_date'])
         total = 0.0
         for products_cart in cart_products:     
             order_Products = Order_Product.objects.create(
@@ -258,7 +262,7 @@ class CreateOrderView(APIView):
             message=Message(
                 notification=Notification(
                     title='create order',
-                    boody='تم انشاء طلبك بنجاح بانتظار الموافقة في قسم ادارة الطلبات'
+                    body='تم انشاء طلبك بنجاح بانتظار الموافقة في قسم ادارة الطلبات'
                 ),
             ),
         )

@@ -63,6 +63,7 @@ class CustomUser(AbstractUser):
 
 class CodeVerivecation(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    is_verified = models.BooleanField(default=False)
     code = models.IntegerField(validators=[MinValueValidator(1000,9999),])
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(default=timezone.now() + timedelta(minutes=10))

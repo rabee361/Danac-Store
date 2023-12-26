@@ -134,7 +134,7 @@ class SupplierAdmin(admin.ModelAdmin):
 
 class ClientAdmin(admin.ModelAdmin):
 
-    list_display = ['name', 'address', 'category', 'phonenumber', 'info']
+    list_display = ['id', 'name', 'address', 'category', 'phonenumber', 'info']
     search_fields = ['name', 'phonenumber']
     list_filter =['category']
 
