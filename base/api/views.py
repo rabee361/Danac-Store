@@ -187,7 +187,7 @@ class ListPointsView(GenericAPIView):
     def get(self, request):
         user = request.user
         clinet = Client.objects.get(phonenumber=user.phonenumber)
-        points = clinet.point_set.all()
+        points = clinet.points_set.all()
         serializer = PointSerializer(points, many=True)
         response = serializer.data
         return Response(response)
@@ -279,11 +279,11 @@ class RetUpdDesAbsenceAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = AbsenceSerializer
 
 class ListCreateAwardView(ListCreateAPIView):
-    queryset = Award.objects.all()
+    queryset = Bonus.objects.all()
     serializer_class = AwardSerializer
 
 class RetUpdDesAwardView(RetrieveUpdateDestroyAPIView):
-    queryset = Award.objects.all()
+    queryset = Bonus.objects.all()
     serializer_class = AwardSerializer
 
 class ListCreateDicountView(ListCreateAPIView):
@@ -295,19 +295,19 @@ class RetUpdDesDicountView(RetrieveUpdateDestroyAPIView):
     serializer_class = DiscountSerializer
 
 class ListCreateAdvanceView(ListCreateAPIView):
-    queryset = Advance.objects.all()
+    queryset = Advance_On_salary.objects.all()
     serializer_class = AdvanceSerializer
 
 class RetUpdDesAdvanceView(RetrieveUpdateDestroyAPIView):
-    queryset = Advance.objects.all()
+    queryset = Advance_On_salary.objects.all()
     serializer_class = AdvanceSerializer
 
 class ListCreateExpenceView(ListCreateAPIView):
-    queryset = ExtraExpense.objects.all()
+    queryset = Extra_Expense.objects.all()
     serializer_class = ExpenseSerializer
 
 class RetUpdDesExpenceView(RetrieveUpdateDestroyAPIView):
-    queryset = ExtraExpense.objects.all()
+    queryset = Extra_Expense.objects.all()
     serializer_class = ExpenseSerializer
 
 

@@ -10,24 +10,21 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     actions = ['accept_user']
-    list_display = ['id', 'email', 'is_staff']
-
-    # def accept_user(self, request, queryset):
-        
+    list_display = ['id', 'email', 'is_staff']        
 
     def accept_user(self, request, queryset):
         queryset.update(is_active=True)
         user = queryset.get(is_active=True)
         rand_num = random.randint(1,10000)
-        email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(rand_num)
-        data = {'email_body':email_body, 'to_email':user.email, 'email_subject':'Verify your email'}
-        Utlil.send_eamil(data)
         client = Client.objects.create(
             name=user.username,
             address = user.address,
             phonenumber = user.phonenumber
         )
         code_verivecation = random.randint(1000,9999)
+        email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
+        data = {'email_body':email_body, 'to_email':user.email, 'email_subject':'Verify your email'}
+        Utlil.send_eamil(data)
         serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
                 'code':code_verivecation
@@ -226,20 +223,83 @@ class ProductOrderEnvoyAdmin(admin.ModelAdmin):
     list_display = ['id', 'order_envoy', 'name_product']
     def name_product(self, obj):
         return obj.product.name
-    
+
+########################################
 class OverTimeAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['id', 'employee' , 'num_hours' , 'amount' ,'date']
+    search_fields = ['employee__name']
+    list_per_page = 50
 
-admin.site.register(OverTime)
+class AbsenceAdmin(admin.ModelAdmin):
+    list_display = ['id', 'employee', 'date', 'days', 'amount']
+    search_fields = ['employee__name']
+    list_per_page = 50
+
+class BounsAdmin(admin.ModelAdmin):
+    list_display = ['id', 'employee','reason', 'amount', 'date']
+    search_fields = ['employee__name']
+    list_per_page = 50
 
 
-# ---------------------------------------------------AFTER---------------------------------------------------
-admin.site.register(SalesEmployee)
-admin.site.register(Driver)
-admin.site.register(Notifications)
-admin.site.register(Point)
-admin.site.register(MediumTwo)
-admin.site.register(MediumTwo_Products)
+class DiscountAdmin(admin.ModelAdmin):
+    list_display = ['id', 'employee','reason', 'amount', 'date']
+    search_fields = ['employee__name']
+    list_per_page = 50
+
+class Advance_On_salaryAdmin(admin.ModelAdmin):
+    list_display = ['id', 'employee','reason', 'amount', 'date']
+    search_fields = ['employee__name']
+    list_per_page = 50
+
+class Extra_ExpenseAdmin(admin.ModelAdmin):
+    list_display = ['id', 'employee','reason', 'amount', 'barcode', 'date']
+    search_fields = ['employee__name']
+
+    list_per_page = 50
+
+class DepositeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'client', 'detail_deposite', 'total', 'verify_code', 'date']
+    search_fields = ['client__name']
+
+    list_per_page = 50
+
+class WithDrawAdmin(admin.ModelAdmin):
+    list_display = ['id', 'details_withdraw', 'client', 'total', 'verify_code', 'date']
+    search_fields = ['client__name']
+
+    list_per_page = 50
+
+class ExpenseAdmin(admin.ModelAdmin):
+    list_display = ['id', 'expense_name', 'details', 'name', 'amount', 'receipt_num', 'date']
+    list_per_page = 50
+
+class Debt_SupplierAdmin(admin.ModelAdmin):
+    list_display = ['id', 'supplier_name', 'amount', 'payment_method', 'bank_name', 'check_num', 'date']
+    search_fields = ['supplier_name__name']
+    list_per_page = 50
+
+class Debt_ClientAdmin(admin.ModelAdmin):
+    list_display = ['id', 'client_name', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date']
+    search_fields = ['client_name__name']
+    list_per_page = 50
+
+class PoinstAdmin(admin.ModelAdmin):
+    list_display = ['id', 'client', 'number', 'expire_date', 'date', 'is_used']
+    list_filter = ['is_used']
+    search_fields= ['client__name']
+
+    list_per_page = 50
+
+
+class MediumTwoAdmin(admin.ModelAdmin):
+    list_display = ['id', ]
+
+class MediumTwo_ProductsAdmin(admin.ModelAdmin):
+    list_display  = ['id', 'product', 'mediumtwo', 'quantity']
+    search_fields = ['porduct__name']
+    list_per_page = 50
+
+
 # ---------------------------------------------------DONE---------------------------------------------------
 
 admin.site.register(Order, OrderAdmin)
@@ -268,3 +328,19 @@ admin.site.register(ReturnedGoodsClient, ReturnedGoodsClientAdmin)
 admin.site.register(ReturnedGoodsSupplier, ReturnedGoodsSupplierAdmin)
 admin.site.register(OrderEnvoy, OrderEnvoyAdmin)
 admin.site.register(Product_Order_Envoy, ProductOrderEnvoyAdmin)
+
+############################
+admin.site.register(OverTime, OverTimeAdmin)
+admin.site.register(Absence, AbsenceAdmin)
+admin.site.register(Bonus, BounsAdmin)
+admin.site.register(Discount, DiscountAdmin)
+admin.site.register(Advance_On_salary, Advance_On_salaryAdmin)
+admin.site.register(Extra_Expense, Extra_ExpenseAdmin)
+admin.site.register(Deposite, DepositeAdmin)
+admin.site.register(WithDraw, WithDrawAdmin)
+admin.site.register(Debt_Supplier, Debt_SupplierAdmin)
+admin.site.register(Expense, ExpenseAdmin)
+admin.site.register(Debt_Client, Debt_ClientAdmin)
+admin.site.register(Points, PoinstAdmin)
+admin.site.register(MediumTwo, MediumTwoAdmin)
+admin.site.register(MediumTwo_Products, MediumTwo_ProductsAdmin)

@@ -8,6 +8,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import Sum
 
 
 class UserType(models.Model):
@@ -88,7 +89,7 @@ class Client(models.Model):
     # location
 
 
-class Point(models.Model):
+class Points(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     number = models.FloatField()
     expire_date = models.DateField()
@@ -225,7 +226,7 @@ class Employee(models.Model):
 class OverTime(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     num_hours = models.FloatField()
-    deserved_amount = models.FloatField()
+    amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
@@ -233,18 +234,18 @@ class OverTime(models.Model):
 
 class Absence(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    num_absence = models.IntegerField()
-    amoumt_deducted = models.FloatField()
+    days = models.IntegerField()
+    amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.employee.name
     
 
-class Award(models.Model):
+class Bonus(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    reason_award = models.CharField(max_length=100)
-    total = models.FloatField()
+    reason = models.CharField(max_length=100)
+    amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
@@ -253,27 +254,28 @@ class Award(models.Model):
 
 class Discount(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    reason_discount = models.CharField(max_length=100)
-    total = models.FloatField()
+    reason = models.CharField(max_length=100)
+    amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.employee.name
     
 
-class Advance(models.Model):
+class Advance_On_salary(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    reason_advance = models.CharField(max_length=100)
-    total = models.FloatField()
+    reason = models.CharField(max_length=100)
+    amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.employee.name
     
-class ExtraExpense(models.Model):
+class Extra_Expense(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    reason_expense = models.CharField(max_length=100)
-    total = models.FloatField()
+    reason = models.CharField(max_length=100)
+    amount = models.FloatField()
+    barcode = models.CharField(max_length=200,default=" ")
     date = models.DateField(auto_now_add=True)
     
     def __str__(self) -> str:
@@ -357,43 +359,77 @@ class Deposite(models.Model):
 
 class WithDraw(models.Model):
     details_withdraw = models.CharField(max_length=50)
-    name_user = models.CharField(max_length= 30)
+    client = models.ForeignKey(Client,on_delete=models.CASCADE, null=True)
     total = models.FloatField()
     verify_code = models.IntegerField()
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return self.name_user
-    
-class Expence(models.Model):
-    detail_expence = models.CharField(max_length=50)
-    name_user = models.CharField(max_length=30)
-    total = models.FloatField()
-    num_reciept = models.IntegerField()
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return self.name_user
-    
-class DeptsSuppliers(models.Model):
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    recive_pyement = models.FloatField()
-    pyement_method = models.CharField(max_length=10)
-    name_bank = models.CharField(max_length=20)
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return self.supplier.name
-    
-class DeptsClients(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    recive_pyement = models.FloatField()
-    pyement_method = models.CharField(max_length=10)
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self) -> str:
         return self.client.name
+    
+class Expense(models.Model):
+    expense_name = models.CharField(max_length=100)
+    details = models.TextField(max_length=100)
+    name =  models.CharField(max_length=50)
+    amount = models.IntegerField()
+    receipt_num = models.IntegerField()
+    date = models.DateField(default=timezone.now) ######### new
 
+    def __str__(self):
+        return self.expense_name
+    
+    @classmethod
+    def get_total_expenses(cls):
+        return cls.objects.count()
+
+    @classmethod
+    def get_total_amount(cls):
+        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+class Debt_Supplier(models.Model):
+    CHOICES = (
+        ('نقدا','نقدا'),
+        ('بنك','بنك')
+    )
+    supplier_name = models.ForeignKey(Supplier,on_delete=models.CASCADE)
+    amount = models.FloatField()
+    payment_method = models.CharField(max_length=30,choices=CHOICES)
+    bank_name = models.CharField(max_length=60,default='_')
+    check_num = models.IntegerField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.supplier_name.name
+    
+    @classmethod
+    def get_total_supplier_debts(cls):
+        return cls.objects.count()
+    
+    @classmethod
+    def get_total_sum(cls):
+        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    
+class Debt_Client(models.Model):
+    CHOICES = (
+        ('نقدا','نقدا'),
+        ('بنك','بنك')
+    )
+    client_name = models.ForeignKey(Client,on_delete=models.CASCADE)
+    amount = models.FloatField()
+    payment_method = models.CharField(max_length=30,choices=CHOICES)
+    bank_name = models.CharField(max_length=60,default='_')
+    receipt_num = models.IntegerField()
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.client_name
+
+    @classmethod
+    def get_total_client_debts(cls):
+        return cls.objects.count()
+    
+    @classmethod
+    def get_total_sum(cls):
+        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 class Outputs(models.Model):

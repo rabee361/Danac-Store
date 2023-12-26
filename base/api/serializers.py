@@ -129,7 +129,7 @@ class ClientSerializer(serializers.ModelSerializer):
 
 class PointSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Point
+        model = Points
         fields = '__all__'
 
             
@@ -231,7 +231,7 @@ class OverTimeSerializer(serializers.ModelSerializer):
         employee = Employee.objects.get(name=employee_name)
         instance.employee = validated_data.get('employee', employee)
         instance.num_hours = validated_data.get('num_hours', instance.num_hours)
-        instance.deserved_amount = validated_data.get('deserved_amount', instance.deserved_amount)
+        instance.amount = validated_data.get('amount', instance.amount)
         instance.save()
         return instance
 
@@ -252,8 +252,8 @@ class AbsenceSerializer(serializers.ModelSerializer):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
         instance.employee = validated_data.get('employee', employee)
-        instance.num_absence = validated_data.get('num_absence', instance.num_absence)
-        instance.amoumt_deducted = validated_data.get('amoumt_deducted', instance.amoumt_deducted)
+        instance.days = validated_data.get('days', instance.days)
+        instance.amount = validated_data.get('amount', instance.amount)
         instance.save()
         return instance
     
@@ -262,21 +262,21 @@ class AwardSerializer(serializers.ModelSerializer):
     employee = serializers.CharField()
 
     class Meta:
-        model = Award
+        model = Bonus
         fields = '__all__'
 
     def create(self, validated_data):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
-        award = Award.objects.create(employee=employee, **validated_data)
+        award = Bonus.objects.create(employee=employee, **validated_data)
         return award
 
     def update(self, instance, validated_data):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
         instance.employee = validated_data.get('employee', employee)
-        instance.reason_award = validated_data.get('reason_award', instance.reason_award)
-        instance.total = validated_data.get('total', instance.total)
+        instance.reason = validated_data.get('reason', instance.reason)
+        instance.amount = validated_data.get('amount', instance.amount)
         instance.save()
         return instance
     
@@ -297,8 +297,8 @@ class DiscountSerializer(serializers.ModelSerializer):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
         instance.employee = validated_data.get('employee', employee)
-        instance.reason_discount = validated_data.get('reason_discount', instance.reason_discount)
-        instance.total = validated_data.get('total', instance.total)
+        instance.reason = validated_data.get('reason', instance.reason)
+        instance.amount = validated_data.get('amount', instance.amount)
         instance.save()
         return instance
     
@@ -306,21 +306,21 @@ class AdvanceSerializer(serializers.ModelSerializer):
     employee = serializers.CharField()
 
     class Meta:
-        model = Advance
+        model = Advance_On_salary
         fields = '__all__'
 
     def create(self, validated_data):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
-        advance = Advance.objects.create(employee=employee, **validated_data)
+        advance = Advance_On_salary.objects.create(employee=employee, **validated_data)
         return advance
 
     def update(self, instance, validated_data):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
         instance.employee = validated_data.get('employee', employee)
-        instance.reason_advance = validated_data.get('reason_advance', instance.reason_advance)
-        instance.total = validated_data.get('total', instance.total)
+        instance.reason = validated_data.get('reason', instance.reason)
+        instance.amount = validated_data.get('amount', instance.amount)
         instance.save()
         return instance
     
@@ -328,21 +328,22 @@ class ExpenseSerializer(serializers.ModelSerializer):
     employee = serializers.CharField()
 
     class Meta:
-        model = ExtraExpense
+        model = Extra_Expense
         fields = '__all__'
 
     def create(self, validated_data):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
-        expense = ExtraExpense.objects.create(employee=employee, **validated_data)
+        expense = Extra_Expense.objects.create(employee=employee, **validated_data)
         return expense
     
     def update(self, instance, validated_data):
         employee_name = validated_data.pop('employee')
         employee = Employee.objects.get(name=employee_name)
         instance.employee = validated_data.get('employee', employee)
-        instance.reason_expense = validated_data.get('reason_expense', instance.reason_expense)
-        instance.total = validated_data.get('total', instance.total)
+        instance.reason = validated_data.get('reason', instance.reason)
+        instance.amount = validated_data.get('amount', instance.amount)
+        instance.barcode = validated_data.get('barcode', instance.barcode)
         instance.save()
         return instance
 
