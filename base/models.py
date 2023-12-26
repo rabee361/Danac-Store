@@ -113,7 +113,6 @@ class Order(models.Model):
     delivery_date = models.DateField()
     delivered = models.BooleanField(null=True,default=False)
 
-
     def __str__(self):
         return f'{self.client} : {self.id}'
 

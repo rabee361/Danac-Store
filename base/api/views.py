@@ -187,13 +187,15 @@ class VerifyCodeToChangePassword(APIView):
 
 
 class UpdateLocationView(APIView):
-    def put(self, request, user_id):
+    permission_classes = [IsAuthenticated]
+    def put(self, request):
+        user = request.user
         x = request.data.get('x')
         y = request.data.get('y')
         if x is None or y is None:
             return Response({"error": "Both 'longitude' and 'latitude' coordinates are required."}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            employee = Employee.objects.get(id=user_id)
+            employee = Employee.objects.get(id=user.id)
         except Employee.DoesNotExist:
             return Response({"error": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
         employee.location = Point(float(x), float(y))
@@ -344,7 +346,6 @@ class CreateOrderView(APIView):
                     ),
                 ),
             ) 
-        
         order.save()
         
 
@@ -362,18 +363,52 @@ class ListSimpleOrders(ListAPIView):
     queryset = Order.objects.all()
     serializer_class = SimpleOrderSerializer
 
-# class ListDeliveredOrders(APIView):
-#     def get(self,request):
-#         orders = Order.objects.filter(delivered=True)
-#         serializer = SimpleOrderSerializer(orders,many=True)
-#         return Response(serializer.data,status=status.HTTP_200_OK)
+
+class ListClientOrders(GenericAPIView):
+    permission_classes = [IsAuthenticated,]
+    serializer_class = OrderSerializer
+    def get(self,request):
+        user = request.user
+        client = Client.objects.get(phonenumber=user.phonenumber)
+        orders = client.order_set.all()
+        serializer = self.get_serializer(orders,many=True)
+        return Response(serializer.data,)
+        
 
 
-# class ListNotDeliveredOrders(APIView):
-#     def get(self,request):
-#         orders = Order.objects.filter(delivered=False)
-#         serializer = SimpleOrderSerializer(orders,many=True)
-#         return Response(serializer.data,status=status.HTTP_200_OK)
+# class ListDeliveredDriverOutputs(ListAPIView):
+#     queryset = Order.objects.all()
+#     permission_classes = [IsAuthenticated]
+#     serializer_class = SimpleOrderSerializer
+#     def get_queryset(self,request):
+#         user = request.user
+#         employee = Employee.objects.get(phonnumber=user.phonenumber)
+#         return Output.objects.filter(employee=employee,delivered)
+    
+
+
+# class ListNotDeliveredDriverOutputs(ListAPIView):
+#     queryset = Order.objects.all()
+#     permission_classes = [IsAuthenticated]
+#     serializer_class = SimpleOrderSerializer
+#     def get_queryset(self,request):
+#         user = request.user
+#         return super().get_queryset()
+
+
+
+class ListDeliveredOrders(APIView):
+    def get(self,request):
+        orders = Order.objects.filter(delivered=True)
+        serializer = SimpleOrderSerializer(orders,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+class ListNotDeliveredOrders(APIView):
+    def get(self,request):
+        orders = Order.objects.filter(delivered=False)
+        serializer = SimpleOrderSerializer(orders,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 
 class GetOrder(RetrieveAPIView):

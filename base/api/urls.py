@@ -16,7 +16,7 @@ urlpatterns = [
     path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
     path('users/' , users.as_view()),
 
-    path('update-location/' , UpdateLocationView.as_view() , name="update-location"),
+    path('update-location/' , UpdateLocationView.as_view() , name="update-location"),#### new 
 
     path('clients/' , ListCreateClient.as_view() , name="clients"),######
     path('total-points/<int:client_id>/', TotalClientPointsView.as_view(), name='total-points'),
@@ -25,6 +25,7 @@ urlpatterns = [
     path('points/<int:client_id>/', ClientPointsView.as_view(), name='client-points'),
     path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),########
     path('products/' , listCreateProducts.as_view() , name="products"),######
+    path('client-orders/' , ListClientOrders.as_view() , name="client-orders"),#### new
     path('special-products/' , SpecialProducts.as_view() , name="special-products"),######
     path('get-product/<str:pk>/' , RetUpdDesProduct.as_view() , name="product"),##### 
     path('categories/' , ListCreateCategory.as_view() , name="categories"),##### 

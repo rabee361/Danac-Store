@@ -9,7 +9,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     actions = ['accept_user']
-
+    
     # def accept_user(self, request, queryset):
     #     queryset.update(is_active=True)
     #     user = queryset.get(is_active=True)
@@ -37,7 +37,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
                 {'fields':('phonenumber','email', 'password',)}
             ),
             ('User Information',
-                {'fields':('username', 'first_name', 'last_name','location')}
+                {'fields':('username', 'first_name', 'last_name','location','image')}
             ),
             ('Permissions', 
                 {'fields':('is_verified', 'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type')}
