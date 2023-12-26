@@ -85,8 +85,8 @@ class ResetPasswordView(UpdateAPIView):
     
     def put(self, request, user_id):
         user = CustomUser.objects.get(id=user_id)
-        ver_user = user.codeverivecation_set.filter(user__id=user_id).first()
-        if ver_user.is_verified:
+        ver_user = user.codeverivecation_set.filter(user__id=user_id).first()#######
+        if ver_user.is_verified:########
             data = request.data
             serializer = self.get_serializer(data=data, context={'user_id':user_id})
             serializer.is_valid(raise_exception=True)
@@ -97,7 +97,7 @@ class ResetPasswordView(UpdateAPIView):
             ver_user.delete()
             return Response(messages, status=status.HTTP_200_OK)
         else:
-            return Response({'error':'please verivecation code'})
+            return Response({'error':'please verivecation code'})############
 
 class LogoutAPIView(GenericAPIView):
     serializer_class = LogoutSerializer
@@ -126,7 +126,7 @@ class GetPhonenumberView(APIView):
             serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
                 'code':code_verivecation,
-                'is_verified':False
+                'is_verified':False ###########
             })
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -139,15 +139,12 @@ class GetPhonenumberView(APIView):
 class VerefyCodeView(APIView):
     def post(self, request):
         code = request.data['code']
-
         code_ver = CodeVerivecation.objects.filter(code=code).first()
-        
         if code_ver:
             if timezone.now() > code_ver.expires_at:
-
                 return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
-            code_ver.is_verified = True
-            code_ver.save()
+            code_ver.is_verified = True########
+            code_ver.save() #########
             return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
         else:
             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
@@ -493,6 +490,17 @@ class ReceiptOrdersView(APIView):
                 quantity_product = Product.objects.get(id=product.product.id)
                 quantity_product.quantity -= product.num_item
                 quantity_product.save()
+                # if quantity_product.quantity < 10:
+                #     user = CustomUser.objects.get(id=request.user.id)
+                #     devices = FCMDevice.objects.filter(user=user.id)
+                #     devices.send_message(
+                #         message=Message(
+                #             notification=Notification(
+                #                 title='create order',
+                #                 body=f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج إلى أقل من 10{quantity_product.name}'
+                #             ),
+                #         ),
+                #     )
                 output_product = Outputs_Products.objects.create(
                     products = product.product,
                     output = output,
@@ -504,9 +512,8 @@ class ReceiptOrdersView(APIView):
             return Response(output_serializer.data)
         return Response(output_serializer.errors)
     
-
+############
 class ListCreateDeliveryArrived(APIView):
-    
     def post(self, request, pk):
         output = Outputs.objects.filter(id=pk).first()
         employee = Employee.objects.filter(id=request.data['employee']).first()
@@ -515,6 +522,16 @@ class ListCreateDeliveryArrived(APIView):
             employee = employee
         )
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=False)
+        # user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
+        # devices = FCMDevice.objects.filter(user=user.id)
+        # devices.send_message(
+        #     message=Message(
+        #         notification=Notification(
+        #             title='create order',
+        #             body= "لديك طلب توصيل جديد"
+        #         ),
+        #     ),
+        # )
         return Response(del_arr_serializer.data)
     
 
@@ -692,6 +709,17 @@ class CreateManualReceiptView(APIView):
             for product in products:
                 update_quantity =Product.objects.get(id=product.product.id)
                 update_quantity.quantity -= product.num_item
+                # if update_quantity.quantity < 10:
+                #     user = CustomUser.objects.get(id=request.user.id)
+                #     devices = FCMDevice.objects.filter(user=user.id)
+                #     devices.send_message(
+                #         message=Message(
+                #             notification=Notification(
+                #                 title='create order',
+                #                 body=f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج إلى أقل من 10{quantity_product.name}'
+                #             ),
+                #         ),
+                #     )
                 update_quantity.save()
                 manual_eceipt_products = ManualReceipt_Products.objects.create(
                     product = product.product,

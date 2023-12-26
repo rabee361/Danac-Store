@@ -39,13 +39,8 @@ urlpatterns = [
     path('sxtraexpences/', ListCreateExpenceView.as_view(), name='extra-expence'),
     path('extraexpences/<str:pk>/', RetUpdDesExpenceView.as_view(), name='get-extra-expence'),
     path('search/product/', SearchView.as_view(), name='search-product'),
-    # path('incomings/', ListCreateIncomingView.as_view(), name='incoming'),
-    # path('incoming-products/<int:id>/', CreateIncomingProductsView.as_view(), name='incoming-produc')
-    # path('manual-reciepts/', ListCreateManualRecieptView.as_view(), name='manual-reciepts'),
-    # path('one/', ListManualRecieptProductsView.as_view()),
     path('add-product-to-cart/', ListCreateCartProduct.as_view(), name='add-pro-to-cart'),
     path('list-product-cart/<str:pk>/', DesUpdCartProducts.as_view(), name='list-product-cart'),
-
     path('create-medium/', CreateMedium.as_view()),
     path('delete-medium/<str:pk>/', RetDesMedium.as_view()),
     path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),
@@ -79,8 +74,8 @@ urlpatterns = [
     path('put-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
 
 # ------------------------------------------DAMAGED PRODUCTS------------------------------------------
-    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
-    path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
+    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),######
+    path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),######
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
 
     # -----------------------------------------------MEDIUM TWO-----------------------------------------------
