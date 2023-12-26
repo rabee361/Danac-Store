@@ -68,9 +68,11 @@ class LoginSerializer(serializers.Serializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
+    x = serializers.FloatField(write_only=True)
+    y = serializers.FloatField(write_only=True)
     class Meta:
         model = CustomUser
-        fields = ['phonenumber', 'email', 'username', 'password']
+        fields = ['phonenumber', 'email', 'username', 'password','x','y']
         extra_kwargs = {
             'password':{'write_only':True,}
         }
@@ -82,12 +84,16 @@ class SignUpSerializer(serializers.ModelSerializer):
         return CustomUser.objects.create_user(**validated_data)
 
     def save(self, **kwargs):
+        x = self.validated_data['x']
+        y = self.validated_data['y']
         user = CustomUser(
             phonenumber=self.validated_data['phonenumber'],
             email = self.validated_data['email'],
-            username = self.validated_data['username']
+            username = self.validated_data['username'],
+            location = Point(x,y)
         )
         password = self.validated_data['password']
+
         user.set_password(password)
         # user.is_active = False
         user.save()

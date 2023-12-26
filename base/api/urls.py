@@ -10,10 +10,13 @@ urlpatterns = [
     path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),####
     path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
     path('verefy-code/', VerefyCodeView.as_view(), name='verefy-code'),
+    path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
     path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
     path('settings/<str:pk>/', ListInformationUserView.as_view(), name='settings'),
     path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
     path('users/' , users.as_view()),
+
+    path('update-location/' , UpdateLocationView.as_view() , name="update-location"),
 
     path('clients/' , ListCreateClient.as_view() , name="clients"),######
     path('total-points/<int:client_id>/', TotalClientPointsView.as_view(), name='total-points'),

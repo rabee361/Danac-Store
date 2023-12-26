@@ -86,7 +86,7 @@ class ResetPasswordView(UpdateAPIView):
     def put(self, request, user_id):
         user = CustomUser.objects.get(id=user_id)
         try:
-            ver_user = user.codeverivecation_set.filter(user__id=user_id).first()
+            ver_user = user.codeverification
             if ver_user.is_verified:
                 data = request.data
                 serializer = self.get_serializer(data=data, context={'user_id':user_id})
@@ -98,8 +98,8 @@ class ResetPasswordView(UpdateAPIView):
                 ver_user.delete()
                 return Response(messages, status=status.HTTP_200_OK)
             else:
-                return Response({'error':'please verivecation code'})
-        except:
+                return Response({'error':'please verification code'})
+        except CodeVerification.DoesNotExist:
             return Response({'message':'ليس لديك صلاحية لتغيير كبمة المرور'})
 
 
@@ -165,6 +165,22 @@ class VerefyCodeView(APIView):
                 return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
             code_ver.user.is_verified = True
             code_ver.user.save()
+            return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
+        else:
+            raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
+
+
+
+
+class VerifyCodeToChangePassword(APIView):
+    def post(self, request):
+        code = request.data['code']
+        code_ver = CodeVerification.objects.filter(code=code).first()
+        if code_ver:
+            if timezone.now() > code_ver.expires_at:
+                return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
+            code_ver.is_verified = True
+            code_ver.save()
             return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
         else:
             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
