@@ -514,6 +514,7 @@ class ReceiptOrdersView(APIView):
     
 ############
 class ListCreateDeliveryArrived(APIView):
+
     def post(self, request, pk):
         output = Outputs.objects.filter(id=pk).first()
         employee = Employee.objects.filter(id=request.data['employee']).first()
@@ -709,6 +710,7 @@ class CreateManualReceiptView(APIView):
             for product in products:
                 update_quantity =Product.objects.get(id=product.product.id)
                 update_quantity.quantity -= product.num_item
+                update_quantity.save()
                 # if update_quantity.quantity < 10:
                 #     user = CustomUser.objects.get(id=request.user.id)
                 #     devices = FCMDevice.objects.filter(user=user.id)
@@ -720,7 +722,6 @@ class CreateManualReceiptView(APIView):
                 #             ),
                 #         ),
                 #     )
-                update_quantity.save()
                 manual_eceipt_products = ManualReceipt_Products.objects.create(
                     product = product.product,
                     manualreceipt = manual_receipt,
