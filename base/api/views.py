@@ -137,8 +137,8 @@ class GetPhonenumberView(APIView):
                 existing_code.delete()
 
             code_verivecation = random.randint(1000,9999)
-            email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
-            data= {'email_body':email_body, 'to_email':user.email, 'email_subject':'Verify your email'}
+            # email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
+            data= {'to_email':user.email, 'email_subject':'Verify your email','username':user.username, 'code': str(code_verivecation)}
             Utlil.send_eamil(data)
             serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
