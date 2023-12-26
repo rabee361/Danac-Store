@@ -315,7 +315,7 @@ class Quantity_Handler(APIView):
 class Add_to_Cart(APIView):
     def post(self,request,pk,pk2):
         user = CustomUser.objects.get(id=pk2)
-        client = Client.objects.get(customer=user)
+        client = Client.objects.get(phonenumber=user.phonenumber)
         item = Product.objects.get(id=pk)
         cart, created = Cart.objects.get_or_create(customer=client)
         cart_products, created = Cart_Products.objects.get_or_create(products=item, cart=cart)
