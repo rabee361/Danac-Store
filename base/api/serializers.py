@@ -92,6 +92,17 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 
+class SerializerNotificationI(serializers.ModelSerializer):
+    class Meta:
+        model = Notifications
+        fields = '__all__'
+    def to_representation(self, instance):
+        reper = super().to_representation(instance)
+        reper['username'] = instance.user.username
+        return reper
+
+
+
 class UserLogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
     def validate(self, attrs):

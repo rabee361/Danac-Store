@@ -11,6 +11,7 @@ urlpatterns = [
     path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),####
     path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
     path('verefy-code/', VerefyCodeView.as_view(), name='verefy-code'),
+    path('get-notification/', GetNotificationView.as_view()),
     path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
     path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
     path('settings/<str:pk>/', ListInformationUserView.as_view(), name='settings'),

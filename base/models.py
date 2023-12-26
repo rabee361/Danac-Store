@@ -58,6 +58,19 @@ class Client(models.Model):
 
 
 
+class Notifications(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    body = models.CharField(max_length=500)
+    title = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.user.username
+
+
+
+
+
 class CodeVerification(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     is_verified = models.BooleanField(default=False)
@@ -190,11 +203,6 @@ class Cart(models.Model):
 
     
 ##################################################################################################################
-
-
-
-class Notifications(models.Model):
-    pass
 
 
 class Supplier(models.Model):

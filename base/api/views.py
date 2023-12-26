@@ -87,6 +87,17 @@ class UpdateImageUserView(APIView):
 
 
 
+
+class GetNotificationView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        notification = Notifications.objects.filter(user__id=user.id)
+        serializer = SerializerNotificationI(notification, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
 class ResetPasswordView(UpdateAPIView):
     serializer_class = ResetPasswordSerializer
     permission_classes = [permissions.AllowAny,]
