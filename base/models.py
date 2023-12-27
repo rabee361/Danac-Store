@@ -68,6 +68,17 @@ class CustomUser(AbstractUser):
     # def type_client_or_sales_employee(self):
     #     return self.user_type.user_type == 'عميل' or self.user_type.user_type == 'مندوب'
 
+#############################################################
+class Notifications(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    body = models.CharField(max_length=500)
+    title = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.user.username
+#############################################################
+
 class CodeVerivecation(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     is_verified = models.BooleanField(default=False)
@@ -108,21 +119,7 @@ class Points(models.Model):
     def __str__(self) -> str:
         return f'{self.client.name} {self.number}'
     
-
-
-
-
-class Driver(models.Model):
-    driver = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-
-
-class SalesEmployee(models.Model):
-    representative = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    # address = 
-    # nots text
-    # شاحنة
     
-
 class Category(models.Model):
     name = models.CharField(max_length=50)
 
@@ -191,12 +188,6 @@ class Order_Product(models.Model):
 
     def __str__(self) -> str:
         return f'{self.order.client.name} {str(self.order.id)}'
-
-
-
-
-class Notifications(models.Model):
-    pass
 
 
 class Supplier(models.Model):

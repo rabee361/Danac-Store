@@ -587,3 +587,15 @@ class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
         reper['description'] = instance.product.description
 
         return reper
+
+
+################################## Notificaiton #################################
+    
+class SerializerNotificationI(serializers.ModelSerializer):
+    class Meta:
+        model = Notifications
+        fields = '__all__'
+    def to_representation(self, instance):
+        reper = super().to_representation(instance)
+        reper['username'] = instance.user.username
+        return reper

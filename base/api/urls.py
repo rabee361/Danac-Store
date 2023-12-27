@@ -16,9 +16,7 @@ urlpatterns = [
     path('logout/', LogoutAPIView.as_view(), name='logout'),
     path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('verefy-code/', VerifyCodeView.as_view(), name='verefy-code'),
-    # new
     path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
-    # 
     path('categorys/', ListCreatCategoryView.as_view(), name='catogorys'),
     path('products/', ListCreateProductView().as_view(), name='products'),
     path('get-product/<str:pk>/', GetUdpDesProductView.as_view()),
@@ -80,11 +78,9 @@ urlpatterns = [
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),###################
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),######################
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
-    #######
     path('get-delivery-arrived-for-employee/<str:state>/', DelevaryArrivedForEmployee.as_view()),
     path('get/<str:pk>/', GetDelevaryArrivedForEmployee.as_view()),
     path('accept-delevary-arrived/<str:pk>/', AcceptDelevaryArrived.as_view()),
-    ######
     # -----------------------------------------------MEDIUM TWO-----------------------------------------------
     path('create-medium-two/', CreateMediumTwo.as_view(), name='create-mediumtwo'),
     path('add-to-medium-two/<str:mediumtwo_id>/<str:product_id>/', AddToMediumTwo.as_view(), name='add-to-mediumtwo'),
@@ -94,5 +90,9 @@ urlpatterns = [
     path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
     path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view()),
     path('delete-medium-two/<str:pk>/', DeleteMediumTwo.as_view()),
+
+
+    ####################################################
+    path('get-notification/', GetNotificationView.as_view()),
 
 ]

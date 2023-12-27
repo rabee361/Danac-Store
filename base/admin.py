@@ -355,3 +355,9 @@ admin.site.register(Debt_Client, Debt_ClientAdmin)
 admin.site.register(Points, PoinstAdmin)
 admin.site.register(MediumTwo, MediumTwoAdmin)
 admin.site.register(MediumTwo_Products, MediumTwo_ProductsAdmin)
+
+######
+
+class AdminNotification(admin.ModelAdmin):
+    list_display = ['id', 'user', 'title', 'created_at']
+admin.site.register(Notifications, AdminNotification)

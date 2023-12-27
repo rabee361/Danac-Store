@@ -249,10 +249,6 @@ class ListOrdersUserView(GenericAPIView):
 
         return Response(response)
 
-# class ListCreateOrderView(ListCreateAPIView):
-#     queryset = Order.objects.all()
-#     serializer_class = OrderSerializer
-
 class CreateOrderView(APIView):
     permission_classes = [permissions.IsAuthenticated, Is_Client]
 
@@ -278,13 +274,20 @@ class CreateOrderView(APIView):
         order_serializer = OrderSerializer(order)
         # user = CustomUser.objects.get(phonenumber=client.phonenumber)
         # devices = FCMDevice.objects.filter(user=user.id)
+        # title = 'create_order'
+        # body = 'تم انشاء طلبك بنجاح بانتظار الموافقة في قسم ادارة الطلبات'
         # devices.send_message(
         #     message=Message(
         #         notification=Notification(
-        #             title='create order',
-        #             body='تم انشاء طلبك بنجاح بانتظار الموافقة في قسم ادارة الطلبات'
+        #             title=title,
+        #             body=body
         #         ),
         #     ),
+        # )
+        # notification = Notifications.objects.create(
+        #     user = user,
+        #     title = title,
+        #     body = body
         # )
         return Response(order_serializer.data)
 
@@ -513,17 +516,24 @@ class ReceiptOrdersView(APIView):
                 quantity_product = Product.objects.get(id=product.product.id)
                 quantity_product.quantity -= product.num_item
                 quantity_product.save()
-                # if quantity_product.quantity < 10:
-                #     user = CustomUser.objects.get(id=request.user.id)
-                #     devices = FCMDevice.objects.filter(user=user.id)
-                #     devices.send_message(
-                #         message=Message(
-                #             notification=Notification(
-                #                 title='create order',
-                #                 body=f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج إلى أقل من 10{quantity_product.name}'
-                #             ),
-                #         ),
-                #     )
+        #         if quantity_product.quantity < 10:
+        #             user = CustomUser.objects.get(id=request.user.id)
+        #             devices = FCMDevice.objects.filter(user=user.id)
+        #             title = 'نقص كمية منتج'
+        #             body = f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج {quantity_product.name}إلى أقل من 10'
+        #             devices.send_message(
+        #                 message=Message(
+        #                     notification=Notification(
+        #                         title=title,
+        #                         body=body
+        #                     ),
+        #                 ),
+        #             )
+        #             notification = Notifications.objects.create(
+        #                 user = user,
+        #                 title = title,
+        #                 body = body
+        #             )
                 output_product = Outputs_Products.objects.create(
                     products = product.product,
                     output = output,
@@ -548,13 +558,20 @@ class ListCreateDeliveryArrived(APIView):
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=False)
         # user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
         # devices = FCMDevice.objects.filter(user=user.id)
+        # title = "create receipt order"
+        # body = "لديك طلب جديد لتوصيله"
         # devices.send_message(
         #     message=Message(
         #         notification=Notification(
-        #             title='create order',
-        #             body= "لديك طلب توصيل جديد"
+        #             title=title,
+        #             body= body
         #         ),
         #     ),
+        # )
+        # notification = Notifications.objects.create(
+        #     user=user,
+        #     title = title,
+        #     body=body
         # )
         return Response(del_arr_serializer.data)
     
@@ -770,13 +787,20 @@ class CreateManualReceiptView(APIView):
                 # if update_quantity.quantity < 10:
                 #     user = CustomUser.objects.get(id=request.user.id)
                 #     devices = FCMDevice.objects.filter(user=user.id)
+                #     title = 'نقص كمية منتج'
+                #     body = f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج {update_quantity.name}إلى أقل من 10'
                 #     devices.send_message(
                 #         message=Message(
                 #             notification=Notification(
-                #                 title='create order',
-                #                 body=f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج إلى أقل من 10{quantity_product.name}'
+                #                 title=title,
+                #                 body=body
                 #             ),
                 #         ),
+                #     )
+                #     notification = Notifications.objects.create(
+                #         user = user,
+                #         title = title,
+                #         body = body
                 #     )
                 manual_eceipt_products = ManualReceipt_Products.objects.create(
                     product = product.product,
@@ -788,13 +812,6 @@ class CreateManualReceiptView(APIView):
             products.delete()
             return Response(manual_receipt_serializer.data)
         return Response(manual_receipt_serializer.errors)
-    
-# class GetManualReceiptView(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def get(self, request, receipt_id):
-#         man
-    
 
 
 class CreateMediumTwo(ListCreateAPIView):
@@ -885,3 +902,13 @@ class ListOrderEnvoy(APIView):
             'order_envoy':serializer.data,
             'products_order_envoy':serializer_two.data
         })
+    
+############################################################################################
+class GetNotificationView(APIView):
+
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        notification = Notifications.objects.filter(user__id=user.id)
+        serializer = SerializerNotificationI(notification, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
