@@ -33,7 +33,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         code_verivecation = random.randint(1000,9999)
         # email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
         data= {'to_email':user.email, 'email_subject':'Verify your email','username':user.username, 'code': str(code_verivecation)}
-        Utlil.send_eamil(data)
+        Utlil.send_email(data)
         serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
                 'code':code_verivecation,
@@ -46,9 +46,9 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
 
     def Refusal_User(self, request, queryset):
         user = queryset.get(is_accepted=False)
-        email_body = 'Hi '+user.username+' نعتذر منك لقد تم رفض حسابك لأن موقعك بعيد ولا يمكن توصيل طلباتك \n'
-        data = {'email_body':email_body, 'to_email':user.email, 'email_subject':'Refusal Account'}
-        Utlil.send_eamil(data)
+        # email_body = 'Hi '+user.username+' نعتذر منك لقد تم رفض حسابك لأن موقعك بعيد ولا يمكن توصيل طلبات إليه \n'
+        data = {'to_email':user.email, 'email_subject':'Account Refused','username':user.username}
+        Utlil.send_email2(data)
         user.delete()
 
     fieldsets = (
@@ -208,7 +208,7 @@ class ManualReceiptAdmin(admin.ModelAdmin):
     search_fields = ['client__name', 'employee__name']
 
 
-class OutputsproductAdmin(admin.ModelAdmin):
+class OutputsproductAdmin(LeafletGeoAdmin):
     list_display = ['id', 'client', 'employee', 'verify_code', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
     search_fields = ['client__name', 'employee__name']
 
