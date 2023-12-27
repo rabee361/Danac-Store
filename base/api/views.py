@@ -18,6 +18,8 @@ from rest_framework.exceptions import NotFound
 from .utils import Utlil
 from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
+from .permissions import *
+
 
 ####################################### AUTHENTICATION ###################################################################3#######
 
@@ -233,6 +235,7 @@ class UpdateLocationView(APIView):
 ######################################### CART & PRODUCTS ##########################################################################
 
 class listCreateProducts(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend]
@@ -240,6 +243,7 @@ class listCreateProducts(ListCreateAPIView):
 
 
 class SpecialProducts(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         products = Product.objects.all().order_by('?')
         serializer = Product2Serializer(products,many=True,context={'request': request})
@@ -247,6 +251,7 @@ class SpecialProducts(APIView):
 
 
 class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
+    # [IsAuthenticated,Is_Client]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -266,6 +271,7 @@ class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
 
 
 class ListCreateCategory(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -301,6 +307,7 @@ class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
 
 
 class Cart_Items(APIView):
+    # permission_classes = [Is_Client]
     def get(self,request,pk):
         products = Cart_Products.objects.filter(cart=pk)
         serializer = Cart_ProductsSerializer(products,many=True, context={'request': request})
@@ -310,6 +317,7 @@ class Cart_Items(APIView):
 
 
 class Quantity_Handler(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request,pk,pk2):
         item = Cart_Products.objects.get(id=pk)
         if pk2 == 'add':
@@ -327,6 +335,7 @@ class Quantity_Handler(APIView):
 
 
 class Add_to_Cart(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request,pk,pk2):
         user = CustomUser.objects.get(id=pk2)
         client = Client.objects.get(phonenumber=user.phonenumber)
@@ -346,6 +355,7 @@ class Add_to_Cart(APIView):
 
 
 class Delete_From_Cart(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Cart_Products.objects.all()
     serializer_class = Cart_Products
 
@@ -354,6 +364,7 @@ class Delete_From_Cart(DestroyAPIView):
 
 
 class CreateOrderView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, cart_id):
         delivery_date = request.data.get('delivery_date')
         if not delivery_date:
@@ -362,18 +373,16 @@ class CreateOrderView(APIView):
         cart = get_object_or_404(Cart, id=cart_id)
         user = CustomUser.objects.get(phonenumber=cart.customer.phonenumber)
         order = cart.create_order(delivery_date)
-        devices = FCMDevice.objects.filter(user=user.id)
-        devices.send_message(
-                message =Message(
-                    notification=Notification(
-                        title='انشاء طلب',
-                        body=f'تم ارسال طلبك بنجاح'
-                    ),
-                ),
-            ) 
+        # devices = FCMDevice.objects.filter(user=user.id)
+        # devices.send_message(
+        #         message =Message(
+        #             notification=Notification(
+        #                 title='انشاء طلب',
+        #                 body=f'تم ارسال طلبك بنجاح'
+        #             ),
+        #         ),
+        #     ) 
         order.save()
-        
-
         order_serializer = OrderSerializer(order)
         return Response(order_serializer.data, status=status.HTTP_201_CREATED)
      

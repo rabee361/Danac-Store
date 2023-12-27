@@ -31,9 +31,44 @@ class CustomUser(AbstractUser):
 
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',) 
-    
+   
+    objects = CustomManagers()
+
     def __str__(self):
         return self.username
+    
+    # @property
+    # def inventory_manager(self):
+    #     return self.user_type.user_type == 'مدير مخزن'
+    
+    # @property
+    # def registry_manager(self):
+    #     return self.user_type.user_type == 'مدير صندوق'
+    
+    # @property
+    # def HR_manager(self):
+    #     return self.user_type.user_type == 'مدير موارد بشرية'
+    
+    # @property
+    # def order_manager(self):
+    #     return self.user_type.user_type == 'مدير الطلبات'
+    
+    # @property
+    # def sales_employee_manager(self):
+    #     return self.user_type.user_type == 'مدير مندوبين'
+    
+    # @property
+    # def manual_sales_manager(self):
+    #     return self.user_type.user_type == 'مدير مبيعات يدوية'
+    
+    # @property
+    # def type_client(self):
+    #     return self.user_type.user_type == 'عميل'
+    
+    # # @property
+    # # def type_client_or_sales_employee(self):
+    # #     return self.user_type.user_type == 'عميل' or self.user_type.user_type == 'مندوب'
+
 
 
 
@@ -386,7 +421,6 @@ class Deposite(models.Model):
         return cls.objects.aggregate(Sum('total'))['total__sum'] or 0
 
     
-
 class Debt_Client(models.Model):
     CHOICES = (
         ('نقدا','نقدا'),

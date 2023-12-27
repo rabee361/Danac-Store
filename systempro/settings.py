@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',   
     'phonenumber_field',
     'django_filters',
+    'import_export',
     'leaflet',
     'fcm_django',
     'rest_framework_simplejwt.token_blacklist',

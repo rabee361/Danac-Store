@@ -345,10 +345,10 @@ class SalesEmployeeSerializer(serializers.ModelSerializer):
         fields = ['id','name','notes','truck_num','phonenumber','longitude','latitude','address']
 
     def get_longitude(self, obj):
-        return obj.location.x
+        return obj.location.longitude
 
     def get_latitude(self, obj):
-        return obj.location.y
+        return obj.location.latitude
 
 
 
@@ -665,7 +665,6 @@ class PointsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Points
         fields = '__all__'
-
 
 
 

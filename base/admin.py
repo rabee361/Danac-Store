@@ -6,7 +6,8 @@ from django.contrib.auth.admin import UserAdmin
 import random
 from base.api.utils import Utlil
 from base.api.serializers import CodeVerivecationSerializer
-
+from import_export.admin import ImportExportModelAdmin
+from base.resources import ProductResource
 
 admin.site.site_header = "Danac"
 admin.site.index_title = "Welcome to Danac Admin Panel" 
@@ -29,6 +30,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
             name=user.username,
             address = "syria/homs",
             phonenumber = user.phonenumber,
+            location = user.location
         )
         code_verivecation = random.randint(1000,9999)
         # email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
@@ -104,7 +106,8 @@ class ProductMediumAdmin(admin.ModelAdmin):
         return obj.product.name
     get_name_product.short_descreption = 'product'
 
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ImportExportModelAdmin):
+    resource_class = ProductResource
     list_display = ['id', 'name', 'quantity', 'purchasing_price', 'category', 'num_per_item', 'item_per_carton']
 
     search_fields = ['name']
