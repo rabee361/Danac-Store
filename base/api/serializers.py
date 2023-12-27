@@ -3,7 +3,7 @@ from base.models import *
 from django.contrib.auth import login
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
-
+from rest_framework.response import Response
 from django.contrib.auth.password_validation import validate_password
 
 
@@ -102,8 +102,14 @@ class LoginSerializer(serializers.Serializer):
         password = data.get('password')
         if username and password:
             user = authenticate(request=self.context.get('request'), username=username, password=password)
-            if not user or not user.is_active:
+            if not user:
                 raise serializers.ValidationError("Incorrect Credentials")
+            if not user.is_active:
+                raise serializers.ValidationError({'message_error':'this account is not active'})
+            if not user.is_verified:
+                raise serializers.ValidationError({'message_error':'this account is not verified'})
+            if not user.is_accepted:
+                raise serializers.ValidationError({'message_error':'this account is not accepted'})
         else:
             raise serializers.ValidationError('Must include "username" and "password".')
 

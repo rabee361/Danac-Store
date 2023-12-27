@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'base',
     'django_twilio',
     'fcm_django',
-    'admin_reorder',
+    # 'admin_reorder',
 ]
 
 REST_FRAMEWORK = {
@@ -68,7 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'admin_reorder.middleware.ModelAdminReorder',
+    # 'admin_reorder.middleware.ModelAdminReorder',
 ]
 
 ROOT_URLCONF = 'systempro.urls'

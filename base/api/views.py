@@ -208,7 +208,7 @@ class CartProducts(ListAPIView):
 
 
 class ListPointsView(GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated,]
+    permission_classes = [permissions.IsAuthenticated, Is_Client]
 
     def get(self, request):
         user = request.user
@@ -238,7 +238,7 @@ class GetSupplier(RetrieveUpdateDestroyAPIView):
 
 class ListOrdersUserView(GenericAPIView):
     serializer_class = OrderSerializer
-    permission_classes = [permissions.IsAuthenticated,]
+    permission_classes = [permissions.IsAuthenticated, Is_Client]
 
     def get(self, request):
         user = request.user
@@ -254,7 +254,7 @@ class ListOrdersUserView(GenericAPIView):
 #     serializer_class = OrderSerializer
 
 class CreateOrderView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, Is_Client]
 
     def post(self, request):
         user = request.user
@@ -276,16 +276,16 @@ class CreateOrderView(APIView):
             order.save()
             products_cart.delete()
         order_serializer = OrderSerializer(order)
-        user = CustomUser.objects.get(phonenumber=client.phonenumber)
-        devices = FCMDevice.objects.filter(user=user.id)
-        devices.send_message(
-            message=Message(
-                notification=Notification(
-                    title='create order',
-                    body='تم انشاء طلبك بنجاح بانتظار الموافقة في قسم ادارة الطلبات'
-                ),
-            ),
-        )
+        # user = CustomUser.objects.get(phonenumber=client.phonenumber)
+        # devices = FCMDevice.objects.filter(user=user.id)
+        # devices.send_message(
+        #     message=Message(
+        #         notification=Notification(
+        #             title='create order',
+        #             body='تم انشاء طلبك بنجاح بانتظار الموافقة في قسم ادارة الطلبات'
+        #         ),
+        #     ),
+        # )
         return Response(order_serializer.data)
 
         
@@ -410,7 +410,7 @@ class CreateIncomingView(APIView):
 
 # Add Or Get Products From Cart
 class ListCreateCartProduct(APIView):
-    permission_classes=[permissions.IsAuthenticated]
+    permission_classes=[permissions.IsAuthenticated, Is_Client]
 
     def post(self, request):
         user = request.user
@@ -439,7 +439,7 @@ class ListCreateCartProduct(APIView):
 class DesUpdCartProducts(RetrieveUpdateDestroyAPIView):
     queryset = Cart_Products.objects.all()
     serializer_class = Cart_ProductsSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, Is_Client]
 
 class ListReceiptOutput(APIView):
     # permission_classes = [permissions.IsAuthenticated]
