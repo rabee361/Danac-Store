@@ -80,7 +80,11 @@ urlpatterns = [
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),###################
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),######################
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
-
+    #######
+    path('get-delivery-arrived-for-employee/<str:state>/', DelevaryArrivedForEmployee.as_view()),
+    path('get/<str:pk>/', GetDelevaryArrivedForEmployee.as_view()),
+    path('accept-delevary-arrived/<str:pk>/', AcceptDelevaryArrived.as_view()),
+    ######
     # -----------------------------------------------MEDIUM TWO-----------------------------------------------
     path('create-medium-two/', CreateMediumTwo.as_view(), name='create-mediumtwo'),
     path('add-to-medium-two/<str:mediumtwo_id>/<str:product_id>/', AddToMediumTwo.as_view(), name='add-to-mediumtwo'),

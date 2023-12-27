@@ -63,7 +63,7 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     add_fieldsets = (
         (None, {'classes':('wide',),
             'fields':(
-                'phonenumber','email' , 'username', 'password1', 'password2', 'user_type'
+                'phonenumber','email' , 'username', 'password1', 'password2', 'user_type', 'is_verified'
             ),}
             ),
     )

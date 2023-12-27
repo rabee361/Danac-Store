@@ -566,6 +566,39 @@ class ListCreateDeliveryArrived(APIView):
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=True)
         return Response(del_arr_serializer.data)
     
+#################
+class DelevaryArrivedForEmployee(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, state):
+        user = request.user
+        delevary_arrived = DelevaryArrived.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
+        serializer = DelevaryArrivedSerializer(delevary_arrived, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+#####################
+class GetDelevaryArrivedForEmployee(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        delevary_arrived = DelevaryArrived.objects.filter(id=pk).first()
+        serializer = DelevaryArrivedSerializer(delevary_arrived, many=False)
+        output = Outputs.objects.filter(id=delevary_arrived.output_receipt.id).first()
+        print(output.id)
+        products = Outputs_Products.objects.filter(output__id= output.id)
+        products_serializer = GetProductsOutputsSerializer(products, many=True)
+        receipt_serializer = GetOutputsSerializer(output)
+        return Response({'receipt':receipt_serializer.data, 'products':products_serializer.data , 'is_delivered':serializer.data['is_delivered']})
+    
+#################################
+class AcceptDelevaryArrived(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        delevary_arrived = DelevaryArrived.objects.filter(id=pk).first()
+        delevary_arrived.is_delivered = request.data['state']
+        delevary_arrived.save()
+        return Response(status=status.HTTP_200_OK)
 
 class Medium_Handler(APIView):
     def post(self, request, pk, pk2):
