@@ -886,21 +886,21 @@ class ReceiptOrdersView(APIView):
             products.delete()
             return Response(output_serializer.data)
         return Response(output_serializer.errors)
-    
 
 
 
-class DeliverOutput(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self,request,output_id):
+
+
+
+
+class DelevaryArrivedForEmployee(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, state):
         user = request.user
-        employee = Employee.objects.get(phonenumber=user.phonenumber)
-        output = Output.objects.get(id=output_id)
-        output.delivered = True
-        output.save()
-
-        return Response({'message':'order delivered'})
-
+        delevary_arrived = DelievaryArrived.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
+        serializer = DelevaryArrivedSerializer(delevary_arrived, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ListCreateDeliveryArrived(APIView):
@@ -912,29 +912,58 @@ class ListCreateDeliveryArrived(APIView):
             employee = employee
         )
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=False)
+        # user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
+        # devices = FCMDevice.objects.filter(user=user.id)
+        # title = "create receipt order"
+        # body = "لديك طلب جديد لتوصيله"
+        # devices.send_message(
+        #     message=Message(
+        #         notification=Notification(
+        #             title=title,
+        #             body= body
+        #         ),
+        #     ),
+        # )
+        # notification = Notifications.objects.create(
+        #     user=user,
+        #     title = title,
+        #     body=body
+        # )
         return Response(del_arr_serializer.data)
-    
+
     def get(self, request):
         delivery_arrived = DelievaryArrived.objects.all()
+        for delivery in delivery_arrived:
+            print(delivery.output_receipt)
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=True)
-        user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
-        devices = FCMDevice.objects.filter(user=user.id)
-        devices.send_message(
-            message=Message(
-                notification=Notification(
-                    title='create order',
-                    body= "لديك طلب توصيل جديد"
-                ),
-            ),
-        )
         return Response(del_arr_serializer.data)
     
 
 
-class RetdeliveryArrived(RetrieveAPIView):
-    serializer_class = DelevaryArrivedSerializer
-    queryset = DelievaryArrived.objects.all()
+class GetDelevaryArrivedForEmployee(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
+    def get(self, request, pk):
+        delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
+        serializer = DelevaryArrivedSerializer(delevary_arrived, many=False)
+        output = Output.objects.filter(id=delevary_arrived.output_receipt.id).first()
+        print(output.id)
+        products = Output_Products.objects.filter(output__id= output.id)
+        products_serializer = GetProductsOutputsSerializer(products, many=True)
+        receipt_serializer = OutputSerializer(output)
+        return Response({'receipt':receipt_serializer.data, 'products':products_serializer.data , 'is_delivered':serializer.data['is_delivered']})
+
+
+
+
+class AcceptDelevaryArrived(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
+        delevary_arrived.is_delivered = request.data['state']
+        delevary_arrived.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 

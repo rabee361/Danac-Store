@@ -805,7 +805,17 @@ class DelevaryArrivedSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class GetProductsOutputsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Output_Products
+        fields = ['products', 'quantity', 'total', 'discount']
 
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['num_per_item '] = instance.products.num_per_item
+        repr['sale_price'] = instance.products.sale_price
+        repr['product'] = instance.products.name
+        return repr
 
 
 

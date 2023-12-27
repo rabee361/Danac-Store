@@ -718,8 +718,8 @@ class ManualReceipt(models.Model):
     phonenumber = PhoneNumberField(region='DZ')
     recive_payment = models.FloatField()
     discount = models.FloatField()
-    reclaimed_products = models.FloatField()
-    previous_depts = models.FloatField()
+    reclaimed_products = models.FloatField()#####
+    previous_depts = models.FloatField()#####
     remaining_amount = models.FloatField(default=0)
     date = models.DateField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
