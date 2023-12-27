@@ -831,6 +831,11 @@ class OrderEnvoySerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderEnvoy
         fields = '__all__'
+    # def to_representation(self, instance):
+    #     print(instance.client.address)  # Add this line
+    #     representation = super().to_representation(instance)
+    #     return representation
+
 
 class ListOrderEnvoySerialzier(serializers.ModelSerializer):
     class Meta : 

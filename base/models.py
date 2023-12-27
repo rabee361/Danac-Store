@@ -753,6 +753,7 @@ class ManualReceipt_Products(models.Model):
 
 class OrderEnvoy(models.Model):
     client = models.CharField(max_length=50)
+    address = models.CharField(max_length=100,default="address")
     phonenumber = PhoneNumberField(region='DZ')
     products = models.ManyToManyField(Product, through='Product_Order_Envoy')
     products_num = models.IntegerField(default=0)

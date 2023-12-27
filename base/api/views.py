@@ -1123,14 +1123,15 @@ class CreateOrderEnvoyView(APIView):
         order_envoy_ser = OrderEnvoySerializer(data={
             'client':request.data['client'],
             'phonenumber': request.data['phonenumber'],
-            'delivery_date':request.data['delivery_date']
+            'delivery_date':request.data['delivery_date'],
+            'address' : request.data['address']
         })
         if order_envoy_ser.is_valid():
             order_envoy = order_envoy_ser.save()
             for medium in mediumtwo:
                 product_order_envoy = Product_Order_Envoy.objects.create(
                     order_envoy = order_envoy,
-                    product = medium.product,   
+                    product = medium.product,
                 )
                 order_envoy.products_num += medium.quantity
                 order_envoy.total_price += (medium.quantity * medium.product.sale_price)
