@@ -22,10 +22,10 @@ urlpatterns = [
     path('update-location/' , UpdateLocationView.as_view() , name="update-location"),#### new 
 
     path('clients/' , ListCreateClient.as_view() , name="clients"),######
-    path('total-points/<int:client_id>/', TotalClientPointsView.as_view(), name='total-points'),
-    path('used-points/<int:client_id>/', UsedClientPointsView.as_view(), name='used-points'),
-    path('expired-points/<int:client_id>/', ExpiredClientPointsView.as_view(), name='expired-points'),
-    path('points/<int:client_id>/', ClientPointsView.as_view(), name='client-points'),
+    path('total-points/', TotalClientPointsView.as_view(), name='total-points'),
+    path('used-points/', UsedClientPointsView.as_view(), name='used-points'),
+    path('expired-points/', ExpiredClientPointsView.as_view(), name='expired-points'),
+    path('points/', ClientPointsView.as_view(), name='client-points'),
     path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),########
     path('products/' , listCreateProducts.as_view() , name="products"),######
     path('client-orders/' , ListClientOrders.as_view() , name="client-orders"),#### new

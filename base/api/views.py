@@ -371,7 +371,6 @@ class CreateOrderView(APIView):
             return Response({"error": "Delivery date is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         cart = get_object_or_404(Cart, id=cart_id)
-        user = CustomUser.objects.get(phonenumber=cart.customer.phonenumber)
         order = cart.create_order(delivery_date)
         # devices = FCMDevice.objects.filter(user=user.id)
         # devices.send_message(
@@ -445,41 +444,49 @@ class AcceptDelevaryArrived(APIView):
 
 
 class GetOrder(RetrieveAPIView):
-    queryset = Order.objects.all()
+    queryset = Order.objects.all() 
     serializer_class = OrderSerializer2
 
 
 
 class TotalClientPointsView(ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Points.objects.all()
     serializer_class = PointsSerializer
     def get_queryset(self):
-        client_id = self.kwargs['client_id']
-        return Points.objects.filter(client__id=client_id)
+        user = self.request.user
+        client = Client.objects.get(phonenumber=user.phonenumber)
+        return Points.objects.filter(client=client)
 
 
 class ExpiredClientPointsView(ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Points.objects.all()
     serializer_class = PointsSerializer
     def get_queryset(self):
-        client_id = self.kwargs['client_id']
-        return Points.objects.filter(Q(client__id=client_id)&Q(expire_date__lt=timezone.now())).distinct()
+        user = self.request.user
+        client = Client.objects.get(phonenumber=user.phonenumber)
+        return Points.objects.filter(Q(client=client)&Q(expire_date__lt=timezone.now())).distinct()
 
 
 class UsedClientPointsView(ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Points.objects.all()
     serializer_class = PointsSerializer
     def get_queryset(self):
-        client_id = self.kwargs['client_id']
-        return Points.objects.filter(Q(client__id=client_id)&Q(is_used=True)).distinct()
+        user = self.request.user
+        client = Client.objects.get(phonenumber=user.phonenumber)
+        return Points.objects.filter(Q(client=client)&Q(is_used=True)).distinct()
 
 
 class ClientPointsView(ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Points.objects.all()
     serializer_class = PointsSerializer
     def get_queryset(self):
-        client_id = self.kwargs['client_id']
-        return Points.objects.filter(Q(client__id=client_id)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).distinct()
+        user = self.request.user
+        client = Client.objects.get(phonenumber=user.phonenumber)
+        return Points.objects.filter(Q(client=client)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).distinct()
 
 
 ######################################  ###########
