@@ -17,7 +17,6 @@ urlpatterns = [
     path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
     path('settings/<str:pk>/', ListInformationUserView.as_view(), name='settings'),
     path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
-    path('users/' , users.as_view()),
 
     path('update-location/' , UpdateLocationView.as_view() , name="update-location"),#### new 
 

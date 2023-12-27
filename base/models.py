@@ -61,9 +61,9 @@ class CustomUser(AbstractUser):
     # def manual_sales_manager(self):
     #     return self.user_type.user_type == 'مدير مبيعات يدوية'
     
-    # @property
-    # def type_client(self):
-    #     return self.user_type.user_type == 'عميل'
+    @property
+    def type_client(self):
+        return self.user_type.user_type == 'عميل'
     
     # # @property
     # # def type_client_or_sales_employee(self):

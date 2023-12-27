@@ -51,9 +51,6 @@ class SignUpView(GenericAPIView):
 
 
 class UserLoginApiView(GenericAPIView):
-    """
-    An endpoint to authenticate existing users their email and passowrd.
-    """
     permission_classes = (permissions.AllowAny,)
     serializer_class = LoginSerializer
 
@@ -126,13 +123,6 @@ class ResetPasswordView(UpdateAPIView):
 
 
 
-
-class users(ListAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
-
-
-
 class LogoutAPIView(GenericAPIView):
     serializer_class = UserLogoutSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -145,6 +135,7 @@ class LogoutAPIView(GenericAPIView):
 
 
 class ListInformationUserView(RetrieveAPIView):
+    [IsAuthenticated]
     queryset = CustomUser.objects.all()
     serializer_class= CustomUserSerializer
     # permission_classes = [permissions.IsAuthenticated]
@@ -251,7 +242,7 @@ class SpecialProducts(APIView):
 
 
 class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
-    # [IsAuthenticated,Is_Client]
+    [IsAuthenticated,Is_Client]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -290,24 +281,14 @@ class ListCreateCategory(ListCreateAPIView):
 
 
 class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
+    pagination_class = [IsAuthenticated]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
 #################################################### CART HNADLING #####################################################################
 
-# class CartProductsView(ListCreateAPIView):
-#     # permission_classes = [IsAuthenticated]
-#     queryset = Cart_Products.objects.select_related('products','cart').all()
-#     serializer_class = Cart_ProductsSerializer
-#     def get_queryset(self):
-#         client = Client.objects.get(id=1)
-#         return Cart_Products.objects.filter(cart__customer=client)
-    
-
-
-
 class Cart_Items(APIView):
-    # permission_classes = [Is_Client]
+    permission_classes = [IsAuthenticated,Is_Client]
     def get(self,request,pk):
         products = Cart_Products.objects.filter(cart=pk)
         serializer = Cart_ProductsSerializer(products,many=True, context={'request': request})
@@ -317,7 +298,7 @@ class Cart_Items(APIView):
 
 
 class Quantity_Handler(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,Is_Client]
     def post(self,request,pk,pk2):
         item = Cart_Products.objects.get(id=pk)
         if pk2 == 'add':
@@ -335,7 +316,7 @@ class Quantity_Handler(APIView):
 
 
 class Add_to_Cart(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,Is_Client]
     def post(self,request,pk,pk2):
         user = CustomUser.objects.get(id=pk2)
         client = Client.objects.get(phonenumber=user.phonenumber)
@@ -355,7 +336,7 @@ class Add_to_Cart(APIView):
 
 
 class Delete_From_Cart(DestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,Is_Client]
     queryset = Cart_Products.objects.all()
     serializer_class = Cart_Products
 
@@ -364,7 +345,7 @@ class Delete_From_Cart(DestroyAPIView):
 
 
 class CreateOrderView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,Is_Client]
     def post(self, request, cart_id):
         delivery_date = request.data.get('delivery_date')
         if not delivery_date:
@@ -398,7 +379,7 @@ class ListSimpleOrders(ListAPIView):
 
 
 class ListClientOrders(GenericAPIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated,Is_Client]
     serializer_class = OrderSerializer
     def get(self,request):
         user = request.user
