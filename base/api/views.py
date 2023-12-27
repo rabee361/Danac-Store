@@ -1087,18 +1087,19 @@ class MediumTow_Handler(APIView):
         item = MediumTwo_Products.objects.get(id=mediumtwo_id)
         if pk2 == 'add':
             item.add_item()
-            serializer = MediumTwo_ProductsSerializer(item,many=False)
+            serializer = MediumTwo_ProductsSerializer(item,many=False, context={'request': request})
             return Response(serializer.data)
         else:
             if item.quantity == 1:
                 item.delete()
             else:
                 item.sub_item()
-            serializer = MediumTwo_ProductsSerializer(item,many=False)
+            serializer = MediumTwo_ProductsSerializer(item,many=False, context={'request': request})
         return Response(serializer.data)
     
-class CreateOrderEnvoyView(APIView):
 
+
+class CreateOrderEnvoyView(APIView):
     def post(self, request, mediumtwo_id):
         mediumtwo = MediumTwo_Products.objects.filter(mediumtwo__id = mediumtwo_id)
         order_envoy_ser = OrderEnvoySerializer(data={
@@ -1122,8 +1123,8 @@ class CreateOrderEnvoyView(APIView):
         return Response(order_envoy_ser.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-class ListOrderEnvoy(APIView):
 
+class ListOrderEnvoy(APIView):
     def get(self, request, pk):
         order_envoy = OrderEnvoy.objects.get(id=pk)
         serializer = ListOrderEnvoySerialzier(order_envoy, many=False)

@@ -7,6 +7,11 @@ import random
 from base.api.utils import Utlil
 from base.api.serializers import CodeVerivecationSerializer
 
+
+admin.site.site_header = "Danac"
+admin.site.index_title = "Welcome to Danac Admin Panel" 
+
+
 class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
@@ -31,7 +36,8 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         Utlil.send_eamil(data)
         serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
-                'code':code_verivecation
+                'code':code_verivecation,
+                'expires_at' : timezone.now() + timedelta(minutes=10)
             })
         serializer.is_valid(raise_exception=True)
         serializer.save()
