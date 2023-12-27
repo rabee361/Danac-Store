@@ -420,6 +420,7 @@ class Deposite(models.Model):
     def get_total_sum(cls):
         return cls.objects.aggregate(Sum('total'))['total__sum'] or 0
 
+
     
 class Debt_Client(models.Model):
     CHOICES = (
@@ -505,6 +506,15 @@ class Recieved_Payment(models.Model):
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
+    @classmethod
+    def get_total_recieved_payments(cls):
+        return cls.objects.count()
+
+    @classmethod
+    def get_total_amount(cls):
+        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+
+
 
 class Payment(models.Model):
     CHOICES = (
@@ -518,6 +528,16 @@ class Payment(models.Model):
     receipt_num = models.IntegerField()
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
+
+    @classmethod
+    def get_total_payments(cls):
+        return cls.objects.count()
+
+    @classmethod
+    def get_total_amount(cls):
+        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+
+
 
 
 

@@ -1031,13 +1031,13 @@ class CreateManualReceiptView(APIView):
                             ),
                         ),
                     )   
-                    manual_eceipt_products = ManualReceipt_Products.objects.create(
-                        product = product.product,
-                        manualreceipt = manual_receipt,
-                        num_item = product.num_item,
-                        discount=product.discount,
-                        total_price = product.total_price,
-                    )
+                manual_eceipt_products = ManualReceipt_Products.objects.create(
+                    product = product.product,
+                    manualreceipt = manual_receipt,
+                    num_item = product.num_item,
+                    discount=product.discount,
+                    total_price = product.total_price,
+                )
             products.delete()
             return Response(manual_receipt_serializer.data)
         return Response(manual_receipt_serializer.errors)

@@ -475,6 +475,11 @@ class Client_DebtSerializer(serializers.ModelSerializer):
     def get_total_sum(self, obj):
         return Debt_Client.get_total_sum()
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['client_name'] = instance.client_name.name
+        return representation
+
 
 
 class Supplier_DebtSerializer(serializers.ModelSerializer):
@@ -490,6 +495,11 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
     def get_total_sum(self, obj):
         return Debt_Supplier.get_total_sum()
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['supplier_name'] = instance.supplier_name.name
+        return representation
+
 
 
 class DepositeSerializer(serializers.ModelSerializer):
@@ -504,6 +514,12 @@ class DepositeSerializer(serializers.ModelSerializer):
 
     def get_total_sum(self, obj):
         return Deposite.get_total_sum()
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['client'] = instance.client.name
+        return representation
+
 
 
 
@@ -519,20 +535,42 @@ class WithDrawSerializer(serializers.ModelSerializer):
 
     def get_total_sum(self, obj):
         return WithDraw.get_total_sum()
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['client'] = instance.client.name
+        return representation
 
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
+    total_expenses = serializers.SerializerMethodField()
+    total_amount = serializers.SerializerMethodField()
     class Meta:
         model = Expense
         fields = '__all__'
 
+    def get_total_expenses(self, obj):
+        return Expense.get_total_expenses()
+
+    def get_total_amount(self, obj):
+        return Expense.get_total_amount()
+    
 
 
 class PaymentSerializer(serializers.ModelSerializer):
+    total_payments = serializers.SerializerMethodField()
+    total_amount = serializers.SerializerMethodField()
     class Meta:
         model = Payment
         fields = '__all__'
+
+    def get_total_withdraws(self, obj):
+        return Payment.get_total_expenses()
+
+    def get_total_amount(self, obj):
+        return Payment.get_total_sum()
+    
 
 
 class RecievedPaymentSerializer(serializers.ModelSerializer):
@@ -540,6 +578,12 @@ class RecievedPaymentSerializer(serializers.ModelSerializer):
         model = Recieved_Payment
         fields = '__all__'
 
+    def get_total_recieved_payments(self, obj):
+        return Recieved_Payment.get_total_expenses()
+
+    def get_total_amount(self, obj):
+        return Recieved_Payment.get_total_sum()
+    
 #################################################### Medium #######################################################################3###
 
 
@@ -571,27 +615,6 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
 ######################################## RETURNED GOODS #####################################################################
 
 
-
-
-# class ProductSerializerGoods(serializers.ModelSerializer):
-#     class Meta:
-#         model = Product
-#         fields = ['name']  # include other fields if needed
-
-# class SupplierSerializerGoods(serializers.ModelSerializer):
-#     class Meta:
-#         model = Supplier
-#         fields = ['name']  # include other fields if needed
-
-# class EmployeeSerializerGoods(serializers.ModelSerializer):
-#     class Meta:
-#         model = Employee
-#         fields = ['name'] 
-
-# class ClientSerializerGoods(serializers.ModelSerializer):
-#     class Meta:
-#         model = Client
-#         fields = ['name'] 
 
 
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
