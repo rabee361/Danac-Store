@@ -119,7 +119,7 @@ urlpatterns = [
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),######################
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived-for-employee/<str:state>/', DelevaryArrivedForEmployee.as_view()),
-    path('get/<str:pk>/', GetDelevnaryArrivedForEmployee.as_view()),
+    path('get/<str:pk>/', GetDelevaryArrivedForEmployee.as_view()),
     path('accept-delevary-arrived/<str:pk>/', AcceptDelevaryArrived.as_view()), 
 
     path('create-medium-two/', CreateMediumTwo.as_view(), name='create-mediumtwo'),
