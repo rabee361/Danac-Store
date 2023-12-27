@@ -162,6 +162,8 @@ class GetPhonenumberView(APIView):
             # email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
             data= {'to_email':user.email, 'email_subject':'Verify your email','username':user.username, 'code': str(code_verivecation)}
             Utlil.send_email(data)
+            Utlil.send_email(data)
+            Utlil.send_email(data)
             serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
                 'code':code_verivecation,
@@ -1038,7 +1040,7 @@ class ListManualReceipt(ListAPIView):
 
 
 
-
+########################## MEDIUM 2 #######################################################################################
 
 
 
@@ -1048,15 +1050,18 @@ class CreateMediumTwo(ListCreateAPIView):
     serializer_class = MediumTwoSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
+
 class DesMediumTwo(DestroyAPIView):
     queryset = MediumTwo_Products.objects.all()
     serializer_class = MediumTwo_ProductsSerializer
     # permission_classe = [permissions.IsAuthenticated]
 
 
-class ListProductsMediumTwo(ListAPIView):
-    queryset = MediumTwo_Products.objects.all()
-    serializer_class = MediumTwo_ProductsSerializer
+class ListMediumTwoProducts(APIView):
+    def get(self,request,medium2_id):
+        products = MediumTwo_Products.objects.filter(mediumtwo__id=medium2_id)
+        serializer = MediumTwo_ProductsSerializer(products,many=True,context={'request':request})
+        return Response(serializer.data)
 
 
 class AddToMediumTwo(APIView):
@@ -1074,12 +1079,9 @@ class AddToMediumTwo(APIView):
         return Response(mediumtwo_serializer.data, status=status.HTTP_201_CREATED)
     
 
-
-
 class DeleteMediumTwo(DestroyAPIView):
     queryset = MediumTwo.objects.all()
     serializer_class = MediumTwoSerializer
-
 
 
 class MediumTow_Handler(APIView):
@@ -1114,7 +1116,6 @@ class CreateOrderEnvoyView(APIView):
                     order_envoy = order_envoy,
                     product = medium.product,   
                 )
-
                 order_envoy.products_num += medium.quantity
                 order_envoy.total_price += (medium.quantity * medium.product.sale_price)
                 order_envoy.save()
@@ -1136,9 +1137,3 @@ class ListOrderEnvoy(APIView):
             'products_order_envoy':serializer_two.data
         })
     
-
-
-
-
-# class Notifications(APIView):
-#     def get

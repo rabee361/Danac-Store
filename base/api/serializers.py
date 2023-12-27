@@ -806,7 +806,6 @@ class DelevaryArrivedSerializer(serializers.ModelSerializer):
 # ---------------------------------------------ORDER ENVOY---------------------------------------------
 
 class OrderEnvoySerializer(serializers.ModelSerializer):
-
     class Meta:
         model = OrderEnvoy
         fields = '__all__'

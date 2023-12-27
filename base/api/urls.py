@@ -123,10 +123,10 @@ urlpatterns = [
     path('add-to-medium-two/<str:mediumtwo_id>/<str:product_id>/', AddToMediumTwo.as_view(), name='add-to-mediumtwo'),
     path('medium-two-handler/<str:mediumtwo_id>/<str:pk2>/', MediumTow_Handler.as_view()),
     path('delete-product-from-medium-two/<str:pk>/', DesMediumTwo.as_view()),
-    path('list-products-form-medium-two/', ListProductsMediumTwo.as_view()),
     path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
     path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view()),
-    path('delete-medium-two/<str:pk>/' , DeleteMediumTwo.as_view())
-
+    path('delete-medium-two/<str:pk>/' , DeleteMediumTwo.as_view()),
+    path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view())
+    
     ]
 

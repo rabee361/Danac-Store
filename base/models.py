@@ -705,7 +705,6 @@ class OrderEnvoy(models.Model):
     total_price = models.FloatField(default=0)
     created = models.DateField(auto_now_add=True)
     delivery_date = models.DateField()
-    # is_accepted = models.BooleanField(null=True, default=False)
     delivered = models.BooleanField(null=True, default=False)
 
     # location = 
