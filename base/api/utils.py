@@ -24,7 +24,7 @@ class Utlil:
         email.send()
 
     def send_email2(data):
-        email_body = render_to_string('email_template.html', {'username': data['username'], 'code': data['code']})
+        email_body = render_to_string('email_template.html', {'username': data['username']})
         email = EmailMessage(subject=data['email_subject'], body=email_body, to=[data['to_email']])
         email.content_subtype = 'html'
         email.send()
