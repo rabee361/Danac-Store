@@ -569,7 +569,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         return Payment.get_total_payments()
 
     def get_total_amount(self, obj):
-        return Payment.get_total_sum()
+        return Payment.get_total_amount()
     
 
 
@@ -582,7 +582,7 @@ class RecievedPaymentSerializer(serializers.ModelSerializer):
         return Recieved_Payment.get_total_revieved_payments()
 
     def get_total_amount(self, obj):
-        return Recieved_Payment.get_total_sum()
+        return Recieved_Payment.get_total_amount()
     
 #################################################### Medium #######################################################################3###
 
