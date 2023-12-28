@@ -367,37 +367,43 @@ class SupplierSerializer(serializers.ModelSerializer):
 ############################################################## HR ##################################################################
 
 class Advance_on_SalarySerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Advance_On_salary
-        fields = '__all__'
+        fields = ['employee','employee_name','num_hours','ampunt','date']
 
 
 
 class OverTimeSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = OverTime
-        fields = '__all__'
+        fields = ['id','employee','employee_name','num_hours','ampunt','date']
 
 
 class AbsenceSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Absence
-        fields = '__all__'
+        fields = ['id','employee','employee_name','days','amount',]
 
 
 class BonusSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Bonus
         fields = '__all__'
     
 
 class DiscountSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Discount
         fields = '__all__'
 
 
 class ExtraExpenseSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Extra_Expense
         fields = '__all__'
@@ -827,7 +833,7 @@ class OutputSerializer2(serializers.ModelSerializer):
     products = ProductsOutputSerializer(source='output_products_set', many=True,read_only=True)
     longitude = serializers.SerializerMethodField()
     latitude = serializers.SerializerMethodField()
-    client_phone = serializers.CharField(source='client.phonenumber')
+    client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
 
     class Meta:
         model = Output
