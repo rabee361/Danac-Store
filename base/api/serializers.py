@@ -517,9 +517,9 @@ class DepositeSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         withdraw = Deposite.objects.create(**validated_data)
-        registry = Registry.objects.first()
+        registry = Registry.objects.first()  
         registry.total -= withdraw.total
-        registry.save()
+        registry.save() 
         return withdraw
 
     def update(self, instance, validated_data):
