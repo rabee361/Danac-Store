@@ -756,9 +756,10 @@ class IncomingProductsSerializer(serializers.ModelSerializer):
 
 class IncomingSerializer2(serializers.ModelSerializer):
     products = IncomingProductsSerializer(source='incoming_product_set', many=True,read_only=True)
+    supplier_phone = serializers.CharField(source='supplier.phone_number',read_only=True)
     class Meta:
         model = Incoming
-        fields = ['id','agent','supplier','num_truck','employee','code_verefy','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','agent','supplier','num_truck','employee','code_verefy','supplier_phone','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['supplier'] = instance.supplier.name
