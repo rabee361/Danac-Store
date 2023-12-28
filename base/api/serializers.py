@@ -803,12 +803,17 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
 
 
 class ManualRecieptSerializer2(serializers.ModelSerializer):
-    client_name = serializers.CharField(source='client.name')
     products = ManualRecieptProductsSerializer(source='manualreceipt_products_set', many=True,read_only=True)
+    client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
     class Meta:
         model = ManualReceipt
-        fields = ['id','client_name','employee','verify_code','phonenumber','recive_payment','discount','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
-
+        fields = ['id','client','client_phone','employee','verify_code','phonenumber','recive_payment','discount','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['employee'] = instance.employee.name
+        repr['client'] = instance.client.name
+        return repr
 
 ########################################## OUTPUT ##############################################
         
