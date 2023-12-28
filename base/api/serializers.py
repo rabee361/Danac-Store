@@ -510,7 +510,7 @@ class DepositeSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     class Meta:
         model = Deposite
-        fields = ['id','client','client_id','detail_deposite','total','verify_code','total_deposites','total_sum']
+        fields = ['id','client','client_id','detail_deposite','total','verify_code','total_deposites','total_sum','date']
 
     def get_total_deposites(self, obj):
         return Deposite.get_total_deposites()
