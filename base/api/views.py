@@ -994,12 +994,12 @@ class CreateIncomingView(APIView):
 class GetIncoming(RetrieveAPIView):
     # permission_classes = [permissions.IsAuthenticated]
     queryset = Incoming.objects.all()
-    serializer_class = IncomingSerializer
+    serializer_class = IncomingSerializer2
 
 
 class ListIncomings(ListAPIView):
     queryset = Incoming.objects.all()
-    serializer_class = IncomingSerializer
+    serializer_class = IncomingSerializer2
 
 
 
