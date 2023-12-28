@@ -762,6 +762,11 @@ class IncomingSerializer2(serializers.ModelSerializer):
     class Meta:
         model = Incoming
         fields = ['id','agent','supplier','num_truck','employee','code_verefy','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['supplier'] = instance.supplier.name
+        return repr
     
 
 ############################# 
