@@ -345,10 +345,10 @@ class SalesEmployeeSerializer(serializers.ModelSerializer):
         fields = ['id','name','notes','truck_num','phonenumber','longitude','latitude','address']
 
     def get_longitude(self, obj):
-        return obj.location.longitude
+        return obj.location.x
 
     def get_latitude(self, obj):
-        return obj.location.latitude
+        return obj.location.y
 
 
 
@@ -585,7 +585,6 @@ class RecievedPaymentSerializer(serializers.ModelSerializer):
         return Recieved_Payment.get_total_amount()
     
 #################################################### Medium #######################################################################3###
-
 
 
 class MediumSerializer(serializers.ModelSerializer):
