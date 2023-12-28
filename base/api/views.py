@@ -799,7 +799,8 @@ class CreateMediumForOrderView(APIView):
                 num_item=product.quantity,
                 total_price=product.total_price
             )
-        return Response(status=status.HTTP_200_OK)
+        serializer = MediumSerializer(medium,many=False)
+        return Response(serializer.data,status=status.HTTP_200_OK)
        
 
  
