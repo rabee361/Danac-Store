@@ -485,7 +485,6 @@ class RetSalesEmployee(RetrieveAPIView):
     serializer_class = SalesEmployeeSerializer
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
-
         try:
             employee = queryset.get(pk=self.kwargs['pk'])
         except Employee.DoesNotExist:
