@@ -370,7 +370,7 @@ class Advance_on_SalarySerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Advance_On_salary
-        fields = ['employee','employee_name','num_hours','ampunt','date']
+        fields = ['employee','employee_name','num_hours','amount','date']
 
 
 
@@ -378,28 +378,28 @@ class OverTimeSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = OverTime
-        fields = ['id','employee','employee_name','num_hours','ampunt','date']
+        fields = ['id','employee','employee_name','num_hours','amount','date']
 
 
 class AbsenceSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Absence
-        fields = ['id','employee','employee_name','days','amount',]
+        fields = ['id','employee','employee_name','days','amount','date']
 
 
 class BonusSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Bonus
-        fields = '__all__'
+        fields = ['id','employee','employee_name','reason','amount','date']
     
 
 class DiscountSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Discount
-        fields = '__all__'
+        fields = ['id','employee','employee_name','reason','amount','date']
 
 
 class ExtraExpenseSerializer(serializers.ModelSerializer):
@@ -407,6 +407,7 @@ class ExtraExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Extra_Expense
         fields = '__all__'
+        fields = ['id','employee','employee_name','reason','amount','date','barcode']
 
 
 
