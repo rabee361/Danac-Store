@@ -515,6 +515,21 @@ class DepositeSerializer(serializers.ModelSerializer):
     def get_total_sum(self, obj):
         return Deposite.get_total_sum()
     
+    def create(self, validated_data):
+        withdraw = Deposite.objects.create(**validated_data)
+        registry = Registry.objects.first()
+        registry.total -= withdraw.total
+        registry.save()
+        return withdraw
+
+    def update(self, instance, validated_data):
+        difference = validated_data.get('total', instance.total) - instance.total
+        instance = super().update(instance, validated_data)
+        registry = Registry.objects.first()
+        registry.total -= difference
+        registry.save()
+        return instance
+    
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['client'] = instance.client.name
@@ -535,6 +550,21 @@ class WithDrawSerializer(serializers.ModelSerializer):
 
     def get_total_sum(self, obj):
         return WithDraw.get_total_sum()
+
+    def create(self, validated_data):
+        withdraw = WithDraw.objects.create(**validated_data)
+        registry = Registry.objects.first()
+        registry.total -= withdraw.total
+        registry.save()
+        return withdraw
+
+    def update(self, instance, validated_data):
+        difference = validated_data.get('total', instance.total) - instance.total
+        instance = super().update(instance, validated_data)
+        registry = Registry.objects.first()
+        registry.total -= difference
+        registry.save()
+        return instance
     
     def to_representation(self, instance):
         representation = super().to_representation(instance)
