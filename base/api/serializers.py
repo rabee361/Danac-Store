@@ -827,10 +827,11 @@ class OutputSerializer2(serializers.ModelSerializer):
     products = ProductsOutputSerializer(source='output_products_set', many=True,read_only=True)
     longitude = serializers.SerializerMethodField()
     latitude = serializers.SerializerMethodField()
+    client_phone = serializers.CharField(source='client.phonenumber')
 
     class Meta:
         model = Output
-        fields = ['id', 'client', 'employee', 'verify_code', 'phonenumber', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date', 'barcode','longitude','latitude', 'products']
+        fields = ['id', 'client', 'employee', 'verify_code', 'phonenumber','client_phone', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date', 'barcode','longitude','latitude', 'products']
 
     def get_longitude(self, obj):
         return obj.location.x
@@ -838,6 +839,11 @@ class OutputSerializer2(serializers.ModelSerializer):
     def get_latitude(self, obj):
         return obj.location.y
 
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['client'] = instance.client.name
+        repr['employee'] = instance.employee.name
+        return repr
 
 ##########################################
 
