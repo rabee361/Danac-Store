@@ -465,9 +465,10 @@ class RegistrySerializer(serializers.ModelSerializer):
 class Client_DebtSerializer(serializers.ModelSerializer):
     total_client_debts = serializers.SerializerMethodField()
     total_sum = serializers.SerializerMethodField()
+    client_id = serializers.IntegerField(source='client_name.id',read_only=True)
     class Meta :
         model = Debt_Client
-        fields = '__all__'
+        fields = ['client_name','client_id','amount','payment_method','bank_name','receipt_num','date','total_client_debts','total_sum']
 
     def get_total_client_debts(self, obj):
         return Debt_Client.get_total_client_debts()
@@ -485,9 +486,10 @@ class Client_DebtSerializer(serializers.ModelSerializer):
 class Supplier_DebtSerializer(serializers.ModelSerializer):
     total_supplier_debts = serializers.SerializerMethodField()
     total_sum = serializers.SerializerMethodField()
+    supplier_id = serializers.IntegerField(source='supplier_name.id',read_only=True)
     class Meta :
         model = Debt_Supplier
-        fields = '__all__'
+        fields = ['supplier_name','supplier_id','amount','payment_method','bank_name','check_num','date','total_supplier_debts','total_sum']
 
     def get_total_supplier_debts(self, obj):
         return Debt_Supplier.get_total_supplier_debts()
@@ -545,7 +547,7 @@ class WithDrawSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     class Meta:
         model = WithDraw
-        fields = ['client','client_id','details_withdraw','total','verify_code','total_withdraws','total_sum']
+        fields = ['client','client_id','details_withdraw','total','verify_code','total_withdraws','total_sum','date']
 
     def get_total_withdraws(self, obj):
         return WithDraw.get_total_withdraws()
@@ -568,10 +570,10 @@ class WithDrawSerializer(serializers.ModelSerializer):
         registry.save()
         return instance
     
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     representation['client'] = instance.client.name
-    #     return representation
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['client'] = instance.client.name
+        return representation
 
 
 
