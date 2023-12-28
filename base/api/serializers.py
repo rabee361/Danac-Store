@@ -370,7 +370,7 @@ class Advance_on_SalarySerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Advance_On_salary
-        fields = ['employee','employee_name','num_hours','amount','date']
+        fields = ['employee','employee_name','reason','amount','date']
 
 
 
