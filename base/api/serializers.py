@@ -468,7 +468,7 @@ class Client_DebtSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client_name.id',read_only=True)
     class Meta :
         model = Debt_Client
-        fields = ['client_name','client_id','amount','payment_method','bank_name','receipt_num','date','total_client_debts','total_sum']
+        fields = ['id','client_name','client_id','amount','payment_method','bank_name','receipt_num','date','total_client_debts','total_sum']
 
     def get_total_client_debts(self, obj):
         return Debt_Client.get_total_client_debts()
@@ -489,7 +489,7 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
     supplier_id = serializers.IntegerField(source='supplier_name.id',read_only=True)
     class Meta :
         model = Debt_Supplier
-        fields = ['supplier_name','supplier_id','amount','payment_method','bank_name','check_num','date','total_supplier_debts','total_sum']
+        fields = ['id','supplier_name','supplier_id','amount','payment_method','bank_name','check_num','date','total_supplier_debts','total_sum']
 
     def get_total_supplier_debts(self, obj):
         return Debt_Supplier.get_total_supplier_debts()
@@ -510,7 +510,7 @@ class DepositeSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     class Meta:
         model = Deposite
-        fields = ['client','client_id','detail_deposite','total','verify_code','total_deposites','total_sum']
+        fields = ['id','client','client_id','detail_deposite','total','verify_code','total_deposites','total_sum']
 
     def get_total_deposites(self, obj):
         return Deposite.get_total_deposites()
@@ -547,7 +547,7 @@ class WithDrawSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     class Meta:
         model = WithDraw
-        fields = ['client','client_id','details_withdraw','total','verify_code','total_withdraws','total_sum','date']
+        fields = ['id','client','client_id','details_withdraw','total','verify_code','total_withdraws','total_sum','date']
 
     def get_total_withdraws(self, obj):
         return WithDraw.get_total_withdraws()
@@ -736,6 +736,12 @@ class IncomingSerializer(serializers.ModelSerializer):
         model = Incoming
         fields = '__all__'
     
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['supplier'] = instance.supplier.name
+        repr['employee'] = instance.employee.name
+        return repr
+
 
 
 class SpecialSerializer(serializers.ModelSerializer):
@@ -763,10 +769,7 @@ class IncomingSerializer2(serializers.ModelSerializer):
         model = Incoming
         fields = ['id','agent','supplier','num_truck','employee','code_verefy','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
 
-    def to_representation(self, instance):
-        repr = super().to_representation(instance)
-        repr['supplier'] = instance.supplier.name
-        return repr
+
     
 
 ############################# 
