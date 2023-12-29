@@ -124,7 +124,7 @@ class CodeVerivecationAdmin(admin.ModelAdmin):
     get_user_name.short_descreption = 'username'
 
 
-class EmployeeAdmin(admin.ModelAdmin):
+class EmployeeAdmin(LeafletGeoAdmin):
     list_display = ['id', 'name', 'phonenumber', 'salary', 'address', 'birthday']
     search_fields = ['name', 'phonenumber']
     # list_filter = ['type_employee']
@@ -372,10 +372,10 @@ admin.site.register(ReturnedGoodsSupplier, ReturnedGoodsSupplierAdmin)
 admin.site.register(DamagedProduct, DamagedProductAdmin)
 
 #### Medium ####
-admin.site.register(Medium, MediumAdmin)
-admin.site.register(Products_Medium,ProductMediumAdmin)
-admin.site.register(MediumTwo,MediumTwoAdmin)
-admin.site.register(MediumTwo_Products,MediumTwo_ProductsAdmin)
+# admin.site.register(Medium, MediumAdmin)
+# admin.site.register(Products_Medium,ProductMediumAdmin)
+# admin.site.register(MediumTwo,MediumTwoAdmin)
+# admin.site.register(MediumTwo_Products,MediumTwo_ProductsAdmin)
 
 #### Rceipts ###
 admin.site.register(Incoming_Product, IncomingProductAdmin)
