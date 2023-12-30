@@ -235,7 +235,7 @@ class CustomFirebaseCredentials(credentials.ApplicationDefault):
                                                                               scopes=credentials._scopes)
 
 
-custom_credentials = CustomFirebaseCredentials('C:/Users/eng.Rabee/systempro/test-9c6e8-firebase-adminsdk-7b7ev-2e61fd0ad1.json')
+custom_credentials = CustomFirebaseCredentials('C:/Users/eng.Rabee/systempro/storeapp-8cc25-firebase-adminsdk-63jeh-3a5b5e4884.json')
 # FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, name='messaging')
 FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, options={'projectId': 'test-9c6e8'}, name='messaging')
 
