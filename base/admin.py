@@ -8,6 +8,8 @@ from base.api.utils import Utlil
 from base.api.serializers import CodeVerivecationSerializer
 from import_export.admin import ImportExportModelAdmin
 from base.resources import ProductResource
+from django.urls import reverse
+from django.utils.html import format_html
 
 admin.site.site_header = "Danac"
 admin.site.index_title = "Welcome to Danac Admin Panel" 
@@ -18,7 +20,8 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     form = CustomUserChangeForm
     list_filter = ['is_accepted']
     actions = ['Accept_User', 'Refusal_User']
-    list_display = ['id', 'email', 'is_staff', 'is_accepted']        
+    list_display = ['id', 'email', 'is_staff', 'is_accepted']    
+    ordering = ['-id']
 
     def Accept_User(self, request, queryset):
         queryset.update(is_active=True) 
@@ -81,9 +84,10 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
 
 @admin.register(Client)
 class ClientAdmin(LeafletGeoAdmin):
-    list_display = ('id','name','location','address','phonenumber','category','notes')
+    list_display = ('id','name','category','phonenumber','address','notes')
     search_fields = ['name', 'phonenumber']
     list_filter =['category']
+    ordering = ['-id']
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'get_client_name','products_num' ,'total' , 'delivery_date', 'delivered']
@@ -109,12 +113,12 @@ class ProductMediumAdmin(admin.ModelAdmin):
 class ProductAdmin(ImportExportModelAdmin):
     resource_class = ProductResource
     list_display = ['id', 'name', 'quantity', 'purchasing_price', 'category', 'num_per_item', 'item_per_carton']
-
     search_fields = ['name']
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display= ['id', 'name']
+    list_display= ['id','name']
+
 
 class CodeVerivecationAdmin(admin.ModelAdmin):
     list_display = ['get_user_name', 'code', 'is_verified','created_at', 'expires_at']
@@ -372,10 +376,10 @@ admin.site.register(ReturnedGoodsSupplier, ReturnedGoodsSupplierAdmin)
 admin.site.register(DamagedProduct, DamagedProductAdmin)
 
 #### Medium ####
-# admin.site.register(Medium, MediumAdmin)
-# admin.site.register(Products_Medium,ProductMediumAdmin)
-# admin.site.register(MediumTwo,MediumTwoAdmin)
-# admin.site.register(MediumTwo_Products,MediumTwo_ProductsAdmin)
+admin.site.register(Medium, MediumAdmin)
+admin.site.register(Products_Medium,ProductMediumAdmin)
+admin.site.register(MediumTwo,MediumTwoAdmin)
+admin.site.register(MediumTwo_Products,MediumTwo_ProductsAdmin)
 
 #### Rceipts ###
 admin.site.register(Incoming_Product, IncomingProductAdmin)
@@ -404,3 +408,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Cart, CartAdmin)
 admin.site.register(Cart_Products, CartProductsAdmin)
 
+admin.site.register(Notifications)

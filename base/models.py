@@ -100,7 +100,7 @@ class Notifications(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return self.user.username
+        return f'{self.user.username} : {self.body[:50]}'
 
 
 

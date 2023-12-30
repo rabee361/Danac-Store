@@ -348,18 +348,23 @@ class CreateOrderView(APIView):
         delivery_date = request.data.get('delivery_date')
         if not delivery_date:
             return Response({"error": "Delivery date is required"}, status=status.HTTP_400_BAD_REQUEST)
-
         cart = get_object_or_404(Cart, id=cart_id)
         order = cart.create_order(delivery_date)
-        # devices = FCMDevice.objects.filter(user=user.id)
-        # devices.send_message(
-        #         message =Message(
-        #             notification=Notification(
-        #                 title='انشاء طلب',
-        #                 body=f'تم ارسال طلبك بنجاح'
-        #             ),
-        #         ),
-        #     ) 
+        ###################################
+        user = CustomUser.objects.get(phonenumber=cart.customer.phonenumber)
+        devices = FCMDevice.objects.filter(user=user.id)
+        title = 'انشاء طلب'
+        body = f'تم ارسال طلبك بنجاح'
+        devices.send_message(
+                message =Message(
+                    notification=Notification(
+                        title=title,
+                        body=body
+                    ),
+                ),
+            )
+        Notifications.objects.create(user=user,body=body,title=title)
+        ###################################
         order.save()
         order_serializer = OrderSerializer(order)
         return Response(order_serializer.data, status=status.HTTP_201_CREATED)
@@ -842,19 +847,26 @@ class ReceiptOrdersView(APIView):
                 quantity_product = Product.objects.get(id=product.product.id)
                 quantity_product.quantity -= product.num_item
                 quantity_product.save()
-
+    #############################################################################
                 if quantity_product.quantity < quantity_product.limit_less:
                     user = CustomUser.objects.get(id=request.user.id)
                     devices = FCMDevice.objects.filter(user=user.id)
+                    title = 'نقص كمية منتج'
+                    body = f'نقص كمية المنتج {quantity_product.name}{quantity_product.limit_less}عن الحد الأدنى'
                     devices.send_message(
                         message=Message(
                             notification=Notification(
-                                title='create order',
-                                body=f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج إلى أقل من 10{quantity_product.name}'
+                                title=title,
+                                body=body
                             ),
                         ),
                     )
-
+                    Notifications.objects.create(
+                        user = user,
+                        title = title,
+                        body = body
+                    )
+########################################################################################
                 output_product = Output_Products.objects.create(
                     products = product.product,
                     output = output,
@@ -891,23 +903,24 @@ class ListCreateDeliveryArrived(APIView):
             employee = employee
         )
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=False)
-        # user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
-        # devices = FCMDevice.objects.filter(user=user.id)
-        # title = "create receipt order"
-        # body = "لديك طلب جديد لتوصيله"
-        # devices.send_message(
-        #     message=Message(
-        #         notification=Notification(
-        #             title=title,
-        #             body= body
-        #         ),
-        #     ),
-        # )
-        # notification = Notifications.objects.create(
-        #     user=user,
-        #     title = title,
-        #     body=body
-        # )
+        
+        user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
+        devices = FCMDevice.objects.filter(user=user.id)
+        title = "طلب توصيل جديد"
+        body = "لديك طلب جديد لتوصيله"
+        devices.send_message(
+            message=Message(
+                notification=Notification(
+                    title=title,
+                    body= body
+                ),
+            ),
+        )
+        Notifications.objects.create(
+            user=user,
+            title = title,
+            body=body
+        )
         return Response(del_arr_serializer.data)
 
     def get(self, request):
@@ -1031,14 +1044,21 @@ class CreateManualReceiptView(APIView):
                 if update_quantity.quantity < update_quantity.limit_less:
                     user = CustomUser.objects.get(id=request.user.id)
                     devices = FCMDevice.objects.filter(user=user.id)
+                    title = 'نقص كمية منتج'
+                    body = f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج {update_quantity.name}إلى أقل من 10'
                     devices.send_message(
                         message=Message(
                             notification=Notification(
-                                title='create order',
-                                body=f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج إلى أقل من 10{update_quantity.name}'
+                                title=title,
+                                body=body
                             ),
                         ),
-                    )   
+                    )
+                    Notifications.objects.create(
+                        user = user,
+                        title = title,
+                        body = body
+                    ) 
                 manual_eceipt_products = ManualReceipt_Products.objects.create(
                     product = product.product,
                     manualreceipt = manual_receipt,
