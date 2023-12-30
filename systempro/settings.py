@@ -233,12 +233,20 @@ class CustomFirebaseCredentials(credentials.ApplicationDefault):
         if not self._g_credential:
             self._g_credential, self._project_id = load_credentials_from_file(self._account_file_path,
                                                                               scopes=credentials._scopes)
-            
+
+
+custom_credentials = CustomFirebaseCredentials('C:/Users/eng.Rabee/systempro/test-9c6e8-firebase-adminsdk-7b7ev-2e61fd0ad1.json')
+# FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, name='messaging')
+FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, options={'projectId': 'test-9c6e8'}, name='messaging')
+
+
+
 FCM_DJANGO_SETTINGS = {
      # an instance of firebase_admin.App to be used as default for all fcm-django requests
      # default: None (the default Firebase app)
+    "DEFAULT_FIREBASE_APP": FIREBASE_MESSAGING_APP,
      # default: _('FCM Django')
-    "APP_VERBOSE_NAME": "test",
+    "APP_VERBOSE_NAME": "What ever name",
      # true if you want to have only one active device per registered user at a time
      # default: False
     "ONE_DEVICE_PER_USER": False,
@@ -248,6 +256,5 @@ FCM_DJANGO_SETTINGS = {
     "DELETE_INACTIVE_DEVICES": False,
 }
 
-custom_credentials = CustomFirebaseCredentials('C:/Users/eng.Rabee/systempro/storeapp-8cc25-firebase-adminsdk-63jeh-3a5b5e4884.json')
-FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, name='messaging')
+
 
