@@ -673,12 +673,12 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
 
 
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    client = serializers.PrimaryKeyRelatedField(queryset=Client.objects.all())
-    employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all())
+    client_id = serializers.IntegerField(source='client.id')
+    product_id = serializers.IntegerField(source='product.id')
+    employee_id = serializers.IntegerField(source='employee.id')
     class Meta:
         model = ReturnedGoodsClient
-        fields = ['id','client','product','employee','quantity','total_price','reason','date']
+        fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason','date']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

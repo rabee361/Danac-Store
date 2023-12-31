@@ -96,7 +96,6 @@ urlpatterns = [
     path('damaged-product/', ListCreateDamagedProduct.as_view()),####### 
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),##### 
 
-
     path('get-receipt-manual/<str:pk>/', GetManualReceipt.as_view(), name="get-manuals"),##### 
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),#### 
     path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),##### 
