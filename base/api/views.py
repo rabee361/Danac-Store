@@ -358,17 +358,18 @@ class SearchView(ListAPIView):
 
 
 class Add_To_Medium(APIView):
-    
 
     def post(self, request, medium_id, product_id):
         product = Product.objects.get(id=product_id)
         medium = Medium.objects.get(id=medium_id)
-        medium_products, created = Products_Medium.objects.get_or_create(product=product, medium=medium)
-        if created:
-            medium_products.add_num_item()
-            medium_products.total_price = medium_products.total_price_of_item
-            medium_products.save()
-
+        medium_products, created = Products_Medium.objects.get_or_create(
+            product=product,
+            medium=medium,
+            sale_price = request.data['sale_price'],
+            num_item = request.data['quantity'],
+            )
+        medium_products.total_price = medium_products.total_price_of_item
+        medium_products.save()
         pro_med_serializer = ProductsMediumSerializer(medium_products)
         return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
 
@@ -408,18 +409,22 @@ class CreateIncomingView(APIView):
             products.delete()
             return Response(incoming_serializer.data)
         return Response(incoming_serializer.errors)
-    
+
+class ListIncoming(RetrieveAPIView):
+    queryset = Incoming.objects.all()
+    serializer_class = IncomingSerializer2
+
 
 
 # Add Or Get Products From Cart
 class ListCreateCartProduct(APIView):
     permission_classes=[permissions.IsAuthenticated, Is_Client]
 
-    def post(self, request):
+    def post(self, request, pk):
         user = request.user
         client = Client.objects.filter(phonenumber=user.phonenumber).first()
         cart = Cart.objects.filter(customer=client).first()
-        product = Product.objects.get(id=request.data['id'])
+        product = Product.objects.get(id=pk)
         serializer = Cart_ProductsSerializer(data = {
             'products':product.id,
             'cart':cart.id,
@@ -463,7 +468,7 @@ class GetProductsOutputsView(APIView):
         return Response(output_serializer.data, status=status.HTTP_200_OK)
 # --------------------------------------CREATE MEDIUM--------------------------------------
 class CreateMedium(APIView):
-    permission_classes = [permissions.IsAuthenticated, OrderManager]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         medium = Medium.objects.create()
@@ -589,9 +594,15 @@ class DelevaryArrivedForEmployee(APIView):
 
     def get(self, request, state):
         user = request.user
+        List_products = []
         delevary_arrived = DelevaryArrived.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
+        for i in delevary_arrived:
+            products = Outputs_Products.objects.filter(output__id= i.output_receipt.id)
+            products_serializer = GetProductsOutputsSerializer(products, many=True)
+            List_products.append(products_serializer.data)
+        print(List_products)
         serializer = DelevaryArrivedSerializer(delevary_arrived, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'data':serializer.data, 'products':List_products}, status=status.HTTP_200_OK)
     
 #####################
 class GetDelevaryArrivedForEmployee(APIView):
@@ -617,27 +628,29 @@ class AcceptDelevaryArrived(APIView):
         delevary_arrived.save()
         return Response(status=status.HTTP_200_OK)
 
-class Medium_Handler(APIView):
-    def post(self, request, pk, pk2):
-        item = Products_Medium.objects.get(id=pk)
-        if pk2 == 'add':
-            item.add_item()
-            serializer = ProductsMediumSerializer(item,many=False)
-            return Response(serializer.data)
-        else:
-            item.sub_item()
-            if item.num_item == 1:
-                item.delete()
-            serializer = ProductsMediumSerializer(item,many=False)
-        return Response(serializer.data)
+# class Medium_Handler(APIView):
+#     def post(self, request, pk, pk2):
+#         item = Products_Medium.objects.get(id=pk)
+#         if pk2 == 'add':
+#             item.add_item()
+#             serializer = ProductsMediumSerializer(item,many=False)
+#             return Response(serializer.data)
+#         else:
+#             item.sub_item()
+#             if item.num_item == 1:
+#                 item.delete()
+#             serializer = ProductsMediumSerializer(item,many=False)
+#         return Response(serializer.data)
     
 class DeleteProductsMediumView(RetrieveDestroyAPIView):
     queryset = Products_Medium.objects.all()
     serializer_class = ProductsMediumSerializer
 
-class UpdateProductsMedium(RetrieveUpdateAPIView):
+class UpdateProductsMedium(UpdateAPIView):
     queryset = Products_Medium.objects.all()
     serializer_class = UpdateProductMediumSerializer
+
+            
 
 class ListMediumView(APIView):
 #     # permission_classes = [permissions.IsAuthenticated]
@@ -757,7 +770,6 @@ class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
     serializer_class = DamagedProductSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
-
 # -------------------------------------MANUAL RECEIPT-------------------------------------
     
 class CreateManualReceiptView(APIView):
@@ -772,7 +784,7 @@ class CreateManualReceiptView(APIView):
             "verify_code": request.data['verify_code'],
             "phonenumber":request.data['phonenumber'], 
             "recive_payment": request.data['recive_payment'],
-            "discount":request.data['discount'],
+            # "discount":request.data['discount'],
             "reclaimed_products": request.data['reclaimed_products'],
             "previous_depts": request.data['previous_depts'],
             "remaining_amount":request.data['remaining_amount'],
@@ -784,29 +796,29 @@ class CreateManualReceiptView(APIView):
                 update_quantity =Product.objects.get(id=product.product.id)
                 update_quantity.quantity -= product.num_item
                 update_quantity.save()
-                # if update_quantity.quantity < 10:
-                #     user = CustomUser.objects.get(id=request.user.id)
-                #     devices = FCMDevice.objects.filter(user=user.id)
-                #     title = 'نقص كمية منتج'
-                #     body = f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج {update_quantity.name}إلى أقل من 10'
-                #     devices.send_message(
-                #         message=Message(
-                #             notification=Notification(
-                #                 title=title,
-                #                 body=body
-                #             ),
-                #         ),
-                #     )
-                #     notification = Notifications.objects.create(
-                #         user = user,
-                #         title = title,
-                #         body = body
-                #     )
+                if update_quantity.quantity < 10:
+                    user = CustomUser.objects.get(id=request.user.id)
+                    devices = FCMDevice.objects.filter(user=user.id)
+                    title = 'نقص كمية منتج'
+                    body = f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج {update_quantity.name}إلى أقل من 10'
+                    devices.send_message(
+                        message=Message(
+                            notification=Notification(
+                                title=title,
+                                body=body
+                            ),
+                        ),
+                    )
+                    notification = Notifications.objects.create(
+                        user = user,
+                        title = title,
+                        body = body
+                    )
                 manual_eceipt_products = ManualReceipt_Products.objects.create(
                     product = product.product,
                     manualreceipt = manual_receipt,
                     num_item = product.num_item,
-                    discount=product.discount,
+                    discount=product.sale_price,
                     total_price = product.total_price,
                 )
             products.delete()

@@ -323,7 +323,7 @@ class ManualReceipt(models.Model):
     verify_code = models.IntegerField()
     phonenumber = PhoneNumberField(region='DZ')
     recive_payment = models.FloatField()
-    discount = models.FloatField()
+    # discount = models.FloatField()
     reclaimed_products = models.FloatField()
     previous_depts = models.FloatField()
     remaining_amount = models.FloatField(default=0)
@@ -477,30 +477,30 @@ class Medium(models.Model):
 class Products_Medium(models.Model):
     medium = models.ForeignKey(Medium, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    discount = models.FloatField(default=0)
+    sale_price = models.FloatField(default=0)
     num_item = models.IntegerField(default=0)
     total_price = models.FloatField(default=0)
 
     def __str__(self) -> str:
         return f'{self.product.name} : {str(self.id)}'
     
-    def add_item(self):
-        self.num_item += 1
-        self.total_price += self.product.sale_price
-        self.save()
+    # def add_item(self):
+    #     self.num_item += 1
+    #     self.total_price += self.product.sale_price
+    #     self.save()
     
-    def sub_item(self):
-        self.num_item -= 1
-        self.total_price -= self.product.sale_price
-        self.save()
+    # def sub_item(self):
+    #     self.num_item -= 1
+    #     self.total_price -= self.product.sale_price
+    #     self.save()
 
     @property
     def total_price_of_item(self):
-        return (self.num_item * self.product.sale_price)
+        return (int(self.num_item) * float(self.sale_price))
     
-    def add_num_item(self):
-        self.num_item  +=1
-        self.save()
+    # def add_num_item(self):
+    #     self.num_item  +=1
+    #     self.save()
     
     # def get
 

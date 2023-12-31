@@ -364,7 +364,18 @@ class IncomingProductsSerializer(serializers.ModelSerializer):
         model = Incoming_Product
         fields = '__all__'
 
-
+class IncomingSerializer2(serializers.ModelSerializer):
+    products = ProductSerializer(many=True, read_only=True)
+    class Meta:
+        model = Incoming
+        fields = '__all__'
+    def to_representation(self, instance):
+        reper = super().to_representation(instance)
+        reper['supplier'] = instance.supplier.name
+        reper['employee'] = instance.employee.name
+        return reper
+    
+    
 class ManualRecieptSerializer(serializers.ModelSerializer):
     class Meta:
         model = ManualReceipt
@@ -420,6 +431,10 @@ class DelevaryArrivedSerializer(serializers.ModelSerializer):
         model = DelevaryArrived
         fields = '__all__'
 
+    # def to_representation(self, instance):
+    #     reper = super().to_representation(instance)\
+        
+
 
 # --------------------------------------CREATE MEDIUM--------------------------------------
 class MediumSerializer(serializers.ModelSerializer):
@@ -440,9 +455,33 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
         return repr
 
 class UpdateProductMediumSerializer(serializers.ModelSerializer):
+    medium = serializers.CharField()
+    product = serializers.CharField()
     class Meta:
         model = Products_Medium
-        fields = ['discount']
+        fields = '__all__'
+
+    def update(self, instance, validated_data):
+        medium_id = validated_data.pop('medium')
+        medium = Medium.objects.get(id=medium_id)
+        product_id = validated_data.pop('product')
+        product = Product.objects.get(id=product_id)
+        instance.product = product
+        instance.medium = medium
+        instance.sale_price = validated_data.get('sale_price', instance.sale_price)
+        instance.num_item = validated_data.get('num_item', instance.num_item)
+        instance.total_price = instance.sale_price * instance.num_item
+        instance.save()
+
+        return instance
+    
+    # def to_representation(self, instance):
+    #     repr = super().to_representation(instance)
+    #     repr['num_per_item '] = instance.product.num_per_item
+    #     repr['sale_price'] = instance.product.sale_price
+    #     repr['product'] = instance.product.name
+    #     return repr
+    
 # ------------------------------------------RETURNED GOODS------------------------------------------
     
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):

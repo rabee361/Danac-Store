@@ -40,14 +40,15 @@ urlpatterns = [
     path('sxtraexpences/', ListCreateExpenceView.as_view(), name='extra-expence'),
     path('extraexpences/<str:pk>/', RetUpdDesExpenceView.as_view(), name='get-extra-expence'),
     path('search/product/', SearchView.as_view(), name='search-product'),
-    path('add-product-to-cart/', ListCreateCartProduct.as_view(), name='add-pro-to-cart'),
+    path('add-product-to-cart/<str:pk>/', ListCreateCartProduct.as_view(), name='add-pro-to-cart'),
     path('list-product-cart/<str:pk>/', DesUpdCartProducts.as_view(), name='list-product-cart'),
     path('create-medium/', CreateMedium.as_view()),
     path('delete-medium/<str:pk>/', RetDesMedium.as_view()),
     path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),
-    path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),
+    # path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),
     path('delete-product-from-medium/<str:pk>/', DeleteProductsMediumView.as_view()),
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),
+    path('list-incoming/<str:pk>/', ListIncoming.as_view()),
 
     # _____________________________________________CREATE RECEIPT________________________________________
 

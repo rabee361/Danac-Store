@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'base',
     'django_twilio',
     'fcm_django',
-    # 'admin_reorder',
+
 ]
 
 REST_FRAMEWORK = {
