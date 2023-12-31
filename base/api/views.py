@@ -804,7 +804,9 @@ class CreateMediumForOrderView(APIView):
         serializer = MediumSerializer(medium,many=False)
         return Response(serializer.data,status=status.HTTP_200_OK)
        
-
+class DeleteProductsMediumView(RetrieveDestroyAPIView):
+    queryset = Products_Medium.objects.all()
+    serializer_class = ProductsMediumSerializer
  
 
  ##################################################RECEIPTS ######################################################################
@@ -1081,6 +1083,11 @@ class ListManualReceipt(ListAPIView):
     queryset = ManualReceipt.objects.all()
     serializer_class = ManualRecieptSerializer2
 
+
+
+class UpdateManualReceipt(RetrieveUpdateAPIView):
+    queryset = ManualReceipt.objects.all()
+    serializer_class = ManualRecieptSerializer
 
 
 

@@ -645,12 +645,27 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
         repr['product'] = instance.product.name
         return repr
 
+
 class UpdateProductMediumSerializer(serializers.ModelSerializer):
+    medium = serializers.CharField()
+    product = serializers.CharField()
     class Meta:
         model = Products_Medium
-        fields = ['discount']
+        fields = '__all__'
 
+    def update(self, instance, validated_data):
+        medium_id = validated_data.pop('medium')
+        medium = Medium.objects.get(id=medium_id)
+        product_id = validated_data.pop('product')
+        product = Product.objects.get(id=product_id)
+        instance.product = product
+        instance.medium = medium
+        instance.price = validated_data.get('price', instance.price)
+        instance.num_item = validated_data.get('num_item', instance.num_item)
+        instance.total_price = instance.price * instance.num_item
+        instance.save()
 
+        return instance
 
 ######################################## RETURNED GOODS #####################################################################
 
