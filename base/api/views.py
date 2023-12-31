@@ -365,7 +365,7 @@ class Add_To_Medium(APIView):
         medium_products, created = Products_Medium.objects.get_or_create(
             product=product,
             medium=medium,
-            sale_price = request.data['sale_price'],
+            price = request.data['price'],
             num_item = request.data['quantity'],
             )
         medium_products.total_price = medium_products.total_price_of_item
@@ -406,7 +406,7 @@ class CreateIncomingView(APIView):
                     num_item = product.num_item,
                     total_price = product.total_price,
                 )
-            products.delete()
+            Medium.objects.get(id=medium_id).delete()
             return Response(incoming_serializer.data)
         return Response(incoming_serializer.errors)
 
@@ -490,7 +490,8 @@ class CreateMediumForOrderView(APIView):
                 product = product.products,
                 medium = medium,
                 num_item=product.quantity,
-                total_price=product.total_price
+                total_price=product.total_price,
+                price = product.products.sale_price
             )
         return Response(status=status.HTTP_200_OK)
         
@@ -498,7 +499,6 @@ class ReceiptOrdersView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, medium_id):
-        # manual_reciept = request.data
         client_id = request.data['client']
         client = Client.objects.filter(id=client_id).first()
         employee = Employee.objects.get(phonenumber=request.user.phonenumber)
@@ -543,7 +543,7 @@ class ReceiptOrdersView(APIView):
                     products = product.product,
                     output = output,
                     quantity = product.num_item,
-                    discount = product.discount,
+                    discount = product.price,
                     total = product.total_price
                 )
             products.delete()

@@ -468,9 +468,9 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
         product = Product.objects.get(id=product_id)
         instance.product = product
         instance.medium = medium
-        instance.sale_price = validated_data.get('sale_price', instance.sale_price)
+        instance.price = validated_data.get('price', instance.price)
         instance.num_item = validated_data.get('num_item', instance.num_item)
-        instance.total_price = instance.sale_price * instance.num_item
+        instance.total_price = instance.price * instance.num_item
         instance.save()
 
         return instance
