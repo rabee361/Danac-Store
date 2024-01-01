@@ -833,9 +833,11 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
 ########################################## OUTPUT ##############################################
         
 class OutputSerializer(serializers.ModelSerializer):
+    client_name = serializers.CharField(source='client.name',read_only=True)
+    address = serializers.CharField(source='client.address',read_only=True)
     class Meta:
         model = Output
-        fields = '__all__'
+        fields = ['id','client','client_name','address','products','employee','verify_code','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered']
     
 
 
