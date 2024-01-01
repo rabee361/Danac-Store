@@ -885,15 +885,17 @@ class DelevaryArrivedSerializer(serializers.ModelSerializer):
 
 
 class GetProductsOutputsSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(source='products.image',read_only=True)
     class Meta:
         model = Output_Products
-        fields = ['products', 'quantity', 'total', 'discount']
+        fields = ['products', 'quantity', 'total', 'discount','image']
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['num_per_item '] = instance.products.num_per_item
         repr['sale_price'] = instance.products.sale_price
         repr['product'] = instance.products.name
+        repr['image'] = self.context['request'].build_absolute_uri(instance.products.image.url)
         return repr
 
 

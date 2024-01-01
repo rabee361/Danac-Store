@@ -943,7 +943,7 @@ class GetDelevaryArrivedForEmployee(APIView):
         output = Output.objects.filter(id=delevary_arrived.output_receipt.id).first()
         print(output.id)
         products = Output_Products.objects.filter(output__id= output.id)
-        products_serializer = GetProductsOutputsSerializer(products, many=True)
+        products_serializer = GetProductsOutputsSerializer(products, many=True, context={'request': request})
         receipt_serializer = OutputSerializer(output)
         return Response({'receipt':receipt_serializer.data, 'products':products_serializer.data , 'is_delivered':serializer.data['is_delivered']})
 
@@ -1031,7 +1031,7 @@ class CreateManualReceiptView(APIView):
             "verify_code": request.data['verify_code'],
             "phonenumber":request.data['phonenumber'], 
             "recive_payment": request.data['recive_payment'],
-            "discount":request.data['discount'],
+            "discount":request.data['discount'],############
             "reclaimed_products": request.data['reclaimed_products'],
             "previous_depts": request.data['previous_depts'],
             "remaining_amount":request.data['remaining_amount'],
@@ -1065,7 +1065,7 @@ class CreateManualReceiptView(APIView):
                     product = product.product,
                     manualreceipt = manual_receipt,
                     num_item = product.num_item,
-                    discount=product.discount,
+                    discount=product.discount,###########
                     total_price = product.total_price,
                 )
             products.delete()
