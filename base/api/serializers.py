@@ -673,9 +673,9 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
 
 
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
-    client_id = serializers.IntegerField(source='client.id')
-    product_id = serializers.IntegerField(source='product.id')
-    employee_id = serializers.IntegerField(source='employee.id')
+    client_id = serializers.IntegerField(source='client.id',read_only=True)
+    product_id = serializers.IntegerField(source='product.id',read_only=True)
+    employee_id = serializers.IntegerField(source='employee.id',read_only=True)
     class Meta:
         model = ReturnedGoodsClient
         fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason','date']
