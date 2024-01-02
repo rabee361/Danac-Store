@@ -649,15 +649,16 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
 class UpdateProductMediumSerializer(serializers.ModelSerializer):
     medium = serializers.CharField()
     product = serializers.CharField()
+    product_id = serializers.IntegerField(source='product.id',read_only=True)
     class Meta:
         model = Products_Medium
-        fields = '__all__'
+        fields = ['id','medium','product','product_id','price','num_item','total_price']
 
     def update(self, instance, validated_data):
         medium_id = validated_data.pop('medium')
         medium = Medium.objects.get(id=medium_id)
-        product_id = validated_data.pop('product')
-        product = Product.objects.get(id=product_id)
+        my_id = validated_data.pop('product')
+        product = Product.objects.get(id=my_id)
         instance.product = product
         instance.medium = medium
         instance.price = validated_data.get('price', instance.price)
@@ -822,7 +823,7 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
     client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
     class Meta:
         model = ManualReceipt
-        fields = ['id','client','client_phone','employee','verify_code','phonenumber','recive_payment','discount','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','client','client_phone','employee','verify_code','phonenumber','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
         
     def to_representation(self, instance):
         repr = super().to_representation(instance)

@@ -751,23 +751,23 @@ class Add_To_Medium(APIView):
 
 
 
-class Medium_Handler(APIView):
-    def post(self, request, pk, pk2):
-        item = Products_Medium.objects.get(id=pk)
-        if pk2 == 'add':
-            item.add_item()
-            serializer = ProductsMediumSerializer(item,many=False)
-            return Response(serializer.data)
-        else:
-            if item.num_item == 1:
-                # item.sub_item()
-                item.delete()
-            else:
-                item.sub_item()
+# class Medium_Handler(APIView):
+#     def post(self, request, pk, pk2):
+#         item = Products_Medium.objects.get(id=pk)
+#         if pk2 == 'add':
+#             item.add_item()
+#             serializer = ProductsMediumSerializer(item,many=False)
+#             return Response(serializer.data)
+#         else:
+#             if item.num_item == 1:
+#                 # item.sub_item()
+#                 item.delete()
+#             else:
+#                 item.sub_item()
                 
 
-            serializer = ProductsMediumSerializer(item,many=False)
-        return Response(serializer.data)
+#             serializer = ProductsMediumSerializer(item,many=False)
+#         return Response(serializer.data)
     
 
 class GetMediumView(RetrieveAPIView):
@@ -1031,7 +1031,7 @@ class CreateManualReceiptView(APIView):
             "verify_code": request.data['verify_code'],
             "phonenumber":request.data['phonenumber'], 
             "recive_payment": request.data['recive_payment'],
-            "discount":request.data['discount'],############
+            # "discount":request.data['discount'],############
             "reclaimed_products": request.data['reclaimed_products'],
             "previous_depts": request.data['previous_depts'],
             "remaining_amount":request.data['remaining_amount'],
@@ -1065,7 +1065,7 @@ class CreateManualReceiptView(APIView):
                     product = product.product,
                     manualreceipt = manual_receipt,
                     num_item = product.num_item,
-                    discount=product.discount,###########
+                    # discount=product.discount,###########
                     total_price = product.total_price,
                 )
             products.delete()

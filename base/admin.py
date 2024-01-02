@@ -201,7 +201,7 @@ class IncomingAdmin(admin.ModelAdmin):
 
 
 class ManualReceiptProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'num_manul_receipt', 'name_client', 'discount', 'num_item', 'total_price']
+    list_display = ['id', 'name_product', 'num_manul_receipt', 'name_client', 'num_item', 'total_price']
     search_fields = ['manualreceipt__client__name']
     def name_product(self, obj):
         return obj.product.name

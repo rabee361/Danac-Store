@@ -708,7 +708,7 @@ class ManualReceipt(models.Model):
     verify_code = models.IntegerField()
     phonenumber = PhoneNumberField(region='DZ')
     recive_payment = models.FloatField()
-    discount = models.FloatField()
+    # discount = models.FloatField()
     reclaimed_products = models.FloatField()#####
     previous_depts = models.FloatField()#####
     remaining_amount = models.FloatField(default=0)
@@ -723,7 +723,7 @@ class ManualReceipt(models.Model):
 class ManualReceipt_Products(models.Model):
     product = models.ForeignKey(Product, on_delete= models.CASCADE)
     manualreceipt = models.ForeignKey(ManualReceipt, on_delete= models.CASCADE)
-    discount = models.FloatField()
+    # discount = models.FloatField()
     num_item = models.IntegerField(default=0)
     total_price = models.FloatField(default=0)
 
