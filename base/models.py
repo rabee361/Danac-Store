@@ -144,7 +144,7 @@ class Product(models.Model):
     item_per_carton = models.IntegerField()
     sale_price = models.IntegerField(default=50)
     added = models.DateTimeField(auto_now_add=True)
-    barcode = models.CharField(max_length=200,default=' ')
+    barcode = models.CharField(max_length=200,default=' ',blank=True,null=True)
     class Meta:
         ordering = ['-added']
 
