@@ -12,6 +12,7 @@ from datetime import timedelta
 from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
 
+
 class UserType(models.Model):
     user_type = models.CharField(max_length=20)
 
@@ -106,12 +107,15 @@ class Notifications(models.Model):
 
 
 
+def get_expiration_time():
+    return timezone.now() + timedelta(minutes=10)
+
 class CodeVerification(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     is_verified = models.BooleanField(default=False)
     code = models.IntegerField(validators=[MinValueValidator(1000), MaxValueValidator(9999)])
     created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField(default=timezone.now() + timedelta(minutes=10))
+    expires_at = models.DateTimeField(default=get_expiration_time)
 
     def __str__(self):
         return f'{self.user.username} code:{self.code}'
@@ -596,21 +600,25 @@ class Medium(models.Model):
 class Products_Medium(models.Model):
     medium = models.ForeignKey(Medium, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    price = models.FloatField(default=0)
+    price = models.FloatField(null=True,blank=True)
     num_item = models.IntegerField(default=0)
     total_price = models.FloatField(default=0)
 
     def __str__(self) -> str:
         return f'{self.product.name} : {str(self.id)}'
     
-
     @property
     def total_price_of_item(self):
-        return (self.num_item * self.product.sale_price)
+        return (self.num_item * self.price)
     
     def add_num_item(self):
         self.num_item  +=1
         self.save()
+
+    def save(self, *args, **kwargs):
+        if self.price is None:
+            self.price = self.product.sale_price
+        super().save(*args, **kwargs)
     
 
 
@@ -715,21 +723,25 @@ class ManualReceipt(models.Model):
     date = models.DateField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
 
-
     def __str__(self) -> str:
         return f'{self.client.name} - {str(self.id)}'
     
+    class Meta:
+        ordering = ['-date']
 
-class ManualReceipt_Products(models.Model):
+
+
+
+class ManualReceipt_Products(models.Model): 
     product = models.ForeignKey(Product, on_delete= models.CASCADE)
     manualreceipt = models.ForeignKey(ManualReceipt, on_delete= models.CASCADE)
-    # discount = models.FloatField()
+    price = models.FloatField()
     num_item = models.IntegerField(default=0)
     total_price = models.FloatField(default=0)
 
     def __str__(self) -> str:
         return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
-
+    
 
 
 

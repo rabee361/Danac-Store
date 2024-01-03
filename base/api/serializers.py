@@ -638,7 +638,7 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField(source='product.id',read_only=True)
     class Meta:
         model = Products_Medium
-        fields = ['id','medium','product','product_id','price','num_item','total_price']
+        fields = ['id','medium','product','product_id','price','num_item','total_price_of_item']
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['num_per_item'] = instance.product.num_per_item
@@ -652,7 +652,7 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
     product = serializers.CharField()
     class Meta:
         model = Products_Medium
-        fields = ['id','medium','product','price','num_item','total_price']
+        fields = ['id','medium','product','price','num_item','total_price_of_item']
 
     def update(self, instance, validated_data):
         medium_id = validated_data.pop('medium')
