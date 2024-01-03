@@ -25,7 +25,7 @@ class CustomUser(AbstractUser):
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='images/users', null=True)
+    image = models.ImageField(upload_to='images/users', null=True,default='images/account.jpg')
     location = models.PointField(default=Point(0,0))
     user_type = models.ForeignKey(UserType,on_delete=models.CASCADE,null=True)
     is_accepted = models.BooleanField(default=False)
