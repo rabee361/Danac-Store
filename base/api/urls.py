@@ -44,19 +44,18 @@ urlpatterns = [
     path('list-product-cart/<str:pk>/', DesUpdCartProducts.as_view(), name='list-product-cart'),
     path('create-medium/', CreateMedium.as_view()),
     path('delete-medium/<str:pk>/', RetDesMedium.as_view()),
-    path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),
-    # path('medium-handler-quantity/<str:pk>/<str:pk2>/', Medium_Handler.as_view()),
+    path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),#####
     path('delete-product-from-medium/<str:pk>/', DeleteProductsMediumView.as_view()),
-    path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),
+    path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),#####
     path('list-incoming/<str:pk>/', ListIncoming.as_view()),
 
     # _____________________________________________CREATE RECEIPT________________________________________
 
     path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
     path('get-product-for-receipt-output/<str:output_id>/', GetProductsOutputsView.as_view()),
-    path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),
-    path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),
-    path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), ################################
+    path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),#####
+    path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),#####
+    path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), #####
     path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),
     # _____________________________________________RETURNED PRODUCTS________________________________________
 
@@ -75,9 +74,9 @@ urlpatterns = [
     path('delete-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
     path('put-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
 
-# ------------------------------------------DAMAGED PRODUCTS------------------------------------------
-    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),###################
-    path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),######################
+# ------------------------------------------------------------------------------------
+    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),#####
+    path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived-for-employee/<str:state>/', DelevaryArrivedForEmployee.as_view()),
     path('get/<str:pk>/', GetDelevaryArrivedForEmployee.as_view()),
@@ -91,9 +90,6 @@ urlpatterns = [
     path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
     path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view()),
     path('delete-medium-two/<str:pk>/', DeleteMediumTwo.as_view()),
-
-
-    ####################################################
     path('get-notification/', GetNotificationView.as_view()),
 
 ]

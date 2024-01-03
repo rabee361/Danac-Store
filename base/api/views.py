@@ -79,15 +79,14 @@ class ListInformationUserView(RetrieveAPIView):
     serializer_class= CustomUserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-#################################### 
 class ResetPasswordView(UpdateAPIView):
     serializer_class = ResetPasswordSerializer
     
     def put(self, request, user_id):
         user = CustomUser.objects.get(id=user_id)
         try:
-            ver_user = user.codeverivecation_set.filter(user__id=user_id).first()#######
-            if ver_user.is_verified:########
+            ver_user = user.codeverivecation_set.filter(user__id=user_id).first()
+            if ver_user.is_verified:
                 data = request.data
                 serializer = self.get_serializer(data=data, context={'user_id':user_id})
                 serializer.is_valid(raise_exception=True)
@@ -98,7 +97,7 @@ class ResetPasswordView(UpdateAPIView):
                 ver_user.delete()
                 return Response(messages, status=status.HTTP_200_OK)
             else:
-                return Response({'error':'please verivecation code'})############
+                return Response({'error':'please verivecation code'})
         except:
             return Response({'message':'ليس لديك صلاحية لتغيير كبمة المرور'})
 
@@ -111,7 +110,7 @@ class LogoutAPIView(GenericAPIView):
         serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-########################################################
+
 class GetPhonenumberView(APIView):
     # serializer_class = CustomUserSerializer
     def post(self, request):
@@ -130,7 +129,7 @@ class GetPhonenumberView(APIView):
             serializer = CodeVerivecationSerializer(data ={
                 'user':user.id,
                 'code':code_verivecation,
-                'is_verified':False ###########
+                'is_verified':False 
             })
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -139,7 +138,6 @@ class GetPhonenumberView(APIView):
             raise serializers.ValidationError({'error':'pleace enter valid email'})
 
 
-# ##############################
 class VerifyCodeView(APIView):
     def post(self, request):
         code = request.data['code']
@@ -148,8 +146,8 @@ class VerifyCodeView(APIView):
             if timezone.now() > code_ver.expires_at:
                 
                 return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
-            code_ver.user.is_verified = True#####
-            code_ver.user.save()######
+            code_ver.user.is_verified = True
+            code_ver.user.save()
             return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
         else:
             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
@@ -176,10 +174,6 @@ class ListCreatCategoryView(ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-
-# class retrieveUpdateDestroyCategoryView(RetrieveUpdateDestroyAPIView):
-
-
 class ListCreateProductView(ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -190,12 +184,9 @@ class GetUdpDesProductView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-
 class UserListView(ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
-
 
 class CartProducts(ListAPIView):
     permission_classes = [IsAuthenticated]
@@ -205,7 +196,6 @@ class CartProducts(ListAPIView):
     def get_queryset(self):
         client = Client.objects.get(id=1)
         return Cart_Products.objects.filter(cart__customer=client)
-
 
 class ListPointsView(GenericAPIView):
     permission_classes = [permissions.IsAuthenticated, Is_Client]
@@ -230,11 +220,9 @@ class ListCreateSupplierView(ListCreateAPIView):
     serializer_class= SupplierSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
-
 class GetSupplier(RetrieveUpdateDestroyAPIView):
     queryset = Supplier.objects.all()
     serializer_class= SupplierSerializer
-
 
 class ListOrdersUserView(GenericAPIView):
     serializer_class = OrderSerializer
@@ -349,14 +337,13 @@ class RetUpdDesExpenceView(RetrieveUpdateDestroyAPIView):
     queryset = Extra_Expense.objects.all()
     serializer_class = ExpenseSerializer
 
-
 class SearchView(ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilterName
 
-
+####################################
 class Add_To_Medium(APIView):
 
     def post(self, request, medium_id, product_id):
@@ -373,6 +360,7 @@ class Add_To_Medium(APIView):
         pro_med_serializer = ProductsMediumSerializer(medium_products)
         return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
 
+##################################
 class CreateIncomingView(APIView):
 
     def post(self, request, medium_id):
@@ -473,13 +461,12 @@ class CreateMedium(APIView):
     def post(self, request):
         medium = Medium.objects.create()
         return Response(status=status.HTTP_200_OK)
-    
 
 class RetDesMedium(RetrieveDestroyAPIView):
     queryset = Medium.objects.all()
     serializer_class = MediumSerializer
 
-
+###################
 class CreateMediumForOrderView(APIView):
     def post(self, request, order_id):
         order = Order.objects.get(id=order_id)
@@ -494,7 +481,8 @@ class CreateMediumForOrderView(APIView):
                 price = product.products.sale_price
             )
         return Response(status=status.HTTP_200_OK)
-        
+
+###########################################
 class ReceiptOrdersView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -550,7 +538,6 @@ class ReceiptOrdersView(APIView):
             return Response(output_serializer.data)
         return Response(output_serializer.errors)
     
-############
 class ListCreateDeliveryArrived(APIView):
 
     def post(self, request, pk):
@@ -587,8 +574,7 @@ class ListCreateDeliveryArrived(APIView):
             print(delivery.output_receipt)
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=True)
         return Response(del_arr_serializer.data)
-    
-#################
+
 class DelevaryArrivedForEmployee(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -604,7 +590,6 @@ class DelevaryArrivedForEmployee(APIView):
         serializer = DelevaryArrivedSerializer(delevary_arrived, many=True)
         return Response({'data':serializer.data, 'products':List_products}, status=status.HTTP_200_OK)
     
-#####################
 class GetDelevaryArrivedForEmployee(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -618,7 +603,6 @@ class GetDelevaryArrivedForEmployee(APIView):
         receipt_serializer = GetOutputsSerializer(output)
         return Response({'receipt':receipt_serializer.data, 'products':products_serializer.data , 'is_delivered':serializer.data['is_delivered']})
     
-#################################
 class AcceptDelevaryArrived(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -628,24 +612,11 @@ class AcceptDelevaryArrived(APIView):
         delevary_arrived.save()
         return Response(status=status.HTTP_200_OK)
 
-# class Medium_Handler(APIView):
-#     def post(self, request, pk, pk2):
-#         item = Products_Medium.objects.get(id=pk)
-#         if pk2 == 'add':
-#             item.add_item()
-#             serializer = ProductsMediumSerializer(item,many=False)
-#             return Response(serializer.data)
-#         else:
-#             item.sub_item()
-#             if item.num_item == 1:
-#                 item.delete()
-#             serializer = ProductsMediumSerializer(item,many=False)
-#         return Response(serializer.data)
-    
 class DeleteProductsMediumView(RetrieveDestroyAPIView):
     queryset = Products_Medium.objects.all()
     serializer_class = ProductsMediumSerializer
 
+######################
 class UpdateProductsMedium(UpdateAPIView):
     queryset = Products_Medium.objects.all()
     serializer_class = UpdateProductMediumSerializer
@@ -772,6 +743,7 @@ class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
 
 # -------------------------------------MANUAL RECEIPT-------------------------------------
     
+#############################################
 class CreateManualReceiptView(APIView):
 
     def post(self, request, medium_id):
@@ -818,7 +790,7 @@ class CreateManualReceiptView(APIView):
                     product = product.product,
                     manualreceipt = manual_receipt,
                     num_item = product.num_item,
-                    discount=product.sale_price,
+                    discount=product.price,
                     total_price = product.total_price,
                 )
             products.delete()

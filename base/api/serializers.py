@@ -62,7 +62,6 @@ class SignUpSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-################################
 class ResetPasswordSerializer(serializers.ModelSerializer):
 
     newpassword = serializers.CharField(style={"input_type":"password"}, write_only=True)
@@ -453,7 +452,8 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
         repr['sale_price'] = instance.product.sale_price
         repr['product'] = instance.product.name
         return repr
-
+    
+####################################################
 class UpdateProductMediumSerializer(serializers.ModelSerializer):
     medium = serializers.CharField()
     product = serializers.CharField()
@@ -474,13 +474,6 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-    
-    # def to_representation(self, instance):
-    #     repr = super().to_representation(instance)
-    #     repr['num_per_item '] = instance.product.num_per_item
-    #     repr['sale_price'] = instance.product.sale_price
-    #     repr['product'] = instance.product.name
-    #     return repr
     
 # ------------------------------------------RETURNED GOODS------------------------------------------
     
