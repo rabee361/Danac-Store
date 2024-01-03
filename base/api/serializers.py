@@ -526,11 +526,11 @@ class DepositeSerializer(serializers.ModelSerializer):
         return Deposite.get_total_sum()
     
     def create(self, validated_data):
-        withdraw = Deposite.objects.create(**validated_data)
+        deposite = Deposite.objects.create(**validated_data)
         registry = Registry.objects.first() 
-        registry.total -= withdraw.total
+        registry.total += deposite.total
         registry.save() 
-        return withdraw
+        return deposite
 
     def update(self, instance, validated_data):
         difference = validated_data.get('total', instance.total) - instance.total
