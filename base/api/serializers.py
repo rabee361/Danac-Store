@@ -536,7 +536,7 @@ class DepositeSerializer(serializers.ModelSerializer):
         difference = validated_data.get('total', instance.total) - instance.total
         instance = super().update(instance, validated_data)
         registry = Registry.objects.first()
-        registry.total -= difference
+        registry.total += difference
         registry.save()
         return instance
     
