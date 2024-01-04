@@ -19,6 +19,7 @@ urlpatterns = [
     path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
 
     path('update-location/' , UpdateLocationView.as_view() , name="update-location"),#### new 
+    path('get-location/' , GetSalesEmployeeLocation.as_view() , name="get-location"),
 
     path('clients/' , ListCreateClient.as_view() , name="clients"),######
     path('total-points/', TotalClientPointsView.as_view(), name='total-points'),

@@ -222,6 +222,18 @@ class UpdateLocationView(APIView):
 
 
 
+class GetSalesEmployeeLocation(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        employee_id = request.data['employee_id']
+        employee = Employee.objects.get(id=employee_id)
+        serializer = SalesEmployeeLocationSerializer(employee,many=False)
+
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+
+
 
 ######################################### CART & PRODUCTS ##########################################################################
 

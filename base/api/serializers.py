@@ -353,6 +353,21 @@ class SalesEmployeeSerializer(serializers.ModelSerializer):
 
 
 
+class SalesEmployeeLocationSerializer(serializers.ModelSerializer):
+    longitude = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+    class Meta:
+        model = Employee
+        fields = ['longitude','latitude']
+
+    def get_longitude(self, obj):
+        return obj.location.x
+
+    def get_latitude(self, obj):
+        return obj.location.y
+
+
+
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
@@ -431,7 +446,7 @@ class EmployeeSalarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id','job_position','name', 'salary','sale_percentage']
+        fields = ['id','job_position','name','phonenumber' ,'salary','sale_percentage']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
