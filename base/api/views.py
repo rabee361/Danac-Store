@@ -216,7 +216,9 @@ class UpdateLocationView(APIView):
         employee.location = Point(float(x), float(y))
         employee.save()
 
-        return Response({"message": "Location updated successfully."}, status=status.HTTP_200_OK)
+        return Response({"message": "Location updated successfully.",
+                         "longitude" : employee.location.x ,
+                         "latitude" : employee.location.y}, status=status.HTTP_200_OK)
 
 
 
