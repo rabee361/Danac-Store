@@ -210,7 +210,7 @@ class UpdateLocationView(APIView):
         if x is None or y is None:
             return Response({"error": "Both 'longitude' and 'latitude' coordinates are required."}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            employee = Employee.objects.get(id=user.id)
+            employee = Employee.objects.get(phonenumber=user.phonenumber)
         except Employee.DoesNotExist:
             return Response({"error": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
         employee.location = Point(float(x), float(y))
@@ -428,7 +428,7 @@ class AcceptDelevaryArrived(APIView):
 
 
 class GetOrder(RetrieveAPIView):
-    queryset = Order.objects.all() 
+    queryset = Order.objects.all()
     serializer_class = OrderSerializer2
 
 
