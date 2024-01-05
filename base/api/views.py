@@ -855,7 +855,7 @@ class ReceiptOrdersView(APIView):
         employee = Employee.objects.get(phonenumber=request.user.phonenumber)
         output_serializer = OutputSerializer2(data={
             'employee':employee.id,
-            "client": client.id,
+            "client": client_id,
             "verify_code": request.data['verify_code'],
             "recive_pyement": request.data['recive_pyement'],
             "phonenumber":request.data['phonenumber'], 
