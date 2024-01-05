@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated  ,AllowAny
 from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
-from base.filters import ProductFilter , PointFilter
+from base.filters import ProductFilter ,SalaryFilter
 import random
 from django.shortcuts import get_object_or_404
 from django.db.models import F
@@ -618,6 +618,8 @@ class GetSalaryEmployee(RetrieveAPIView):
 class ListCreateSalary(ListCreateAPIView):
     queryset = Salary.objects.all()
     serializer_class = SalarySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = SalaryFilter
 
 class RetUpdDesSalary(RetrieveUpdateDestroyAPIView):
     queryset = Salary.objects.all()

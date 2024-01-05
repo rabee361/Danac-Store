@@ -548,17 +548,20 @@ class DepositeSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         deposite = Deposite.objects.create(**validated_data)
-        registry = Registry.objects.first() 
+        registry = Registry.objects.first()
         registry.total += deposite.total
-        registry.save() 
+        registry.save()
         return deposite
 
     def update(self, instance, validated_data):
         difference = validated_data.get('total', instance.total) - instance.total
-        instance = super().update(instance, validated_data)
-        registry = Registry.objects.first()
-        registry.total += difference
-        registry.save()
+        if instance.total - difference >= 0:
+            instance = super().update(instance, validated_data)
+            registry = Registry.objects.first()
+            registry.total += difference
+            registry.save()
+        else:
+            raise serializers.ValidationError("Total cannot be less than 0")
         return instance
     
     def to_representation(self, instance):
@@ -592,10 +595,13 @@ class WithDrawSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         difference = validated_data.get('total', instance.total) - instance.total
-        instance = super().update(instance, validated_data)
-        registry = Registry.objects.first()
-        registry.total -= difference
-        registry.save()
+        if instance.total - difference >= 0:
+            instance = super().update(instance, validated_data)
+            registry = Registry.objects.first()
+            registry.total -= difference
+            registry.save()
+        else:
+            raise serializers.ValidationError("Total cannot be less than 0")
         return instance
     
     def to_representation(self, instance):
@@ -697,10 +703,28 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     product_id = serializers.IntegerField(source='product.id',read_only=True)
     employee_id = serializers.IntegerField(source='employee.id',read_only=True)
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     class Meta:
         model = ReturnedGoodsClient
         fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason','date']
 
+    def update(self, instance, validated_data):
+        original_quantity = instance.quantity
+        super().update(instance, validated_data)
+        quantity_diff = original_quantity - instance.quantity
+        product = instance.product
+        product.quantity += quantity_diff
+        product.save()
+
+        return instance
+    
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        product = instance.product
+        product.quantity -= instance.quantity
+        product.save()
+
+        return instance
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['product'] = instance.product.name
@@ -717,7 +741,24 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReturnedGoodsSupplier
         fields = ['id', 'supplier', 'product', 'employee', 'quantity', 'total_price', 'reason', 'date']
+
+    def update(self, instance, validated_data):
+        original_quantity = instance.quantity
+        super().update(instance, validated_data)
+        quantity_diff = original_quantity - instance.quantity
+        product = instance.product
+        product.quantity += quantity_diff
+        product.save()
+
+        return instance
     
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        product = instance.product
+        product.quantity -= instance.quantity
+        product.save()
+
+        return instance    
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['product'] = instance.product.name
@@ -867,10 +908,12 @@ class ProductsOutputSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='products.name')
     num_per_item = serializers.IntegerField(source='products.num_per_item')
     sale_price = serializers.FloatField(source='products.sale_price')
+    num_item = serializers.IntegerField(source='quantity',read_only=True)
+    total_price = serializers.FloatField(source='total',read_only=True)
 
     class Meta:
         model = Output_Products
-        fields = ['id', 'name', 'num_per_item', 'sale_price', 'quantity', 'total', 'discount', 'output']
+        fields = ['id', 'name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'discount', 'output']
 
 
 class OutputSerializer2(serializers.ModelSerializer):

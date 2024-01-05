@@ -1,5 +1,7 @@
 import django_filters
-from .models import Product
+from .models import Product ,Salary
+from django_filters import rest_framework as filters
+from datetime import datetime
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -13,11 +15,16 @@ class ProductFilter(django_filters.FilterSet):
 
 
 
+class MonthFilter(filters.Filter):
+    def filter(self, qs, value):
+        if value:
+            date = datetime.strptime(value, "%Y-%m")
+            return qs.filter(date__year=date.year, date__month=date.month)
+        return qs
 
-class PointFilter(django_filters.FilterSet):
-    is_used = django_filters.BooleanFilter(field_name="is_used")
+class SalaryFilter(django_filters.FilterSet):
+    date = MonthFilter(field_name="date")
 
     class Meta: 
-        model = Product
-        fields = ['is_used']
-
+        model = Salary
+        fields = ['date']
