@@ -132,17 +132,17 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='images/products')
-    description = models.TextField(max_length=2000)
+    image = models.ImageField(upload_to='images/products',null=True,blank=True)
+    description = models.TextField(max_length=2000,null=True,blank=True)
     quantity = models.IntegerField()
     purchasing_price = models.FloatField()
     category = models.ForeignKey(Category , on_delete=models.CASCADE)
-    notes = models.TextField(max_length=1000)
-    limit_less = models.IntegerField(default=0)
-    limit_more = models.IntegerField(default=0)
+    notes = models.TextField(max_length=1000,null=True,blank=True)
+    limit_less = models.IntegerField()
+    limit_more = models.IntegerField()
     num_per_item = models.IntegerField(null=True,blank=True)
     item_per_carton = models.IntegerField(null=True,blank=True)
-    sale_price = models.IntegerField(default=50)
+    sale_price = models.IntegerField()
     added = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200,default=' ',blank=True,null=True)
     class Meta:
@@ -556,7 +556,7 @@ class ReturnedGoodsSupplier(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
-    reason = models.CharField(max_length=50)
+    reason = models.CharField(max_length=50,null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
@@ -568,7 +568,7 @@ class ReturnedGoodsClient(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
-    reason = models.CharField(max_length=50)
+    reason = models.CharField(max_length=50,null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
@@ -640,7 +640,7 @@ class Incoming(models.Model):
     discount = models.FloatField(null=True,blank=True,default=0.0)
     Reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)
     previous_depts = models.FloatField(null=True,blank=True,default=0.0)
-    remaining_amount = models.FloatField(null=True,blank=True,default=0.0)
+    remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
 
@@ -714,10 +714,9 @@ class ManualReceipt(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     verify_code = models.IntegerField()
     phonenumber = PhoneNumberField(region='DZ')
-    recive_payment = models.FloatField()
     reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)#####
     previous_depts = models.FloatField(null=True,blank=True,default=0.0)#####
-    remaining_amount = models.FloatField(null=True,blank=True,default=0.0)
+    remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
 

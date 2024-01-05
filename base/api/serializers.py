@@ -854,9 +854,15 @@ class IncomingSerializer2(serializers.ModelSerializer):
 class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Incoming
-        fields = '__all__'
-    
+        exclude = ['employee']
 
+    def create(self, validated_data):
+        request = self.context.get('request')
+        supplier_data = validated_data.pop('supplier', None)
+        employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
+        supplier = Supplier.objects.get(id=supplier_data.id)
+        instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
+        return instance  
     
 
 ############################# 
@@ -865,9 +871,17 @@ class IncomingSerializer(serializers.ModelSerializer):
 class ManualRecieptSerializer(serializers.ModelSerializer):
     class Meta:
         model = ManualReceipt
-        fields = '__all__'
+        exclude = ['employee']
 
-    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        client_data = validated_data.pop('client', None)
+        employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
+        client = Client.objects.get(id=client_data.id)
+        instance = ManualReceipt.objects.create(employee=employee, client=client, **validated_data)
+        return instance    
+
+
 class ManualRecieptProductsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='product.id')
     name = serializers.CharField(source='product.name')

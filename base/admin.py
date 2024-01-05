@@ -211,7 +211,7 @@ class ManualReceiptProductAdmin(admin.ModelAdmin):
         return obj.manualreceipt.id
 
 class ManualReceiptAdmin(admin.ModelAdmin):
-    list_display = ['id', 'client', 'employee', 'verify_code', 'recive_payment', 'reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
+    list_display = ['id', 'client', 'employee', 'verify_code', 'reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
     search_fields = ['client__name', 'employee__name']
 
 
