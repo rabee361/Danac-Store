@@ -168,6 +168,16 @@ class ClientSerializer(serializers.ModelSerializer):
         model = Client
         fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points']
 
+    def is_valid(self, raise_exception=False):
+        super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field]
+            self._errors = {first_error_field: first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self.errors)
+        return not bool(self._errors)
+
     def get_total_points(self,obj):
         total = Points.objects.filter(Q(client=obj)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).aggregate(total_points=models.Sum('number'))['total_points'] or 0
         return total
@@ -181,6 +191,16 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
         
+    def is_valid(self, raise_exception=False):
+        super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field]
+            self._errors = {first_error_field: first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self.errors)
+        return not bool(self._errors)
+            
     def create(self, validated_data):
         category_name = validated_data.pop('category')
         category = Category.objects.get(name=category_name)
@@ -342,6 +362,16 @@ class EmployeeSerializer(serializers.ModelSerializer):
         model = Employee
         fields = '__all__'
 
+    def is_valid(self, raise_exception=False):
+        super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field]
+            self._errors = {first_error_field: first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self.errors)
+        return not bool(self._errors)
+    
 
 class SalesEmployeeSerializer(serializers.ModelSerializer):
     longitude = serializers.SerializerMethodField()
@@ -816,9 +846,6 @@ class PointsSerializer(serializers.ModelSerializer):
 
 
 
-
-
-
 class SpecialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -850,11 +877,21 @@ class IncomingSerializer2(serializers.ModelSerializer):
         repr['employee'] = instance.employee.name
         return repr
 
-
 class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Incoming
         exclude = ['employee']
+
+    def is_valid(self, raise_exception=False):
+        super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field]
+            self._errors = {first_error_field: first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self.errors)
+
+        return not bool(self._errors)
 
     def create(self, validated_data):
         request = self.context.get('request')
@@ -862,7 +899,8 @@ class IncomingSerializer(serializers.ModelSerializer):
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         supplier = Supplier.objects.get(id=supplier_data.id)
         instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
-        return instance  
+        return instance
+     
     
 
 ############################# 
@@ -873,6 +911,16 @@ class ManualRecieptSerializer(serializers.ModelSerializer):
         model = ManualReceipt
         exclude = ['employee']
 
+    def is_valid(self, raise_exception=False):
+        super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field]
+            self._errors = {first_error_field: first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self.errors)
+        return not bool(self._errors)
+    
     def create(self, validated_data):
         request = self.context.get('request')
         client_data = validated_data.pop('client', None)
@@ -938,13 +986,31 @@ class OutputSerializer2(serializers.ModelSerializer):
 
     class Meta:
         model = Output
-        fields = ['id', 'client', 'employee', 'verify_code', 'phonenumber','client_phone', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date', 'barcode','longitude','latitude', 'products']
+        exclude = ['employee','location']
 
+    def is_valid(self, raise_exception=False):
+        super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field]
+            self._errors = {first_error_field: first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self.errors)
+        return not bool(self._errors)
+    
     def get_longitude(self, obj):
         return obj.location.x
 
     def get_latitude(self, obj):
         return obj.location.y
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        client_data = validated_data.pop('client', None)
+        employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
+        client = Client.objects.get(id=client_data.id)
+        instance = Output.objects.create(employee=employee, client=client, **validated_data)
+        return instance    
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
