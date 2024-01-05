@@ -896,7 +896,7 @@ class ReceiptOrdersView(APIView):
                     products = product.product,
                     output = output,
                     quantity = product.num_item,
-                    discount = product.discount,
+                    # discount = product.discount,
                     total = product.total_price
                 )
             products.delete()

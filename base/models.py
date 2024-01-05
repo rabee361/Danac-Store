@@ -263,10 +263,10 @@ class Employee(models.Model):
     name = models.CharField(max_length=30)
     phonenumber = PhoneNumberField(region='DZ')
     job_position = models.CharField(max_length=20)
-    truck_num = models.IntegerField(null=True)
+    truck_num = models.IntegerField(null=True,blank=True)
     location = models.PointField(default=Point(0,0))
     salary = models.FloatField()
-    sale_percentage = models.FloatField(null=True)
+    sale_percentage = models.FloatField(null=True,blank=True)
     address = models.CharField(max_length=100)
     notes = models.TextField(max_length=150,default=' ')
     birthday = models.DateField(auto_now_add=True)
@@ -688,7 +688,7 @@ class Output_Products(models.Model):
     output = models.ForeignKey(Output, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total = models.FloatField(default=0)
-    discount = models.FloatField()
+    discount = models.FloatField(default=0)
 
     def __str__(self) -> str:
         return f'{self.products.name} {self.output.id}'
