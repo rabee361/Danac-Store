@@ -47,6 +47,7 @@ urlpatterns = [
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),######
     path('orders/' , ListOrders.as_view() ,name="orders"),#######
     path('order/<str:pk>/' , GetOrder.as_view() , name="get-order"),####
+    path('reject-order/<str:pk>/' , DeleteOrder.as_view() , name="delete-order"),#### new
     # path('delivered-orders/' , ListDeliveredOrders.as_view() , name="delivered-orders"),
     # path('not-delivered-orders/' , ListNotDeliveredOrders.as_view() , name="not-delivered-orders"),
 

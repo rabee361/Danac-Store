@@ -275,28 +275,34 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class OrderProductsSerializer(serializers.ModelSerializer):
+    price = serializers.FloatField(source='product.sale_price',read_only=True)
+    description = serializers.CharField(source='product.description',read_only=True)
+
     class Meta:
         model = Order_Product
-        fields = ['product','order','quantity','total_price']
+        fields = ['product','order','quantity','total_price','price','image','description']
+
 
 
 
 class OrderSerializer(serializers.ModelSerializer):
     client = ClientSerializer()
     products = OrderProductsSerializer(source='order_product_set', many=True)
-
     class Meta:
         model = Order
         fields = ['id', 'client', 'products', 'total', 'products_num', 'created', 'delivery_date', 'delivered']
 
 
 
+
+
 class OrderProductsSerializer2(serializers.ModelSerializer):
     image = serializers.ImageField(source='product.image')
+    price = serializers.FloatField(source='product.sale_price',read_only=True)
     description = serializers.CharField(source='product.description')
     class Meta:
         model = Order_Product
-        fields = ['product','order','quantity','total_price','image','description']
+        fields = ['product','order','quantity','price','total_price','image','description']
 
 
 
@@ -657,7 +663,6 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['num_per_item'] = instance.product.num_per_item
-        repr['sale_price'] = instance.product.sale_price
         repr['product'] = instance.product.name
         return repr
 

@@ -291,9 +291,6 @@ class Points(models.Model):
 
 
 
-
-
-
 ######################################## HR Department ##################################################################
     
 class OverTime(models.Model):
@@ -574,6 +571,7 @@ class ReturnedGoodsClient(models.Model):
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
 
+
 class DamagedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
@@ -638,10 +636,10 @@ class Incoming(models.Model):
     code_verefy = models.IntegerField()
     phonenumber = PhoneNumberField(region='DZ')
     recive_pyement = models.FloatField()
-    discount = models.FloatField()
-    Reclaimed_products = models.FloatField(default=0)
-    previous_depts = models.FloatField()
-    remaining_amount = models.FloatField()
+    discount = models.FloatField(blank=True,default=0.0)
+    Reclaimed_products = models.FloatField(blank=True,default=0.0)
+    previous_depts = models.FloatField(blank=True,default=0.0)
+    remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
 
@@ -673,10 +671,10 @@ class Output(models.Model):
     verify_code = models.IntegerField()
     phonenumber = PhoneNumberField(region='DZ' ,default='+213672007698')
     recive_pyement = models.FloatField()
-    discount = models.FloatField()
-    Reclaimed_products = models.FloatField()
-    previous_depts = models.FloatField()
-    remaining_amount = models.FloatField()
+    discount = models.FloatField(blank=True,default=0.0)
+    Reclaimed_products = models.FloatField(blank=True,default=0.0)
+    previous_depts = models.FloatField(blank=True,default=0.0)
+    remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateField(auto_now_add=True, null=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
     location = models.PointField(default=Point(0.0,0.0))
@@ -717,9 +715,9 @@ class ManualReceipt(models.Model):
     phonenumber = PhoneNumberField(region='DZ')
     recive_payment = models.FloatField()
     # discount = models.FloatField()
-    reclaimed_products = models.FloatField()#####
-    previous_depts = models.FloatField()#####
-    remaining_amount = models.FloatField(default=0)
+    reclaimed_products = models.FloatField(blank=True,default=0.0)#####
+    previous_depts = models.FloatField(blank=True,default=0.0)#####
+    remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
 

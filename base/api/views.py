@@ -389,6 +389,12 @@ class ListOrders(ListAPIView):
     # permission_classes = [permissions.IsAuthenticated,]
 
 
+class GetOrder(RetrieveAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer2
+
+
+
 class ListSimpleOrders(ListAPIView):
     queryset = Order.objects.all()
     serializer_class = SimpleOrderSerializer
@@ -405,6 +411,13 @@ class ListClientOrders(GenericAPIView):
         return Response(serializer.data,)
         
 
+class DeleteOrder(DestroyAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+
+######################################Delivery Arrived ##########################################################3
+    
 
 class DelevaryArrivedForEmployee(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -440,9 +453,6 @@ class AcceptDelevaryArrived(APIView):
     
 
 
-class GetOrder(RetrieveAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer2
 
 
 
