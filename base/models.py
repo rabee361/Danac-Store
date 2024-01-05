@@ -269,7 +269,7 @@ class Employee(models.Model):
     sale_percentage = models.FloatField(null=True,blank=True)
     address = models.CharField(max_length=100)
     notes = models.TextField(max_length=150,default=' ')
-    birthday = models.DateField(auto_now_add=True)
+    birthday = models.DateField()
 
     def __str__(self):
         return f'{self.name}'
@@ -367,6 +367,9 @@ class Salary(models.Model):
     extra_expense = models.FloatField(default=0.0)
     total = models.FloatField()
     date = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-date']
 
     def __str__(self):
         return self.employee.name
