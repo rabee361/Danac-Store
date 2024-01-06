@@ -428,7 +428,18 @@ class Advance_on_SalarySerializer(serializers.ModelSerializer):
         model = Advance_On_salary
         fields = ['employee','employee_name','reason','amount','date']
 
-
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+    
 
 class OverTimeSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
@@ -436,6 +447,18 @@ class OverTimeSerializer(serializers.ModelSerializer):
         model = OverTime
         fields = ['id','employee','employee_name','num_hours','amount','date']
 
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+    
 
 class AbsenceSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
@@ -443,13 +466,37 @@ class AbsenceSerializer(serializers.ModelSerializer):
         model = Absence
         fields = ['id','employee','employee_name','days','amount','date']
 
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+    
 
 class BonusSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Bonus
         fields = ['id','employee','employee_name','reason','amount','date']
-    
+
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+     
 
 class DiscountSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
@@ -457,6 +504,18 @@ class DiscountSerializer(serializers.ModelSerializer):
         model = Discount
         fields = ['id','employee','employee_name','reason','amount','date']
 
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+    
 
 class ExtraExpenseSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
@@ -464,7 +523,18 @@ class ExtraExpenseSerializer(serializers.ModelSerializer):
         model = Extra_Expense
         fields = '__all__'
         fields = ['id','employee','employee_name','reason','amount','date','barcode']
-
+        
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
 
 
 
@@ -538,6 +608,18 @@ class Client_DebtSerializer(serializers.ModelSerializer):
 
     def get_total_sum(self, obj):
         return Debt_Client.get_total_sum()
+    
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -560,6 +642,18 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
     def get_total_sum(self, obj):
         return Debt_Supplier.get_total_sum()
 
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['supplier_name'] = instance.supplier_name.name
@@ -580,7 +674,19 @@ class DepositeSerializer(serializers.ModelSerializer):
 
     def get_total_sum(self, obj):
         return Deposite.get_total_sum()
-    
+
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+
     def create(self, validated_data):
         deposite = Deposite.objects.create(**validated_data)
         registry = Registry.objects.first()
@@ -618,6 +724,18 @@ class WithDrawSerializer(serializers.ModelSerializer):
     def get_total_sum(self, obj):
         return WithDraw.get_total_sum()
 
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+
     def create(self, validated_data):
         withdraw = WithDraw.objects.create(**validated_data)
         registry = Registry.objects.first()
@@ -635,8 +753,7 @@ class WithDrawSerializer(serializers.ModelSerializer):
         registry.save()
 
         return instance
-
-    
+   
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['client'] = instance.client.name
@@ -657,6 +774,17 @@ class ExpenseSerializer(serializers.ModelSerializer):
     def get_total_amount(self, obj):
         return Expense.get_total_amount()
     
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)   
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -671,6 +799,18 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     def get_total_amount(self, obj):
         return Payment.get_total_amount()
+
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
     
 
 
@@ -684,7 +824,19 @@ class RecievedPaymentSerializer(serializers.ModelSerializer):
 
     def get_total_amount(self, obj):
         return Recieved_Payment.get_total_amount()
-    
+
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+      
 #################################################### Medium #######################################################################3###
 
 

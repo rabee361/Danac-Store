@@ -526,7 +526,7 @@ class Payment(models.Model):
         ('بنك','بنك')
     )    
     employee = models.ForeignKey(Employee , on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)####### ???
+    name = models.CharField(max_length=50)
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=60,default='_')
     receipt_num = models.IntegerField(null=True,blank=True)
