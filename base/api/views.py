@@ -849,22 +849,7 @@ class ListOutputs(ListAPIView):
 class ReceiptOrdersView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def post(self, request, medium_id):
-        # client_id = request.data['client']
-        # client = Client.objects.filter(id=client_id).first()
-        # employee = Employee.objects.get(phonenumber=request.user.phonenumber)
         output_serializer = OutputSerializer2(data=request.data, context={'request': request})
-        # output_serializer = OutputSerializer2(data={
-        #     'employee':employee.id,
-        #     "client": client_id,
-        #     "verify_code": request.data['verify_code'],
-        #     "recive_pyement": request.data['recive_pyement'],
-        #     "phonenumber":request.data['phonenumber'],
-        #     "discount":request.data['discount'],
-        #     "Reclaimed_products": request.data['Reclaimed_products'],
-        #     "previous_depts": request.data['previous_depts'],
-        #     'remaining_amount':request.data['remaining_amount'],
-            
-        # })
         if output_serializer.is_valid():
             output = output_serializer.save()
             products = Products_Medium.objects.filter(medium__id=medium_id)
@@ -900,7 +885,7 @@ class ReceiptOrdersView(APIView):
                 )
             products.delete()
             return Response(output_serializer.data)
-        return Response(output_serializer.errors)
+        return Response(output_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -1005,7 +990,7 @@ class CreateIncomingView(APIView):
                 )
             products.delete()
             return Response(incoming_serializer.data)
-        return Response(incoming_serializer.errors)
+        return Response(incoming_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 
 
@@ -1064,7 +1049,7 @@ class CreateManualReceiptView(APIView):
                 )
             products.delete()
             return Response(manual_receipt_serializer.data)
-        return Response(manual_receipt_serializer.errors)
+        return Response(manual_receipt_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 
 class GetManualReceipt(RetrieveAPIView):
