@@ -347,7 +347,7 @@ class Extra_Expense(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     reason = models.TextField(max_length=100)
     amount = models.FloatField()
-    barcode = models.CharField(max_length=200,default=" ")
+    barcode = models.CharField(max_length=200,default=" ")#############################
     date = models.DateField(auto_now_add=True)
 
 
@@ -356,7 +356,7 @@ class Salary(models.Model):
     employee_name = models.CharField(max_length=100)
     job_position = models.CharField(max_length=50)
     salary = models.FloatField()
-    percentage = models.FloatField()
+    percentage = models.FloatField()###################
     hr = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='hr_employee_salaries')
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
     overtime = models.FloatField(default=0.0)
@@ -390,7 +390,7 @@ class WithDraw(models.Model):
     details_withdraw = models.CharField(max_length=50)
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
-    verify_code = models.IntegerField()
+    verify_code = models.IntegerField(null=True,blank=True)#################
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -410,7 +410,7 @@ class Deposite(models.Model):
     detail_deposite = models.CharField(max_length=50)
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
-    verify_code = models.IntegerField()
+    verify_code = models.IntegerField(null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -435,7 +435,7 @@ class Debt_Client(models.Model):
     amount = models.FloatField()
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=60,default='_')
-    receipt_num = models.IntegerField()
+    receipt_num = models.IntegerField(null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -460,7 +460,7 @@ class Debt_Supplier(models.Model):
     amount = models.FloatField()
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=60,default='_')
-    check_num = models.IntegerField()
+    check_num = models.IntegerField(null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -481,8 +481,8 @@ class Expense(models.Model):
     details = models.TextField(max_length=100)
     name =  models.CharField(max_length=50)
     amount = models.IntegerField()
-    receipt_num = models.IntegerField()
-    date = models.DateField(default=timezone.now) ######### new
+    receipt_num = models.IntegerField(null=True,blank=True)
+    date = models.DateField(default=timezone.now)
 
     def __str__(self):
         return self.expense_name
@@ -506,7 +506,7 @@ class Recieved_Payment(models.Model):
     name = models.CharField(max_length=50)####### ???
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=60,default='_')
-    receipt_num = models.IntegerField()
+    receipt_num = models.IntegerField(null=True,blank=True)
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
@@ -529,7 +529,7 @@ class Payment(models.Model):
     name = models.CharField(max_length=50)####### ???
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=60,default='_')
-    receipt_num = models.IntegerField()
+    receipt_num = models.IntegerField(null=True,blank=True)
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 

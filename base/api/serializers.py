@@ -590,13 +590,10 @@ class DepositeSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         difference = validated_data.get('total', instance.total) - instance.total
-        if instance.total - difference >= 0:
-            instance = super().update(instance, validated_data)
-            registry = Registry.objects.first()
-            registry.total += difference
-            registry.save()
-        else:
-            raise serializers.ValidationError("Total cannot be less than 0")
+        super().update(instance, validated_data)
+        registry = Registry.objects.first()
+        registry.total += difference
+        registry.save()
         return instance
     
     def to_representation(self, instance):
@@ -630,14 +627,15 @@ class WithDrawSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         difference = validated_data.get('total', instance.total) - instance.total
-        if instance.total - difference >= 0:
-            instance = super().update(instance, validated_data)
-            registry = Registry.objects.first()
-            registry.total -= difference
-            registry.save()
-        else:
-            raise serializers.ValidationError("Total cannot be less than 0")
+        super().update(instance, validated_data)
+        registry = Registry.objects.first()
+        if registry.total - difference < 0:
+            raise serializers.ValidationError("The total in the registry cannot go below zero.")
+        registry.total -= difference
+        registry.save()
+
         return instance
+
     
     def to_representation(self, instance):
         representation = super().to_representation(instance)

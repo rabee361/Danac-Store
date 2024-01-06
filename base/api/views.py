@@ -55,9 +55,7 @@ class UserLoginApiView(GenericAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):  
-
         serializer = self.get_serializer(data = request.data)
-
         serializer.is_valid(raise_exception=True)
         user = CustomUser.objects.filter(email = request.data['username']).first()
         if not user:
