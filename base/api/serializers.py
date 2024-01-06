@@ -893,6 +893,18 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
         model = ReturnedGoodsClient
         fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason','date']
 
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+
     def update(self, instance, validated_data):
         original_quantity = instance.quantity
         super().update(instance, validated_data)
@@ -927,6 +939,18 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
         model = ReturnedGoodsSupplier
         fields = ['id', 'supplier', 'product', 'employee', 'quantity', 'total_price', 'reason', 'date']
 
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+
     def update(self, instance, validated_data):
         original_quantity = instance.quantity
         super().update(instance, validated_data)
@@ -960,16 +984,18 @@ class DamagedProductSerializer(serializers.ModelSerializer):
         model = DamagedProduct
         fields  = ['id','product','quantity','total_price','date','product_id']
 
-    def update(self, instance, validated_data):
-        original_quantity = instance.quantity
-        super().update(instance, validated_data)
-        quantity_diff = original_quantity - instance.quantity
-        product = instance.product
-        product.quantity += quantity_diff
-        product.save()
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
 
-        return instance
-    
     def create(self, validated_data):
         instance = super().create(validated_data)
         product = instance.product
@@ -977,6 +1003,17 @@ class DamagedProductSerializer(serializers.ModelSerializer):
         product.save()
 
         return instance
+
+    def update(self, instance, validated_data):
+        original_quantity = instance.quantity
+        super().update(instance, validated_data)
+        quantity_diff = instance.quantity - original_quantity
+        product = instance.product
+        product.quantity -= quantity_diff
+        product.save()
+
+        return instance
+
     
     def to_representation(self, instance):
         representation = super().to_representation(instance)
