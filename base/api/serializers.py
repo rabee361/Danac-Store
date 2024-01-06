@@ -1,15 +1,11 @@
 from rest_framework import serializers
 from base.models import *
-from django.contrib.auth import login , authenticate , get_user_model
+from django.contrib.auth import  authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
-from django.core.validators import MinValueValidator, MaxValueValidator
-from rest_framework.serializers import StringRelatedField
-from rest_framework.response import Response
-from rest_framework import status
 from django.db.models import Q
-
-
+from phonenumber_field.serializerfields import PhoneNumberField
+from phonenumber_field.phonenumber import to_python
 ############################################################## AUTHENTICATION ###################################################
 
 def modify_name(name):
@@ -169,13 +165,15 @@ class ClientSerializer(serializers.ModelSerializer):
         fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points']
 
     def is_valid(self, raise_exception=False):
-        super().is_valid(raise_exception=False)
+        is_valid = super().is_valid(raise_exception=False)
         if self._errors:
             first_error_field = next(iter(self._errors))
-            first_error_message = self._errors[first_error_field]
-            self._errors = {first_error_field: first_error_message}
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
             if raise_exception:
-                raise serializers.ValidationError(self.errors)
+                raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
 
     def get_total_points(self,obj):
@@ -192,13 +190,15 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
     def is_valid(self, raise_exception=False):
-        super().is_valid(raise_exception=False)
+        is_valid = super().is_valid(raise_exception=False)
         if self._errors:
             first_error_field = next(iter(self._errors))
-            first_error_message = self._errors[first_error_field]
-            self._errors = {first_error_field: first_error_message}
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
             if raise_exception:
-                raise serializers.ValidationError(self.errors)
+                raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
             
     def create(self, validated_data):
@@ -362,17 +362,22 @@ class EmployeeSerializer(serializers.ModelSerializer):
         model = Employee
         fields = '__all__'
 
+
     def is_valid(self, raise_exception=False):
-        super().is_valid(raise_exception=False)
+        is_valid = super().is_valid(raise_exception=False)
+
         if self._errors:
             first_error_field = next(iter(self._errors))
-            first_error_message = self._errors[first_error_field]
-            self._errors = {first_error_field: first_error_message}
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
             if raise_exception:
-                raise serializers.ValidationError(self.errors)
-        return not bool(self._errors)
-    
+                raise serializers.ValidationError(self._errors)
 
+        return not bool(self._errors)
+
+        
 class SalesEmployeeSerializer(serializers.ModelSerializer):
     longitude = serializers.SerializerMethodField()
     latitude = serializers.SerializerMethodField()
@@ -881,17 +886,20 @@ class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Incoming
         exclude = ['employee']
+        
 
     def is_valid(self, raise_exception=False):
-        super().is_valid(raise_exception=False)
+        is_valid = super().is_valid(raise_exception=False)
         if self._errors:
             first_error_field = next(iter(self._errors))
-            first_error_message = self._errors[first_error_field]
-            self._errors = {first_error_field: first_error_message}
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
             if raise_exception:
-                raise serializers.ValidationError(self.errors)
-
+                raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
+
 
     def create(self, validated_data):
         request = self.context.get('request')
@@ -912,13 +920,15 @@ class ManualRecieptSerializer(serializers.ModelSerializer):
         exclude = ['employee']
 
     def is_valid(self, raise_exception=False):
-        super().is_valid(raise_exception=False)
+        is_valid = super().is_valid(raise_exception=False)
         if self._errors:
             first_error_field = next(iter(self._errors))
-            first_error_message = self._errors[first_error_field]
-            self._errors = {first_error_field: first_error_message}
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
             if raise_exception:
-                raise serializers.ValidationError(self.errors)
+                raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
     
     def create(self, validated_data):
@@ -989,13 +999,15 @@ class OutputSerializer2(serializers.ModelSerializer):
         exclude = ['employee','location']
 
     def is_valid(self, raise_exception=False):
-        super().is_valid(raise_exception=False)
+        is_valid = super().is_valid(raise_exception=False)
         if self._errors:
             first_error_field = next(iter(self._errors))
-            first_error_message = self._errors[first_error_field]
-            self._errors = {first_error_field: first_error_message}
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            self._errors = {"error": first_error_message}
             if raise_exception:
-                raise serializers.ValidationError(self.errors)
+                raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
     
     def get_longitude(self, obj):
