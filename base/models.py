@@ -685,7 +685,7 @@ class Output(models.Model):
         return str(self.id)
     
 class Output_Products(models.Model):
-    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    products = models.ForeignKey(Product, on_delete=models.CASCADE) 
     output = models.ForeignKey(Output, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total = models.FloatField(default=0)
@@ -714,7 +714,7 @@ class ManualReceipt(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     verify_code = models.IntegerField(null=True,blank=True)
     phonenumber = PhoneNumberField(region='DZ')
-    recive_payment = models.FloatField(null=True,blank=True,default=0.0)####
+    recive_payment = models.FloatField(default=0.0)
     reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)#####
     previous_depts = models.FloatField(null=True,blank=True,default=0.0)#####
     remaining_amount = models.FloatField(blank=True,default=0.0)
