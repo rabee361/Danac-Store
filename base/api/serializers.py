@@ -1255,6 +1255,8 @@ class ManualRecieptSerializer(serializers.ModelSerializer):
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
             elif first_error_message == "A valid integer is required.":
                 first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be null.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"     
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
