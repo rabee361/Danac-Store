@@ -1273,6 +1273,11 @@ class IncomingSerializer(serializers.ModelSerializer):
         supplier = Supplier.objects.get(id=supplier_data.id)
         instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
         return instance
+    
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['supplier'] = instance.supplier.name
+        return repr
      
     
 
