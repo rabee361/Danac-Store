@@ -714,6 +714,7 @@ class ManualReceipt(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     verify_code = models.IntegerField()
     phonenumber = PhoneNumberField(region='DZ')
+    recive_payment = models.FloatField(null=True,blank=True,default=0.0)####
     reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)#####
     previous_depts = models.FloatField(null=True,blank=True,default=0.0)#####
     remaining_amount = models.FloatField(blank=True,default=0.0)
