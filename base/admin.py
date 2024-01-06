@@ -172,7 +172,7 @@ class IncomingProductAdmin(admin.ModelAdmin):
     employee.short_descreption = 'employee'
 
 class IncomingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'supplier', 'agent', 'employee', 'code_verefy', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date']
+    list_display = ['id', 'supplier', 'employee', 'code_verefy', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date']
     search_fields = ['supplier__name', 'employee__name']
     def get_name_supplier(self, obj):
         return obj.supplier.name

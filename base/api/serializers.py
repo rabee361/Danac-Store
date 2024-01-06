@@ -355,8 +355,16 @@ class ExpenseSerializer(serializers.ModelSerializer):
 class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Incoming
-        fields = '__all__'
-    
+        # fields = '__all__'
+        exclude = ['employee',]
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        supplier_data = validated_data.pop('supplier', None)
+        employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
+        supplier = Supplier.objects.get(id=supplier_data.id)
+        instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
+        return instance    
     
 class IncomingProductsSerializer(serializers.ModelSerializer):
     class Meta:
