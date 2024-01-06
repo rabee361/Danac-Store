@@ -712,7 +712,7 @@ class ManualReceipt(models.Model):
     products = models.ManyToManyField(Product, through='ManualReceipt_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    verify_code = models.IntegerField()
+    verify_code = models.IntegerField(null=True,blank=True)
     phonenumber = PhoneNumberField(region='DZ')
     recive_payment = models.FloatField(null=True,blank=True,default=0.0)####
     reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)#####
