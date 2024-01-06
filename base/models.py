@@ -84,7 +84,7 @@ class Client(models.Model):
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=100)
     phonenumber = PhoneNumberField(region='DZ',default='+213876543232')
-    category = models.CharField(max_length=75,choices=CHOICES,default=' ')
+    category = models.CharField(max_length=75,choices=CHOICES)
     notes = models.TextField(max_length=150,default='note')
     location = models.PointField(null=True)
 
