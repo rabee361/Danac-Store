@@ -174,7 +174,9 @@ class ClientSerializer(serializers.ModelSerializer):
             elif first_error_message == "This field may not be blank.":
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"               
+                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -385,6 +387,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -469,6 +473,8 @@ class Advance_on_SalarySerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -492,6 +498,8 @@ class OverTimeSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -515,6 +523,8 @@ class AbsenceSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -538,6 +548,8 @@ class BonusSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -561,6 +573,8 @@ class DiscountSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -585,6 +599,8 @@ class ExtraExpenseSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -674,6 +690,8 @@ class Client_DebtSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -711,6 +729,8 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -748,6 +768,8 @@ class DepositeSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -801,6 +823,8 @@ class WithDrawSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -855,6 +879,8 @@ class ExpenseSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -885,6 +911,8 @@ class PaymentSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -914,6 +942,8 @@ class RecievedPaymentSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -986,6 +1016,8 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1036,6 +1068,8 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1085,6 +1119,8 @@ class DamagedProductSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1180,6 +1216,8 @@ class IncomingSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1215,6 +1253,8 @@ class ManualRecieptSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1298,6 +1338,8 @@ class OutputSerializer2(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
