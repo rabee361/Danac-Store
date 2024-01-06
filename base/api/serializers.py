@@ -371,6 +371,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
                 first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be blank.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
