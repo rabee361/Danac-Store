@@ -204,6 +204,8 @@ class ProductSerializer(serializers.ModelSerializer):
                 first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
             elif first_error_message == "A valid number is required.":
                 first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
