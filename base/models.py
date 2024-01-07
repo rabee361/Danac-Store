@@ -430,7 +430,7 @@ class Debt_Client(models.Model):
     CHOICES = (
         ('نقدا','نقدا'),
         ('بنك','بنك')
-    )
+    )   
     client_name = models.ForeignKey(Client,on_delete=models.CASCADE)
     amount = models.FloatField()
     payment_method = models.CharField(max_length=30,choices=CHOICES)
@@ -439,7 +439,7 @@ class Debt_Client(models.Model):
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.client_name
+        return self.client_name.name
 
     @classmethod
     def get_total_client_debts(cls):
