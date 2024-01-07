@@ -387,7 +387,8 @@ class Registry(models.Model):
     
 
 class WithDraw(models.Model):
-    details_withdraw = models.CharField(max_length=50)
+    withdraw_name = models.CharField(max_length=50)
+    details_withdraw = models.CharField(max_length=50,null=True,blank=True)
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
     verify_code = models.IntegerField(null=True,blank=True)#################
@@ -407,7 +408,8 @@ class WithDraw(models.Model):
 
 
 class Deposite(models.Model):
-    detail_deposite = models.CharField(max_length=50)
+    deposite_name = models.CharField(max_length=50)
+    detail_deposite = models.CharField(max_length=50,null=True,blank=True)
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
     verify_code = models.IntegerField(null=True,blank=True)

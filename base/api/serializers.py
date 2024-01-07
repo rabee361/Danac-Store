@@ -773,7 +773,7 @@ class DepositeSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     class Meta:
         model = Deposite
-        fields = ['id','client','client_id','detail_deposite','total','verify_code','total_deposites','total_sum','date']
+        fields = ['id','client','client_id','deposite_name','detail_deposite','total','verify_code','total_deposites','total_sum','date']
 
     def get_total_deposites(self, obj):
         return Deposite.get_total_deposites()
@@ -830,7 +830,7 @@ class WithDrawSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     class Meta:
         model = WithDraw
-        fields = ['id','client','client_id','details_withdraw','total','verify_code','total_withdraws','total_sum','date']
+        fields = ['id','client','client_id','withdraw_name','details_withdraw','total','verify_code','total_withdraws','total_sum','date']
 
     def get_total_withdraws(self, obj):
         return WithDraw.get_total_withdraws()
