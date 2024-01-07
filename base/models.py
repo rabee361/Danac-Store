@@ -313,7 +313,7 @@ class Absence(models.Model):
     
 class Bonus(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    reason = models.CharField(max_length=100,blank=True,null=True)
+    reason = models.CharField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
@@ -323,7 +323,7 @@ class Bonus(models.Model):
 
 class Discount(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    reason = models.CharField(max_length=100,blank=True,null=True)
+    reason = models.CharField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
@@ -334,7 +334,7 @@ class Discount(models.Model):
 
 class Advance_On_salary(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
-    reason = models.CharField(max_length=100,blank=True,null=True)
+    reason = models.CharField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
@@ -345,7 +345,7 @@ class Advance_On_salary(models.Model):
 
 class Extra_Expense(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
-    reason = models.TextField(max_length=100,blank=True,null=True)
+    reason = models.TextField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
     barcode = models.CharField(max_length=200,default=" ")#############################
     date = models.DateField(auto_now_add=True)
@@ -388,7 +388,7 @@ class Registry(models.Model):
 
 class WithDraw(models.Model):
     withdraw_name = models.CharField(max_length=50)
-    details_withdraw = models.CharField(max_length=50,null=True,blank=True)
+    details_withdraw = models.CharField(max_length=50,null=True,blank=True,default=' ')
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
     verify_code = models.IntegerField(null=True,blank=True)#################
@@ -409,7 +409,7 @@ class WithDraw(models.Model):
 
 class Deposite(models.Model):
     deposite_name = models.CharField(max_length=50)
-    detail_deposite = models.CharField(max_length=50,null=True,blank=True)
+    detail_deposite = models.CharField(max_length=50,null=True,blank=True,default=' ')
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
     verify_code = models.IntegerField(null=True,blank=True)
@@ -558,7 +558,7 @@ class ReturnedGoodsSupplier(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
-    reason = models.CharField(max_length=50,null=True,blank=True)
+    reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
@@ -570,7 +570,7 @@ class ReturnedGoodsClient(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
-    reason = models.CharField(max_length=50,null=True,blank=True)
+    reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
     date = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
@@ -636,8 +636,8 @@ class Incoming(models.Model):
     products = models.ManyToManyField(Product, through='Incoming_Product')
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    code_verefy = models.IntegerField()
-    phonenumber = PhoneNumberField(region='DZ')
+    code_verefy = models.IntegerField(null=True,blank=True)
+    phonenumber = models.CharField(max_length=20,default='000 208 0660')
     recive_pyement = models.FloatField()
     discount = models.FloatField(null=True,blank=True,default=0.0)
     Reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)
@@ -671,8 +671,8 @@ class Output(models.Model):
     products = models.ManyToManyField(Product, through='Output_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    verify_code = models.IntegerField()
-    phonenumber = PhoneNumberField(region='DZ' ,default='+213672007698')
+    verify_code = models.IntegerField(null=True,blank=True)
+    phonenumber = models.CharField(max_length=20,default='000 208 0660')
     recive_pyement = models.FloatField()
     discount = models.FloatField(null=True,blank=True,default=0.0)
     Reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)
@@ -715,10 +715,10 @@ class ManualReceipt(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     verify_code = models.IntegerField(null=True,blank=True)
-    phonenumber = PhoneNumberField(region='DZ')
-    recive_payment = models.FloatField(default=0.0)
-    reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)#####
-    previous_depts = models.FloatField(null=True,blank=True,default=0.0)#####
+    phonenumber = models.CharField(max_length=20,default='000 208 0660')
+    recive_payment = models.FloatField()
+    reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)
+    previous_depts = models.FloatField(null=True,blank=True,default=0.0)
     remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
