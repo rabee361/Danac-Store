@@ -648,7 +648,7 @@ class SimpleEmployeeSerializer(serializers.ModelSerializer):
 
 
 class SalarySerializer(serializers.ModelSerializer):
-    hr = SimpleEmployeeSerializer(many=False,read_only=True)
+    hr = SimpleEmployeeSerializer(many=False)
     class Meta:
         model = Salary
         fields = '__all__'
