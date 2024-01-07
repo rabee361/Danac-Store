@@ -648,10 +648,14 @@ class SimpleEmployeeSerializer(serializers.ModelSerializer):
 
 
 class SalarySerializer(serializers.ModelSerializer):
-    hr = SimpleEmployeeSerializer(many=False)
     class Meta:
         model = Salary
         fields = '__all__'
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['hr'] = instance.hr.name
+        return repr
 
 
 
