@@ -905,6 +905,27 @@ class DelevaryArrivedForEmployee(APIView):
 
 class ListCreateDeliveryArrived(APIView):
     def post(self, request, pk):
+        # Check if a DelievaryArrived with the given output already exists
+        if DelievaryArrived.objects.filter(output_receipt_id=pk).exists():
+            return Response(
+                {"error": "Delivery with this output has already arrived."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        output = Output.objects.filter(id=pk).first()
+        if not output:
+            return Response(
+                {"error": "Output not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        employee = Employee.objects.filter(id=request.data.get('employee')).first()
+        if not employee:
+            return Response(
+                {"error": "Employee not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
         output = Output.objects.filter(id=pk).first()
         employee = Employee.objects.filter(id=request.data['employee']).first()
         delivery_arrived = DelievaryArrived.objects.create(
