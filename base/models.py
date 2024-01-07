@@ -313,7 +313,7 @@ class Absence(models.Model):
     
 class Bonus(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    reason = models.CharField(max_length=100)
+    reason = models.CharField(max_length=100,blank=True,null=True)
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
@@ -323,7 +323,7 @@ class Bonus(models.Model):
 
 class Discount(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    reason = models.CharField(max_length=100)
+    reason = models.CharField(max_length=100,blank=True,null=True)
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
@@ -334,7 +334,7 @@ class Discount(models.Model):
 
 class Advance_On_salary(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
-    reason = models.CharField(max_length=100)
+    reason = models.CharField(max_length=100,blank=True,null=True)
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
@@ -345,7 +345,7 @@ class Advance_On_salary(models.Model):
 
 class Extra_Expense(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
-    reason = models.TextField(max_length=100)
+    reason = models.TextField(max_length=100,blank=True,null=True)
     amount = models.FloatField()
     barcode = models.CharField(max_length=200,default=" ")#############################
     date = models.DateField(auto_now_add=True)
