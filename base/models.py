@@ -436,7 +436,7 @@ class Debt_Client(models.Model):
     client_name = models.ForeignKey(Client,on_delete=models.CASCADE)
     amount = models.FloatField()
     payment_method = models.CharField(max_length=30,choices=CHOICES)
-    bank_name = models.CharField(max_length=60,default='_')
+    bank_name = models.CharField(max_length=60,null=True,blank=True,default='_')
     receipt_num = models.IntegerField(null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
@@ -461,7 +461,7 @@ class Debt_Supplier(models.Model):
     supplier_name = models.ForeignKey(Supplier,on_delete=models.CASCADE)
     amount = models.FloatField()
     payment_method = models.CharField(max_length=30,choices=CHOICES)
-    bank_name = models.CharField(max_length=60,default='_')
+    bank_name = models.CharField(max_length=60,null=True,blank=True,default='_')
     check_num = models.IntegerField(null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
@@ -507,7 +507,7 @@ class Recieved_Payment(models.Model):
     employee = models.ForeignKey(Employee , on_delete=models.CASCADE)
     name = models.CharField(max_length=50)####### ???
     payment_method = models.CharField(max_length=30,choices=CHOICES)
-    bank_name = models.CharField(max_length=60,default='_')
+    bank_name = models.CharField(max_length=60,null=True,blank=True,default='_')
     receipt_num = models.IntegerField(null=True,blank=True)
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
@@ -530,7 +530,7 @@ class Payment(models.Model):
     employee = models.ForeignKey(Employee , on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     payment_method = models.CharField(max_length=30,choices=CHOICES)
-    bank_name = models.CharField(max_length=60,default='_')
+    bank_name = models.CharField(max_length=60,null=True,blank=True,default='_')
     receipt_num = models.IntegerField(null=True,blank=True)
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
