@@ -266,9 +266,9 @@ class Employee(models.Model):
     truck_num = models.IntegerField(null=True,blank=True)
     location = models.PointField(default=Point(0,0))
     salary = models.FloatField()
-    sale_percentage = models.FloatField(null=True,blank=True)
+    sale_percentage = models.FloatField(null=True,blank=True,default=0.0)
     address = models.CharField(max_length=100)
-    notes = models.TextField(max_length=150,default=' ')
+    notes = models.TextField(max_length=150,null=True,blank=True,default=' ')
     birthday = models.DateField()
 
     def __str__(self):
