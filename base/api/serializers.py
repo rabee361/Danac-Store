@@ -484,7 +484,9 @@ class Advance_on_SalarySerializer(serializers.ModelSerializer):
             elif first_error_message == "A valid integer is required.":
                 first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"  
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
