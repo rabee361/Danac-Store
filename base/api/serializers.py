@@ -1391,7 +1391,7 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
     total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = ManualReceipt
-        fields = ['id','client','client_phone','employee','verify_code','phonenumber','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','client','client_phone','total_receipt','employee','verify_code','phonenumber','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
 
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
