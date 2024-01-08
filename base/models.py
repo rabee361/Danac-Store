@@ -742,7 +742,7 @@ class ManualReceipt(models.Model):
     def calculate_total_receipt(self):
         return self.manualreceipt_products_set.aggregate(
             total_receipt=models.Sum('total_price')
-        )['total_receipt_amount'] or 0.0
+        )['total_receipt'] or 0.0
 
     def __str__(self) -> str:
         return f'{self.client.name} - {str(self.id)}'
