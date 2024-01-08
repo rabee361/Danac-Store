@@ -1079,11 +1079,17 @@ class GetManualReceipt(RetrieveAPIView):
     queryset = ManualReceipt.objects.all()
     serializer_class = ManualRecieptSerializer2
 
+    def get_serializer_context(self):
+        return {'show_datetime': True}
+
 
 
 class ListManualReceipt(ListAPIView):
     queryset = ManualReceipt.objects.all()
     serializer_class = ManualRecieptSerializer2
+
+    def get_serializer_context(self):
+        return {'show_datetime': False}
 
 
 

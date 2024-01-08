@@ -1390,11 +1390,14 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
     client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
     class Meta:
         model = ManualReceipt
-        fields = ['id','client','client_phone','employee','verify_code','phonenumber','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','client','client_phone','employee','verify_code','phonenumber','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
         
     def to_representation(self, instance):
         repr = super().to_representation(instance)
-        repr['date'] = instance.date.strftime("%B %d, %Y, %I:%M %p")
+        if self.context.get('show_datetime', False):
+            repr['date'] = instance.date.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            repr['date'] = instance.date.strftime("%Y-%m-%d")
         repr['employee'] = instance.employee.name
         repr['client'] = instance.client.name
         return repr
