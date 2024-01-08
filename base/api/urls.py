@@ -100,7 +100,7 @@ urlpatterns = [
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),#### 
     path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),##### 
     path('update-manual/<str:pk>/' , UpdateManualReceipt.as_view() , name="update-manual"),##### new
-
+ 
     path('get-receipt-output/<str:pk>/', GetOutput.as_view(), name='get-output'),#####
     path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), ####   
     path('list-outputs/' , ListOutputs.as_view() , name="list-outputs"),##### 

@@ -1078,7 +1078,7 @@ class CreateManualReceiptView(APIView):
                     product = product.product,
                     manualreceipt = manual_receipt,
                     num_item = product.num_item,
-                    price=product.price,###########
+                    price=product.price,#######
                     total_price = product.total_price_of_item,
                 )
             products.delete()
