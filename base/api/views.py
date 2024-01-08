@@ -888,7 +888,7 @@ class ReceiptOrdersView(APIView):
                     products = product.product,
                     output = output,
                     quantity = product.num_item,
-                    total = product.total_price
+                    total_price = product.total_price
                 )
             products.delete()
             return Response(output_serializer.data)
