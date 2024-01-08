@@ -842,10 +842,15 @@ class GetOutput(RetrieveAPIView):
     queryset = Output.objects.all()
     serializer_class = OutputSerializer2
 
+    def get_serializer_context(self):
+        return {'show_datetime': True}
 
 class ListOutputs(ListAPIView):
     queryset = Output.objects.all()
     serializer_class = OutputSerializer2
+
+    def get_serializer_context(self):
+        return {'show_datetime': False}
 
 
 class ReceiptOrdersView(APIView):
@@ -1023,10 +1028,16 @@ class GetIncoming(RetrieveAPIView):
     queryset = Incoming.objects.all()
     serializer_class = IncomingSerializer2
 
+    def get_serializer_context(self):
+        return {'show_datetime': True}
+
 
 class ListIncomings(ListAPIView):
     queryset = Incoming.objects.all()
     serializer_class = IncomingSerializer2
+
+    def get_serializer_context(self):
+        return {'show_datetime': False}
 
 
 

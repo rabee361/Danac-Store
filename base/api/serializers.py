@@ -1282,14 +1282,25 @@ class IncomingProductsSerializer(serializers.ModelSerializer):
 class IncomingSerializer2(serializers.ModelSerializer):
     products = IncomingProductsSerializer(source='incoming_product_set', many=True,read_only=True)
     supplier_phone = serializers.CharField(source='supplier.phone_number',read_only=True)
+    total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = Incoming
         fields = ['id','supplier','employee','code_verefy','supplier_phone','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+    
+    def get_total_receipt(self, obj):
+        return obj.calculate_total_receipt()
+    
     def to_representation(self, instance):
         repr = super().to_representation(instance)
+        if self.context.get('show_datetime', False):
+            repr['date'] = instance.date.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            repr['date'] = instance.date.strftime("%Y-%m-%d")
         repr['supplier'] = instance.supplier.name
         repr['employee'] = instance.employee.name
         return repr
+
+
 
 class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -1435,6 +1446,7 @@ class OutputSerializer2(serializers.ModelSerializer):
     longitude = serializers.SerializerMethodField()
     latitude = serializers.SerializerMethodField()
     client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
+    total_receipt = serializers.SerializerMethodField()
 
     class Meta:
         model = Output
@@ -1468,6 +1480,9 @@ class OutputSerializer2(serializers.ModelSerializer):
     def get_latitude(self, obj):
         return obj.location.y
 
+    def get_total_receipt(self, obj):
+        return obj.calculate_total_receipt()
+
     def create(self, validated_data):
         request = self.context.get('request')
         client_data = validated_data.pop('client', None)
@@ -1478,6 +1493,10 @@ class OutputSerializer2(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
+        if self.context.get('show_datetime', False):
+            repr['date'] = instance.date.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            repr['date'] = instance.date.strftime("%Y-%m-%d")
         repr['client'] = instance.client.name
         repr['employee'] = instance.employee.name
         return repr
