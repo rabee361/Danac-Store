@@ -1389,11 +1389,11 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='product.id')
     name = serializers.CharField(source='product.name')
     num_per_item = serializers.IntegerField(source='product.num_per_item')
-    # sale_price = serializers.FloatField(source='product.sale_price')
+    sale_price = serializers.FloatField(source='price')
     
     class Meta :
         model = ManualReceipt_Products
-        fields = ['id', 'name', 'num_per_item', 'price', 'num_item', 'total_price', 'manualreceipt']
+        fields = ['id', 'name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'manualreceipt']
 
 
 class ManualRecieptSerializer2(serializers.ModelSerializer):
