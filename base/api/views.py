@@ -774,25 +774,6 @@ class Add_To_Medium(APIView):
         pro_med_serializer = ProductsMediumSerializer(medium_products)
         return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
 
-
-
-# class Medium_Handler(APIView):
-#     def post(self, request, pk, pk2):
-#         item = Products_Medium.objects.get(id=pk)
-#         if pk2 == 'add':
-#             item.add_item()
-#             serializer = ProductsMediumSerializer(item,many=False)
-#             return Response(serializer.data)
-#         else:
-#             if item.num_item == 1:
-#                 # item.sub_item()
-#                 item.delete()
-#             else:
-#                 item.sub_item()
-                
-
-#             serializer = ProductsMediumSerializer(item,many=False)
-#         return Response(serializer.data)
     
 
 class GetMediumView(RetrieveAPIView):
@@ -891,6 +872,8 @@ class ReceiptOrdersView(APIView):
                     total_price = product.total_price
                 )
             products.delete()
+            medium = Medium.objects.get(id=medium_id)
+            medium.delete()
             return Response(output_serializer.data)
         return Response(output_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
@@ -1017,6 +1000,8 @@ class CreateIncomingView(APIView):
                     total_price = product.total_price,
                 )
             products.delete()
+            medium = Medium.objects.get(id=medium_id)
+            medium.delete()
             return Response(incoming_serializer.data)
         return Response(incoming_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
@@ -1078,10 +1063,12 @@ class CreateManualReceiptView(APIView):
                     product = product.product,
                     manualreceipt = manual_receipt,
                     num_item = product.num_item,
-                    price=product.price,#######
+                    price=product.price,
                     total_price = product.total_price_of_item,
                 )
             products.delete()
+            medium = Medium.objects.get(id=medium_id)
+            medium.delete()
             return Response(manual_receipt_serializer.data)
         return Response(manual_receipt_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
