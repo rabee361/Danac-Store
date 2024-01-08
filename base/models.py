@@ -100,6 +100,9 @@ class Notifications(models.Model):
     title = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-created_at']
+
     def __str__(self) -> str:
         return f'{self.user.username} : {self.body[:50]}'
 
@@ -251,6 +254,9 @@ class Supplier(models.Model):
     address = models.CharField(max_length=100)
     info = models.TextField(max_length=500)
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self):
         return f'{self.name}'
 
@@ -270,6 +276,9 @@ class Employee(models.Model):
     address = models.CharField(max_length=100)
     notes = models.TextField(max_length=150,null=True,blank=True,default=' ')
     birthday = models.DateField()
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return f'{self.name}'
@@ -294,8 +303,8 @@ class Points(models.Model):
 ######################################## HR Department ##################################################################
     
 class OverTime(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE) #### drop down menu ?
-    num_hours = models.FloatField() #### drop down menu ?
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    num_hours = models.FloatField()
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
 
@@ -347,7 +356,7 @@ class Extra_Expense(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     reason = models.TextField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
-    barcode = models.CharField(max_length=200,default=" ")#############################
+    barcode = models.CharField(max_length=200,default=" ")
     date = models.DateField(auto_now_add=True)
 
 
@@ -356,7 +365,7 @@ class Salary(models.Model):
     employee_name = models.CharField(max_length=100)
     job_position = models.CharField(max_length=50)
     salary = models.FloatField()
-    percentage = models.FloatField()###################
+    percentage = models.FloatField()
     hr = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='hr_employee_salaries')
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
     overtime = models.FloatField(default=0.0)
@@ -391,7 +400,7 @@ class WithDraw(models.Model):
     details_withdraw = models.CharField(max_length=50,null=True,blank=True,default=' ')
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
-    verify_code = models.IntegerField(null=True,blank=True)#################
+    verify_code = models.IntegerField(null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -505,7 +514,7 @@ class Recieved_Payment(models.Model):
         ('بنك','بنك')
     )
     employee = models.ForeignKey(Employee , on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)####### ???
+    name = models.CharField(max_length=50)
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=60,null=True,blank=True,default='_')
     receipt_num = models.IntegerField(null=True,blank=True)
