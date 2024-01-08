@@ -653,7 +653,7 @@ class Incoming(models.Model):
         ordering=['-date']
 
     def calculate_total_receipt(self):
-        return self.manualreceipt_products_set.aggregate(
+        return self.incoming_product_set.aggregate(
             total_receipt=models.Sum('total_price')
         )['total_receipt'] or 0.0
 
@@ -701,7 +701,7 @@ class Output(models.Model):
         ordering = ['-date']
 
     def calculate_total_receipt(self):
-        return self.manualreceipt_products_set.aggregate(
+        return self.output_products_set.aggregate(
             total_receipt=models.Sum('total_price')
         )['total_receipt'] or 0.0
 
