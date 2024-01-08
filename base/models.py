@@ -484,7 +484,7 @@ class Expense(models.Model):
     name =  models.CharField(max_length=50)
     amount = models.IntegerField()
     receipt_num = models.IntegerField(null=True,blank=True)
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.expense_name
