@@ -648,9 +648,18 @@ class SimpleEmployeeSerializer(serializers.ModelSerializer):
 
 
 class SalarySerializer(serializers.ModelSerializer):
+    hr = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Salary
         fields = '__all__'
+        read_only_fields = ('hr',)  # Add 'hr' to the read-only fields
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        validated_data['hr'] = employee
+        salary = Salary.objects.create(**validated_data)
+        return salary
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)

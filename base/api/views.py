@@ -618,6 +618,8 @@ class ListCreateSalary(ListCreateAPIView):
     serializer_class = SalarySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = SalaryFilter
+    def perform_create(self, serializer):
+        serializer.save(hr=self.request.user)
 
 class RetUpdDesSalary(RetrieveUpdateDestroyAPIView):
     queryset = Salary.objects.all()
