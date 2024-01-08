@@ -480,7 +480,7 @@ class Debt_Supplier(models.Model):
 
 class Expense(models.Model):
     expense_name = models.CharField(max_length=100)
-    details = models.TextField(max_length=100)
+    details = models.TextField(max_length=100,null=True,blank=True,default=' ')
     name =  models.CharField(max_length=50)
     amount = models.IntegerField()
     receipt_num = models.IntegerField(null=True,blank=True)
