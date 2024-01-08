@@ -1388,10 +1388,14 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
 class ManualRecieptSerializer2(serializers.ModelSerializer):
     products = ManualRecieptProductsSerializer(source='manualreceipt_products_set', many=True,read_only=True)
     client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
+    total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = ManualReceipt
         fields = ['id','client','client_phone','employee','verify_code','phonenumber','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
-        
+
+    def get_total_receipt(self, obj):
+        return obj.calculate_total_receipt()
+
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         if self.context.get('show_datetime', False):

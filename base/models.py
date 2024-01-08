@@ -662,6 +662,9 @@ class Incoming_Product(models.Model):
     num_item = models.IntegerField()
     total_price = models.FloatField()
 
+    class Meta:
+        ordering = ['-product_id']
+
     def all_item(self):
         pass
     def total(self):
@@ -702,6 +705,9 @@ class Output_Products(models.Model):
     total = models.FloatField(default=0)
     discount = models.FloatField(default=0)
 
+    class Meta:
+        ordering = ['-products_id']
+
     def __str__(self) -> str:
         return f'{self.products.name} {self.output.id}'
 
@@ -733,6 +739,11 @@ class ManualReceipt(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
 
+    def calculate_total_receipt(self):
+        return self.manualreceipt_products_set.aggregate(
+            total_receipt=models.Sum('total_price')
+        )['total_receipt_amount'] or 0.0
+
     def __str__(self) -> str:
         return f'{self.client.name} - {str(self.id)}'
     
@@ -748,6 +759,9 @@ class ManualReceipt_Products(models.Model):
     price = models.FloatField()
     num_item = models.IntegerField(default=0)
     total_price = models.FloatField(default=0)
+
+    class Meta:
+        ordering = ['-product_id']
 
     def __str__(self) -> str:
         return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
