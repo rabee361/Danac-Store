@@ -607,6 +607,9 @@ class Products_Medium(models.Model):
     num_item = models.IntegerField(default=0)
     total_price = models.FloatField(default=0)
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self) -> str:
         return f'{self.product.name} : {str(self.id)}'
     
