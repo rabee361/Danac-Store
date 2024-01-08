@@ -1451,7 +1451,7 @@ class OutputSerializer2(serializers.ModelSerializer):
     class Meta:
         model = Output
         exclude = ['employee','location']
-        inlude = ['totla_receipt']
+        include = ['totla_receipt']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
