@@ -1434,7 +1434,7 @@ class ProductsOutputSerializer(serializers.ModelSerializer):
     num_per_item = serializers.IntegerField(source='products.num_per_item')
     sale_price = serializers.FloatField(source='products.sale_price')
     num_item = serializers.IntegerField(source='quantity',read_only=True)
-    total_price = serializers.FloatField(source='total',read_only=True)
+    # total_price = serializers.FloatField(source='total',read_only=True)
 
     class Meta:
         model = Output_Products

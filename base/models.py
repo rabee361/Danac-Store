@@ -712,7 +712,7 @@ class Output_Products(models.Model):
     products = models.ForeignKey(Product, on_delete=models.CASCADE) 
     output = models.ForeignKey(Output, on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    total = models.FloatField(default=0)
+    total_price = models.FloatField(default=0)
     discount = models.FloatField(default=0)
 
     class Meta:

@@ -221,7 +221,7 @@ class OutputsproductAdmin(LeafletGeoAdmin):
 
 
 class OutputProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'output', 'quantity', 'total', 'discount']
+    list_display = ['id', 'name_product', 'output', 'quantity', 'total_price', 'discount']
 
     def name_product(self, obj):
         return obj.products.name
