@@ -646,8 +646,11 @@ class Incoming(models.Model):
     Reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)
     previous_depts = models.FloatField(null=True,blank=True,default=0.0)
     remaining_amount = models.FloatField(blank=True,default=0.0)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
+
+    class Meta:
+        ordering=['-date']
 
     def __str__(self):
         return str(self.id)
@@ -681,10 +684,13 @@ class Output(models.Model):
     Reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)
     previous_depts = models.FloatField(null=True,blank=True,default=0.0)
     remaining_amount = models.FloatField(null=True,blank=True,default=0.0)
-    date = models.DateField(auto_now_add=True,null=True)
+    date = models.DateTimeField(auto_now_add=True,null=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
     location = models.PointField(default=Point(0.0,0.0))
     delivered = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-date']
 
     def __str__(self):
         return str(self.id)
@@ -720,10 +726,11 @@ class ManualReceipt(models.Model):
     verify_code = models.IntegerField(null=True,blank=True)
     phonenumber = models.CharField(max_length=20,default='000 208 0660')
     recive_payment = models.FloatField()
+    discount = models.FloatField(null=True,blank=True,default=0.0)
     reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)
     previous_depts = models.FloatField(null=True,blank=True,default=0.0)
     remaining_amount = models.FloatField(blank=True,default=0.0)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
 
     def __str__(self) -> str:

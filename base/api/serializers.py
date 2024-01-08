@@ -11,6 +11,10 @@ from phonenumber_field.phonenumber import to_python
 def modify_name(name):
     return name
 
+class DateOnlyField(serializers.DateTimeField):
+    def to_representation(self, value):
+        return value.date()
+
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -1390,6 +1394,7 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
         
     def to_representation(self, instance):
         repr = super().to_representation(instance)
+        repr['date'] = instance.date.strftime("%B %d, %Y, %I:%M %p")
         repr['employee'] = instance.employee.name
         repr['client'] = instance.client.name
         return repr
