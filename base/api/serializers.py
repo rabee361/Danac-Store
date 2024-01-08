@@ -468,7 +468,7 @@ class Advance_on_SalarySerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = Advance_On_salary
-        fields = ['employee','employee_name','reason','amount','date']
+        fields = ['id','employee','employee_name','reason','amount','date']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
