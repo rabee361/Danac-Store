@@ -41,7 +41,6 @@ class CustomUser(AbstractUser):
     # @property
     # def inventory_manager(self):
     #     return self.user_type.user_type == 'مدير مخزن'
-    
     # @property
     # def registry_manager(self):
     #     return self.user_type.user_type == 'مدير صندوق'
@@ -101,8 +100,8 @@ class Notifications(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-created_at']
 
+        ordering = ['-created_at']
     def __str__(self) -> str:
         return f'{self.user.username} : {self.body[:50]}'
 
@@ -127,6 +126,9 @@ class CodeVerification(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=35)
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
@@ -570,6 +572,9 @@ class ReturnedGoodsSupplier(models.Model):
     reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
     date = models.DateField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
     
@@ -582,6 +587,9 @@ class ReturnedGoodsClient(models.Model):
     reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
     date = models.DateField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
 
@@ -591,6 +599,9 @@ class DamagedProduct(models.Model):
     quantity = models.IntegerField()
     total_price = models.FloatField()
     date = models.DateField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self) -> str:
         return self.product.name
