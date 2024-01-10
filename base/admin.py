@@ -214,6 +214,10 @@ class ManualReceiptAdmin(admin.ModelAdmin):
     list_display = ['id', 'client', 'employee', 'verify_code', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
     search_fields = ['client__name', 'employee__name']
 
+    class Meta:
+        app_label = 'Receipts'
+        admin_order = 1 
+
 
 class OutputsproductAdmin(LeafletGeoAdmin):
     list_display = ['id', 'client', 'employee', 'verify_code', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date']

@@ -36,7 +36,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -50,9 +49,14 @@ INSTALLED_APPS = [
     'leaflet',
     'fcm_django',
     'rest_framework_simplejwt.token_blacklist',
+    'admin_interface',
+    'colorfield',
+    'django.contrib.admin',
+    # 'flat_responsive',  # optional, it provides a better responsive version
     'base'
 ]
-
+X_FRAME_OPTIONS = "SAMEORIGIN"
+SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
 LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (39.694819, -8.130229),

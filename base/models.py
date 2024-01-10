@@ -9,8 +9,6 @@ import uuid
 from django.contrib.gis.geos import Point
 from django.utils import timezone
 from datetime import timedelta
-from fcm_django.models import FCMDevice
-from firebase_admin.messaging import Message, Notification
 
 
 class UserType(models.Model):
@@ -779,6 +777,7 @@ class ManualReceipt(models.Model):
     
     class Meta:
         ordering = ['-date']
+  
 
 
 
