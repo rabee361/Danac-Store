@@ -53,7 +53,12 @@ INSTALLED_APPS = [
     'colorfield',
     'django.contrib.admin',
     # 'flat_responsive',  # optional, it provides a better responsive version
-    'base'
+    'base',
+    'Receipts',
+    'Human_Resources',
+    'Company_Fund',
+    'Clients_and_Products',
+    
 ]
 X_FRAME_OPTIONS = "SAMEORIGIN"
 SILENCED_SYSTEM_CHECKS = ["security.W019"]
