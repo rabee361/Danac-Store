@@ -127,7 +127,7 @@ class CodeVerification(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=35)
-    
+
     class Meta:
         ordering = ['-id']
         app_label = 'Clients_and_Products'
@@ -154,6 +154,7 @@ class Product(models.Model):
     barcode = models.CharField(max_length=200,default=' ',blank=True)
     class Meta:
         ordering = ['-added']
+        app_label = 'Clients_and_Products'
 
     def __str__(self):
         return self.name
