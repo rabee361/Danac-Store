@@ -9,6 +9,7 @@ import uuid
 from django.contrib.gis.geos import Point
 from django.utils import timezone
 from datetime import timedelta
+from django.utils.translation import gettext_lazy as _
 
 
 class UserType(models.Model):
@@ -30,6 +31,10 @@ class CustomUser(AbstractUser):
 
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',) 
+
+    class Meta:
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
    
     objects = CustomManagers()
 
@@ -75,8 +80,10 @@ class Client(models.Model):
     CHOICES = (
         ('سوبرماركت','سوبرماركت'),
         ('مقهى','مقهى'),
-        ('محل جملة','محل جملة'),
-        ('محل نصف جملة','محل نصف جملة')
+        (' جملة',' جملة'),
+        (' نصف جملة',' نصف جملة'),
+        ('مطعم' ,'مطعم'),
+        ('تجزئة' , 'تجزئة')
     )
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=100)
@@ -726,7 +733,6 @@ class Incoming(models.Model):
     products = models.ManyToManyField(Product, through='Incoming_Product')
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    code_verefy = models.IntegerField(null=True,blank=True)
     phonenumber = models.CharField(max_length=20,default='000 208 0660')
     recive_pyement = models.FloatField()
     discount = models.FloatField(null=True,blank=True,default=0.0)
@@ -774,7 +780,6 @@ class Output(models.Model):
     products = models.ManyToManyField(Product, through='Output_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    verify_code = models.IntegerField(blank=True,default=0)
     phonenumber = models.CharField(max_length=20,default='000 208 0660')
     recive_pyement = models.FloatField()
     discount = models.FloatField(blank=True,default=0.0)
@@ -830,7 +835,6 @@ class ManualReceipt(models.Model):
     products = models.ManyToManyField(Product, through='ManualReceipt_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    verify_code = models.IntegerField(null=True,blank=True)
     phonenumber = models.CharField(max_length=20,default='000 208 0660')
     recive_payment = models.FloatField()
     discount = models.FloatField(null=True,blank=True,default=0.0)

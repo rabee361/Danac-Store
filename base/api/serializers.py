@@ -1285,7 +1285,7 @@ class IncomingSerializer2(serializers.ModelSerializer):
     total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = Incoming
-        fields = ['id','supplier','employee','code_verefy','total_receipt','supplier_phone','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','supplier','employee','total_receipt','supplier_phone','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
     
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
@@ -1402,7 +1402,7 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
     total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = ManualReceipt
-        fields = ['id','client','client_phone','total_receipt','employee','verify_code','phonenumber','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','client','client_phone','total_receipt','employee','phonenumber','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
 
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
@@ -1424,7 +1424,7 @@ class OutputSerializer(serializers.ModelSerializer):
     address = serializers.CharField(source='client.address',read_only=True)
     class Meta:
         model = Output
-        fields = ['id','client','client_name','address','products','employee','verify_code','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered']
+        fields = ['id','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered']
     
 
 

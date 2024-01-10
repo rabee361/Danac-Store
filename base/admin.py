@@ -10,9 +10,84 @@ from import_export.admin import ImportExportModelAdmin
 from base.resources import ProductResource
 from django.urls import reverse
 from django.utils.html import format_html
+from arabic_reshaper import reshape
+from bidi.algorithm import get_display
+from django.http import HttpResponse
+from io import BytesIO
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet
+styles = getSampleStyleSheet()
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
 
 admin.site.site_header = "Danac"
 admin.site.index_title = "Welcome to Danac Admin Panel" 
+
+
+
+
+
+
+def export_to_pdf_reportlab(modeladmin, request, queryset):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="recipes.pdf"'
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+
+    # Key-value pairs
+    for op in queryset:
+        elements.append(Paragraph(f"date: {op.output.date}", styles['Normal']))
+        elements.append(Paragraph(f"Receipt num: {op.output.id}", styles['Normal']))
+        elements.append(Paragraph(f"client name: {op.output.client.name}", styles['Normal']))
+        elements.append(Paragraph(f"client service: {op.output.phonenumber}", styles['Normal']))
+        elements.append(Paragraph(f"client phonenumber: {op.output.client}", styles['Normal']))
+        elements.append(Spacer(1, 12))
+
+        # Table data
+        data = [
+        [get_display(reshape('رقم المنتج')), get_display(reshape('اسم المنتج')), get_display(reshape('عدد الوحدات')), get_display(reshape('السعر')), get_display(reshape('الكمية')), get_display(reshape('المبلغ الإجمالي'))],  # Table header reshaped and reordered
+            # Add table rows here for each ingredient in the recipe
+        ]
+        for item in Output_Products.objects.all():
+            data.append([
+                item.products.id,
+                item.products.name,
+                item.products.num_per_item,
+                item.products.sale_price,
+                item.products.quantity,
+                item.total_price
+            ])
+
+        # Create the table with the data
+        table = Table(data, colWidths=100)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.pink),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+
+        elements.append(table)
+        elements.append(PageBreak())  # Add a page break after each recipe
+
+    # Build the PDF
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response
+
+export_to_pdf_reportlab.short_description = "Export selected objects to PDF"
+
+
+
+
+
+
+
 
 
 class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
@@ -188,7 +263,7 @@ class IncomingProductAdmin(admin.ModelAdmin):
 
 
 class IncomingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'supplier', 'employee', 'code_verefy', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date']
+    list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date']
     search_fields = ['supplier__name', 'employee__name']
     def get_name_supplier(self, obj):
         return obj.supplier.name
@@ -211,7 +286,7 @@ class ManualReceiptProductAdmin(admin.ModelAdmin):
         return obj.manualreceipt.id
 
 class ManualReceiptAdmin(admin.ModelAdmin):
-    list_display = ['id', 'client', 'employee', 'verify_code', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
+    list_display = ['id', 'client', 'employee', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
     search_fields = ['client__name', 'employee__name']
 
     class Meta:
@@ -220,12 +295,13 @@ class ManualReceiptAdmin(admin.ModelAdmin):
 
 
 class OutputsproductAdmin(LeafletGeoAdmin):
-    list_display = ['id', 'client', 'employee', 'verify_code', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
+    list_display = ['id', 'client', 'employee', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
     search_fields = ['client__name', 'employee__name']
 
 
 class OutputProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'name_product', 'output', 'quantity', 'total_price', 'discount']
+    actions = [export_to_pdf_reportlab]
 
     def name_product(self, obj):
         return obj.products.name
