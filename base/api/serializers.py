@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from base.models import *
 from django.contrib.auth import login
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
 from rest_framework.response import Response
 from django.contrib.auth.password_validation import validate_password
-
+from Inventory.models import *
 
 def modify_name(name):
     return name
@@ -14,13 +14,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'username', 'phonenumber', 'password', 'image']
+        fields = ['id', 'username', 'phonenumber', 'password', 'image']
 
 
-class CodeVerivecationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CodeVerivecation
-        fields = '__all__'
+# class CodeVerivecationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = CodeVerivecation
+#         fields = '__all__'
 
 class UpdateUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,7 +37,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['phonenumber', 'email', 'username', 'password']
+        fields = ['phonenumber', 'username', 'password']
 
         extra_kwargs = {
             'password':{'write_only':True,}
@@ -53,7 +53,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     def save(self, **kwargs):
         user = CustomUser(
             phonenumber=self.validated_data['phonenumber'],
-            email = self.validated_data['email'],
+            # email = self.validated_data['email'],
             username = self.validated_data['username']
         )
         password = self.validated_data['password']
@@ -62,51 +62,51 @@ class SignUpSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-class ResetPasswordSerializer(serializers.ModelSerializer):
+# class ResetPasswordSerializer(serializers.ModelSerializer):
 
-    newpassword = serializers.CharField(style={"input_type":"password"}, write_only=True)
-    class Meta:
-        model = CustomUser
-        fields = ['password', 'newpassword']
+#     newpassword = serializers.CharField(style={"input_type":"password"}, write_only=True)
+#     class Meta:
+#         model = CustomUser
+#         fields = ['password', 'newpassword']
 
-        extra_kwargs = {
-            'password':{'write_only':True,}
-        }
+#         extra_kwargs = {
+#             'password':{'write_only':True,}
+#         }
 
-    def validate(self, attrs):
-        password = attrs.get('password', '')
-        newpassword = attrs.get('newpassword', '')
-        validate_password(password)
-        validate_password(newpassword)
+#     def validate(self, attrs):
+#         password = attrs.get('password', '')
+#         newpassword = attrs.get('newpassword', '')
+#         validate_password(password)
+#         validate_password(newpassword)
         
-        if password != newpassword:
-            raise serializers.ValidationError({'message_error':'The password and newpassword didnt matched.'})
+#         if password != newpassword:
+#             raise serializers.ValidationError({'message_error':'The password and newpassword didnt matched.'})
         
-        return attrs
+#         return attrs
     
-    def save(self, **kwargs):
-        user_id = self.context.get('user_id')
-        user = CustomUser.objects.get(id=user_id)
-        password = self.validated_data['newpassword']
-        user.set_password(password)
-        user.save()
-        return user
+#     def save(self, **kwargs):
+#         user_id = self.context.get('user_id')
+#         user = CustomUser.objects.get(id=user_id)
+#         password = self.validated_data['newpassword']
+#         user.set_password(password)
+#         user.save()
+#         return user
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    phonenumber = serializers.CharField()
     password = serializers.CharField(write_only = True)
 
     def validate(self, data):
-        username = data.get('username')
-        password = data.get('password')
-        if username and password:
-            user = authenticate(request=self.context.get('request'), username=username, password=password)
+        phonenumber = data.get('phonenumber', )
+        password = data.get('password', )
+        if phonenumber and password:
+            user = authenticate(username=phonenumber, password=password)
             if not user:
                 raise serializers.ValidationError("Incorrect Credentials")
             if not user.is_active:
                 raise serializers.ValidationError({'message_error':'this account is not active'})
-            if not user.is_verified:
-                raise serializers.ValidationError({'message_error':'this account is not verified'})
+            # if not user.is_verified:
+            #     raise serializers.ValidationError({'message_error':'this account is not verified'})
             if not user.is_accepted:
                 raise serializers.ValidationError({'message_error':'this account is not accepted'})
         else:
@@ -114,7 +114,7 @@ class LoginSerializer(serializers.Serializer):
 
         data['user'] = user
         return data
-
+    
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
     def validate(self, attrs):
@@ -352,6 +352,8 @@ class ExpenseSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+from rest_framework.serializers import ValidationError
+
 class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Incoming
@@ -364,7 +366,8 @@ class IncomingSerializer(serializers.ModelSerializer):
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         supplier = Supplier.objects.get(id=supplier_data.id)
         instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
-        return instance    
+        return instance
+
     
 class IncomingProductsSerializer(serializers.ModelSerializer):
     class Meta:

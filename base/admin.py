@@ -2,58 +2,58 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import *
 import random
-from base.api.serializers import CodeVerivecationSerializer
+# from base.api.serializers import CodeVerivecationSerializer
 from .froms import CustomUserCreationForm, CustomUserChangeForm
-from base.api.utils import Utlil
+# from base.api.utils import Utlil
 
 class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     list_filter = ['is_accepted']
     actions = ['Accept_User', 'Refusal_User']
-    list_display = ['id', 'email', 'is_staff', 'is_accepted']        
+    list_display = ['id', 'username', 'phonenumber', 'is_staff', 'is_accepted']        
 
     def Accept_User(self, request, queryset):
         queryset.update(is_active=True)
         user_type = UserType.objects.get(user_type='عميل')
         queryset.update(is_accepted=True, user_type=user_type)
         user = queryset.get(is_active=True)
-        rand_num = random.randint(1,10000)
+        # rand_num = random.randint(1,10000)
         client = Client.objects.create(
             name=user.username,
             address = user.address,
             phonenumber = user.phonenumber
         )
-        code_verivecation = random.randint(1000,9999)
-        email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
-        data = {'email_body':email_body, 'to_email':user.email, 'email_subject':'Verify your email'}
-        Utlil.send_eamil(data)
-        serializer = CodeVerivecationSerializer(data ={
-                'user':user.id,
-                'code':code_verivecation
-            })
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        # code_verivecation = random.randint(1000,9999)
+        # email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
+        # data = {'email_body':email_body, 'to_email':user.email, 'email_subject':'Verify your email'}
+        # Utlil.send_eamil(data)
+        # serializer = CodeVerivecationSerializer(data ={
+        #         'user':user.id,
+        #         'code':code_verivecation
+        #     })
+        # serializer.is_valid(raise_exception=True)
+        # serializer.save()
         cart = Cart.objects.create(customer=client)
         cart.save()
 
 
     def Refusal_User(self, request, queryset):
         user = queryset.get(is_accepted=False)
-        email_body = 'Hi '+user.username+' نعتذر منك لقد تم رفض حسابك لأن موقعك بعيد ولا يمكن توصيل طلباتك \n'
-        data = {'email_body':email_body, 'to_email':user.email, 'email_subject':'Refusal Account'}
-        Utlil.send_eamil(data)
+        # email_body = 'Hi '+user.username+' نعتذر منك لقد تم رفض حسابك لأن موقعك بعيد ولا يمكن توصيل طلباتك \n'
+        # data = {'email_body':email_body, 'to_email':user.email, 'email_subject':'Refusal Account'}
+        # Utlil.send_eamil(data)
         user.delete()
 
     fieldsets = (
         (None, 
-                {'fields':('phonenumber','email', 'password',)}
+                {'fields':('phonenumber', 'password',)}
             ),
             ('User Information',
                 {'fields':('username', 'first_name', 'last_name',)}
             ),
             ('Permissions', 
-                {'fields':('is_verified', 'is_accepted', 'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type')}
+                {'fields':('is_accepted', 'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type')}
             ),
             ('Registration', 
                 {'fields':('date_joined', 'last_login',)}
@@ -63,7 +63,7 @@ class AdminCustomUser(UserAdmin, admin.ModelAdmin):
     add_fieldsets = (
         (None, {'classes':('wide',),
             'fields':(
-                'phonenumber','email' , 'username', 'password1', 'password2', 'user_type', 'is_verified'
+                'phonenumber', 'username', 'password1', 'password2', 'user_type',
             ),}
             ),
     )
@@ -105,12 +105,12 @@ class ProductAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display= ['id', 'name']
 
-class CodeVerivecationAdmin(admin.ModelAdmin):
-    list_display = ['get_user_name', 'code', 'created_at', 'expires_at']
+# class CodeVerivecationAdmin(admin.ModelAdmin):
+#     list_display = ['get_user_name', 'code', 'created_at', 'expires_at']
 
-    def get_user_name(self, obj):
-        return obj.user.username
-    get_user_name.short_descreption = 'username'
+#     def get_user_name(self, obj):
+#         return obj.user.username
+#     get_user_name.short_descreption = 'username'
 
 
 class EmployeeAdmin(admin.ModelAdmin):
@@ -318,7 +318,7 @@ admin.site.register(Medium, MediumAdmin)
 admin.site.register(Products_Medium)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
-admin.site.register(CodeVerivecation, CodeVerivecationAdmin)
+# admin.site.register(CodeVerivecation, CodeVerivecationAdmin)
 admin.site.register(CustomUser, AdminCustomUser)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Cart, CartAdmin)
@@ -328,10 +328,10 @@ admin.site.register(Client, ClientAdmin)
 admin.site.register(DamagedProduct, DamagedProductAdmin)
 admin.site.register(UserType, UserTypeAdmin)
 admin.site.register(Order_Product, OrderProductAdmin)
-admin.site.register(Incoming_Product, IncomingProductAdmin)
-admin.site.register(Incoming, IncomingAdmin)
-admin.site.register(ManualReceipt_Products, ManualReceiptProductAdmin)
-admin.site.register(ManualReceipt, ManualReceiptAdmin)
+# admin.site.register(Incoming_Product, IncomingProductAdmin)
+# admin.site.register(Incoming, IncomingAdmin)
+# admin.site.register(ManualReceipt_Products, ManualReceiptProductAdmin)
+# admin.site.register(ManualReceipt, ManualReceiptAdmin)
 admin.site.register(Outputs, OutputsproductAdmin)
 admin.site.register(Outputs_Products, OutputProductAdmin)
 admin.site.register(DelevaryArrived, DElevaryArrivedAdmin)
@@ -347,8 +347,8 @@ admin.site.register(Bonus, BounsAdmin)
 admin.site.register(Discount, DiscountAdmin)
 admin.site.register(Advance_On_salary, Advance_On_salaryAdmin)
 admin.site.register(Extra_Expense, Extra_ExpenseAdmin)
-admin.site.register(Deposite, DepositeAdmin)
-admin.site.register(WithDraw, WithDrawAdmin)
+# admin.site.register(Deposite, DepositeAdmin)
+# admin.site.register(WithDraw, WithDrawAdmin)
 admin.site.register(Debt_Supplier, Debt_SupplierAdmin)
 admin.site.register(Expense, ExpenseAdmin)
 admin.site.register(Debt_Client, Debt_ClientAdmin)

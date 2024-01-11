@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'base',
     'django_twilio',
     'fcm_django',
+    'Inventory',
+    'registry',
 
 ]
 
@@ -45,7 +47,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-AUTHENTICATION_BACKENDS = ['base.api.backend.CustomUserModelBackend']
+# AUTHENTICATION_BACKENDS = ['base.api.backend.CustomUserModelBackend']
 
 AUTH_USER_MODEL = 'base.CustomUser'
 
@@ -183,12 +185,12 @@ SIMPLE_JWT = {
 
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Replace with your preferred backend
-EMAIL_HOST = 'smtp.gmail.com' # Replace with your email host for gmail -> 'smtp.gmail.com'
-EMAIL_PORT = 587  # Replace with your email port
-EMAIL_USE_TLS = True  # Set to False if your email server doesn't use TLS
-EMAIL_HOST_USER = 'jacoubakizi81@gmail.com'  # Replace with your email username
-EMAIL_HOST_PASSWORD = 'eabqhwegdhezskam'  # Replace with your email password
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Replace with your preferred backend
+# EMAIL_HOST = 'smtp.gmail.com' # Replace with your email host for gmail -> 'smtp.gmail.com'
+# EMAIL_PORT = 587  # Replace with your email port
+# EMAIL_USE_TLS = True  # Set to False if your email server doesn't use TLS
+# EMAIL_HOST_USER = 'jacoubakizi81@gmail.com'  # Replace with your email username
+# EMAIL_HOST_PASSWORD = 'eabqhwegdhezskam'  # Replace with your email password
 
 
 class CustomFirebaseCredentials(credentials.ApplicationDefault):

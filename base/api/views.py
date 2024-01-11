@@ -13,10 +13,10 @@ from rest_framework.views import APIView
 import random
 from rest_framework import filters
 from .permissions import *
-from .utils import Utlil
+# from .utils import Utlil
 from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
-
+from Inventory.models import *
 
 
 class SingupView(GenericAPIView):
@@ -48,13 +48,39 @@ class UserLoginApiView(GenericAPIView):
 
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        user = CustomUser.objects.filter(email = request.data['username']).first()
-        if not user:
-            user = CustomUser.objects.get(phonenumber = request.data['username'])
+        print(request.data)
+        user = serializer.validated_data['user']
+        serializer = CustomUserSerializer(user)
         token = RefreshToken.for_user(user)
         data = serializer.data
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)
+
+# class UserLoginApiView(APIView):
+
+#     def post(self, request):
+#         serializer = LoginSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.validated_data['user']
+#         refresh = RefreshToken.for_user(user)
+#         return Response({
+#             'refresh': str(refresh),
+#             'access': str(refresh.access_token),
+#             'user': {
+#                 'id': user.id,
+#                 # 'phonenumber': user.phonenumber,
+#                 # Include any other user information you want to return here
+#             }
+#         }, status=status.HTTP_200_OK)
+   
+class LogoutAPIView(GenericAPIView):
+    serializer_class = LogoutSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
 class UpdateImageUserView(APIView):
 
@@ -79,93 +105,83 @@ class ListInformationUserView(RetrieveAPIView):
     serializer_class= CustomUserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-class ResetPasswordView(UpdateAPIView):
-    serializer_class = ResetPasswordSerializer
+# class ResetPasswordView(UpdateAPIView):
+#     serializer_class = ResetPasswordSerializer
     
-    def put(self, request, user_id):
-        user = CustomUser.objects.get(id=user_id)
-        try:
-            ver_user = user.codeverivecation_set.filter(user__id=user_id).first()
-            if ver_user.is_verified:
-                data = request.data
-                serializer = self.get_serializer(data=data, context={'user_id':user_id})
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                messages = {
-                    'message':'Password Changed Successfully.'
-                }
-                ver_user.delete()
-                return Response(messages, status=status.HTTP_200_OK)
-            else:
-                return Response({'error':'please verivecation code'})
-        except:
-            return Response({'message':'ليس لديك صلاحية لتغيير كبمة المرور'})
+#     def put(self, request, user_id):
+#         user = CustomUser.objects.get(id=user_id)
+#         try:
+#             ver_user = user.codeverivecation_set.filter(user__id=user_id).first()
+#             if ver_user.is_verified:
+#                 data = request.data
+#                 serializer = self.get_serializer(data=data, context={'user_id':user_id})
+#                 serializer.is_valid(raise_exception=True)
+#                 serializer.save()
+#                 messages = {
+#                     'message':'Password Changed Successfully.'
+#                 }
+#                 ver_user.delete()
+#                 return Response(messages, status=status.HTTP_200_OK)
+#             else:
+#                 return Response({'error':'please verivecation code'})
+#         except:
+#             return Response({'message':'ليس لديك صلاحية لتغيير كبمة المرور'})
 
-class LogoutAPIView(GenericAPIView):
-    serializer_class = LogoutSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+# class GetPhonenumberView(APIView):
+#     # serializer_class = CustomUserSerializer
+#     def post(self, request):
+#         email = request.data['email']
 
+#         try: 
+#             user = get_object_or_404(CustomUser, email=email)
+#             existing_code = CodeVerivecation.objects.filter(user=user).first()
+#             if existing_code:
+#                 existing_code.delete()
 
-class GetPhonenumberView(APIView):
-    # serializer_class = CustomUserSerializer
-    def post(self, request):
-        email = request.data['email']
-
-        try: 
-            user = get_object_or_404(CustomUser, email=email)
-            existing_code = CodeVerivecation.objects.filter(user=user).first()
-            if existing_code:
-                existing_code.delete()
-
-            code_verivecation = random.randint(1000,9999)
-            email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
-            data= {'email_body':email_body, 'to_email':user.email, 'email_subject':'Verify your email'}
-            Utlil.send_eamil(data)
-            serializer = CodeVerivecationSerializer(data ={
-                'user':user.id,
-                'code':code_verivecation,
-                'is_verified':False 
-            })
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response({'message':'تم ارسال رمز التحقق'})
-        except:
-            raise serializers.ValidationError({'error':'pleace enter valid email'})
+#             code_verivecation = random.randint(1000,9999)
+#             email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
+#             data= {'email_body':email_body, 'to_email':user.email, 'email_subject':'Verify your email'}
+#             Utlil.send_eamil(data)
+#             serializer = CodeVerivecationSerializer(data ={
+#                 'user':user.id,
+#                 'code':code_verivecation,
+#                 'is_verified':False 
+#             })
+#             serializer.is_valid(raise_exception=True)
+#             serializer.save()
+#             return Response({'message':'تم ارسال رمز التحقق'})
+#         except:
+#             raise serializers.ValidationError({'error':'pleace enter valid email'})
 
 
-class VerifyCodeView(APIView):
-    def post(self, request):
-        code = request.data['code']
-        code_ver = CodeVerivecation.objects.filter(code=code).first()
-        if code_ver:
-            if timezone.now() > code_ver.expires_at:
+# class VerifyCodeView(APIView):
+#     def post(self, request):
+#         code = request.data['code']
+#         code_ver = CodeVerivecation.objects.filter(code=code).first()
+#         if code_ver:
+#             if timezone.now() > code_ver.expires_at:
                 
-                return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
-            code_ver.user.is_verified = True
-            code_ver.user.save()
-            return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
-        else:
-            raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
+#                 return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
+#             code_ver.user.is_verified = True
+#             code_ver.user.save()
+#             return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
+#         else:
+#             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
         
 
-# new view for verify code to change password
-class VerifyCodeToChangePassword(APIView):
-    def post(self, request):
-        code = request.data['code']
-        code_ver = CodeVerivecation.objects.filter(code=code).first()
-        if code_ver:
-            if timezone.now() > code_ver.expires_at:
-                return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
-            code_ver.is_verified = True
-            code_ver.save()
-            return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
-        else:
-            raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
+# # new view for verify code to change password
+# class VerifyCodeToChangePassword(APIView):
+#     def post(self, request):
+#         code = request.data['code']
+#         code_ver = CodeVerivecation.objects.filter(code=code).first()
+#         if code_ver:
+#             if timezone.now() > code_ver.expires_at:
+#                 return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
+#             code_ver.is_verified = True
+#             code_ver.save()
+#             return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
+#         else:
+#             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
 
 
 

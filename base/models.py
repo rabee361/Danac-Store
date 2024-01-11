@@ -19,10 +19,10 @@ class UserType(models.Model):
     
 
 class CustomUser(AbstractUser):
-    email = models.EmailField(max_length=50, unique=True)
+    # email = models.EmailField(max_length=50, unique=True)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     username = models.CharField(max_length=200)
-    is_verified = models.BooleanField(default=False)
+    # is_verified = models.BooleanField(default=False)
     is_accepted = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True)
     address = models.CharField(max_length=100, default='one')
@@ -79,15 +79,15 @@ class Notifications(models.Model):
         return self.user.username
 #############################################################
 
-class CodeVerivecation(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    is_verified = models.BooleanField(default=False)
-    code = models.IntegerField(validators=[MinValueValidator(1000,9999),])
-    created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField(default=timezone.now() + timedelta(minutes=10))
+# class CodeVerivecation(models.Model):
+#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+#     is_verified = models.BooleanField(default=False)
+#     code = models.IntegerField(validators=[MinValueValidator(1000,9999),])
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     expires_at = models.DateTimeField(default=timezone.now() + timedelta(minutes=10))
 
-    def __str__(self) -> str:
-        return f'{self.user.username} {self.code}'
+#     def __str__(self) -> str:
+#         return f'{self.user.username} {self.code}'
 
 
 class Client(models.Model):
@@ -281,86 +281,6 @@ class Extra_Expense(models.Model):
     def __str__(self) -> str:
         return self.employee.name
 
-
-class Incoming(models.Model):
-    products = models.ManyToManyField(Product, through='Incoming_Product')
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    # agent = models.CharField(max_length=30)
-    # num_truck = models.IntegerField(null=True)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    code_verefy = models.IntegerField(null=True, blank=True)
-    phonenumber = PhoneNumberField(region='DZ')
-    recive_pyement = models.FloatField(blank=True, default=0)
-    discount = models.FloatField(blank=True, default=0)
-    Reclaimed_products = models.FloatField(blank=True, default=0)
-    previous_depts = models.FloatField(blank=True, default=True)
-    remaining_amount = models.FloatField()
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self):
-        return str(self.id)
-        
-
-class Incoming_Product(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    incoming = models.ForeignKey(Incoming, on_delete=models.CASCADE)
-    num_item = models.IntegerField()
-    total_price = models.FloatField()
-
-    def __str__(self) -> str:
-        return f'{self.incoming.supplier.name}:{str(self.incoming.id)}'
-
-
-class ManualReceipt(models.Model):
-    products = models.ManyToManyField(Product, through='ManualReceipt_Products')
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    verify_code = models.IntegerField()
-    phonenumber = PhoneNumberField(region='DZ')
-    recive_payment = models.FloatField()
-    # discount = models.FloatField()
-    reclaimed_products = models.FloatField()
-    previous_depts = models.FloatField()
-    remaining_amount = models.FloatField(default=0)
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return f'{self.client.name} - {str(self.id)}'
-    
-    # def get_remaining_amount(self):
-    #     self.remaining_amount = (self.recive_payment + self.discount + self.reclaimed_products) - self.previous_depts
-    #     self.save()
-    
-class ManualReceipt_Products(models.Model):
-    product = models.ForeignKey(Product, on_delete= models.CASCADE)
-    manualreceipt = models.ForeignKey(ManualReceipt, on_delete= models.CASCADE)
-    discount = models.FloatField()
-    num_item = models.IntegerField(default=0)
-    total_price = models.FloatField(default=0)
-
-    def __str__(self) -> str:
-        return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
-
-
-class Deposite(models.Model):
-    detail_deposite = models.CharField(max_length=50)
-    client = models.ForeignKey(Client, on_delete= models.CASCADE)
-    total = models.FloatField()
-    verify_code = models.IntegerField()
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return self.client.name
-
-class WithDraw(models.Model):
-    details_withdraw = models.CharField(max_length=50)
-    client = models.ForeignKey(Client,on_delete=models.CASCADE, null=True)
-    total = models.FloatField()
-    verify_code = models.IntegerField()
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return self.client.name
     
 class Expense(models.Model):
     expense_name = models.CharField(max_length=100)
