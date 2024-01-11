@@ -596,8 +596,19 @@ class IncomingSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         supplier_data = validated_data.pop('supplier', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
+        print(employee)
         supplier = Supplier.objects.get(id=supplier_data.id)
         instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
+        return instance
+    
+    def update(self, instance, validated_data):
+        supplier_name = validated_data.pop('supplier', None)
+        supplier = Supplier.objects.get(id=supplier_name.id)
+        instance.supplier = supplier
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+            
+        instance.save()
         return instance
 
     
@@ -611,6 +622,7 @@ class IncomingSerializer2(serializers.ModelSerializer):
     class Meta:
         model = Incoming
         fields = '__all__'
+
     def to_representation(self, instance):
         reper = super().to_representation(instance)
         reper['supplier'] = instance.supplier.name
@@ -654,6 +666,16 @@ class ManualRecieptSerializer(serializers.ModelSerializer):
         instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
         return instance
     
+    def update(self, instance, validated_data):
+        client_name = validated_data.pop('client', None)
+        client = Client.objects.get(id=client_name.id)
+        instance.client = client
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+            
+        instance.save()
+        return instance
+    
 class ManualRecieptProductsSerializer(serializers.ModelSerializer):
     class Meta :
         model = ManualReceipt_Products
@@ -667,9 +689,10 @@ class ProductsOutputsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class OutputsSerializer(serializers.ModelSerializer):
+    # supplier = serializers.CharField()
     class Meta:
         model = Outputs
-        fields = '__all__'
+        exclude = ['employee', ]
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -700,6 +723,18 @@ class OutputsSerializer(serializers.ModelSerializer):
         supplier = Supplier.objects.get(id=supplier_data.id)
         instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
         return instance
+    
+    def update(self, instance, validated_data):
+        client_name = validated_data.pop('client', None)
+        client = Client.objects.get(id=client_name.id)
+        instance.client = client
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
 
 class GetOutputsSerializer(serializers.ModelSerializer):
     class Meta:

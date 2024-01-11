@@ -47,11 +47,13 @@ urlpatterns = [
     path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),#####
     path('delete-product-from-medium/<str:pk>/', DeleteProductsMediumView.as_view()),
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),#####
+    path('update-incoming-receipt/<str:pk>/', UpdateReceiptIncomingViews.as_view()),
     path('list-incoming/<str:pk>/', ListIncoming.as_view()),
 
     # _____________________________________________CREATE RECEIPT________________________________________
 
     path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
+    path('update-output-receipt/<str:pk>/', UpdateReceiptOutputViews.as_view()),
     path('get-product-for-receipt-output/<str:output_id>/', GetProductsOutputsView.as_view()),
     path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),#####
     path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),#####

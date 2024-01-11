@@ -420,7 +420,9 @@ class ListIncoming(RetrieveAPIView):
     queryset = Incoming.objects.all()
     serializer_class = IncomingSerializer2
 
-
+class UpdateReceiptIncomingViews(UpdateAPIView):
+    queryset = Incoming.objects.all()
+    serializer_class = IncomingSerializer
 
 # Add Or Get Products From Cart
 class ListCreateCartProduct(APIView):
@@ -544,6 +546,10 @@ class ReceiptOrdersView(APIView):
             return Response(output_serializer.data)
         return Response(output_serializer.errors)
     
+class UpdateReceiptOutputViews(UpdateAPIView):
+    queryset = Outputs.objects.all()
+    serializer_class = OutputsSerializer
+
 class ListCreateDeliveryArrived(APIView):
 
     def post(self, request, pk):
@@ -791,7 +797,7 @@ class CreateManualReceiptView(APIView):
             return Response(manual_receipt_serializer.data)
         return Response(manual_receipt_serializer.errors)
 
-
+cl
 class CreateMediumTwo(ListCreateAPIView):
     queryset = MediumTwo.objects.all()
     serializer_class = MediumTwoSerializer
