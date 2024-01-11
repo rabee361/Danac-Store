@@ -106,12 +106,14 @@ urlpatterns = [
     path('get-receipt-output/<str:pk>/', GetOutput.as_view(), name='get-output'),#####
     path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), ####   
     path('list-outputs/' , ListOutputs.as_view() , name="list-outputs"),##### 
+    path('update-output/<str:pk>/' , UpdateOutputReceipt.as_view() , name="update-output"),##### new
     path('get-output-product/<str:pk>/' , RetUpdDesOutputProduct.as_view()),
     path('create-output-product/' , CreateOutputProduct.as_view()),
  
     path('get-receipt-incoming/<str:pk>/' , GetIncoming.as_view() , name="get-incoming"),##### 
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),#### 
     path('list-incoming/' , ListIncomings.as_view() , name="list-incomings"),##### 
+    path('update-incoming/<str:pk>/' , UpdateIncomingReceipt.as_view() , name="update-incoming"),##### new
     path('get-incoming-product/<str:pk>/' , RetUpdDesIncomingProduct.as_view()),
     path('create-incoming-product/' , CreateIncomingProduct.as_view()),
  
