@@ -1394,9 +1394,27 @@ class IncomingSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         supplier_data = validated_data.pop('supplier', None)
+        remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         supplier = Supplier.objects.get(id=supplier_data.id)
-        instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
+        instance = Incoming.objects.create(employee=employee, supplier=supplier,remaining_amount=remaining_amount ,**validated_data)
+        supplier.debts += remaining_amount
+        supplier.save()
+        return instance
+    
+    def update(self, instance, validated_data):
+        supplier_name = validated_data.pop('supplier', None)
+        supplier = Supplier.objects.get(id=supplier_name.id)
+        orginal_remaining_amount = instance.remaining_amount
+        super().update(instance, validated_data)
+        deff_remaining_amount = instance.remaining_amount - orginal_remaining_amount
+        instance.supplier = supplier
+        supplier.debts -= deff_remaining_amount
+        supplier.save()
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+            
+        instance.save()
         return instance
     
     def to_representation(self, instance):
@@ -1472,10 +1490,28 @@ class ManualRecieptSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         client_data = validated_data.pop('client', None)
+        remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         client = Client.objects.get(id=client_data.id)
-        instance = ManualReceipt.objects.create(employee=employee, client=client, **validated_data)
-        return instance    
+        instance = Incoming.objects.create(employee=employee, client=client, **validated_data)
+        client.debts += remaining_amount
+        client.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        client_name = validated_data.pop('client', None)
+        client = Client.objects.get(id=client_name.id)
+        orginal_remaining_amount = instance.remaining_amount
+        super().update(instance, validated_data)
+        deff_remaining_amount = instance.remaining_amount - orginal_remaining_amount
+        instance.client = client
+        client.debts -= deff_remaining_amount
+        client.save()
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+            
+        instance.save()
+        return instance  
 
 
 class ManualRecieptProductsSerializer(serializers.ModelSerializer):
@@ -1522,27 +1558,27 @@ class OutputSerializer(serializers.ModelSerializer):
 
 class ProductsOutputSerializer2(serializers.ModelSerializer):
     # id = serializers.IntegerField(source='products.id')
-    name = serializers.CharField(source='products.name')
+    name = serializers.CharField(source='products.name',read_only=True)
     num_per_item = serializers.IntegerField(source='products.num_per_item',read_only=True)
     sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
     # total_price = serializers.FloatField(source='total',read_only=True)
 
     class Meta:
         model = Output_Products
-        fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'discount', 'output']
+        fields = ['id', 'products','name', 'num_per_item', 'sale_price', 'quantity', 'total_price', 'discount', 'output']
 
     def create(self, validated_data):
         instance = super().create(validated_data)
-        product = instance.product
-        product.quantity -= instance.num_item
+        product = instance.products
+        product.quantity -= instance.quantity
         product.save()
         return instance
 
     def update(self, instance, validated_data):
-        original_quantity = instance.num_item
+        original_quantity = instance.quantity
         super().update(instance, validated_data)
-        quantity_diff = instance.num_item - original_quantity
-        product = instance.product
+        quantity_diff = instance.quantity - original_quantity
+        product = instance.products
         product.quantity -= quantity_diff
         product.save()
         return instance
@@ -1608,10 +1644,28 @@ class OutputSerializer2(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         client_data = validated_data.pop('client', None)
+        remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         client = Client.objects.get(id=client_data.id)
-        instance = Output.objects.create(employee=employee, client=client, **validated_data)
-        return instance    
+        instance = Incoming.objects.create(employee=employee, client=client, **validated_data)
+        client.debts += remaining_amount
+        client.save()
+        return instance
+    
+    def update(self, instance, validated_data):
+        client_name = validated_data.pop('client', None)
+        client = Client.objects.get(id=client_name.id)
+        orginal_remaining_amount = instance.remaining_amount
+        super().update(instance, validated_data)
+        deff_remaining_amount = instance.remaining_amount - orginal_remaining_amount
+        instance.client = client
+        client.debts -= deff_remaining_amount
+        client.save()        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance 
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
