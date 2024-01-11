@@ -1309,11 +1309,19 @@ class IncomingProductsSerializer2(serializers.ModelSerializer):
         fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'incoming']
 
     def create(self, validated_data):
-        instance = super().create(validated_data)
-        product = instance.product
-        product.quantity -= instance.num_item
-        product.save()
-        return instance
+        product = validated_data.get('product')
+        num_item = validated_data.get('num_item')
+        incoming_receipt = validated_data.get('incoming')
+        incoming_product = Incoming_Product.objects.filter(product=product,incoming=incoming_receipt).first()
+        if incoming_product:
+            incoming_product.num_item += num_item
+            incoming_product.save()
+            return incoming_product
+        else:
+            instance = super().create(validated_data)
+            product.quantity -= num_item
+            product.save()
+            return instance
 
     def update(self, instance, validated_data):
         original_quantity = instance.num_item
@@ -1440,11 +1448,19 @@ class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
         fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'num_item', 'price' ,'total_price', 'manualreceipt']
 
     def create(self, validated_data):
-        instance = super().create(validated_data)
-        product = instance.product
-        product.quantity -= instance.num_item
-        product.save()
-        return instance
+        product = validated_data.get('product')
+        num_item = validated_data.get('num_item')
+        manual_receipt = validated_data.get('manualreceipt')
+        manual_product = ManualReceipt_Products.objects.filter(product=product,manualreceipt=manual_receipt).first()
+        if manual_product:
+            manual_product.num_item += num_item
+            manual_product.save()
+            return manual_product
+        else:
+            instance = super().create(validated_data)
+            product.quantity -= num_item
+            product.save()
+            return instance
 
     def update(self, instance, validated_data):
         original_quantity = instance.num_item
@@ -1454,8 +1470,6 @@ class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
         product.quantity -= quantity_diff
         product.save()
         return instance
-
-
 
 
 
@@ -1568,11 +1582,19 @@ class ProductsOutputSerializer2(serializers.ModelSerializer):
         fields = ['id', 'products','name', 'num_per_item', 'sale_price', 'quantity', 'total_price', 'discount', 'output']
 
     def create(self, validated_data):
-        instance = super().create(validated_data)
-        product = instance.products
-        product.quantity -= instance.quantity
-        product.save()
-        return instance
+        product = validated_data.get('products')
+        quantity = validated_data.get('quantity')
+        output_receipt = validated_data.get('output')
+        output_product = Output_Products.objects.filter(products=product,output=output_receipt).first()
+        if output_product:
+            output_product.quantity += quantity
+            output_product.save()
+            return output_product
+        else:
+            instance = super().create(validated_data)
+            product.quantity -= quantity
+            product.save()
+            return instance
 
     def update(self, instance, validated_data):
         original_quantity = instance.quantity

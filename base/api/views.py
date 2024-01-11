@@ -862,7 +862,7 @@ class ListOutputs(ListAPIView):
 
 class UpdateOutputReceipt(RetrieveUpdateDestroyAPIView):
     queryset = Output.objects.all()
-    serializer_class = IncomingSerializer
+    serializer_class = OutputSerializer2
 
 class RetUpdDesOutputProduct(RetrieveUpdateDestroyAPIView):
     queryset = Output_Products.objects.all()
