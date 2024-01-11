@@ -1553,7 +1553,7 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
         return obj.calculate_total_receipt()
     
     def get_client_points(self,obj):
-        client = Client.objects.get(self.client.id)
+        client = obj.client
         points = Points.objects.filter(client=client).aggregate(
             total = Sum('number')
         )['total'] or 0
@@ -1676,7 +1676,7 @@ class OutputSerializer2(serializers.ModelSerializer):
         return obj.calculate_total_receipt()
     
     def get_client_points(self,obj):
-        client = Client.objects.get(self.client.id)
+        client = obj.client
         points = Points.objects.filter(client=client).aggregate(
             total = Sum('number')
         )['total'] or 0
