@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from base.models import *
+from rest_framework.response import Response
 from django.contrib.auth import  authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
-from django.db.models import Q
+from django.db.models import Q , F , Sum
 from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import to_python
 ############################################################## AUTHENTICATION ###################################################
@@ -1507,7 +1508,7 @@ class ManualRecieptSerializer(serializers.ModelSerializer):
         remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         client = Client.objects.get(id=client_data.id)
-        instance = Incoming.objects.create(employee=employee, client=client, **validated_data)
+        instance = ManualReceipt.objects.create(employee=employee, client=client, **validated_data)
         client.debts += remaining_amount
         client.save()
         return instance
@@ -1536,19 +1537,29 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
     
     class Meta :
         model = ManualReceipt_Products
-        fields = ['id', 'name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'manualreceipt']
+        fields = ['id', 'name', 'num_per_item', 'sale_price', 'num_item','total_price', 'manualreceipt']
 
 
 class ManualRecieptSerializer2(serializers.ModelSerializer):
     products = ManualRecieptProductsSerializer(source='manualreceipt_products_set', many=True,read_only=True)
     client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
     total_receipt = serializers.SerializerMethodField()
+    client_points = serializers.SerializerMethodField()
     class Meta:
         model = ManualReceipt
-        fields = ['id','client','client_phone','total_receipt','employee','phonenumber','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','client','client_phone','client_points','total_receipt','employee','phonenumber','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
 
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
+    
+    def get_client_points(self,obj):
+        client = Client.objects.get(id=1)
+        points = Points.objects.filter(client=client).aggregate(
+            total = Sum('number')
+        )['total'] or 0
+        return points
+
+        
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
@@ -1626,6 +1637,7 @@ class OutputSerializer2(serializers.ModelSerializer):
     latitude = serializers.SerializerMethodField()
     client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
     total_receipt = serializers.SerializerMethodField()
+    client_points = serializers.SerializerMethodField()
 
     class Meta:
         model = Output
@@ -1662,6 +1674,13 @@ class OutputSerializer2(serializers.ModelSerializer):
 
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
+    
+    def get_client_points(self,obj):
+        client = Client.objects.get(id=1)
+        points = Points.objects.filter(client=client).aggregate(
+            total = Sum('number')
+        )['total'] or 0
+        return points
 
     def create(self, validated_data):
         request = self.context.get('request')

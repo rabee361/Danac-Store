@@ -884,6 +884,7 @@ class ReceiptOrdersView(APIView):
     def post(self, request, medium_id):
         output_serializer = OutputSerializer2(data=request.data, context={'request': request})
         if output_serializer.is_valid():
+            total_points = 0
             output = output_serializer.save()
             products = Products_Medium.objects.filter(medium__id=medium_id)
             for product in products:
@@ -916,6 +917,11 @@ class ReceiptOrdersView(APIView):
                     quantity = product.num_item,
                     total_price = product.total_price
                 )
+                total_points += output_product.product_points
+            client_points = Points.objects.create(
+                client = output.client,
+                number = total_points
+            )
             products.delete()
             medium = Medium.objects.get(id=medium_id)
             medium.delete()
@@ -1099,6 +1105,7 @@ class CreateManualReceiptView(APIView):
     def post(self, request, medium_id):
         manual_receipt_serializer = ManualRecieptSerializer(data=request.data, context={'request': request})
         if manual_receipt_serializer.is_valid():
+            total_points = 0
             manual_receipt = manual_receipt_serializer.save()
             products = Products_Medium.objects.filter(medium__id=medium_id)
             for product in products:
@@ -1130,6 +1137,11 @@ class CreateManualReceiptView(APIView):
                     price=product.price,
                     total_price = product.total_price_of_item,
                 )
+                total_points += manual_receipt_products.product_points
+            client_points = Points.objects.create(
+                client = manual_receipt.client,
+                number = total_points
+            )
             products.delete()
             medium = Medium.objects.get(id=medium_id)
             medium.delete()

@@ -184,7 +184,7 @@ class ProductMediumAdmin(admin.ModelAdmin):
 
 class ProductAdmin(ImportExportModelAdmin):
     resource_class = ProductResource
-    list_display = ['id', 'name', 'quantity', 'purchasing_price', 'category', 'num_per_item', 'item_per_carton']
+    list_display = ['id', 'name', 'quantity', 'purchasing_price', 'points','category', 'num_per_item', 'item_per_carton']
     search_fields = ['name']
 
 

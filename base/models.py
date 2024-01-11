@@ -160,6 +160,7 @@ class Product(models.Model):
     sale_price = models.IntegerField()
     added = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200,default=' ',blank=True)
+    points = models.IntegerField()
     class Meta:
         ordering = ['-added']
         app_label = 'Clients_and_Products'
@@ -310,12 +311,13 @@ class Employee(models.Model):
         return f'{self.name}'
 
 
-
+def get_expiration_date():
+    return timezone.now() + timedelta(days=30)
 
 class Points(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     number = models.FloatField()
-    expire_date = models.DateField()
+    expire_date = models.DateField(default=get_expiration_date)
     date = models.DateField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
 
@@ -811,6 +813,11 @@ class Output_Products(models.Model):
     quantity = models.IntegerField()
     total_price = models.FloatField(default=0)
     discount = models.FloatField(default=0)
+    product_points = models.IntegerField()
+
+    def save(self, *args, **kwargs):
+        self.product_points = self.num_item * self.product.points
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['-products_id']
@@ -818,6 +825,8 @@ class Output_Products(models.Model):
 
     def __str__(self) -> str:
         return f'{self.products.name} {self.output.id}'
+
+
 
 class DelievaryArrived(models.Model):
     output_receipt = models.OneToOneField(Output, on_delete=models.CASCADE)
@@ -866,8 +875,13 @@ class ManualReceipt_Products(models.Model):
     product = models.ForeignKey(Product, on_delete= models.CASCADE)
     manualreceipt = models.ForeignKey(ManualReceipt, on_delete= models.CASCADE)
     price = models.FloatField()
-    num_item = models.IntegerField(default=0)
+    num_item = models.IntegerField()
     total_price = models.FloatField(default=0)
+    product_points = models.IntegerField()
+
+    def save(self, *args, **kwargs):
+        self.product_points = self.num_item * self.product.points
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['-product_id']
