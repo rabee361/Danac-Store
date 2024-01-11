@@ -263,7 +263,11 @@ class SupplierSerializer(serializers.ModelSerializer):
         repr = super().to_representation(instance)
         repr['name'] = modify_name(repr['name'])
         return repr
-    
+
+class DebtsSupplierSerizlizer(serializers.ModelSerializer):
+    class Meta:
+        model = Supplier
+        fields = ['debts']
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -595,16 +599,23 @@ class IncomingSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         supplier_data = validated_data.pop('supplier', None)
+        remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
-        print(employee)
         supplier = Supplier.objects.get(id=supplier_data.id)
-        instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
+        instance = Incoming.objects.create(employee=employee, supplier=supplier,remaining_amount=remaining_amount ,**validated_data)
+        supplier.debts += remaining_amount
+        supplier.save()
         return instance
     
     def update(self, instance, validated_data):
         supplier_name = validated_data.pop('supplier', None)
         supplier = Supplier.objects.get(id=supplier_name.id)
+        orginal_remaining_amount = instance.remaining_amount
+        super().update(instance, validated_data)
+        deff_remaining_amount = instance.remaining_amount - orginal_remaining_amount
         instance.supplier = supplier
+        supplier.debts -= deff_remaining_amount
+        supplier.save()
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
             
@@ -660,16 +671,24 @@ class ManualRecieptSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get('request')
-        supplier_data = validated_data.pop('supplier', None)
+        client_data = validated_data.pop('client', None)
+        remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
-        supplier = Supplier.objects.get(id=supplier_data.id)
-        instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
+        client = Client.objects.get(id=client_data.id)
+        instance = Incoming.objects.create(employee=employee, client=client, **validated_data)
+        client.debts += remaining_amount
+        client.save()
         return instance
     
     def update(self, instance, validated_data):
         client_name = validated_data.pop('client', None)
         client = Client.objects.get(id=client_name.id)
+        orginal_remaining_amount = instance.remaining_amount
+        super().update(instance, validated_data)
+        deff_remaining_amount = instance.remaining_amount - orginal_remaining_amount
         instance.client = client
+        client.debts -= deff_remaining_amount
+        client.save()
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
             
@@ -718,16 +737,24 @@ class OutputsSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         request = self.context.get('request')
-        supplier_data = validated_data.pop('supplier', None)
+        client_data = validated_data.pop('client', None)
+        remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
-        supplier = Supplier.objects.get(id=supplier_data.id)
-        instance = Incoming.objects.create(employee=employee, supplier=supplier, **validated_data)
+        client = Client.objects.get(id=client_data.id)
+        instance = Incoming.objects.create(employee=employee, client=client, **validated_data)
+        client.debts += remaining_amount
+        client.save()
         return instance
     
     def update(self, instance, validated_data):
         client_name = validated_data.pop('client', None)
         client = Client.objects.get(id=client_name.id)
+        orginal_remaining_amount = instance.remaining_amount
+        super().update(instance, validated_data)
+        deff_remaining_amount = instance.remaining_amount - orginal_remaining_amount
         instance.client = client
+        client.debts -= deff_remaining_amount
+        client.save()        
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 

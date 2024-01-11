@@ -94,4 +94,7 @@ urlpatterns = [
     path('delete-medium-two/<str:pk>/', DeleteMediumTwo.as_view()),
     path('get-notification/', GetNotificationView.as_view()),
 
+    ################   new
+    path('get-debts-supplier/<str:pk>/', GetDebtSupplier.as_view()),
+
 ]

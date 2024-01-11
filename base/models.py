@@ -102,6 +102,7 @@ class Client(models.Model):
     category = models.CharField(max_length=75, choices=CHOICES, null=True)
     phonenumber = PhoneNumberField(region='DZ')
     info = models.TextField(null=True)
+    debts = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -196,6 +197,7 @@ class Supplier(models.Model):
     phonenumber = PhoneNumberField(region='DZ')
     address = models.CharField(max_length=100)
     info = models.TextField(max_length=500)
+    debts = models.PositiveIntegerField(default=0)
 
     def __str__(self) -> str:
         return self.name

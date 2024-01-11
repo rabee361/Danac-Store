@@ -240,7 +240,13 @@ class GetSupplier(RetrieveUpdateDestroyAPIView):
     queryset = Supplier.objects.all()
     serializer_class= SupplierSerializer
 
+class GetDebtSupplier(RetrieveAPIView):
+    queryset = Supplier.objects.all()
+    serializer_class = DebtsSupplierSerizlizer
+
+    
 class ListOrdersUserView(GenericAPIView):
+
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated, Is_Client]
 
@@ -797,7 +803,6 @@ class CreateManualReceiptView(APIView):
             return Response(manual_receipt_serializer.data)
         return Response(manual_receipt_serializer.errors)
 
-cl
 class CreateMediumTwo(ListCreateAPIView):
     queryset = MediumTwo.objects.all()
     serializer_class = MediumTwoSerializer
