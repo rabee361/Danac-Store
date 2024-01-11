@@ -1298,6 +1298,34 @@ class SpecialSerializer(serializers.ModelSerializer):
         fields = ['id','name','num_per_item','sale_price']
 
 
+class IncomingProductsSerializer2(serializers.ModelSerializer):
+    # product = serializers.IntegerField(source='product.id',read_only=True)
+    name = serializers.CharField(source='product.name',read_only=True)
+    num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
+    sale_price = serializers.FloatField(source='product.sale_price',read_only=True)
+
+    class Meta:
+        model = Incoming_Product
+        fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'incoming']
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        product = instance.product
+        product.quantity -= instance.num_item
+        product.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        original_quantity = instance.num_item
+        super().update(instance, validated_data)
+        quantity_diff = instance.num_item - original_quantity
+        product = instance.product
+        product.quantity -= quantity_diff
+        product.save()
+        return instance
+
+
+
 
 class IncomingProductsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='product.id')
@@ -1381,6 +1409,39 @@ class IncomingSerializer(serializers.ModelSerializer):
 ############################# 
 
 
+
+
+class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
+    # product = serializers.IntegerField()
+    name = serializers.CharField(source='product.name',read_only=True)
+    num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
+    sale_price = serializers.FloatField(source='price',read_only=True)
+    
+    class Meta :
+        model = ManualReceipt_Products
+        fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'num_item', 'price' ,'total_price', 'manualreceipt']
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        product = instance.product
+        product.quantity -= instance.num_item
+        product.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        original_quantity = instance.num_item
+        super().update(instance, validated_data)
+        quantity_diff = instance.num_item - original_quantity
+        product = instance.product
+        product.quantity -= quantity_diff
+        product.save()
+        return instance
+
+
+
+
+
+
 class ManualRecieptSerializer(serializers.ModelSerializer):
     class Meta:
         model = ManualReceipt
@@ -1457,7 +1518,35 @@ class OutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Output
         fields = ['id','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered']
-    
+
+
+class ProductsOutputSerializer2(serializers.ModelSerializer):
+    # id = serializers.IntegerField(source='products.id')
+    name = serializers.CharField(source='products.name')
+    num_per_item = serializers.IntegerField(source='products.num_per_item',read_only=True)
+    sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
+    # total_price = serializers.FloatField(source='total',read_only=True)
+
+    class Meta:
+        model = Output_Products
+        fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'discount', 'output']
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        product = instance.product
+        product.quantity -= instance.num_item
+        product.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        original_quantity = instance.num_item
+        super().update(instance, validated_data)
+        quantity_diff = instance.num_item - original_quantity
+        product = instance.product
+        product.quantity -= quantity_diff
+        product.save()
+        return instance
+
 
 
 class ProductsOutputSerializer(serializers.ModelSerializer):

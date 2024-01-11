@@ -860,6 +860,25 @@ class ListOutputs(ListAPIView):
         return {'show_datetime': False}
 
 
+class UpdateOutputReceipt(RetrieveUpdateDestroyAPIView):
+    queryset = Output.objects.all()
+    serializer_class = IncomingSerializer
+
+class RetUpdDesOutputProduct(RetrieveUpdateDestroyAPIView):
+    queryset = Output_Products.objects.all()
+    serializer_class = ProductsOutputSerializer2
+
+    def perform_destroy(self, instance):
+        product = instance.product
+        product.quantity += instance.num_item
+        product.save()
+        instance.delete()
+
+class CreateOutputProduct(CreateAPIView):
+    queryset = Output_Products.objects.all()
+    serializer_class = ProductsOutputSerializer2
+
+
 class ReceiptOrdersView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def post(self, request, medium_id):
@@ -1051,6 +1070,25 @@ class ListIncomings(ListAPIView):
         return {'show_datetime': False}
 
 
+class UpdateIncomingReceipt(RetrieveUpdateDestroyAPIView):
+    queryset = Incoming.objects.all()
+    serializer_class = IncomingSerializer
+
+class RetUpdDesIncomingProduct(RetrieveUpdateDestroyAPIView):
+    queryset = Incoming_Product.objects.all()
+    serializer_class = IncomingProductsSerializer2
+
+    def perform_destroy(self, instance):
+        product = instance.product
+        product.quantity += instance.num_item
+        product.save()
+        instance.delete()
+
+class CreateIncomingProduct(CreateAPIView):
+    queryset = Incoming_Product.objects.all()
+    serializer_class = IncomingProductsSerializer2
+
+
 
 ############################### MANUAL RECEIPT #####################################################
     
@@ -1116,11 +1154,23 @@ class ListManualReceipt(ListAPIView):
         return {'show_datetime': False}
 
 
-
-class UpdateManualReceipt(RetrieveUpdateAPIView):
+class UpdateManualReceipt(RetrieveUpdateDestroyAPIView):
     queryset = ManualReceipt.objects.all()
     serializer_class = ManualRecieptSerializer
 
+class RetUpdDesManualReceiptProduct(RetrieveUpdateDestroyAPIView):
+    queryset = ManualReceipt_Products.objects.all()
+    serializer_class = ManualRecieptProductsSerializer2
+
+    def perform_destroy(self, instance):
+        product = instance.product
+        product.quantity += instance.num_item
+        product.save()
+        instance.delete()
+
+class CreateManualProduct(CreateAPIView):
+    queryset = ManualReceipt_Products.objects.all()
+    serializer_class = ManualRecieptProductsSerializer2
 
 
 ########################## MEDIUM 2 #######################################################################################
