@@ -663,6 +663,21 @@ class RetUpdDesClientDebt(RetrieveUpdateDestroyAPIView):
         client.save()
         instance.delete()
 
+
+class GetClientDebt(APIView):
+    def get(self,request,pk):
+        client = Client.objects.get(id=pk)
+        serializer = ClientSerializer(client,many=False)
+        return Response({"client_debt":serializer.data['debts']})
+
+
+class GetSupplierDebt(APIView):
+    def get(self,request,pk):
+        supplier = Supplier.objects.get(id=pk)
+        serializer = SupplierSerializer(supplier,many=False)
+        return Response({"supplier_debt":serializer.data['debts']})
+
+
 class ListCreateDeposite(ListCreateAPIView):
     queryset = Deposite.objects.all()
     serializer_class = DepositeSerializer
