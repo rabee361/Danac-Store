@@ -506,20 +506,8 @@ class ReceiptOrdersView(APIView):
 
     def post(self, request, medium_id):
         client_id = request.data['client']
-        client = Client.objects.filter(id=client_id).first()
-        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
-        output_serializer = OutputsSerializer(data={
-            'employee':employee.id,
-            "client": client.id,
-            "verify_code": request.data['verify_code'],
-            "recive_pyement": request.data['recive_pyement'],
-            "phonenumber":request.data['phonenumber'], 
-            "discount":request.data['discount'],
-            "Reclaimed_products": request.data['Reclaimed_products'],
-            "previous_depts": request.data['previous_depts'],
-            'remaining_amount':request.data['remaining_amount'],
-            
-        })
+
+        output_serializer = OutputsSerializer(data=request.data, context={'request':request})
         if output_serializer.is_valid():
             output = output_serializer.save()
             products = Products_Medium.objects.filter(medium__id=medium_id)
@@ -766,19 +754,7 @@ class CreateManualReceiptView(APIView):
 
     def post(self, request, medium_id):
         user = request.user
-        client = Client.objects.get(id=request.data['client'])
-        employee = Employee.objects.get(phonenumber=user.phonenumber)
-        manual_receipt_serializer = ManualRecieptSerializer(data={
-            "employee":employee.id,
-            "client": client.id,
-            "verify_code": request.data['verify_code'],
-            "phonenumber":request.data['phonenumber'], 
-            "recive_payment": request.data['recive_payment'],
-            # "discount":request.data['discount'],
-            "reclaimed_products": request.data['reclaimed_products'],
-            "previous_depts": request.data['previous_depts'],
-            "remaining_amount":request.data['remaining_amount'],
-        })
+        manual_receipt_serializer = ManualRecieptSerializer(data=request.data, context={'request':request})
         if manual_receipt_serializer.is_valid():
             manual_receipt = manual_receipt_serializer.save()
             products = Products_Medium.objects.filter(medium__id=medium_id)
