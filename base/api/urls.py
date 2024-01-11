@@ -67,8 +67,6 @@ urlpatterns = [
     path('salaries/' , ListCreateSalary.as_view() , name="create-salary"),######## 
     path('employee-salary-info/<str:pk>' , GetSalaryEmployee.as_view() , name="salary-info"),#### new 
 
-
-
     path('sales-employees/' , SalesEmployee.as_view() , name="sale-employees"),###### new
     path('get-sales-employee/<str:pk>' , RetSalesEmployee.as_view() , name="get-sales-employee"), ##### new
 

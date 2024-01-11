@@ -8,8 +8,6 @@ from base.api.utils import Utlil
 from base.api.serializers import CodeVerivecationSerializer
 from import_export.admin import ImportExportModelAdmin
 from base.resources import ProductResource
-from django.urls import reverse
-from django.utils.html import format_html
 from arabic_reshaper import reshape
 from bidi.algorithm import get_display
 from django.http import HttpResponse
@@ -19,8 +17,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet
 styles = getSampleStyleSheet()
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+
 
 
 admin.site.site_header = "Danac"

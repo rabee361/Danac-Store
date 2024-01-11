@@ -166,7 +166,7 @@ class ClientSerializer(serializers.ModelSerializer):
     total_points = serializers.SerializerMethodField()
     class Meta:
         model = Client
-        fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points']
+        fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points','debts']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -440,7 +440,7 @@ class SalesEmployeeLocationSerializer(serializers.ModelSerializer):
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
-        fields = ['id','name','company_name','address','phone_number','info']
+        fields = ['id','name','company_name','address','phone_number','info','debts']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -730,6 +730,23 @@ class Client_DebtSerializer(serializers.ModelSerializer):
 
     def get_total_sum(self, obj):
         return Debt_Client.get_total_sum()
+
+
+    def create(self, validated_data):
+        debt_client = Debt_Client.objects.create(**validated_data)
+        client = debt_client.client_name
+        client.debts += debt_client.amount
+        client.save()
+        return debt_client
+
+    def update(self, instance, validated_data):
+        debt_difference = validated_data.get('amount', instance.amount) - instance.amount
+        instance = super().update(instance, validated_data)
+        client = instance.client_name
+        client.debts += debt_difference
+        client.save()
+        return instance
+
     
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -773,6 +790,21 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
 
     def get_total_sum(self, obj):
         return Debt_Supplier.get_total_sum()
+    
+    def create(self, validated_data):
+        supplier_debt = Debt_Supplier.objects.create(**validated_data)
+        supplier = supplier_debt.supplier_name
+        supplier.debts += supplier_debt.amount
+        supplier.save()
+        return supplier_debt
+
+    def update(self, instance, validated_data):
+        debt_difference = validated_data.get('amount', instance.amount) - instance.amount
+        instance = super().update(instance, validated_data)
+        supplier = instance.supplier_name
+        supplier.debts += debt_difference
+        supplier.save()
+        return instance
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
