@@ -816,7 +816,7 @@ class Output_Products(models.Model):
     product_points = models.IntegerField()
 
     def save(self, *args, **kwargs):
-        self.product_points = self.num_item * self.product.points
+        self.product_points = self.quantity * self.products.points
         super().save(*args, **kwargs)
 
     class Meta:

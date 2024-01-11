@@ -1688,7 +1688,7 @@ class OutputSerializer2(serializers.ModelSerializer):
         remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         client = Client.objects.get(id=client_data.id)
-        instance = Incoming.objects.create(employee=employee, client=client, **validated_data)
+        instance = Output.objects.create(employee=employee, client=client, **validated_data)
         client.debts += remaining_amount
         client.save()
         return instance
