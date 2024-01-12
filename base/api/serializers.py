@@ -1332,6 +1332,28 @@ class IncomingProductsSerializer2(serializers.ModelSerializer):
         product.quantity -= quantity_diff
         product.save()
         return instance
+    
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be blank.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+            elif first_error_message == "A valid number is required.":
+                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be null.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
 
 
 
@@ -1471,6 +1493,28 @@ class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
         product.quantity -= quantity_diff
         product.save()
         return instance
+    
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be blank.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+            elif first_error_message == "A valid number is required.":
+                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be null.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
 
 
 
@@ -1606,6 +1650,29 @@ class ProductsOutputSerializer2(serializers.ModelSerializer):
             product.quantity -= quantity
             product.save()
             return instance
+        
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be blank.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+            elif first_error_message == "A valid number is required.":
+                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be null.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+    
 
     def update(self, instance, validated_data):
         original_quantity = instance.quantity
