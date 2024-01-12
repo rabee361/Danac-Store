@@ -681,7 +681,9 @@ class GetSupplierDebt(APIView):
         try:
             supplier = Supplier.objects.get(id=pk)
             serializer = SupplierSerializer(supplier,many=False)
-            return Response({"supplier_debt":serializer.data['debts']})
+            return Response({
+                "supplier" : pk,
+                "supplier_debt":serializer.data['debts']})
         except:
             return Response({"error": "No Supplier with that id"})   
     
