@@ -1464,7 +1464,7 @@ class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
     # product = serializers.IntegerField()
     name = serializers.CharField(source='product.name',read_only=True)
     num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
-    sale_price = serializers.FloatField(source='product.price',read_only=True)
+    sale_price = serializers.FloatField(source='product.sale_price',read_only=True)
     
     class Meta :
         model = ManualReceipt_Products
