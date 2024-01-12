@@ -666,9 +666,14 @@ class RetUpdDesClientDebt(RetrieveUpdateDestroyAPIView):
 
 class GetClientDebt(APIView):
     def get(self,request,pk):
-        client = Client.objects.get(id=pk)
-        serializer = ClientSerializer(client,many=False)
-        return Response({"client_debt":serializer.data['debts']})
+        try:
+            client = Client.objects.get(id=pk)
+            serializer = ClientSerializer(client,many=False)
+            return Response({
+                "client" : pk ,
+                "client_debt":serializer.data['debts']})
+        except:
+            return Response("No Cliet with that id")
 
 
 class GetSupplierDebt(APIView):
