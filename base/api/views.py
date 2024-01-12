@@ -673,14 +673,18 @@ class GetClientDebt(APIView):
                 "client" : pk ,
                 "client_debt":serializer.data['debts']})
         except:
-            return Response("No Cliet with that id")
+            return Response({"error": "No Cliet with that id"})
 
 
 class GetSupplierDebt(APIView):
     def get(self,request,pk):
-        supplier = Supplier.objects.get(id=pk)
-        serializer = SupplierSerializer(supplier,many=False)
-        return Response({"supplier_debt":serializer.data['debts']})
+        try:
+            supplier = Supplier.objects.get(id=pk)
+            serializer = SupplierSerializer(supplier,many=False)
+            return Response({"supplier_debt":serializer.data['debts']})
+        except:
+            return Response({"error": "No Supplier with that id"})   
+    
 
 
 class ListCreateDeposite(ListCreateAPIView):
