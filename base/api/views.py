@@ -386,24 +386,7 @@ class Add_To_Medium(APIView):
 class CreateIncomingView(APIView):
 
     def post(self, request, medium_id):
-        # user = request.user
-        # supplier = Supplier.objects.get(id=request.data['supplier'])
-        # employee = Employee.objects.get(phonenumber=user.phonenumber)
-        incoming_serializer = IncomingSerializer(data=request.data, context={'request': request}
-        #     data={
-        #     "employee":employee.id,
-        #     "supplier": supplier.id,
-        #     # "agent":request.data['agent'],
-        #     # "num_truck":request.data['num_truck'],
-        #     "code_verefy": request.data['code_verefy'],
-        #     "recive_pyement": request.data['recive_pyement'],
-        #     "phonenumber":request.data['phonenumber'], 
-        #     "discount":request.data['discount'],
-        #     "Reclaimed_products": request.data['Reclaimed_products'],
-        #     "previous_depts": request.data['previous_depts'],
-        #     "remaining_amount":request.data['remaining_amount'],
-        # }
-        )
+        incoming_serializer = IncomingSerializer(data=request.data, context={'request': request})
         if incoming_serializer.is_valid():
             incoming = incoming_serializer.save()
             products = Products_Medium.objects.filter(medium__id=medium_id)

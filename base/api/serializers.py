@@ -1062,3 +1062,120 @@ class SerializerNotificationI(serializers.ModelSerializer):
         reper = super().to_representation(instance)
         reper['username'] = instance.user.username
         return reper
+    
+# --------------------------------------------DEBTS-CLIENT-SUPPLIER--------------------------------------------
+    
+class Supplier_DebtSerializer(serializers.ModelSerializer):
+    total_supplier_debts = serializers.SerializerMethodField()
+    total_sum = serializers.SerializerMethodField()
+    supplier_id = serializers.IntegerField(source='supplier_name.id',read_only=True)
+    class Meta :
+        model = Debt_Supplier
+        fields = ['id','supplier_name','supplier_id','amount','payment_method','bank_name','check_num','date','total_supplier_debts','total_sum']
+
+    def get_total_supplier_debts(self, obj):
+        return Debt_Supplier.get_total_supplier_debts()
+
+    def get_total_sum(self, obj):
+        return Debt_Supplier.get_total_sum()
+    
+    def create(self, validated_data):
+        supplier_debt = Debt_Supplier.objects.create(**validated_data)
+        supplier = supplier_debt.supplier_name
+        supplier.debts += supplier_debt.amount
+        supplier.save()
+        return supplier_debt
+
+    def update(self, instance, validated_data):
+        debt_difference = validated_data.get('amount', instance.amount) - instance.amount
+        instance = super().update(instance, validated_data)
+        supplier = instance.supplier_name
+        supplier.debts += debt_difference
+        supplier.save()
+        return instance
+
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be blank.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+            elif first_error_message == "A valid number is required.":
+                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be null.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['supplier_name'] = instance.supplier_name.name
+        return representation
+    
+
+class Client_DebtSerializer(serializers.ModelSerializer):
+    total_client_debts = serializers.SerializerMethodField()
+    total_sum = serializers.SerializerMethodField()
+    client_id = serializers.IntegerField(source='client_name.id',read_only=True)
+    class Meta :
+        model = Debt_Client
+        fields = ['id','client_name','client_id','amount','payment_method','bank_name','receipt_num','date','total_client_debts','total_sum']
+
+    def get_total_client_debts(self, obj):
+        return Debt_Client.get_total_client_debts()
+
+    def get_total_sum(self, obj):
+        return Debt_Client.get_total_sum()
+
+
+    def create(self, validated_data):
+        debt_client = Debt_Client.objects.create(**validated_data)
+        client = debt_client.client_name
+        client.debts += debt_client.amount
+        client.save()
+        return debt_client
+
+    def update(self, instance, validated_data):
+        debt_difference = validated_data.get('amount', instance.amount) - instance.amount
+        instance = super().update(instance, validated_data)
+        client = instance.client_name
+        client.debts += debt_difference
+        client.save()
+        return instance
+
+    
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be blank.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+            elif first_error_message == "A valid number is required.":
+                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "A valid integer is required.":
+                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+            elif first_error_message == "This field may not be null.":
+                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null" 
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"    
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['client_name'] = instance.client_name.name
+        return representation
