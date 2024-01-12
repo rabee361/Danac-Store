@@ -769,6 +769,10 @@ class Incoming_Product(models.Model):
         ordering = ['-product_id']
         app_label = 'Receipts'
 
+    # def save(self, *args, **kwargs):
+    #     self.total_price = self.num_item * self.product.price
+    #     super().save(*args, **kwargs)
+
     def all_item(self):
         pass
     def total(self):
@@ -879,9 +883,6 @@ class ManualReceipt_Products(models.Model):
     total_price = models.FloatField(default=0)
     product_points = models.IntegerField()
 
-    def save(self, *args, **kwargs):
-        self.product_points = self.num_item * self.product.points
-        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['-product_id']
