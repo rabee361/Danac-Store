@@ -1359,14 +1359,14 @@ class IncomingProductsSerializer2(serializers.ModelSerializer):
 
 
 class IncomingProductsSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source='product.id')
+    product_id = serializers.IntegerField(source='product.id')
     name = serializers.CharField(source='product.name')
     num_per_item = serializers.IntegerField(source='product.num_per_item')
     sale_price = serializers.FloatField(source='product.sale_price')
 
     class Meta:
         model = Incoming_Product
-        fields = ['id', 'name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'incoming']
+        fields = ['id', 'product_id','name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'incoming']
 
 
 
