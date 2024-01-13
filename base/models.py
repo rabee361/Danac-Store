@@ -883,6 +883,10 @@ class ManualReceipt_Products(models.Model):
     total_price = models.FloatField(default=0)
     product_points = models.IntegerField()
 
+    def save(self, *args, **kwargs):
+        self.product_points = self.num_item * self.product.points
+        super().save(*args, **kwargs)
+
 
     class Meta:
         ordering = ['-product_id']
