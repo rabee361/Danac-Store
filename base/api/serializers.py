@@ -1622,7 +1622,7 @@ class OutputSerializer(serializers.ModelSerializer):
     address = serializers.CharField(source='client.address',read_only=True)
     class Meta:
         model = Output
-        fields = ['id','client','client_name','address','product','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered']
+        fields = ['id','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered']
 
 
 class ProductsOutputSerializer2(serializers.ModelSerializer):
@@ -1699,7 +1699,7 @@ class ProductsOutputSerializer(serializers.ModelSerializer):
 
 
 class OutputSerializer2(serializers.ModelSerializer):
-    product = ProductsOutputSerializer(source='output_products_set', many=True,read_only=True)
+    products = ProductsOutputSerializer(source='output_products_set', many=True,read_only=True)
     longitude = serializers.SerializerMethodField()
     latitude = serializers.SerializerMethodField()
     client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
