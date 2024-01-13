@@ -785,7 +785,7 @@ class Incoming_Product(models.Model):
 
 
 class Output(models.Model):
-    products = models.ManyToManyField(Product, through='Output_Products')
+    product = models.ManyToManyField(Product, through='Output_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     phonenumber = models.CharField(max_length=20,default='000 208 0660')
@@ -812,7 +812,7 @@ class Output(models.Model):
         return str(self.id)
     
 class Output_Products(models.Model):
-    products = models.ForeignKey(Product, on_delete=models.CASCADE) 
+    product = models.ForeignKey(Product, on_delete=models.CASCADE) 
     output = models.ForeignKey(Output, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField(default=0)
@@ -824,7 +824,7 @@ class Output_Products(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ['-products_id']
+        ordering = ['-product_id']
         app_label = 'Receipts'
 
     def __str__(self) -> str:

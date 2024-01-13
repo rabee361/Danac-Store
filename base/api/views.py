@@ -923,7 +923,7 @@ class ReceiptOrdersView(APIView):
                     )
 ########################################################################################
                 output_product = Output_Products.objects.create(
-                    products = product.product,
+                    product = product.product,
                     output = output,
                     quantity = product.num_item,
                     total_price = product.total_price

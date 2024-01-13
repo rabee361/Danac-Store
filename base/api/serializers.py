@@ -1622,25 +1622,25 @@ class OutputSerializer(serializers.ModelSerializer):
     address = serializers.CharField(source='client.address',read_only=True)
     class Meta:
         model = Output
-        fields = ['id','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered']
+        fields = ['id','client','client_name','address','product','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered']
 
 
 class ProductsOutputSerializer2(serializers.ModelSerializer):
-    # id = serializers.IntegerField(source='products.id')
-    name = serializers.CharField(source='products.name',read_only=True)
-    num_per_item = serializers.IntegerField(source='products.num_per_item',read_only=True)
-    sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
+    # id = serializers.IntegerField(source='product.id')
+    name = serializers.CharField(source='product.name',read_only=True)
+    num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
+    sale_price = serializers.FloatField(source='product.sale_price',read_only=True)
     # total_price = serializers.FloatField(source='total',read_only=True)
 
     class Meta:
         model = Output_Products
-        fields = ['id', 'products','name', 'num_per_item', 'sale_price', 'quantity', 'total_price', 'discount', 'output']
+        fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'quantity', 'total_price', 'discount', 'output']
 
     def create(self, validated_data):
-        product = validated_data.get('products')
+        product = validated_data.get('product')
         quantity = validated_data.get('quantity')
         output_receipt = validated_data.get('output')
-        output_product = Output_Products.objects.filter(products=product,output=output_receipt).first()
+        output_product = Output_Products.objects.filter(product=product,output=output_receipt).first()
         if output_product:
             output_product.quantity += quantity
             output_product.save()
@@ -1678,7 +1678,7 @@ class ProductsOutputSerializer2(serializers.ModelSerializer):
         original_quantity = instance.quantity
         super().update(instance, validated_data)
         quantity_diff = instance.quantity - original_quantity
-        product = instance.products
+        product = instance.product
         product.quantity -= quantity_diff
         product.save()
         return instance
@@ -1686,10 +1686,10 @@ class ProductsOutputSerializer2(serializers.ModelSerializer):
 
 
 class ProductsOutputSerializer(serializers.ModelSerializer):
-    product_id = serializers.IntegerField(source='products.id')
-    name = serializers.CharField(source='products.name')
-    num_per_item = serializers.IntegerField(source='products.num_per_item')
-    sale_price = serializers.FloatField(source='products.sale_price')
+    product_id = serializers.IntegerField(source='product.id')
+    name = serializers.CharField(source='product.name')
+    num_per_item = serializers.IntegerField(source='product.num_per_item')
+    sale_price = serializers.FloatField(source='product.sale_price')
     num_item = serializers.IntegerField(source='quantity',read_only=True)
     # total_price = serializers.FloatField(source='total',read_only=True)
 
@@ -1699,7 +1699,7 @@ class ProductsOutputSerializer(serializers.ModelSerializer):
 
 
 class OutputSerializer2(serializers.ModelSerializer):
-    products = ProductsOutputSerializer(source='output_products_set', many=True,read_only=True)
+    product = ProductsOutputSerializer(source='output_products_set', many=True,read_only=True)
     longitude = serializers.SerializerMethodField()
     latitude = serializers.SerializerMethodField()
     client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
@@ -1796,17 +1796,17 @@ class DelevaryArrivedSerializer(serializers.ModelSerializer):
 
 
 class GetProductsOutputsSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(source='products.image',read_only=True)
+    image = serializers.ImageField(source='product.image',read_only=True)
     class Meta:
         model = Output_Products
-        fields = ['products', 'quantity', 'total', 'discount','image']
+        fields = ['product', 'quantity', 'total', 'discount','image']
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
-        repr['num_per_item '] = instance.products.num_per_item
-        repr['sale_price'] = instance.products.sale_price
-        repr['product'] = instance.products.name
-        repr['image'] = self.context['request'].build_absolute_uri(instance.products.image.url)
+        repr['num_per_item '] = instance.product.num_per_item
+        repr['sale_price'] = instance.product.sale_price
+        repr['product'] = instance.product.name
+        repr['image'] = self.context['request'].build_absolute_uri(instance.product.image.url)
         return repr
 
 

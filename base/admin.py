@@ -301,7 +301,7 @@ class OutputProductAdmin(admin.ModelAdmin):
     actions = [export_to_pdf_reportlab]
 
     def name_product(self, obj):
-        return obj.products.name
+        return obj.product.name
     
     def num_output(self, obj):
         return obj.output.id
