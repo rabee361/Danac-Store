@@ -638,7 +638,6 @@ class ListCreateClientDebts(ListCreateAPIView):
     queryset = Debt_Client.objects.all()
     serializer_class = Client_DebtSerializer
 
-
 class ListCreateSupplierDebts(ListCreateAPIView):
     queryset = Debt_Supplier.objects.all()
     serializer_class = Supplier_DebtSerializer
@@ -647,22 +646,9 @@ class RetUpdDesSupplierDebt(RetrieveUpdateDestroyAPIView):
     queryset = Debt_Supplier.objects.all()
     serializer_class = Supplier_DebtSerializer
 
-    def perform_destroy(self, instance):
-        supplier = instance.supplier_name
-        supplier.debts -= instance.amount
-        supplier.save()
-        instance.delete()
-
 class RetUpdDesClientDebt(RetrieveUpdateDestroyAPIView):
     queryset = Debt_Client.objects.all()
     serializer_class = Client_DebtSerializer
-
-    def perform_destroy(self, instance):
-        client = instance.client_name
-        client.debts -= instance.amount
-        client.save()
-        instance.delete()
-
 
 class GetClientDebt(APIView):
     def get(self,request,pk):

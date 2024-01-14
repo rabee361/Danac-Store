@@ -810,7 +810,7 @@ class Client_DebtSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         debt_client = Debt_Client.objects.create(**validated_data)
         client = debt_client.client_name
-        client.debts += debt_client.amount
+        client.debts -= debt_client.amount
         client.save()
         return debt_client
 
@@ -875,7 +875,7 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         supplier_debt = Debt_Supplier.objects.create(**validated_data)
         supplier = supplier_debt.supplier_name
-        supplier.debts += supplier_debt.amount
+        supplier.debts -= supplier_debt.amount
         supplier.save()
         return supplier_debt
 
