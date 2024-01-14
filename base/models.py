@@ -92,7 +92,7 @@ class Client(models.Model):
     category = models.CharField(max_length=75,choices=CHOICES)
     notes = models.TextField(max_length=150,default='note')
     location = models.PointField(null=True)
-    debts = models.FloatField(default=0.0)
+    debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
 
     class Meta:
         app_label = 'Clients_and_Products'
@@ -279,7 +279,7 @@ class Supplier(models.Model):
     phone_number = PhoneNumberField(region='DZ')
     address = models.CharField(max_length=100)
     info = models.TextField(max_length=500,default='_')
-    debts = models.FloatField(default=0.0)
+    debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
 
     class Meta:
         ordering = ['-id']
