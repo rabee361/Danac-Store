@@ -810,7 +810,10 @@ class Client_DebtSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         debt_client = Debt_Client.objects.create(**validated_data)
         client = debt_client.client_name
-        client.debts -= debt_client.amount
+        if client.debts >= debt_client.amount:
+            client.debts -= debt_client.amount
+        else:
+            raise serializers.ValidationError("المبلغ المدخل أكبر من الدين الموجود")
         client.save()
         return debt_client
 
