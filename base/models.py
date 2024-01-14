@@ -10,6 +10,7 @@ from django.contrib.gis.geos import Point
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
+import phonenumbers
 
 
 class UserType(models.Model):
@@ -277,7 +278,7 @@ class Supplier(models.Model):
     company_name = models.CharField(max_length=50)
     phone_number = PhoneNumberField(region='DZ')
     address = models.CharField(max_length=100)
-    info = models.TextField(max_length=500)
+    info = models.TextField(max_length=500,default='_')
     debts = models.FloatField(default=0.0)
 
     class Meta:

@@ -6,7 +6,12 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
 from django.db.models import Q , F , Sum
 from phonenumber_field.serializerfields import PhoneNumberField
-from phonenumber_field.phonenumber import to_python
+from phonenumber_field.phonenumber import to_python, PhoneNumber
+from deep_translator import GoogleTranslator
+def translate_to_arabic(text):
+    translator = GoogleTranslator(source='auto', target='ar')
+    return translator.translate(text)
+
 ############################################################## AUTHENTICATION ###################################################
 
 def modify_name(name):
@@ -162,9 +167,9 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class ClientSerializer(serializers.ModelSerializer):
     total_points = serializers.SerializerMethodField()
+    phonenumber = serializers.CharField()
     class Meta:
         model = Client
         fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points','debts']
@@ -175,20 +180,28 @@ class ClientSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
-
+    
     def get_total_points(self,obj):
         total = Points.objects.filter(Q(client=obj)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).aggregate(total_points=models.Sum('number'))['total_points'] or 0
         return total
@@ -208,15 +221,23 @@ class ProductSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -386,23 +407,31 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
-
         if self._errors:
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
 
         return not bool(self._errors)
 
@@ -437,7 +466,6 @@ class SalesEmployeeLocationSerializer(serializers.ModelSerializer):
         return obj.location.y
 
 
-
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
@@ -449,13 +477,23 @@ class SupplierSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
+            elif first_error_message == "A valid integer is required.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -481,17 +519,23 @@ class Advance_on_SalarySerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -510,17 +554,23 @@ class OverTimeSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -539,17 +589,23 @@ class AbsenceSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -568,17 +624,23 @@ class BonusSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -597,17 +659,23 @@ class DiscountSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -627,17 +695,23 @@ class ExtraExpenseSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null" 
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"    
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -755,17 +829,23 @@ class Client_DebtSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null" 
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"    
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -813,17 +893,23 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -856,17 +942,23 @@ class DepositeSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null" 
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"    
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -915,17 +1007,23 @@ class WithDrawSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -975,21 +1073,27 @@ class ExpenseSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
-        return not bool(self._errors)   
+        return not bool(self._errors)  
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -1011,17 +1115,23 @@ class PaymentSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1046,17 +1156,23 @@ class RecievedPaymentSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1124,17 +1240,23 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"     
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1180,17 +1302,23 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null" 
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"    
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1235,17 +1363,23 @@ class DamagedProductSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1339,22 +1473,27 @@ class IncomingProductsSerializer2(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
-
 
 
 
@@ -1405,17 +1544,23 @@ class IncomingSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1500,17 +1645,23 @@ class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1530,17 +1681,23 @@ class ManualRecieptSerializer(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"     
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1657,17 +1814,23 @@ class ProductsOutputSerializer2(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
@@ -1717,17 +1880,23 @@ class OutputSerializer2(serializers.ModelSerializer):
             first_error_field = next(iter(self._errors))
             first_error_message = self._errors[first_error_field][0]
             if first_error_message == "This field is required.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
             elif first_error_message == "This field may not be blank.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be blank"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "A valid number is required.":
-                first_error_message = f"A valid number for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
             elif first_error_message == "A valid integer is required.":
-                first_error_message = f"A valid integer for {first_error_field.replace('_', ' ')} is required"
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
             elif first_error_message == "This field may not be null.":
-                first_error_message = f"{first_error_field.replace('_', ' ')} may not be null"   
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
             elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                first_error_message = f"please choose a value for {first_error_field.replace('_', ' ')}"  
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
             self._errors = {"error": first_error_message}
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
