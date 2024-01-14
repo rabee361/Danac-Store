@@ -812,9 +812,9 @@ class Client_DebtSerializer(serializers.ModelSerializer):
         client = debt_client.client_name
         if client.debts >= debt_client.amount:
             client.debts -= debt_client.amount
+            client.save()
         else:
             raise serializers.ValidationError("المبلغ المدخل أكبر من الدين الموجود")
-        client.save()
         return debt_client
 
     def update(self, instance, validated_data):
