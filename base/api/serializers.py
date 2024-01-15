@@ -877,11 +877,16 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
         return Debt_Supplier.get_total_sum()
     
     def create(self, validated_data):
-        supplier_debt = Debt_Supplier.objects.create(**validated_data)
-        supplier = supplier_debt.supplier_name
-        supplier.debts -= supplier_debt.amount
-        supplier.save()
-        return supplier_debt
+        debt_supplier = Debt_Supplier.objects.create(**validated_data)
+        supplier = debt_supplier.supplier_name
+        if supplier.debts >= debt_supplier.amount:
+            supplier.debts -= debt_supplier.amount
+            supplier.save()
+        else:
+            debt_supplier.delete()
+            raise serializers.ValidationError({"error":"المبلغ المدخل أكبر من الدين الموجود"})
+        return debt_supplier
+
 
     def update(self, instance, validated_data):
         debt_difference = validated_data.get('amount', instance.amount) - instance.amount
