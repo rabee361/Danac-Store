@@ -452,8 +452,6 @@ class AcceptDelevaryArrived(APIView):
 
 
 
-
-
 class TotalClientPointsView(ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Points.objects.all()
@@ -498,10 +496,16 @@ class ClientPointsView(ListAPIView):
 
 
 class SalesEmployee(APIView):
-    def get(self,request):
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = SalesEmployeeFilter
+    ordering_fields = ['name', 'truck_num']
+
+    def get(self, request):
         sales_employees = Employee.objects.filter(Q(truck_num__gt=0) & Q(truck_num__isnull=False))
-        serializer = SalesEmployeeSerializer(sales_employees,many=True)
+        filtered_sales_employees = self.filterset_class(request.GET, queryset=sales_employees)
+        serializer = SalesEmployeeSerializer(filtered_sales_employees.qs, many=True)
         return Response(serializer.data)
+
 
 
 class RetSalesEmployee(RetrieveAPIView):
@@ -517,6 +521,8 @@ class RetSalesEmployee(RetrieveAPIView):
 
 
 class ListCreateEmployee(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = EmployeeFilter
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
@@ -533,11 +539,15 @@ class RetUpdDesClient(RetrieveAPIView):
 
     
 class ListCreateClient(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ClientFilter
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
 
 
 class ListCreateSupplier(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = SupplierFilter
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
 

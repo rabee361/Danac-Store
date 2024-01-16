@@ -14,25 +14,39 @@ class ProductFilter(django_filters.FilterSet):
         fields = ['category','name','barcode']
 
 
+class EmployeeFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(field_name='name', lookup_expr='startswith')
+    job_position = django_filters.CharFilter(field_name='job_position', lookup_expr='iexact')
+
+    class Meta:
+        model = Employee
+        fields = ['name','job_position']
 
 
+class SupplierFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(field_name='name', lookup_expr='startswith')
+    company_name = django_filters.CharFilter(field_name='company_name', lookup_expr='startswith')
 
-############################### HR #################################
+    class Meta:
+        model = Supplier
+        fields = ['name','company_name']
 
-class MonthFilter(filters.Filter):
-    def filter(self, qs, value):
-        if value:
-            date = datetime.strptime(value, "%Y-%m")
-            return qs.filter(date__year=date.year, date__month=date.month)
-        return qs
 
-class SalaryFilter(django_filters.FilterSet):
-    date = MonthFilter(field_name="date")
+class ClientFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(field_name='name', lookup_expr='startswith')
+    category = django_filters.CharFilter(field_name='category', lookup_expr='iexact')
 
-    class Meta: 
-        model = Salary
-        fields = ['date']
+    class Meta:
+        models = Client
+        fields = ['name','category']
 
+
+class SalesEmployeeFilter(django_filters.FilterSet):
+    class Meta:
+        model = Employee
+        fields = ['name','truck_num']
+
+############################### Registry #################################
 
 
 class WithdrawFilter(django_filters.FilterSet):
@@ -82,6 +96,67 @@ class DebtClientFilter(django_filters.FilterSet):
 
 class DebtSupplierFilter(django_filters.FilterSet):
     supplier_name = django_filters.CharFilter(field_name='supplier_name', lookup_expr='startswith')
-    class client_nameMeta: 
+    class Meta: 
         model = Debt_Supplier
         fields = ['supplier_name']
+
+
+
+################################# HR #############################################
+        
+class MonthFilter(filters.Filter):
+    def filter(self, qs, value):
+        if value:
+            date = datetime.strptime(value, "%Y-%m")
+            return qs.filter(date__year=date.year, date__month=date.month)
+        return qs
+
+class SalaryFilter(django_filters.FilterSet):
+    date = MonthFilter(field_name="date")
+
+    class Meta: 
+        model = Salary
+        fields = ['date']
+
+
+
+class OverTimeFilter(django_filters.FilterSet):
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    class Meta: 
+        model = OverTime
+        fields = ['employee_name']
+
+
+class AbsenceFilter(django_filters.FilterSet):
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    class Meta: 
+        model = Debt_Supplier
+        fields = ['employee_name']
+
+
+class DiscountFilter(django_filters.FilterSet):
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    class Meta: 
+        model = Discount
+        fields = ['employee_name']
+
+
+class BonusFilter(django_filters.FilterSet):
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    class Meta: 
+        model = Bonus
+        fields = ['employee_name']
+
+
+class Advance_On_salaryFilter(django_filters.FilterSet):
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    class Meta: 
+        model = Advance_On_salary
+        fields = ['employee_name']
+
+
+class Extra_ExpenseFilter(django_filters.FilterSet):
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    class Meta: 
+        model = Extra_Expense
+        fields = ['employee_name']
