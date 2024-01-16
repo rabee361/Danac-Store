@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated  ,AllowAny
 from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
-from base.filters import ProductFilter ,SalaryFilter
+from base.filters import *
 import random
 from django.shortcuts import get_object_or_404
 from django.db.models import F
@@ -635,10 +635,14 @@ class GetRegistry(ListAPIView):
     serializer_class = RegistrySerializer
 
 class ListCreateClientDebts(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DebtClientFilter
     queryset = Debt_Client.objects.all()
     serializer_class = Client_DebtSerializer
 
 class ListCreateSupplierDebts(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DebtSupplierFilter
     queryset = Debt_Supplier.objects.all()
     serializer_class = Supplier_DebtSerializer
 
@@ -676,6 +680,8 @@ class GetSupplierDebt(APIView):
 
 
 class ListCreateDeposite(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DepositeFilter
     queryset = Deposite.objects.all()
     serializer_class = DepositeSerializer
 
@@ -684,6 +690,8 @@ class RetUpdDesDeposite(RetrieveUpdateDestroyAPIView):
     serializer_class = DepositeSerializer
 
 class ListCreateWithDraw(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = WithdrawFilter
     queryset = WithDraw.objects.all()
     serializer_class = WithDrawSerializer
 
@@ -692,6 +700,8 @@ class RetUpdDesWithDraw(RetrieveUpdateDestroyAPIView):
     serializer_class = WithDrawSerializer
 
 class ListCreatePayment(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PaymentFilter
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
 
@@ -700,6 +710,8 @@ class RetUpdDesPayment(RetrieveUpdateDestroyAPIView):
     serializer_class = PaymentSerializer
 
 class ListCreateRecievedPayment(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = Recieved_PaymentFilter
     queryset = Recieved_Payment.objects.all()
     serializer_class = RecievedPaymentSerializer
 
@@ -708,6 +720,8 @@ class RetUpdDesRecievedPaymnt(RetrieveUpdateDestroyAPIView):
     serializer_class = RecievedPaymentSerializer
 
 class ListCreateExpense(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ExpenseFilter
     queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
 
