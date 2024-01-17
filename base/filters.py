@@ -160,3 +160,83 @@ class Extra_ExpenseFilter(django_filters.FilterSet):
     class Meta: 
         model = Extra_Expense
         fields = ['employee_name']
+
+
+################################ Damaged & Returned Products ####################################
+        
+
+class DamagedProductFilter(django_filters.FilterSet):
+    product_name = django_filters.CharFilter(field_name='product__name' , lookup_expr='startswith')
+    
+    class Meta:
+        model = DamagedProduct
+        fields = ['product_name']
+
+
+class ReturnedGoodsClientFilter(django_filters.FilterSet):
+    client_name = django_filters.CharFilter(field_name='client__name',lookup_expr='startswith')
+    product_name = django_filters.CharFilter(field_name='product__name',lookup_expr='startswith')
+    employee_name = django_filters.CharFilter(field_name='employee_name' , lookup_expr='startswith')
+    
+    class Meta:
+        model = ReturnedGoodsClient
+        fields = ['product_name','client_name','employee_name']
+
+
+
+class ReturnedGoodsSupplierFilter(django_filters.FilterSet):
+    supplier_name = django_filters.CharFilter(field_name='supplier__name',lookup_expr='startswith')
+    product_name = django_filters.CharFilter(field_name='product__name',lookup_expr='startswith')
+    employee_name = django_filters.CharFilter(field_name='employee_name' , lookup_expr='startswith')
+    
+    class Meta:
+        model = ReturnedGoodsSupplier
+        fields = ['product_name','supplier_name','employee_name']
+
+
+
+################################################## Receipts #############################################
+        
+
+
+class IncomingFilter(django_filters.FilterSet):
+    supplier_name = django_filters.CharFilter(field_name="supplier__name", lookup_expr="startswith")
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+
+    class Meta:
+        model = Incoming
+        fields = ['supplier_name', 'employee_name']
+
+
+class OutputFilter(django_filters.FilterSet):
+    client_name = django_filters.CharFilter(field_name='client__name', lookup_expr="startswith")
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+
+    class Meta:
+        model = Output
+        fields = ['client_name', 'employee_name']
+
+
+class ManualReceiptFilter(django_filters.FilterSet):
+    client_name = django_filters.CharFilter(field_name='client__name', lookup_expr='startswith')
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+
+    class Meta:
+        model = ManualReceipt
+        fields = ['client_name', 'employee_name']
+
+
+class OrderFilter(django_filters.FilterSet):
+    client_name = django_filters.CharFilter(field_name='client__name', lookup_expr='startswith')
+
+    class Meta:
+        model = Order
+        fields = ['client_name']
+
+
+class DelevaryArrivedFilter(django_filters.FilterSet):
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+
+    class Meta:
+        model = DelievaryArrived
+        fields = ['employee_name']
