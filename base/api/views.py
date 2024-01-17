@@ -1031,7 +1031,11 @@ class ListCreateDeliveryArrived(APIView):
     def get(self, request):
         queryset = DelievaryArrived.objects.all()
         filterset = DelivaryFilter(request.GET, queryset=queryset)
-        del_arr_serializer = DelevaryArrivedSerializer(filterset, many=True)
+        if filterset.is_valid():
+            delivery_arrived = filterset.qs
+        else:
+            return Response(filterset.errors, status=status.HTTP_400_BAD_REQUEST)
+        del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=True)
         return Response(del_arr_serializer.data)
     
 

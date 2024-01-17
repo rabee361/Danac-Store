@@ -101,7 +101,6 @@ class DebtSupplierFilter(django_filters.FilterSet):
         fields = ['supplier_name','payment_method']
 
 
-
 ################################# HR #############################################
         
 class MonthFilter(filters.Filter):
@@ -117,7 +116,6 @@ class SalaryFilter(django_filters.FilterSet):
     class Meta: 
         model = Salary
         fields = ['date']
-
 
 
 class OverTimeFilter(django_filters.FilterSet):
