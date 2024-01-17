@@ -7,7 +7,7 @@ from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from base.filter import ProductFilter, ProductFilterName
+from base.filter import *
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 import random
@@ -234,6 +234,8 @@ class CreateCartProductsView(ListCreatCategoryView):
 class ListCreateSupplierView(ListCreateAPIView):
     queryset = Supplier.objects.all()
     serializer_class= SupplierSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = SupplierFilter
     # permission_classes = [permissions.IsAuthenticated]
 
 class GetSupplier(RetrieveUpdateDestroyAPIView):
@@ -306,6 +308,8 @@ class CreateOrderView(APIView):
 class ListCreatEmployeeView(ListCreateAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = EmployeeFilter
 
 class RetUpdDesEmployeeAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Employee.objects.all()
@@ -884,3 +888,35 @@ class GetNotificationView(APIView):
         notification = Notifications.objects.filter(user__id=user.id)
         serializer = SerializerNotificationI(notification, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+################################## SEARCH ##################################
+
+class ListIncomingView(ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = IncomingFilter
+    queryset = Incoming.objects.all()
+    serializer_class = IncomingSerializer
+
+class ListOutputView(ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = OutputFilter
+    queryset = Outputs.objects.all()
+    serializer_class = OutputsSerializer
+
+class ListManualReceiptView(ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ManualReceiptFilter
+    queryset = ManualReceipt.objects.all()
+    serializer_class = ManualRecieptSerializer
+
+class ListOrderView(ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = OrderFilter
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+class ListDelevaryArrivedView(ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DelevaryArrivedFilter
+    queryset = DelevaryArrived.objects.all()
+    serializer_class = DelevaryArrivedSerializer

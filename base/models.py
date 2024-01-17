@@ -302,6 +302,7 @@ class Expense(models.Model):
     @classmethod
     def get_total_amount(cls):
         return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    
 class Debt_Supplier(models.Model):
     CHOICES = (
         ('نقدا','نقدا'),

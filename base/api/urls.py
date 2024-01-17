@@ -97,4 +97,11 @@ urlpatterns = [
     ################   new
     path('get-debts-supplier/<str:pk>/', GetDebtSupplier.as_view()),
 
+    ################################# SEARCH #################################
+    path('search-incoming/', ListIncomingView.as_view()),
+    path('search-output/', ListOutputView.as_view()),
+    path('search-manual-receipt/', ListManualReceiptView.as_view()),
+    path('search-order/', ListOrderView.as_view()),
+    path('search-delevery-arrived/', ListDelevaryArrivedView.as_view())
+
 ]
