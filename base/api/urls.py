@@ -52,15 +52,15 @@ urlpatterns = [
     # path('not-delivered-orders/' , ListNotDeliveredOrders.as_view() , name="not-delivered-orders"),
 
     path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),#######
-    path('get-bonus/<str:pk>/', RetUpdDesBonusView.as_view(), name='get-bonus'),######
-    path('discounts/', ListCreateDicountView.as_view(), name='discount'),######
-    path('get-discount/<str:pk>/', RetUpdDesDicountView.as_view(), name='get-discount'),######
-    path('overtimes/', ListCreatOverTimeView.as_view(), name='overtimes'),#######
-    path('get-overtime/<str:pk>/', RetUpdDesOverTimeView.as_view(), name='get_overtime'), #######
-    path('absences/', ListCreateAbsenceView.as_view(), name='absence'),######
-    path('get-absence/<str:pk>/', RetUpdDesAbsenceAPIView.as_view(), name='get-absence'),#######
-    path('advances/', ListCreateAdvanceView.as_view(), name='advances'),#######
-    path('get-advance/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),######
+    path('get-bonus/<str:pk>/', RetUpdDesBonus.as_view(), name='get-bonus'),######
+    path('discounts/', ListCreateDicount.as_view(), name='discount'),######
+    path('get-discount/<str:pk>/', RetUpdDesDicount.as_view(), name='get-discount'),######
+    path('overtimes/', ListCreatOverTime.as_view(), name='overtimes'),#######
+    path('get-overtime/<str:pk>/', RetUpdDesOverTime.as_view(), name='get_overtime'), #######
+    path('absences/', ListCreateAbsence.as_view(), name='absence'),######
+    path('get-absence/<str:pk>/', RetUpdDesAbsence.as_view(), name='get-absence'),#######
+    path('advances/', ListCreateAdvance.as_view(), name='advances'),#######
+    path('get-advance/<str:pk>/', RetUpdDesAdvance.as_view(), name='get-advance'),######
     path('extra-expenses/', ListCreateExtraExpense.as_view(), name='expenses'),######
     path('get-extra-expense/<str:pk>/', RetUpdDesExtraExpense.as_view(), name='get-expense'),#####
     path('employee_salary/<str:pk>/', RetUpdDesSalary.as_view()),########## 

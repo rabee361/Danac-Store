@@ -563,55 +563,64 @@ class RetUpdDesClient(RetrieveUpdateDestroyAPIView):
 
 ########################################### HR ######################################################################
 
-class ListCreatEmployeeView(ListCreateAPIView):
+
+class RetUpdDesEmployee(RetrieveUpdateDestroyAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
-class RetUpdDesEmployeeAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
-
-class ListCreatOverTimeView(ListCreateAPIView):
+class ListCreatOverTime(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = OverTimeFilter
     queryset = OverTime.objects.all()
     serializer_class = OverTimeSerializer
 
-class RetUpdDesOverTimeView(RetrieveUpdateDestroyAPIView):
+class RetUpdDesOverTime(RetrieveUpdateDestroyAPIView):
     queryset = OverTime.objects.all()
     serializer_class = OverTimeSerializer
 
-class ListCreateAbsenceView(ListCreateAPIView):
+class ListCreateAbsence(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = AbsenceFilter
     queryset = Absence.objects.all()
     serializer_class = AbsenceSerializer
 
-class RetUpdDesAbsenceAPIView(RetrieveUpdateDestroyAPIView):
+class RetUpdDesAbsence(RetrieveUpdateDestroyAPIView):
     queryset = Absence.objects.all()
     serializer_class = AbsenceSerializer
 
 class ListCreateBonus(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = BonusFilter
     queryset = Bonus.objects.all()
     serializer_class = BonusSerializer
 
-class RetUpdDesBonusView(RetrieveUpdateDestroyAPIView):
+class RetUpdDesBonus(RetrieveUpdateDestroyAPIView):
     queryset = Bonus.objects.all()
     serializer_class = BonusSerializer
 
-class ListCreateDicountView(ListCreateAPIView):
+class ListCreateDicount(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DiscountFilter
     queryset = Discount.objects.all()
     serializer_class = DiscountSerializer
 
-class RetUpdDesDicountView(RetrieveUpdateDestroyAPIView):
+class RetUpdDesDicount(RetrieveUpdateDestroyAPIView):
     queryset = Discount.objects.all()
     serializer_class = DiscountSerializer
 
-class ListCreateAdvanceView(ListCreateAPIView):
+class ListCreateAdvance(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = Advance_On_salaryFilter
     queryset = Advance_On_salary.objects.all()
     serializer_class = Advance_on_SalarySerializer
 
-class RetUpdDesAdvanceView(RetrieveUpdateDestroyAPIView):
+class RetUpdDesAdvance(RetrieveUpdateDestroyAPIView):
     queryset = Advance_On_salary.objects.all()
     serializer_class = Advance_on_SalarySerializer
 
 class ListCreateExtraExpense(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = Extra_ExpenseFilter
     queryset = Extra_Expense.objects.all()
     serializer_class = ExtraExpenseSerializer
 
