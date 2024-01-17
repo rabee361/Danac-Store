@@ -130,7 +130,7 @@ class OverTimeFilter(django_filters.FilterSet):
 class AbsenceFilter(django_filters.FilterSet):
     employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
     class Meta: 
-        model = Debt_Supplier
+        model = Absence
         fields = ['employee_name']
 
 
