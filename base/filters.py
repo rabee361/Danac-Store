@@ -77,14 +77,14 @@ class Recieved_PaymentFilter(django_filters.FilterSet):
     employee_name = django_filters.CharFilter(field_name='employee__name',lookup_expr='startswith')
     class Meta:
         model = Recieved_Payment
-        fields = ['employee_name']
+        fields = ['employee_name','payment_method']
 
 
 class PaymentFilter(django_filters.FilterSet):
     employee_name = django_filters.CharFilter(field_name='employee__name',lookup_expr='startswith')
     class Meta:
         model = Payment
-        fields = ['employee_name']
+        fields = ['employee_name','payment_method']
 
 
 class DebtClientFilter(django_filters.FilterSet):
