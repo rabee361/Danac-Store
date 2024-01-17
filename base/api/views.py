@@ -382,6 +382,8 @@ class CreateOrderView(APIView):
      
 
 class ListOrders(ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = OrderFilter
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     # permission_classes = [permissions.IsAuthenticated,]
@@ -799,12 +801,6 @@ class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
 
 
 
-
-
-
-
-
-
 #################################################################### MEDIUM ################################################################# 
 
 class CreateMedium(CreateAPIView):
@@ -885,6 +881,8 @@ class GetOutput(RetrieveAPIView):
         return {'show_datetime': True}
 
 class ListOutputs(ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = OutputFilter
     queryset = Output.objects.all()
     serializer_class = OutputSerializer2
 
@@ -978,7 +976,6 @@ class DelevaryArrivedForEmployee(APIView):
 
 class ListCreateDeliveryArrived(APIView):
     def post(self, request, pk):
-        # Check if a DelievaryArrived with the given output already exists
         if DelievaryArrived.objects.filter(output_receipt_id=pk).exists():
             return Response(
                 {"error": "Delivery with this output has already arrived."},
@@ -1027,10 +1024,9 @@ class ListCreateDeliveryArrived(APIView):
         return Response(del_arr_serializer.data)
 
     def get(self, request):
-        delivery_arrived = DelievaryArrived.objects.all()
-        for delivery in delivery_arrived:
-            print(delivery.output_receipt)
-        del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=True)
+        queryset = DelievaryArrived.objects.all()
+        filterset = DelivaryFilter(request.GET, queryset=queryset)
+        del_arr_serializer = DelevaryArrivedSerializer(filterset, many=True)
         return Response(del_arr_serializer.data)
     
 
@@ -1101,6 +1097,8 @@ class GetIncoming(RetrieveAPIView):
 
 
 class ListIncomings(ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = IncomingFilter
     queryset = Incoming.objects.all()
     serializer_class = IncomingSerializer2
 
@@ -1191,6 +1189,8 @@ class GetManualReceipt(RetrieveAPIView):
 
 
 class ListManualReceipt(ListAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ManualFilter
     queryset = ManualReceipt.objects.all()
     serializer_class = ManualRecieptSerializer2
 
