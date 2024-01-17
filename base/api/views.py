@@ -655,11 +655,13 @@ class GetRegistry(ListAPIView):
     queryset = Registry.objects.all()
     serializer_class = RegistrySerializer
 
+
 class ListCreateClientDebts(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = DebtClientFilter
     queryset = Debt_Client.objects.all()
     serializer_class = Client_DebtSerializer
+
 
 class ListCreateSupplierDebts(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
@@ -667,13 +669,16 @@ class ListCreateSupplierDebts(ListCreateAPIView):
     queryset = Debt_Supplier.objects.all()
     serializer_class = Supplier_DebtSerializer
 
+
 class RetUpdDesSupplierDebt(RetrieveUpdateDestroyAPIView):
     queryset = Debt_Supplier.objects.all()
     serializer_class = Supplier_DebtSerializer
 
+
 class RetUpdDesClientDebt(RetrieveUpdateDestroyAPIView):
     queryset = Debt_Client.objects.all()
     serializer_class = Client_DebtSerializer
+
 
 class GetClientDebt(APIView):
     def get(self,request,pk):
@@ -697,7 +702,6 @@ class GetSupplierDebt(APIView):
                 "supplier_debt":serializer.data['debts']})
         except:
             return Response({"error": "No Supplier with that id"})   
-    
 
 
 class ListCreateDeposite(ListCreateAPIView):
@@ -706,9 +710,11 @@ class ListCreateDeposite(ListCreateAPIView):
     queryset = Deposite.objects.all()
     serializer_class = DepositeSerializer
 
+
 class RetUpdDesDeposite(RetrieveUpdateDestroyAPIView):
     queryset = Deposite.objects.all()
     serializer_class = DepositeSerializer
+
 
 class ListCreateWithDraw(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
@@ -716,9 +722,11 @@ class ListCreateWithDraw(ListCreateAPIView):
     queryset = WithDraw.objects.all()
     serializer_class = WithDrawSerializer
 
+
 class RetUpdDesWithDraw(RetrieveUpdateDestroyAPIView):
     queryset = WithDraw.objects.all()
     serializer_class = WithDrawSerializer
+
 
 class ListCreatePayment(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
@@ -726,9 +734,11 @@ class ListCreatePayment(ListCreateAPIView):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
 
+
 class RetUpdDesPayment(RetrieveUpdateDestroyAPIView):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
+
 
 class ListCreateRecievedPayment(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
@@ -736,15 +746,18 @@ class ListCreateRecievedPayment(ListCreateAPIView):
     queryset = Recieved_Payment.objects.all()
     serializer_class = RecievedPaymentSerializer
 
+
 class RetUpdDesRecievedPaymnt(RetrieveUpdateDestroyAPIView):
     queryset = Recieved_Payment.objects.all()
     serializer_class = RecievedPaymentSerializer
+
 
 class ListCreateExpense(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ExpenseFilter
     queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
+
 
 class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
     queryset = Expense.objects.all()
@@ -800,7 +813,6 @@ class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
     # permission_classes = [permissions.IsAuthenticated]
 
 
-
 #################################################################### MEDIUM ################################################################# 
 
 class CreateMedium(CreateAPIView):
@@ -808,11 +820,9 @@ class CreateMedium(CreateAPIView):
     serializer_class = MediumSerializer
 
 
-
 class RetDesMedium(RetrieveDestroyAPIView):
     queryset = Medium.objects.all()
     serializer_class = MediumSerializer
-
 
 
 class Add_To_Medium(APIView):
@@ -829,7 +839,6 @@ class Add_To_Medium(APIView):
         return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
 
     
-
 class GetMediumView(RetrieveAPIView):
     queryset = Medium.objects.all()
     serializer_class = MediumSerializer
@@ -845,7 +854,6 @@ class ListMediumView(APIView):
     def get(self, request, medium_id):
         mediums = Products_Medium.objects.filter(medium__id=medium_id)
         mediums_serializer = ProductsMediumSerializer(mediums, many=True)
-        
         return Response(mediums_serializer.data)
     
 
@@ -864,6 +872,7 @@ class CreateMediumForOrderView(APIView):
         serializer = MediumSerializer(medium,many=False)
         return Response(serializer.data,status=status.HTTP_200_OK)
        
+
 class DeleteProductsMediumView(RetrieveDestroyAPIView):
     queryset = Products_Medium.objects.all()
     serializer_class = ProductsMediumSerializer
@@ -880,6 +889,7 @@ class GetOutput(RetrieveAPIView):
     def get_serializer_context(self):
         return {'show_datetime': True}
 
+
 class ListOutputs(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = OutputFilter
@@ -894,6 +904,7 @@ class UpdateOutputReceipt(RetrieveUpdateDestroyAPIView):
     queryset = Output.objects.all()
     serializer_class = OutputSerializer2
 
+
 class RetUpdDesOutputProduct(RetrieveUpdateDestroyAPIView):
     queryset = Output_Products.objects.all()
     serializer_class = ProductsOutputSerializer2
@@ -903,6 +914,7 @@ class RetUpdDesOutputProduct(RetrieveUpdateDestroyAPIView):
         product.quantity += instance.quantity
         product.save()
         instance.delete()
+
 
 class CreateOutputProduct(CreateAPIView):
     queryset = Output_Products.objects.all()
@@ -921,7 +933,6 @@ class ReceiptOrdersView(APIView):
                 quantity_product = Product.objects.get(id=product.product.id)
                 quantity_product.quantity -= product.num_item
                 quantity_product.save()
-    #############################################################################
                 if quantity_product.quantity < quantity_product.limit_less:
                     user = CustomUser.objects.get(id=request.user.id)
                     devices = FCMDevice.objects.filter(user=user.id)
@@ -940,7 +951,6 @@ class ReceiptOrdersView(APIView):
                         title = title,
                         body = body
                     )
-########################################################################################
                 output_product = Output_Products.objects.create(
                     product = product.product,
                     output = output,
@@ -957,11 +967,6 @@ class ReceiptOrdersView(APIView):
             medium.delete()
             return Response(output_serializer.data)
         return Response(output_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
 
 
 class DelevaryArrivedForEmployee(APIView):
@@ -1086,7 +1091,6 @@ class CreateIncomingView(APIView):
     
 
 
-
 class GetIncoming(RetrieveAPIView):
     # permission_classes = [permissions.IsAuthenticated]
     queryset = Incoming.objects.all()
@@ -1110,6 +1114,7 @@ class UpdateIncomingReceipt(RetrieveUpdateDestroyAPIView):
     queryset = Incoming.objects.all()
     serializer_class = IncomingSerializer
 
+
 class RetUpdDesIncomingProduct(RetrieveUpdateDestroyAPIView):
     queryset = Incoming_Product.objects.all()
     serializer_class = IncomingProductsSerializer2
@@ -1120,15 +1125,14 @@ class RetUpdDesIncomingProduct(RetrieveUpdateDestroyAPIView):
         product.save()
         instance.delete()
 
+
 class CreateIncomingProduct(CreateAPIView):
     queryset = Incoming_Product.objects.all()
     serializer_class = IncomingProductsSerializer2
 
 
-
 ############################### MANUAL RECEIPT #####################################################
     
-
 
 class CreateManualReceiptView(APIView):
     permission_classes = [IsAuthenticated]
@@ -1187,7 +1191,6 @@ class GetManualReceipt(RetrieveAPIView):
         return {'show_datetime': True}
 
 
-
 class ListManualReceipt(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ManualFilter
@@ -1202,6 +1205,7 @@ class UpdateManualReceipt(RetrieveUpdateDestroyAPIView):
     queryset = ManualReceipt.objects.all()
     serializer_class = ManualRecieptSerializer
 
+
 class RetUpdDesManualReceiptProduct(RetrieveUpdateDestroyAPIView):
     queryset = ManualReceipt_Products.objects.all()
     serializer_class = ManualRecieptProductsSerializer2
@@ -1212,14 +1216,13 @@ class RetUpdDesManualReceiptProduct(RetrieveUpdateDestroyAPIView):
         product.save()
         instance.delete()
 
+
 class CreateManualProduct(CreateAPIView):
     queryset = ManualReceipt_Products.objects.all()
     serializer_class = ManualRecieptProductsSerializer2
 
 
 ########################## MEDIUM 2 #######################################################################################
-
-
 
 
 class CreateMediumTwo(ListCreateAPIView):
@@ -1277,7 +1280,6 @@ class MediumTow_Handler(APIView):
         return Response(serializer.data)
     
 
-
 class CreateOrderEnvoyView(APIView):
     def post(self, request, mediumtwo_id):
         mediumtwo = MediumTwo_Products.objects.filter(mediumtwo__id = mediumtwo_id)
@@ -1299,8 +1301,7 @@ class CreateOrderEnvoyView(APIView):
                 order_envoy.save()
             MediumTwo.objects.get(id=mediumtwo_id).delete()
             return Response(order_envoy_ser.data, status=status.HTTP_201_CREATED)
-        return Response(order_envoy_ser.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response(order_envoy_ser.errors, status=status.HTTP_400_BAD_REQUEST)    
 
 
 class ListOrderEnvoy(APIView):
@@ -1314,4 +1315,3 @@ class ListOrderEnvoy(APIView):
             'order_envoy':serializer.data,
             'products_order_envoy':serializer_two.data
         })
-    
