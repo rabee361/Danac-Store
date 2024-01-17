@@ -756,13 +756,11 @@ class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
 
 
 class ListCreateRetGoodsSupplier(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ReturnedGoodsSupplierFilter
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
-
-
-# class ListCreateRetGoodsSupplier(ListAPIView):
-#     queryset = ReturnedGoodsSupplier.objects.all()
-#     serializer_class = ReturnedGoodsSupplierSerializer2
+    # permission_classes = [permissions.IsAuthenticated]    
 
 
 class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
@@ -772,13 +770,12 @@ class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
 
 
 class ListCreateRetGoodsClient(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ReturnedGoodsClientFilter
     queryset = ReturnedGoodsClient.objects.all()
     serializer_class = ReturnedGoodsClientSerializer
+    # permission_classes = [permissions.IsAuthenticated]    
 
-
-# class ListRetGoodsClient(ListAPIView):
-#     queryset = ReturnedGoodsClient.objects.all()
-#     serializer_class = ReturnedGoodsClientSerializer2
 
 
 class RetUpdDesReturnGoodClient(RetrieveUpdateDestroyAPIView):
@@ -786,9 +783,14 @@ class RetUpdDesReturnGoodClient(RetrieveUpdateDestroyAPIView):
     serializer_class = ReturnedGoodsClientSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
+
 class ListCreateDamagedProduct(ListCreateAPIView):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DamagedProductFilter
     queryset = DamagedProduct.objects.all()
     serializer_class = DamagedProductSerializer    
+    # permission_classes = [permissions.IsAuthenticated]    
+
 
 class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
     queryset = DamagedProduct.objects.all()
