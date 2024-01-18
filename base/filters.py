@@ -46,6 +46,12 @@ class SalesEmployeeFilter(django_filters.FilterSet):
         model = Employee
         fields = ['name','truck_num']
 
+
+class CategoryFilter(django_filters.FilterSet):
+    class Meta:
+        model = Category
+        fields = ['name']
+
 ############################### Registry #################################
 
 

@@ -274,6 +274,8 @@ class ListCreateCategory(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CategoryFilter
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
