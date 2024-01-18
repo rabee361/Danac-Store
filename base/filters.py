@@ -7,7 +7,7 @@ from datetime import datetime
 class ProductFilter(django_filters.FilterSet):
     category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
     barcode = django_filters.CharFilter(field_name="barcode", lookup_expr='iexact')
-    name = django_filters.CharFilter(field_name="name", lookup_expr='icontains')
+    name = django_filters.CharFilter(field_name="name", lookup_expr='startswith')
 
     class Meta: 
         model = Product
