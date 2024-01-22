@@ -2,7 +2,7 @@ import django_filters
 from .models import *
 from django_filters import rest_framework as filters
 from datetime import datetime
-
+  
 
 class ProductFilter(django_filters.FilterSet):
     category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
