@@ -3,105 +3,139 @@ from .views import *
 from rest_framework_simplejwt import views as jwt_views
 
 
-from django.urls import path
-from .views import *
 urlpatterns = [
-    path('sign-up/' ,SingupView.as_view(), name='sign-up'),
-    # path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),####
-    path('sign-in/', UserLoginApiView.as_view(), name='sign-in'),
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/sign-up/' , SignUpView.as_view()),
+    path('auth/log-in/', UserLoginApiView.as_view(), name='sign-in'),
+    path('auth/logout/', LogoutAPIView.as_view(), name='logout'),
+    path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),
+    path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
+    path('verefy-code/', VerefyCodeView.as_view(), name='verefy-code'),
+    path('notifications/', GetNotificationView.as_view()),
+    path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
+    path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
     path('settings/<str:pk>/', ListInformationUserView.as_view(), name='settings'),
-    path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'), 
-    path('logout/', LogoutAPIView.as_view(), name='logout'),
-    # path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
-    # path('verefy-code/', VerifyCodeView.as_view(), name='verefy-code'),
-    # path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
-    path('categorys/', ListCreatCategoryView.as_view(), name='catogorys'),
-    path('products/', ListCreateProductView().as_view(), name='products'),
-    path('get-product/<str:pk>/', GetUdpDesProductView.as_view()),
-    path('suppliers/', ListCreateSupplierView.as_view(), name='suppliers'),
+    path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
+
+    path('update-location/' , UpdateLocationView.as_view() , name="update-location"),
+    path('get-location/<str:employee_id>/' , GetSalesEmployeeLocation.as_view() , name="get-location"),
+
+    path('clients/' , ListCreateClient.as_view() , name="clients"),
+    path('total-points/', TotalClientPointsView.as_view(), name='total-points'),
+    path('used-points/', UsedClientPointsView.as_view(), name='used-points'),
+    path('expired-points/', ExpiredClientPointsView.as_view(), name='expired-points'),
+    path('points/', ClientPointsView.as_view(), name='client-points'),
+    path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),
+    path('products/' , listCreateProducts.as_view() , name="products"),
+    path('client-orders/' , ListClientOrders.as_view() , name="client-orders"),
+    path('special-products/' , SpecialProducts.as_view() , name="special-products"),
+    path('get-product/<str:pk>/' , RetUpdDesProduct.as_view() , name="product"),
+    path('categories/' , ListCreateCategory.as_view() , name="categories"),
+    path('get-category/<str:pk>/' , RetUpdDesCategory.as_view() , name="get-category"),
+    path('employees/', ListCreateEmployee.as_view(), name='employee'),
+    path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'), 
+
+    path('cart_items/<str:pk>' , Cart_Items.as_view() , name="cart_products"),
+    path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),
+    path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"), 
+    path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),
+    path('delete-item/<str:pk>/' , Delete_From_Cart.as_view() , name="delete-item"),
+
+    path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
+    path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"),
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),
-    path('create-order/', CreateOrderView.as_view(), name='create-order'),
-    path('points/', ListPointsView.as_view(), name='points'),
-    path('orders/user/', ListOrdersUserView.as_view(), name='orders-user'),
-    path('employees/', ListCreatEmployeeView.as_view(), name='employee'),
-    path('employees/<str:pk>/', RetUpdDesEmployeeAPIView.as_view(), name='get-employee'),
-    path('overtimes/', ListCreatOverTimeView.as_view(), name='overtimes'),
-    path('overtimes/<str:pk>/', RetUpdDesOverTimeView.as_view(), name='get_overtime'),
-    path('absences/', ListCreateAbsenceView.as_view(), name='absence'),
-    path('absences/<str:pk>/', RetUpdDesAbsenceAPIView.as_view(), name='get-absence'),
-    path('awards/', ListCreateAwardView.as_view(), name='award'),
-    path('awards/<str:pk>/', RetUpdDesAwardView.as_view(), name='get-award'),
-    path('discounts/', ListCreateDicountView.as_view(), name='discount'),
-    path('discounts/<str:pk>/', RetUpdDesDicountView.as_view(), name='get-discount'),
-    path('advances/', ListCreateAdvanceView.as_view(), name='advances'),
-    path('advances/<str:pk>/', RetUpdDesAdvanceView.as_view(), name='get-advance'),
-    path('sxtraexpences/', ListCreateExpenceView.as_view(), name='extra-expence'),
-    path('extraexpences/<str:pk>/', RetUpdDesExpenceView.as_view(), name='get-extra-expence'),
-    path('search/product/', SearchView.as_view(), name='search-product'),
-    path('add-product-to-cart/<str:pk>/', ListCreateCartProduct.as_view(), name='add-pro-to-cart'),
-    path('list-product-cart/<str:pk>/', DesUpdCartProducts.as_view(), name='list-product-cart'),
-    path('create-medium/', CreateMedium.as_view()),
-    path('delete-medium/<str:pk>/', RetDesMedium.as_view()),
-    path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),#####
-    path('delete-product-from-medium/<str:pk>/', DeleteProductsMediumView.as_view()),
-    path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),#####
-    path('update-incoming-receipt/<str:pk>/', UpdateReceiptIncomingViews.as_view()),
-    path('list-incoming/<str:pk>/', ListIncoming.as_view()),
+    path('orders/' , ListOrders.as_view() ,name="orders"),
+    path('order/<str:pk>/' , GetOrder.as_view() , name="get-order"),
+    path('reject-order/<str:pk>/' , DeleteOrder.as_view() , name="delete-order"),
 
-    # _____________________________________________CREATE RECEIPT________________________________________
+    path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),
+    path('get-bonus/<str:pk>/', RetUpdDesBonus.as_view(), name='get-bonus'),
+    path('discounts/', ListCreateDicount.as_view(), name='discount'),
+    path('get-discount/<str:pk>/', RetUpdDesDicount.as_view(), name='get-discount'),
+    path('overtimes/', ListCreatOverTime.as_view(), name='overtimes'),
+    path('get-overtime/<str:pk>/', RetUpdDesOverTime.as_view(), name='get_overtime'),
+    path('absences/', ListCreateAbsence.as_view(), name='absence'),
+    path('get-absence/<str:pk>/', RetUpdDesAbsence.as_view(), name='get-absence'),
+    path('advances/', ListCreateAdvance.as_view(), name='advances'),
+    path('get-advance/<str:pk>/', RetUpdDesAdvance.as_view(), name='get-advance'),
+    path('extra-expenses/', ListCreateExtraExpense.as_view(), name='expenses'),
+    path('get-extra-expense/<str:pk>/', RetUpdDesExtraExpense.as_view(), name='get-expense'),
+    path('employee_salary/<str:pk>/', RetUpdDesSalary.as_view()),
+    path('salaries/' , ListCreateSalary.as_view() , name="create-salary"),
+    path('employee-salary-info/<str:pk>' , GetSalaryEmployee.as_view() , name="salary-info"), 
 
-    path('get-receipt-output/<int:output_id>/', ListReceiptOutput.as_view(), name='get'),
-    path('update-output-receipt/<str:pk>/', UpdateReceiptOutputViews.as_view()),
-    path('get-product-for-receipt-output/<str:output_id>/', GetProductsOutputsView.as_view()),
-    path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),#####
-    path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),#####
-    path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()), #####
-    path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),
-    # _____________________________________________RETURNED PRODUCTS________________________________________
+    path('sales-employees/' , SalesEmployee.as_view() , name="sale-employees"),
+    path('get-sales-employee/<str:pk>' , RetSalesEmployee.as_view() , name="get-sales-employee"),
 
-    path('create-return-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),
-    path('get-product-return-supplier/<str:pk>/', RetDesReturnGoodSupplier.as_view()),
-    path('delete-product-return-supplier/<str:pk>/', RetDesReturnGoodSupplier.as_view()),
-    path('put-product-return-supplier/<str:pk>/', UpdateReturnGoodSupplier.as_view()),
-    path('create-return-goods-client/', ListCreateRetGoodsClient.as_view()),
-    path('get-product-return-client/<str:pk>/', RetDesReturnGoodClient.as_view()),
-    path('delete-product-return-client/<str:pk>/', RetDesReturnGoodClient.as_view()),
-    path('put-product-return-client/<str:pk>/', UpdateReturnGoodClient.as_view()),
-# ------------------------------------------DAMAGED PRODUCTS------------------------------------------
+    path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name="supplier-debts"),
+    path('client-debts/' , ListCreateClientDebts.as_view() , name="client-debts"),
+    path('debt-for-client/<str:pk>/' , GetClientDebt.as_view()),
+    path('get-client-debt/<str:pk>/' , RetUpdDesClientDebt.as_view() , name="client-debt"),
+    path('debt-for-supplier/<str:pk>/' , GetSupplierDebt.as_view()),
+    path('get-supplier-debt/<str:pk>/' , RetUpdDesSupplierDebt.as_view() , name="supplier-debt"),
+    path('get-registry/' , GetRegistry.as_view() , name="registry"),
+    path('deposites/' , ListCreateDeposite.as_view() , name="deposites"),
+    path('get-deposite/<str:pk>/' , RetUpdDesDeposite.as_view() , name="get-deposite"),
+    path('withdraws/' , ListCreateWithDraw.as_view() , name="withdraws"),
+    path('get-withdraw/<str:pk>/' , RetUpdDesWithDraw.as_view() , name="get-withdraw"),
+    path('payments/' , ListCreatePayment.as_view() , name="payments"),
+    path('get-payment/<str:pk>/' , RetUpdDesPayment.as_view() , name="get-payment"),
+    path('recieved-payments/' , ListCreateRecievedPayment.as_view() , name="payments"),
+    path('get-recieved-payment/<str:pk>/' , RetUpdDesRecievedPaymnt.as_view() , name="get-payment"),
+    path('expenses/' , ListCreateExpense.as_view() , name="expenses"),
+    path('get-expense/<str:pk>/' , RetUpdDesExpense.as_view() , name="get-expense"),
 
-    path('create-damaged-goods/', CreateDamagedProduct.as_view()),
+    path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),
+    path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
+    path('returned-goods-client/', ListCreateRetGoodsClient.as_view()),
+    path('get-returned-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
+
+    path('damaged-product/', ListCreateDamagedProduct.as_view()),
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
-    path('delete-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
-    path('put-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
 
-# ------------------------------------------------------------------------------------
-    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),#####
+    path('get-receipt-manual/<str:pk>/', GetManualReceipt.as_view(), name="get-manuals"),
+    path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
+    path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),
+    path('update-manual/<str:pk>/' , UpdateManualReceipt.as_view() , name="update-manual"),
+    path('get-manual-product/<str:pk>/' , RetUpdDesManualReceiptProduct.as_view()),
+    path('create-manual-product/' , CreateManualProduct.as_view()),
+ 
+    path('get-receipt-output/<str:pk>/', GetOutput.as_view(), name='get-output'),
+    path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()),
+    path('list-outputs/' , ListOutputs.as_view() , name="list-outputs"),
+    path('update-output/<str:pk>/' , UpdateOutputReceipt.as_view() , name="update-output"),
+    path('get-output-product/<str:pk>/' , RetUpdDesOutputProduct.as_view()),
+    path('create-output-product/' , CreateOutputProduct.as_view()),
+ 
+    path('get-receipt-incoming/<str:pk>/' , GetIncoming.as_view() , name="get-incoming"),
+    path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),
+    path('list-incoming/' , ListIncomings.as_view() , name="list-incomings"),
+    path('update-incoming/<str:pk>/' , UpdateIncomingReceipt.as_view() , name="update-incoming"),
+    path('get-incoming-product/<str:pk>/' , RetUpdDesIncomingProduct.as_view()),
+    path('create-incoming-product/' , CreateIncomingProduct.as_view()),
+ 
+    path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),
+    path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),
+    path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),
+    path('create-medium/', CreateMedium.as_view()),
+    path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),
+    path('delete-product-from-medium/<str:pk>/', DeleteProductsMediumView.as_view()),
+    path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),
+
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived-for-employee/<str:state>/', DelevaryArrivedForEmployee.as_view()),
     path('get/<str:pk>/', GetDelevaryArrivedForEmployee.as_view()),
     path('accept-delevary-arrived/<str:pk>/', AcceptDelevaryArrived.as_view()),
-    # -----------------------------------------------MEDIUM TWO-----------------------------------------------
-    path('create-medium-two/', CreateMediumTwo.as_view(), name='create-mediumtwo'),
-    path('add-to-medium-two/<str:mediumtwo_id>/<str:product_id>/', AddToMediumTwo.as_view(), name='add-to-mediumtwo'),
+
+    path('create-medium-two/', CreateMediumTwo.as_view(), name="create-mediumtwo"),
+    path('add-to-medium-two/<str:mediumtwo_id>/<str:product_id>/', AddToMediumTwo.as_view(), name="add-to-mediumtwo"),
     path('medium-two-handler/<str:mediumtwo_id>/<str:pk2>/', MediumTow_Handler.as_view()),
     path('delete-product-from-medium-two/<str:pk>/', DesMediumTwo.as_view()),
-    path('list-products-form-medium-two/', ListProductsMediumTwo.as_view()),
     path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
     path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view()),
-    path('delete-medium-two/<str:pk>/', DeleteMediumTwo.as_view()),
-    path('get-notification/', GetNotificationView.as_view()),
-
-    ################   new
-    path('get-debts-supplier/<str:pk>/', GetDebtSupplier.as_view()),
-
-    ################################# SEARCH #################################
-    path('search-incoming/', ListIncomingView.as_view()),
-    path('search-output/', ListOutputView.as_view()),
-    path('search-manual-receipt/', ListManualReceiptView.as_view()),
-    path('search-order/', ListOrderView.as_view()),
-    path('search-delevery-arrived/', ListDelevaryArrivedView.as_view())
-
-]
+    path('delete-medium-two/<str:pk>/' , DeleteMediumTwo.as_view()),
+    path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view())
+    
+    ]

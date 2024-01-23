@@ -17,6 +17,5 @@ def custom_validation(data):
     if not password:
         raise ValidationError({"error_message":"The field passowrd is required."})
     
-    return data
 
     
