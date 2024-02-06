@@ -230,6 +230,15 @@ class GetSalesEmployeeLocation(APIView):
 
 
 
+class States(ListAPIView):
+    queryset = State.objects.all()
+    serializer_class = StateSerializer
+
+
+
+class GetState(RetrieveAPIView):
+    queryset = State.objects.all()
+    serializer_class = StateSerializer
 
 
 ######################################### CART & PRODUCTS ##########################################################################

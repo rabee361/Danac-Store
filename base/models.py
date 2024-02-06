@@ -75,6 +75,15 @@ class CustomUser(AbstractUser):
 
 
 
+class State(models.Model):
+    name = models.CharField(max_length=100)
+    location = models.PointField()
+
+    def __str__(self):
+        return self.name
+
+
+
 
 class Client(models.Model):
     CHOICES = (
@@ -86,6 +95,8 @@ class Client(models.Model):
         ('تجزئة' , 'تجزئة')
     )
     name = models.CharField(max_length=30)
+    # work_hours = models.
+    # store_name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
     phonenumber = PhoneNumberField(region='DZ',default='+213876543232')
     category = models.CharField(max_length=75,choices=CHOICES)

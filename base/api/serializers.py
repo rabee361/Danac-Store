@@ -157,6 +157,22 @@ class CodeVerivecationSerializer(serializers.ModelSerializer):
         model = CodeVerification
         fields = '__all__'
 
+
+
+class StateSerializer(serializers.ModelSerializer):
+    longitude = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+    class Meta:
+        model = State
+        fields = '__all__'
+
+    def get_longitude(self, obj):
+        return obj.location.x
+
+    def get_latitude(self, obj):
+        return obj.location.y
+
+
 ############################################################### PRODUCT AND CLIENTS AND ORDERS ###########################################
 
 

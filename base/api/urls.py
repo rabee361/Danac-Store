@@ -21,6 +21,9 @@ urlpatterns = [
     path('update-location/' , UpdateLocationView.as_view() , name="update-location"),
     path('get-location/<str:employee_id>/' , GetSalesEmployeeLocation.as_view() , name="get-location"),
 
+    path('states/' , States.as_view() , name="states"),
+    path('get-state/' , GetState.as_view() , name="get-state"),
+
     path('clients/' , ListCreateClient.as_view() , name="clients"),
     path('total-points/', TotalClientPointsView.as_view(), name='total-points'),
     path('used-points/', UsedClientPointsView.as_view(), name='used-points'),

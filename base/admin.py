@@ -86,7 +86,6 @@ export_to_pdf_reportlab.short_description = "Export selected objects to PDF"
 
 
 
-
 class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
@@ -153,6 +152,14 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
 
     # accept_user.short_descreption = 'Accept User For complet registration'
     # accept_user.short_descreption = 'print_user'
+
+
+@admin.register(State)
+class StateAdmin(LeafletGeoAdmin):
+    list_display = ['name','location']
+    search_fields = ['name']
+    ordering = ['-id']
+
 
 @admin.register(Client)
 class ClientAdmin(LeafletGeoAdmin):
