@@ -234,6 +234,53 @@ class GetSalesEmployeeLocation(APIView):
 
 ######################################### CART & PRODUCTS ##########################################################################
 
+
+class listCreateProductType(ListCreateAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = ProductType.objects.all()
+    serializer_class = ProductTypeSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductTypeFilter
+
+
+
+
+class RetUpdDesProductType(RetrieveUpdateDestroyAPIView):
+    # pagination_class = [IsAuthenticated]
+    queryset = ProductType.objects.all()
+    serializer_class = ProductTypeSerializer
+
+
+
+
+class ListCreateCategory(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CategoryFilter
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                {"message": "تمت الإضافة بنجاح"},
+                status=status.HTTP_201_CREATED,
+                headers=headers
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
+    pagination_class = [IsAuthenticated]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
 class listCreateProducts(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Product.objects.all()
@@ -270,31 +317,8 @@ class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
         serializer.save()
 
 
-class ListCreateCategory(ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = CategoryFilter
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(
-                {"message": "تمت الإضافة بنجاح"},
-                status=status.HTTP_201_CREATED,
-                headers=headers
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 
-class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
-    pagination_class = [IsAuthenticated]
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
 
 #################################################### CART HNADLING #####################################################################
 

@@ -1,18 +1,17 @@
 from rest_framework import serializers
 from base.models import *
-from rest_framework.response import Response
 from django.contrib.auth import  authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
-from django.db.models import Q , F , Sum
-from phonenumber_field.serializerfields import PhoneNumberField
-from phonenumber_field.phonenumber import to_python, PhoneNumber
+from django.db.models import Q , Sum
 from deep_translator import GoogleTranslator
+
+
+############################################################## AUTHENTICATION ###################################################
+
 def translate_to_arabic(text):
     translator = GoogleTranslator(source='auto', target='ar')
     return translator.translate(text)
-
-############################################################## AUTHENTICATION ###################################################
 
 def modify_name(name):
     return name
@@ -72,9 +71,9 @@ class SignUpSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password':{'write_only':True,}
         }
-        def validate(self, validated_data):
-            validate_password(validated_data['password'])
-            return validated_data
+    def validate(self, validated_data):
+        validate_password(validated_data['password'])
+        return validated_data
 
     def create(self, validated_data):
         return CustomUser.objects.create_user(**validated_data)
@@ -159,6 +158,12 @@ class CodeVerivecationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 ############################################################### PRODUCT AND CLIENTS AND ORDERS ###########################################
+
+
+class ProductTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductType
+        fields = '__all__'
 
 
 class CategorySerializer(serializers.ModelSerializer):

@@ -52,6 +52,12 @@ class CategoryFilter(django_filters.FilterSet):
         model = Category
         fields = ['name']
 
+
+class ProductTypeFilter(django_filters.FilterSet):
+    class Meta:
+        model = ProductType
+        fields = ['name']
+
 ############################### Registry #################################
 
 
@@ -206,10 +212,11 @@ class ReturnedGoodsSupplierFilter(django_filters.FilterSet):
 class IncomingFilter(django_filters.FilterSet):
     supplier_name = django_filters.CharFilter(field_name="supplier__name", lookup_expr="startswith")
     employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    
 
     class Meta:
         model = Incoming
-        fields = ['supplier_name', 'employee_name']
+        fields = ['supplier_name', 'employee_name', 'id']
 
 
 class OutputFilter(django_filters.FilterSet):
@@ -218,7 +225,7 @@ class OutputFilter(django_filters.FilterSet):
 
     class Meta:
         model = Output
-        fields = ['client_name', 'employee_name']
+        fields = ['client_name', 'employee_name', 'id']
 
 
 class ManualFilter(django_filters.FilterSet):
@@ -227,7 +234,7 @@ class ManualFilter(django_filters.FilterSet):
 
     class Meta:
         model = ManualReceipt
-        fields = ['client_name', 'employee_name']
+        fields = ['client_name', 'employee_name', 'id']
 
 
 class OrderFilter(django_filters.FilterSet):

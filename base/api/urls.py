@@ -33,8 +33,10 @@ urlpatterns = [
     path('get-product/<str:pk>/' , RetUpdDesProduct.as_view() , name="product"),
     path('categories/' , ListCreateCategory.as_view() , name="categories"),
     path('get-category/<str:pk>/' , RetUpdDesCategory.as_view() , name="get-category"),
+    path('product-types/' ,listCreateProductType.as_view(), name="product-types"), ##### new
+    path('get-product-type/<str:pk>/' , RetUpdDesProductType.as_view() , name="get-product-type"),#### new
     path('employees/', ListCreateEmployee.as_view(), name='employee'),
-    path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'), 
+    path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'),
 
     path('cart_items/<str:pk>' , Cart_Items.as_view() , name="cart_products"),
     path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),

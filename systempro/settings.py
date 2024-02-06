@@ -121,15 +121,15 @@ WSGI_APPLICATION = 'systempro.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-       'default': {
-           'ENGINE': 'django.contrib.gis.db.backends.postgis',
-           'NAME': 'pro_db',
-           'USER': 'postgres',
-           'PASSWORD': 'rabee123',
-           'HOST': 'localhost',
-           'PORT': '5432',
-       }
-   }
+        'default': {
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'NAME': 'pro_db',
+            'USER': 'postgres',
+            'PASSWORD': 'rabee123',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 
 # Password validation

@@ -192,6 +192,10 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display= ['id','name']
 
 
+class ProductTypeAdmin(admin.ModelAdmin):
+    list_display = ['name']
+
+
 class CodeVerivecationAdmin(admin.ModelAdmin):
     list_display = ['get_user_name', 'code', 'is_verified','created_at', 'expires_at']
 
@@ -482,6 +486,7 @@ admin.site.register(Points,PointsAdmin)
 #### Cart & Products ####
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(ProductType,ProductTypeAdmin)
 admin.site.register(Cart, CartAdmin)
 admin.site.register(Cart_Products, CartProductsAdmin)
 

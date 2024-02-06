@@ -10,7 +10,6 @@ from django.contrib.gis.geos import Point
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
-import phonenumbers
 
 
 class UserType(models.Model):
@@ -134,8 +133,25 @@ class CodeVerification(models.Model):
 
 
 
+
+class ProductType(models.Model):
+    name = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='images/product_types', null=True,default='images/category.webp')
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ['-id']
+        app_label = 'Clients_and_Products'
+
+
+
+
 class Category(models.Model):
+    product_type = models.ForeignKey(ProductType,on_delete=models.CASCADE)
     name = models.CharField(max_length=35)
+    image = models.ImageField(upload_to='images/categories', null=True,default='images/category.webp')
 
     class Meta:
         ordering = ['-id']
@@ -154,6 +170,10 @@ class Product(models.Model):
     purchasing_price = models.FloatField()
     category = models.ForeignKey(Category , on_delete=models.CASCADE)
     notes = models.TextField(max_length=1000,null=True,blank=True)
+    
+    made_at = models.DateField(null=True,blank=True)
+    expires_at = models.DateField(null=True,blank=True)
+
     limit_less = models.IntegerField()
     limit_more = models.IntegerField()
     num_per_item = models.IntegerField(blank=True,default=0)
