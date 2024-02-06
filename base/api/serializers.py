@@ -2059,3 +2059,11 @@ class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
         reper['description'] = instance.product.description
 
         return reper
+
+
+########################### Serializer Chatting ###########################
+from Clients_and_Products.models import Message
+class SerializerMessaeg(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fiels = '__all__'

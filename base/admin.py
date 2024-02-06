@@ -486,3 +486,8 @@ admin.site.register(Cart, CartAdmin)
 admin.site.register(Cart_Products, CartProductsAdmin)
 
 admin.site.register(Notifications)
+
+from Clients_and_Products.models import *
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ['id', 'content']
+admin.site.register(Message, MessageAdmin)

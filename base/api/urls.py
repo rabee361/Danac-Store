@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import *
 from rest_framework_simplejwt import views as jwt_views
 
@@ -9,6 +9,9 @@ urlpatterns = [
     path('auth/sign-up/' , SignUpView.as_view()),
     path('auth/log-in/', UserLoginApiView.as_view(), name='sign-in'),
     path('auth/logout/', LogoutAPIView.as_view(), name='logout'),
+    #new for social media
+
+    #
     path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),
     path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
     path('verefy-code/', VerefyCodeView.as_view(), name='verefy-code'),
@@ -136,6 +139,7 @@ urlpatterns = [
     path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
     path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view()),
     path('delete-medium-two/<str:pk>/' , DeleteMediumTwo.as_view()),
-    path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view())
-    
+    path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view()),
+    ################################ create message ###################################
+    path('create-message/', CreateMessage.as_view()),
     ]

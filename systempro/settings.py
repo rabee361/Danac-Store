@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'rest_framework',   
@@ -58,9 +59,17 @@ INSTALLED_APPS = [
     'Human_Resources',
     'Company_Fund',
     'Clients_and_Products',
-    # 'liststyle',
-    
+    # 'auth-social-media',
+    # 'django.contrib.sites',
+    # 'allauth',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
+    # 'allauth.socialaccount.providers.google',    
 ]
+
+# SITE_ID = 1
+
+
 X_FRAME_OPTIONS = "SAMEORIGIN"
 SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
@@ -73,7 +82,12 @@ LEAFLET_CONFIG = {
 }
 
 
-AUTHENTICATION_BACKENDS = ['base.api.backend.CustomUserModelBackend']
+AUTHENTICATION_BACKENDS = [
+    'base.api.backend.CustomUserModelBackend',
+    # #new
+    # 'django.contrib.auth.backends.ModelBackend',
+    # 'allauth.account.auth_backends.AuthenticationBackend',
+    ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -82,6 +96,7 @@ REST_FRAMEWORK = {
     ],
 
 }
+
 
 
 AUTH_USER_MODEL = 'base.CustomUser'
@@ -95,6 +110,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #new
+    # "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'systempro.urls'
@@ -109,6 +126,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
+                #new
                 'django.contrib.messages.context_processors.messages',
             ],
         },
@@ -116,7 +134,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'systempro.wsgi.application'
-
+ASGI_APPLICATION = 'systempro.asgi.application'
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         'APP': {
+#             'client_id': '879471682676-gl1srbbbb62ftujcjtv8ebepr80mebl8.apps.googleusercontent.com',
+#             'secret': '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',
+#             'key': ''
+#         }
+#     }
+# }
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -189,6 +216,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR , 'media')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH')
 GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal308.dll'
 
 
@@ -279,3 +307,12 @@ FCM_DJANGO_SETTINGS = {
 
 
 
+#new
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [('localhost',  6379)],
+        },
+    },
+}

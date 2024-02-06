@@ -1321,3 +1321,18 @@ class ListOrderEnvoy(APIView):
             'order_envoy':serializer.data,
             'products_order_envoy':serializer_two.data
         })
+    
+
+###################### View Chatting ######################
+from base.client import send_mssage
+class CreateMessage(CreateAPIView):
+    permission_classes = [IsAuthenticated,]
+    serializer_class = SerializerMessaeg
+
+    def post(self, request):
+        data = request.data
+        # user = request.user
+        client = Client.objects.filter(phonenumber=request.user.phonenumber).first()
+        print(client)
+        send_mssage(data, client.id)
+        return Response(status=status.HTTP_201_CREATED)
