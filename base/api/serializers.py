@@ -164,7 +164,7 @@ class StateSerializer(serializers.ModelSerializer):
     latitude = serializers.SerializerMethodField()
     class Meta:
         model = State
-        fields = '__all__'
+        fields = ['id','name','longitude','latitude']
 
     def get_longitude(self, obj):
         return obj.location.x
