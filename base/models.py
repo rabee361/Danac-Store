@@ -1,5 +1,4 @@
 from django.contrib.gis.db import models
-from django.contrib.auth.models import AbstractUser
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
@@ -10,6 +9,7 @@ from django.contrib.gis.geos import Point
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractUser
 
 
 
