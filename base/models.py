@@ -29,6 +29,11 @@ class CustomUser(AbstractUser):
     location = models.PointField(default=Point(0,0))
     user_type = models.ForeignKey(UserType,on_delete=models.CASCADE,null=True)
     is_accepted = models.BooleanField(default=False)
+    name_store = models.CharField(max_length=50, default='f')
+    time_hours = models.CharField(max_length=50, default='f')
+    state = models.CharField(max_length=50, default='f')
+    address = models.CharField(max_length=100, default='f')
+    town = models.CharField(max_length=50, default='f')
 
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',) 
@@ -209,7 +214,7 @@ class Order_Product(models.Model):
 class Cart_Products(models.Model):
     products = models.ForeignKey(Product, on_delete=models.CASCADE)
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['products__added']

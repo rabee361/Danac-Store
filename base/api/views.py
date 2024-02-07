@@ -299,7 +299,7 @@ class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
 #################################################### CART HNADLING #####################################################################
 
 class Cart_Items(APIView):
-    permission_classes = [IsAuthenticated,Is_Client]
+    # permission_classes = [IsAuthenticated,Is_Client]
     def get(self,request,pk):
         products = Cart_Products.objects.filter(cart=pk)
         serializer = Cart_ProductsSerializer(products,many=True, context={'request': request})
@@ -327,19 +327,29 @@ class Quantity_Handler(APIView):
 
 
 class Add_to_Cart(APIView):
-    permission_classes = [IsAuthenticated,Is_Client]
+    # permission_classes = [IsAuthenticated,Is_Client]
     def post(self,request,pk,pk2):
         user = CustomUser.objects.get(id=pk2)
         client = Client.objects.get(phonenumber=user.phonenumber)
         item = Product.objects.get(id=pk)
         cart, created = Cart.objects.get_or_create(customer=client)
+        quantity = request.data.get('quantity')
+        if not quantity:
+            product = Cart_Products.objects.filter(products=item, cart=cart).first()
+            if product:
+                serializer = Cart_ProductsSerializer2(product,many=False)
+                return Response(serializer.data)
+            return Response({"error": "Quantity is required"}, status=status.HTTP_400_BAD_REQUEST)
         cart_products, created = Cart_Products.objects.get_or_create(products=item, cart=cart)
-        if not created:
+        if created:
             Cart_Products.objects.filter(products=item, cart=cart).\
-                                    update(quantity=F('quantity') + 1)
-            product = Cart_Products.objects.get(products=item, cart=cart)
-            serializer = Cart_ProductsSerializer2(product,many=False)
-            return Response(serializer.data)
+                                    update(quantity=F('quantity')+request.data['quantity'])
+        # if not created:
+        #     # Cart_Products.objects.filter(products=item, cart=cart).\
+        #     #                         update(quantity=F('quantity') + 1)
+        #     product = Cart_Products.objects.get(products=item, cart=cart)
+        #     serializer = Cart_ProductsSerializer2(product,many=False)
+        #     return Response(serializer.data)
         product = Cart_Products.objects.get(products=item, cart=cart)
         serializer = Cart_ProductsSerializer2(product,many=False)
         return Response(serializer.data)
@@ -356,7 +366,7 @@ class Delete_From_Cart(DestroyAPIView):
 
 
 class CreateOrderView(APIView):
-    permission_classes = [IsAuthenticated,Is_Client]
+    # permission_classes = [IsAuthenticated,Is_Client]
     def post(self, request, cart_id):
         delivery_date = request.data.get('delivery_date')
         if not delivery_date:

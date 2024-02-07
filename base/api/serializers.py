@@ -66,14 +66,19 @@ class LoginSerializer(serializers.Serializer):
 class SignUpSerializer(serializers.ModelSerializer):
     x = serializers.FloatField(write_only=True)
     y = serializers.FloatField(write_only=True)
+    confirmation_password = serializers.CharField(write_only=True)
     class Meta:
         model = CustomUser
-        fields = ['phonenumber', 'email', 'username', 'password','x','y']
+        fields = ['phonenumber', 'email', 'username', 'password','x','y', 'name_store', 'state', 'time_hours', 'town', 'address', 'confirmation_password']
         extra_kwargs = {
             'password':{'write_only':True,}
         }
         def validate(self, validated_data):
             validate_password(validated_data['password'])
+            password = validated_data['password']
+            confirmation_password = validated_data['confirmation_password']
+            if password and confirmation_password and password != confirmation_password:
+                raise serializers.ValidationError("Didn't matches password")
             return validated_data
 
     def create(self, validated_data):
@@ -86,6 +91,11 @@ class SignUpSerializer(serializers.ModelSerializer):
             phonenumber=self.validated_data['phonenumber'],
             email = self.validated_data['email'],
             username = self.validated_data['username'],
+            name_store=self.validated_data['name_store'],
+            state = self.validated_data['state'],   
+            time_hours = self.validated_data['time_hours'],
+            town = self.validated_data['town'],
+            address = self.validated_data['address'],
             location = Point(x,y)
         )
         password = self.validated_data['password']
@@ -320,6 +330,10 @@ class Cart_ProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart_Products
         fields = ['id','quantity','cart','products','total_price_of_item']
+
+    # def to_representation(self, instance):
+    #     reper = super().to_representation(instance)
+    #     # reper['']
 
 class Cart_ProductsSerializer2(serializers.ModelSerializer):
     class Meta:

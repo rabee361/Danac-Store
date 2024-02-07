@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'Company_Fund',
     'Clients_and_Products',
     # 'auth-social-media',
+    'twilio',
     # 'django.contrib.sites',
     # 'allauth',
     # 'allauth.account',
