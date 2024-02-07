@@ -368,7 +368,7 @@ class Add_to_Cart(APIView):
         cart, created = Cart.objects.get_or_create(customer=client)
         quantity = request.data.get('quantity')
         
-        if not quantity:
+        if quantity > 0:
             product = Cart_Products.objects.filter(products=item, cart=cart).first()
             if product:
                 serializer = Cart_ProductsSerializer2(product,many=False)
