@@ -12,6 +12,22 @@ from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 
 
+
+
+###### Chat #########
+
+# class Chat(models.Model):
+#     name
+
+
+# class Message(models.Model):
+#     sender = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+#     timestamp = models.DateTimeField(auto_now_add=True)
+#     content = models.TextField()
+#     group = models.ForeignKey(Room, on_delete=models.CASCADE)
+
+
+
 class UserType(models.Model):
     user_type = models.CharField(max_length=20)
 
@@ -22,6 +38,11 @@ class UserType(models.Model):
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length=50, unique=True)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
+    work_hours = models.CharField(max_length=100)
+    store_name = models.CharField(max_length=100)
+    state = models.CharField(max_length=50 , null=True)
+    town = models.CharField(max_length=100 , null=True)
+    address = models.CharField(max_length=100 , null=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True,default='images/account.jpg')
@@ -95,8 +116,7 @@ class Client(models.Model):
         ('تجزئة' , 'تجزئة')
     )
     name = models.CharField(max_length=30)
-    # work_hours = models.
-    # store_name = models.CharField(max_length=100)
+
     address = models.CharField(max_length=100)
     phonenumber = PhoneNumberField(region='DZ',default='+213876543232')
     category = models.CharField(max_length=75,choices=CHOICES)

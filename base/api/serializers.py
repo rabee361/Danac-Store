@@ -9,6 +9,8 @@ from deep_translator import GoogleTranslator
 
 ############################################################## AUTHENTICATION ###################################################
 
+
+############## Helper Functions ################
 def translate_to_arabic(text):
     translator = GoogleTranslator(source='auto', target='ar')
     return translator.translate(text)
@@ -19,6 +21,10 @@ def modify_name(name):
 class DateOnlyField(serializers.DateTimeField):
     def to_representation(self, value):
         return value.date()
+
+#################################################
+
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,13 +71,18 @@ class LoginSerializer(serializers.Serializer):
 class SignUpSerializer(serializers.ModelSerializer):
     x = serializers.FloatField(write_only=True)
     y = serializers.FloatField(write_only=True)
+    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+
     class Meta:
         model = CustomUser
-        fields = ['phonenumber', 'email', 'username', 'password','x','y']
+        fields = ['phonenumber', 'email', 'username', 'password','password2','x','y','store_name','work_hours' ,'state','town','address']
         extra_kwargs = {
             'password':{'write_only':True,}
         }
     def validate(self, validated_data):
+        if validated_data['password'] != validated_data['password2']:
+            raise serializers.ValidationError({"password": "Passwords doesn't match."})
+
         validate_password(validated_data['password'])
         return validated_data
 
@@ -85,6 +96,11 @@ class SignUpSerializer(serializers.ModelSerializer):
             phonenumber=self.validated_data['phonenumber'],
             email = self.validated_data['email'],
             username = self.validated_data['username'],
+            work_hours = self.validated_data['work_hours'],
+            store_name = self.validated_data['store_name'],
+            state = self.validated_data['state'],
+            town = self.validated_data['town'],
+            address = self.validated_data['address'],
             location = Point(x,y)
         )
         password = self.validated_data['password']
@@ -97,7 +113,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 
-class SerializerNotificationI(serializers.ModelSerializer):
+class SerializerNotification(serializers.ModelSerializer):
     class Meta:
         model = Notifications
         fields = '__all__'
