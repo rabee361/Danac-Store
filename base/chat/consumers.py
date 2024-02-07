@@ -5,71 +5,53 @@ from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
 import json
 from base.models import *
+from base.api.serializers import *
 
 
-# class ChatConsumer(AsyncWebsocketConsumer):
+class CreateMessage(AsyncWebsocketConsumer):
+	async def connect(self):
+		await self.accept()
 
-#     async def receive(self, text_data):
-#         text_data_json = json.loads(text_data)
-#         message = text_data_json['message']
+	async def receive(self, text_data):
+		text_data_json = json.loads(text_data)
+		message = text_data_json['message']
+		user_id = text_data_json['user_id']
+		chat_id = text_data_json['chat_id']
 
-#         try:
-#             msg = await self.save_message(message)
-#             await self.send(text_data=json.dumps({
-#                 'message': message
-#             }))
-#         except Exception as e:
-#             print(f"Failed to save Message: {e}")
+		user = await self.get_user(user_id)
+		chat = await self.get_chat(chat_id)
 
+		try:
+			await self.get_employee(user.phonenumber)
+			msg = Message(sender=user,content=message, chat=chat, employee=True)
+		except Employee.DoesNotExist:
+			msg = Message(sender=user,content=message, chat=chat, employee=False)
 
-#     async def connect(self):
-#         await self.accept()
+		serializer = MessageSerializer(msg,many=False)
+		await self.save_message(msg)
 
-#     async def disconnect(self, close_code):
-#         pass
+		await self.send(text_data=json.dumps({
+			'sender' : serializer.data['sender'],
+			'message': serializer.data['content'],
+			'timestamp': serializer.data['timestamp'],
+			'employee': serializer.data['employee']
+		}))
 
-#     @database_sync_to_async
-#     def save_message(self, message):
-#         from .models import Message
-#         msg = Message.objects.create(content=message)
-#         return msg
-    
+	@database_sync_to_async
+	def get_employee(self,phonenumber):
+		return Employee.objects.get(phonenumber=phonenumber) or None
 
+	@database_sync_to_async
+	def get_user(self, user_id):
+		return CustomUser.objects.get(id=user_id)
 
+	@database_sync_to_async
+	def get_chat(self, chat_id):
+		return Chat.objects.get(id=chat_id)
 
+	@database_sync_to_async
+	def save_message(self, msg):
+		msg.save()
 
-
-
-
-# class ChatHandler(AsyncWebsocketConsumer):
-# 	def connect(self):
-# 		self.room_uuid = self.scope['url_route']['kwargs']['uuid']
-# 		self.room_group_name = f'chat_{self.room_uuid}'
-
-# 		async_to_sync(self.channel_layer.group_add)(
-# 		    self.room_group_name, self.channel_name
-# 		)
-# 		self.accept()
-
-# 	def receive(self, text_data):
-# 		text_data_json = json.loads(text_data)
-# 		message = text_data_json['message']
-# 		user_id = self.scope['user'].user_id
-
-# 		user = User.objects.get(user_id=user_id)
-
-# 		msg = Message(author=user,content=message)
-# 		msg.save()
-
-# 		async_to_sync(self.channel_layer.group_send)(
-# 		    self.room_group_name, {'type': 'chat_message', 'message': f'{user.username}: {message}'}
-# 		)
-
-# 	def disconnect(self, close_code):
-# 		async_to_sync(self.channel_layer.group_discard)(
-# 		    self.room_group_name, self.channel_name
-# 		)
-
-# 	def chat_message(self, event):
-# 		message = event['message']
-# 		self.send(text_data=json.dumps({'message': message}))
+	async def disconnect(self, close_code):
+		pass

@@ -366,13 +366,25 @@ class Add_to_Cart(APIView):
         client = Client.objects.get(phonenumber=user.phonenumber)
         item = Product.objects.get(id=pk)
         cart, created = Cart.objects.get_or_create(customer=client)
+        quantity = request.data.get('quantity')
+        
+        if not quantity:
+            product = Cart_Products.objects.filter(products=item, cart=cart).first()
+            if product:
+                serializer = Cart_ProductsSerializer2(product,many=False)
+                return Response(serializer.data)
+            return Response({"error": "Quantity is required"}, status=status.HTTP_400_BAD_REQUEST)
         cart_products, created = Cart_Products.objects.get_or_create(products=item, cart=cart)
-        if not created:
+
+        if created:
             Cart_Products.objects.filter(products=item, cart=cart).\
-                                    update(quantity=F('quantity') + 1)
-            product = Cart_Products.objects.get(products=item, cart=cart)
-            serializer = Cart_ProductsSerializer2(product,many=False)
-            return Response(serializer.data)
+                                    update(quantity=F('quantity')+request.data['quantity'])
+        # if not created:
+        #     Cart_Products.objects.filter(products=item, cart=cart).\
+        #                             update(quantity=F('quantity') + 1)
+        #     product = Cart_Products.objects.get(products=item, cart=cart)
+        #     serializer = Cart_ProductsSerializer2(product,many=False)
+        #     return Response(serializer.data)
         product = Cart_Products.objects.get(products=item, cart=cart)
         serializer = Cart_ProductsSerializer2(product,many=False)
         return Response(serializer.data)
@@ -1354,3 +1366,22 @@ class ListOrderEnvoy(APIView):
             'order_envoy':serializer.data,
             'products_order_envoy':serializer_two.data
         })
+    
+
+
+
+########################### chat ##########################
+    
+class ChatMessages(APIView):
+    def get(self,request,chat_id):
+        chat = Chat.objects.get(id=chat_id)
+        messages = Message.objects.filter(chat=chat)
+        serializer = MessageSerializer(messages,many=True)
+        return Response(serializer.data)
+    
+
+class Chats(APIView):
+    def get(self,request):
+        chats = Chat.objects.all()
+        serializer = ChatSerializer(chats,many=True)
+        return Response(serializer.data)

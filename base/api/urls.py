@@ -21,6 +21,9 @@ urlpatterns = [
     path('update-location/' , UpdateLocationView.as_view() , name="update-location"),
     path('get-location/<str:employee_id>/' , GetSalesEmployeeLocation.as_view() , name="get-location"),
 
+    path('chats/' , Chats.as_view()),#### new
+    path('chat-messages/<str:chat_id>/', ChatMessages.as_view()), #### new
+
     path('states/' , States.as_view() , name="states"),
     path('get-state/' , GetState.as_view() , name="get-state"),
 

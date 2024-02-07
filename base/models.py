@@ -14,20 +14,6 @@ from django.utils.translation import gettext_lazy as _
 
 
 
-###### Chat #########
-
-# class Chat(models.Model):
-#     name
-
-
-# class Message(models.Model):
-#     sender = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
-#     timestamp = models.DateTimeField(auto_now_add=True)
-#     content = models.TextField()
-#     group = models.ForeignKey(Room, on_delete=models.CASCADE)
-
-
-
 class UserType(models.Model):
     user_type = models.CharField(max_length=20)
 
@@ -260,7 +246,7 @@ class Order_Product(models.Model):
 class Cart_Products(models.Model):
     products = models.ForeignKey(Product, on_delete=models.CASCADE)
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['products__added']
@@ -1009,3 +995,24 @@ class MediumTwo_Products(models.Model):
 
     def __str__(self) -> str:
         return f'{self.product.name} - {str(self.mediumtwo.id)}'
+    
+
+
+
+
+################# Chat ##################
+
+class Chat(models.Model):
+
+    def __str__(self):
+        return f'{self.id}'
+
+
+class Message(models.Model):
+    sender = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
+    employee = models.BooleanField(default=False)
+
+#########################################
