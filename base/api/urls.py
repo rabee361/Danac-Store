@@ -13,10 +13,10 @@ urlpatterns = [
 
     #
     path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),
-    path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
-    path('verefy-code/', VerefyCodeView.as_view(), name='verefy-code'),
+    # path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
+    path('verefy-code/', VerefyPhonenumberView.as_view(), name='verefy-code'),
     path('notifications/', GetNotificationView.as_view()),
-    path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
+    # path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
     path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
     path('settings/<str:pk>/', ListInformationUserView.as_view(), name='settings'),
     path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
@@ -45,7 +45,7 @@ urlpatterns = [
     path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),
     path('delete-item/<str:pk>/' , Delete_From_Cart.as_view() , name="delete-item"),
 
-    path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
+    # path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"),
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),
     path('orders/' , ListOrders.as_view() ,name="orders"),

@@ -21,7 +21,7 @@ class UserType(models.Model):
 
 
 class CustomUser(AbstractUser):
-    email = models.EmailField(max_length=50, unique=True)
+    # email = models.EmailField(max_length=50, unique=True)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)

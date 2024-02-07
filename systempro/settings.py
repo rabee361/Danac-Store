@@ -83,12 +83,12 @@ LEAFLET_CONFIG = {
 }
 
 
-AUTHENTICATION_BACKENDS = [
-    'base.api.backend.CustomUserModelBackend',
-    # #new
-    # 'django.contrib.auth.backends.ModelBackend',
-    # 'allauth.account.auth_backends.AuthenticationBackend',
-    ]
+# AUTHENTICATION_BACKENDS = [
+#     'base.api.backend.CustomUserModelBackend',
+#     # #new
+#     # 'django.contrib.auth.backends.ModelBackend',
+#     # 'allauth.account.auth_backends.AuthenticationBackend',
+#     ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

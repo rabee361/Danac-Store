@@ -51,8 +51,8 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Incorrect Credentials")
             if not user.is_active:
                 raise serializers.ValidationError({'message_error':'this account is not active'})
-            if not user.is_verified:
-                raise serializers.ValidationError({'message_error':'this account is not verified'})
+            # if not user.is_verified:
+            #     raise serializers.ValidationError({'message_error':'this account is not verified'})
             if not user.is_accepted:
                 raise serializers.ValidationError({'message_error':'this account is not accepted'})
         else:
@@ -69,7 +69,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     confirmation_password = serializers.CharField(write_only=True)
     class Meta:
         model = CustomUser
-        fields = ['phonenumber', 'email', 'username', 'password','x','y', 'name_store', 'state', 'time_hours', 'town', 'address', 'confirmation_password']
+        fields = ['phonenumber', 'username', 'password','x','y', 'name_store', 'state', 'time_hours', 'town', 'address', 'confirmation_password']
         extra_kwargs = {
             'password':{'write_only':True,}
         }
@@ -89,7 +89,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         y = self.validated_data['y']
         user = CustomUser(
             phonenumber=self.validated_data['phonenumber'],
-            email = self.validated_data['email'],
+            # email = self.validated_data['email'],
             username = self.validated_data['username'],
             name_store=self.validated_data['name_store'],
             state = self.validated_data['state'],   
@@ -163,10 +163,10 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         return user
 
 
-class CodeVerivecationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CodeVerification
-        fields = '__all__'
+# class CodeVerivecationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = CodeVerification
+#         fields = '__all__'
 
 ############################################################### PRODUCT AND CLIENTS AND ORDERS ###########################################
 
