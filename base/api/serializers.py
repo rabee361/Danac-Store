@@ -342,7 +342,7 @@ class Product3Serializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ['id','name','image','description','sale_price']
+        fields = ['id','name','points','items_per_carton','sale_price']
 
     def get_image(self, obj):
         request = self.context.get('request')
@@ -358,11 +358,41 @@ class Cart_ProductsSerializer(serializers.ModelSerializer):
         fields = ['id','quantity','cart','products','total_price_of_item']
 
 
+
 class Cart_DetailsSerializer(serializers.ModelSerializer):
-    products = Product3Serializer()
+    # total_price = serializers.SerializerMethodField()
+    # total_points = serializers.SerializerMethodField()
+    # customer_id = serializers.IntegerField(source='customer.id',read_only=True)
+    # customer_name = serializers.CharField(source='customer.name',read_only=True)
+    # phonenumber = serializers.CharField(source='customer.phonenumber',read_only=True)
+    # address = serializers.CharField(source='customer.address',read_only=True)
+
     class Meta:
-        model = Cart_Products
-        fields = ['id','quantity','cart','products','total_price_of_item']
+        model = Cart
+        fields = ['id']
+
+    # def get_total_price(obj):
+    #     pass
+
+    # def get_total_points(obj):
+    #     pass
+
+
+
+
+class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
+    cart = Cart_DetailsSerializer()
+    sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
+    item_per_carton = serializers.IntegerField(source='products.item_per_carton',read_only=True)
+    sale_price = serializers.FloatField(source='products.item_per_carton',read_only=True)
+    product_name = serializers.CharField(source='products.name',read_only=True)
+    points = serializers.IntegerField(source='products.points',read_only=True)
+    product_id = serializers.IntegerField(source='product.id',read_only=True) 
+
+    class Meta:
+        model = Product
+        fields = ['id','product_name','quantity','cart','item_per_carton','sale_price','total_price_of_item','points']
+
 
 
 class Cart_ProductsSerializer2(serializers.ModelSerializer):

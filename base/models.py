@@ -184,7 +184,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='images/products',null=True,blank=True)
+    image = models.ImageField(upload_to='images/products',null=True,blank=True,default='images/category.webp')
     description = models.TextField(max_length=2000,null=True,blank=True)
     quantity = models.IntegerField()
     purchasing_price = models.FloatField()
