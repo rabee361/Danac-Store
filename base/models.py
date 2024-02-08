@@ -46,7 +46,7 @@ class CustomUser(AbstractUser):
         verbose_name = _("User")
         verbose_name_plural = _("Users")
    
-    objects = CustomManagers()
+    # objects = CustomManagers()
 
     def __str__(self):
         return self.username
@@ -265,6 +265,9 @@ class Cart_Products(models.Model):
 
     def total_price_of_item(self):
         return (self.quantity * self.products.sale_price)
+    
+    def total_points_of_item(self):
+        return (self.quantity * self.products.points)
 
     def __str__(self):
         return f'{self.cart.customer} - {self.products.name} - {self.quantity}'

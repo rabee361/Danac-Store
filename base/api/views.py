@@ -101,8 +101,7 @@ class ResetPasswordView(UpdateAPIView):
     permission_classes = [permissions.AllowAny,]
     def put(self, request, user_id):
         user = CustomUser.objects.get(id=user_id)
-        # try:
-            # ver_user = user.codeverification_set.filter(user__id=user_id).first()
+        
         if user.is_verified:
             data = request.data
             serializer = self.get_serializer(data=data, context={'user_id':user_id})
@@ -116,8 +115,7 @@ class ResetPasswordView(UpdateAPIView):
             return Response(messages, status=status.HTTP_200_OK)
         else:
             return Response({'error':'ليس لديك صلاحية لتغيير كلمة المرور'})
-        # except CodeVerification.DoesNotExist:
-        #     return Response({'message':'ليس لديك صلاحية لتغيير كبمة المرور'})
+
 
 
 
@@ -290,7 +288,7 @@ class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
 
 
 class listCreateProducts(ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend]
@@ -338,12 +336,16 @@ class Cart_Items(APIView):
         return Response(serializer.data)
 
 
+class Client_Details(RetrieveAPIView):
+    queryset = Client.objects.all()
+    serializer_class = Client_DetailsSerializer
+
 
 class Cart_Items_Details(APIView):
     # permission_classes = [IsAuthenticated,Is_Client]
     def get(self,request,pk):
-        cart = Cart.objects.get(id=pk)
-        serializer = Cart_DetailsSerializer(cart, context={'request': request})
+        products = Cart_Products.objects.filter(cart=pk)
+        serializer = Cart_Product_DetailsSerialzier(products,many=True, context={'request': request})
         return Response(serializer.data)
     
 

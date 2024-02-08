@@ -8,10 +8,11 @@ class ProductFilter(django_filters.FilterSet):
     category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
     barcode = django_filters.CharFilter(field_name="barcode", lookup_expr='iexact')
     name = django_filters.CharFilter(field_name="name", lookup_expr='startswith')
+    product_type = django_filters.CharFilter(field_name="category__product_type__name" , lookup_expr="iexact")
 
-    class Meta: 
+    class Meta:
         model = Product
-        fields = ['category','name','barcode']
+        fields = ['category','name','barcode','product_type']
 
 
 class EmployeeFilter(django_filters.FilterSet):
@@ -48,9 +49,10 @@ class SalesEmployeeFilter(django_filters.FilterSet):
 
 
 class CategoryFilter(django_filters.FilterSet):
+    product_type = django_filters.CharFilter(field_name="product_type__name" , lookup_expr="iexact")
     class Meta:
         model = Category
-        fields = ['name']
+        fields = ['name','product_type']
 
 
 class ProductTypeFilter(django_filters.FilterSet):

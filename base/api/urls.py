@@ -4,18 +4,19 @@ from rest_framework_simplejwt import views as jwt_views
 
 
 urlpatterns = [
+    # path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
+    # path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
+    # path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/sign-up/' , SignUpView.as_view()),
     path('auth/log-in/', UserLoginApiView.as_view(), name='sign-in'),
     path('auth/logout/', LogoutAPIView.as_view(), name='logout'),
-
     path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),
-    # path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
     path('verify-code/', VerefyPhonenumberView.as_view(), name='verefy-code'),
-    path('notifications/', GetNotificationView.as_view()),
-    # path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
+
     path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
+    path('notifications/', GetNotificationView.as_view()),
     path('settings/<str:pk>/', ListInformationUserView.as_view(), name='settings'),
     path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
 
@@ -29,22 +30,23 @@ urlpatterns = [
     path('get-state/' , GetState.as_view() , name="get-state"),
 
     path('clients/' , ListCreateClient.as_view() , name="clients"),
+    path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),
+    path('client-info/' , Client_Details.as_view(), name="client-info"),
+    path('client-orders/' , ListClientOrders.as_view() , name="client-orders"),
+
     path('total-points/', TotalClientPointsView.as_view(), name='total-points'),
     path('used-points/', UsedClientPointsView.as_view(), name='used-points'),
     path('expired-points/', ExpiredClientPointsView.as_view(), name='expired-points'),
     path('points/', ClientPointsView.as_view(), name='client-points'),
-    path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),
+    
     path('products/' , listCreateProducts.as_view() , name="products"),
-    path('client-orders/' , ListClientOrders.as_view() , name="client-orders"),
     path('special-products/' , SpecialProducts.as_view() , name="special-products"),
     path('get-product/<str:pk>/' , RetUpdDesProduct.as_view() , name="product"),
     path('categories/' , ListCreateCategory.as_view() , name="categories"),
     path('get-category/<str:pk>/' , RetUpdDesCategory.as_view() , name="get-category"),
     path('product-types/' ,listCreateProductType.as_view(), name="product-types"), ##### new
     path('get-product-type/<str:pk>/' , RetUpdDesProductType.as_view() , name="get-product-type"),#### new
-    path('employees/', ListCreateEmployee.as_view(), name='employee'),
-    path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'),
-
+    
     path('cart_items/<str:pk>' , Cart_Items.as_view() , name="cart_products"),
     path('cart_datails/<str:pk>' , Cart_Items_Details.as_view() , name="cart_products_details"),
     path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),
@@ -52,12 +54,17 @@ urlpatterns = [
     path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),
     path('delete-item/<str:pk>/' , Delete_From_Cart.as_view() , name="delete-item"),
 
-    # path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"),
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),
     path('orders/' , ListOrders.as_view() ,name="orders"),
     path('order/<str:pk>/' , GetOrder.as_view() , name="get-order"),
     path('reject-order/<str:pk>/' , DeleteOrder.as_view() , name="delete-order"),
+
+    path('employees/', ListCreateEmployee.as_view(), name='employee'),
+    path('get-employee/<str:pk>/', RetUpdDesEmployee.as_view(), name='get-employee'),
+
+    path('sales-employees/' , SalesEmployee.as_view() , name="sale-employees"),
+    path('get-sales-employee/<str:pk>' , RetSalesEmployee.as_view() , name="get-sales-employee"),
 
     path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),
     path('get-bonus/<str:pk>/', RetUpdDesBonus.as_view(), name='get-bonus'),
@@ -74,9 +81,6 @@ urlpatterns = [
     path('employee_salary/<str:pk>/', RetUpdDesSalary.as_view()),
     path('salaries/' , ListCreateSalary.as_view() , name="create-salary"),
     path('employee-salary-info/<str:pk>' , GetSalaryEmployee.as_view() , name="salary-info"), 
-
-    path('sales-employees/' , SalesEmployee.as_view() , name="sale-employees"),
-    path('get-sales-employee/<str:pk>' , RetSalesEmployee.as_view() , name="get-sales-employee"),
 
     path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name="supplier-debts"),
     path('client-debts/' , ListCreateClientDebts.as_view() , name="client-debts"),

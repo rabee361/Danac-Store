@@ -359,39 +359,32 @@ class Cart_ProductsSerializer(serializers.ModelSerializer):
 
 
 
-class Cart_DetailsSerializer(serializers.ModelSerializer):
-    # total_price = serializers.SerializerMethodField()
-    # total_points = serializers.SerializerMethodField()
-    # customer_id = serializers.IntegerField(source='customer.id',read_only=True)
-    # customer_name = serializers.CharField(source='customer.name',read_only=True)
-    # phonenumber = serializers.CharField(source='customer.phonenumber',read_only=True)
-    # address = serializers.CharField(source='customer.address',read_only=True)
+class Client_DetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Cart
-        fields = ['id']
-
-    # def get_total_price(obj):
-    #     pass
-
-    # def get_total_points(obj):
-    #     pass
-
+        model = Client
+        fields = ['id','name','phonenumber','address']
 
 
 
 class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
-    cart = Cart_DetailsSerializer()
-    sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
+    total_points = serializers.SerializerMethodField()
+    total_price = serializers.SerializerMethodField()
     item_per_carton = serializers.IntegerField(source='products.item_per_carton',read_only=True)
-    sale_price = serializers.FloatField(source='products.item_per_carton',read_only=True)
+    sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
     product_name = serializers.CharField(source='products.name',read_only=True)
     points = serializers.IntegerField(source='products.points',read_only=True)
-    product_id = serializers.IntegerField(source='product.id',read_only=True) 
+    product_id = serializers.IntegerField(source='products.id',read_only=True)
 
     class Meta:
-        model = Product
-        fields = ['id','product_name','quantity','cart','item_per_carton','sale_price','total_price_of_item','points']
+        model = Cart_Products
+        fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points']
+
+    def get_total_points(self, obj):
+        return obj.cart.items.aggregate(total_points=Sum('points'))['total_points'] or  0
+
+    def get_total_price(self, obj):
+        return obj.cart.items.aggregate(total_price=Sum('sale_price'))['total_price'] or  0
 
 
 
