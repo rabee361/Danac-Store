@@ -75,7 +75,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['phonenumber', 'email', 'username', 'password','password2','x','y','store_name','work_hours' ,'state','town','address']
+        fields = ['phonenumber', 'username', 'password','password2','x','y','store_name','work_hours' ,'state','town','address']
         extra_kwargs = {
             'password':{'write_only':True,}
         }
@@ -94,7 +94,6 @@ class SignUpSerializer(serializers.ModelSerializer):
         y = self.validated_data['y']
         user = CustomUser(
             phonenumber=self.validated_data['phonenumber'],
-            email = self.validated_data['email'],
             username = self.validated_data['username'],
             work_hours = self.validated_data['work_hours'],
             store_name = self.validated_data['store_name'],
@@ -357,6 +356,14 @@ class Cart_ProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart_Products
         fields = ['id','quantity','cart','products','total_price_of_item']
+
+
+class Cart_DetailsSerializer(serializers.ModelSerializer):
+    products = Product3Serializer()
+    class Meta:
+        model = Cart_Products
+        fields = ['id','quantity','cart','products','total_price_of_item']
+
 
 class Cart_ProductsSerializer2(serializers.ModelSerializer):
     class Meta:

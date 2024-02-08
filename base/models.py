@@ -10,6 +10,9 @@ from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
+import random
+
+
 
 
 
@@ -101,12 +104,12 @@ class Client(models.Model):
         ('مطعم' ,'مطعم'),
         ('تجزئة' , 'تجزئة')
     )
-    name = models.CharField(max_length=30)
 
+    name = models.CharField(max_length=30)
     address = models.CharField(max_length=100)
-    phonenumber = PhoneNumberField(region='DZ',default='+213876543232')
+    phonenumber = PhoneNumberField(region='DZ')
     category = models.CharField(max_length=75,choices=CHOICES)
-    notes = models.TextField(max_length=150,default='note')
+    notes = models.TextField(max_length=150,default='_')
     location = models.PointField(null=True)
     debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
 
