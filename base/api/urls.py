@@ -9,10 +9,10 @@ urlpatterns = [
     path('auth/sign-up/' , SignUpView.as_view()),
     path('auth/log-in/', UserLoginApiView.as_view(), name='sign-in'),
     path('auth/logout/', LogoutAPIView.as_view(), name='logout'),
-    
+
     path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),
     # path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
-    path('verefy-code/', VerefyPhonenumberView.as_view(), name='verefy-code'),
+    path('verify-code/', VerefyPhonenumberView.as_view(), name='verefy-code'),
     path('notifications/', GetNotificationView.as_view()),
     # path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
     path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
