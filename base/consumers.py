@@ -5,7 +5,7 @@ from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
 import json
 from .models import *
-from api.serializers import *
+from .api.serializers import *
 
 
 class CreateMessage(AsyncWebsocketConsumer):

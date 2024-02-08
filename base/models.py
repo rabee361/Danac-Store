@@ -22,7 +22,7 @@ class UserType(models.Model):
 
 
 class CustomUser(AbstractUser):
-    email = models.EmailField(max_length=50, unique=True)
+    email = models.EmailField(max_length=50, unique=True,null=True,blank=True)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     work_hours = models.CharField(max_length=100)
     store_name = models.CharField(max_length=100)
