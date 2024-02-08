@@ -256,6 +256,7 @@ class Cart(models.Model):
     
     def create_order(self,date):
         order = Order.objects.create(client=self.customer,total=0,delivery_date=date)
+        points = 0 #new
         for item in self.cart_products_set.all():
                 Order_Product.objects.create(
                 product=item.products,
@@ -263,10 +264,12 @@ class Cart(models.Model):
                 quantity=item.quantity,
                 total_price=item.total_price_of_item()
             )
+                
                 order.total += item.total_price_of_item()
                 order.products_num += item.quantity
                 order.save()
-
+                points += (item.products.points * item.quantity) #new
+        Points.objects.create(client = self.customer, number=points) #new
         self.items.clear()
         return order
 

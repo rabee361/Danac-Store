@@ -8,6 +8,9 @@ from django.db.models import Q , F , Sum
 from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import to_python, PhoneNumber
 from deep_translator import GoogleTranslator
+import uuid
+import barcode
+from barcode.writer import ImageWriter
 def translate_to_arabic(text):
     translator = GoogleTranslator(source='auto', target='ar')
     return translator.translate(text)
@@ -327,13 +330,32 @@ class Product3Serializer(serializers.ModelSerializer):
 
 class Cart_ProductsSerializer(serializers.ModelSerializer):
     products = Product3Serializer()
+    parcode = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Cart_Products
-        fields = ['id','quantity','cart','products','total_price_of_item']
+        fields = ['id','quantity','cart','products','total_price_of_item', 'parcode']
 
     # def to_representation(self, instance):
     #     reper = super().to_representation(instance)
     #     # reper['']
+
+    def get_parcode(self, obj):
+        request = self.context.get('request')
+        # print(Client.objects.filter(phonenumber=request.user.phonenumber).first())
+        # client = Client.objects.filter(phonenumber=request.user.phonenumber).first()
+        # return {
+        #     'username':client.name,
+        #     'phonenumber':str(client.phonenumber),
+        #     'user_id':client.id,
+        #     'address':client.address
+        # }
+        # parcode = uuid.uuid4
+        # print(parcode)
+        data = "1234567890"
+
+        # Create the barcode object
+        barcode_generator = barcode.get('code39', data, writer=ImageWriter())
+        return str(barcode_generator)
 
 class Cart_ProductsSerializer2(serializers.ModelSerializer):
     class Meta:
