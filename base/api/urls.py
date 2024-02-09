@@ -13,7 +13,7 @@ urlpatterns = [
     path('auth/log-in/', UserLoginApiView.as_view(), name='sign-in'),
     path('auth/logout/', LogoutAPIView.as_view(), name='logout'),
     path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),
-    path('verify-code/', VerefyPhonenumberView.as_view(), name='verefy-code'),
+    path('verify-code/', VerefyPhonenumberView.as_view(), name='verify-code'),
 
     path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
     path('notifications/', GetNotificationView.as_view()),
@@ -48,7 +48,7 @@ urlpatterns = [
     path('get-product-type/<str:pk>/' , RetUpdDesProductType.as_view() , name="get-product-type"),#### new
     
     path('cart_items/<str:pk>' , Cart_Items.as_view() , name="cart_products"),
-    path('cart_datails/<str:pk>' , Cart_Items_Details.as_view() , name="cart_products_details"),
+    path('cart_details/<str:pk>' , Cart_Items_Details.as_view() , name="cart_products_details"),
     path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),
     path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"), 
     path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),

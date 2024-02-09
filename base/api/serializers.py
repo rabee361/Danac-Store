@@ -3,7 +3,7 @@ from base.models import *
 from django.contrib.auth import  authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
-from django.db.models import Q , Sum
+from django.db.models import Q , Sum , F
 from deep_translator import GoogleTranslator
 
 
@@ -368,8 +368,8 @@ class Client_DetailsSerializer(serializers.ModelSerializer):
 
 
 class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
-    total_points = serializers.SerializerMethodField()
-    total_price = serializers.SerializerMethodField()
+    total_points = serializers.IntegerField(source='cart.total_cart_points',read_only=True)
+    total_price = serializers.FloatField(source='cart.total_cart_price',read_only=True)
     item_per_carton = serializers.IntegerField(source='products.item_per_carton',read_only=True)
     sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
     product_name = serializers.CharField(source='products.name',read_only=True)
@@ -380,11 +380,6 @@ class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
         model = Cart_Products
         fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points']
 
-    def get_total_points(self, obj):
-        return obj.cart.items.aggregate(total_points=Sum('points'))['total_points'] or  0
-
-    def get_total_price(self, obj):
-        return obj.cart.items.aggregate(total_price=Sum('sale_price'))['total_price'] or  0
 
 
 

@@ -46,7 +46,7 @@ class CustomUser(AbstractUser):
         verbose_name = _("User")
         verbose_name_plural = _("Users")
    
-    # objects = CustomManagers()
+    objects = CustomManagers()
 
     def __str__(self):
         return self.username
@@ -219,6 +219,7 @@ class Order(models.Model):
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     products = models.ManyToManyField(Product,through='Order_Product')
     total = models.IntegerField()
+    total_points = models.IntegerField()####
     products_num = models.IntegerField(default=0)
     created = models.DateField(auto_now_add=True)
     delivery_date = models.DateField()
@@ -236,6 +237,7 @@ class Order_Product(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
+    total_points = models.IntegerField()
 
     class Meta:
         app_label = 'Clients_and_Products'
@@ -292,16 +294,24 @@ class Cart(models.Model):
             total += item.total_price_of_item()
         return total
     
+    def total_cart_points(self):
+        points = 0
+        for item in self.cart_products_set.all():
+            points += item.total_points_of_item()
+        return points
+    
     def create_order(self,date):
-        order = Order.objects.create(client=self.customer,total=0,delivery_date=date)
+        order = Order.objects.create(client=self.customer,total=0,total_points=0,delivery_date=date)
         for item in self.cart_products_set.all():
                 Order_Product.objects.create(
                 product=item.products,
                 order=order,
                 quantity=item.quantity,
-                total_price=item.total_price_of_item()
+                total_price=item.total_price_of_item(),
+                total_points=item.total_points_of_item()
             )
                 order.total += item.total_price_of_item()
+                order.total_points += item.total_points_of_item() #########
                 order.products_num += item.quantity
                 order.save()
 

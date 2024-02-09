@@ -410,7 +410,7 @@ class Delete_From_Cart(DestroyAPIView):
 
 
 class CreateOrderView(APIView):
-    permission_classes = [IsAuthenticated,Is_Client]
+    # permission_classes = [IsAuthenticated,Is_Client]
     def post(self, request, cart_id):
         delivery_date = request.data.get('delivery_date')
         if not delivery_date:
