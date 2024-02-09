@@ -224,6 +224,7 @@ class Order(models.Model):
     created = models.DateField(auto_now_add=True)
     delivery_date = models.DateField()
     delivered = models.BooleanField(null=True,default=False)
+    barcode = models.CharField(max_length=200,null=True)
 
     class Meta:
         app_label = 'Clients_and_Products'
@@ -280,9 +281,15 @@ class Cart_Products(models.Model):
 class Cart(models.Model):
     customer = models.ForeignKey(Client , on_delete=models.CASCADE)
     items = models.ManyToManyField(Product ,through='Cart_Products')
+    barcode = models.CharField(max_length=200, default=uuid.uuid4)
 
     class Meta:
         app_label = 'Clients_and_Products'
+
+
+    def save(self, *args, **kwargs):
+        self.barcode = str(uuid.uuid4())
+        super(Cart, self).save(*args, **kwargs)
 
     @property
     def get_items_num(self):
@@ -301,7 +308,14 @@ class Cart(models.Model):
         return points
     
     def create_order(self,date):
-        order = Order.objects.create(client=self.customer,total=0,total_points=0,delivery_date=date)
+
+        order = Order.objects.create(
+                client=self.customer,
+                total=0,total_points=0,
+                delivery_date=date,
+                barcode=self.barcode ##### barcode
+                )
+        
         for item in self.cart_products_set.all():
                 Order_Product.objects.create(
                 product=item.products,
@@ -311,11 +325,12 @@ class Cart(models.Model):
                 total_points=item.total_points_of_item()
             )
                 order.total += item.total_price_of_item()
-                order.total_points += item.total_points_of_item() #########
+                order.total_points += item.total_points_of_item()#########
                 order.products_num += item.quantity
                 order.save()
-
         self.items.clear()
+        self.barcode = uuid.uuid4
+        self.save()
         return order
 
     def __str__(self):
