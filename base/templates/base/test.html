@@ -6,6 +6,8 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Hello</h1>
+    {% for msg in messages %}
+    <h1><small>{{msg.sender}}: </small>{{msg.content}}</h1>
+    {% endfor %}
 </body>
 </html>
