@@ -1608,7 +1608,6 @@ class IncomingSerializer(serializers.ModelSerializer):
         model = Incoming
         exclude = ['employee']
         
-
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
         if self._errors:
@@ -1995,7 +1994,8 @@ class OutputSerializer2(serializers.ModelSerializer):
         remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         client = Client.objects.get(id=client_data.id)
-        instance = Output.objects.create(employee=employee, client=client, **validated_data)
+        barcode = Cart.objects.get(customer=client)
+        instance = Output.objects.create(employee=employee, client=client,barcode=barcode, **validated_data)
         client.debts += remaining_amount
         client.save()
         return instance
