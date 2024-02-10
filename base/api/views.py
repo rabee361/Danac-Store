@@ -241,7 +241,7 @@ class GetState(RetrieveAPIView):
 ######################################### CART & PRODUCTS ##########################################################################
 
 
-class listCreateProductType(ListCreateAPIView):
+class ListCreateProductType(ListCreateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = ProductType.objects.all()
     serializer_class = ProductTypeSerializer
@@ -264,7 +264,7 @@ class listCreateProductType(ListCreateAPIView):
 
 
 class RetUpdDesProductType(RetrieveUpdateDestroyAPIView):
-    # pagination_class = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = ProductType.objects.all()
     serializer_class = ProductTypeSerializer
 
