@@ -1046,4 +1046,7 @@ class Message(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
     employee = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f'{self.sender} : "{self.content[0:20]}..."'
+
 #########################################
