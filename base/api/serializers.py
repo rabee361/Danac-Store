@@ -173,6 +173,17 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
 
 ############################################################### PRODUCT AND CLIENTS AND ORDERS ###########################################
 
+class AdvertisingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Advertising
+        fields = '__all__'
+
+
+# class ProductTypeSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ProductType
+#         fields = '__all__'
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -319,7 +330,7 @@ class Product3Serializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ['id','name','image','description','sale_price']
+        fields = ['id','name', 'points','image','description','sale_price']
 
     def get_image(self, obj):
         request = self.context.get('request')
@@ -330,32 +341,32 @@ class Product3Serializer(serializers.ModelSerializer):
 
 class Cart_ProductsSerializer(serializers.ModelSerializer):
     products = Product3Serializer()
-    parcode = serializers.SerializerMethodField(read_only=True)
+    # parcode = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Cart_Products
-        fields = ['id','quantity','cart','products','total_price_of_item', 'parcode']
+        fields = ['id','quantity','cart','products','total_price_of_item']
 
     # def to_representation(self, instance):
     #     reper = super().to_representation(instance)
-    #     # reper['']
+    # #     # reper['']
 
-    def get_parcode(self, obj):
-        request = self.context.get('request')
-        # print(Client.objects.filter(phonenumber=request.user.phonenumber).first())
-        # client = Client.objects.filter(phonenumber=request.user.phonenumber).first()
-        # return {
-        #     'username':client.name,
-        #     'phonenumber':str(client.phonenumber),
-        #     'user_id':client.id,
-        #     'address':client.address
-        # }
-        # parcode = uuid.uuid4
-        # print(parcode)
-        data = "1234567890"
+    # def get_parcode(self, obj):
+    #     request = self.context.get('request')
+    #     # print(Client.objects.filter(phonenumber=request.user.phonenumber).first())
+    #     # client = Client.objects.filter(phonenumber=request.user.phonenumber).first()
+    #     # return {
+    #     #     'username':client.name,
+    #     #     'phonenumber':str(client.phonenumber),
+    #     #     'user_id':client.id,
+    #     #     'address':client.address
+    #     # }
+    #     # parcode = uuid.uuid4
+    #     # print(parcode)
+    #     data = "1234567890"
 
         # Create the barcode object
-        barcode_generator = barcode.get('code39', data, writer=ImageWriter())
-        return str(barcode_generator)
+        # barcode_generator = barcode.get('code39', data, writer=ImageWriter())
+        # return str(barcode_generator)
 
 class Cart_ProductsSerializer2(serializers.ModelSerializer):
     class Meta:
@@ -363,6 +374,24 @@ class Cart_ProductsSerializer2(serializers.ModelSerializer):
         fields = '__all__'
 
 
+# class Client_DetailsSerializer(serializers.ModelSerializer):
+
+#     class Meta:
+#         model = Client
+#         fields = ['id','name','phonenumber','address']
+        
+# class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
+#     total_points = serializers.IntegerField(source='cart.total_cart_points',read_only=True)
+#     total_price = serializers.FloatField(source='cart.total_cart_price',read_only=True)
+#     item_per_carton = serializers.IntegerField(source='products.item_per_carton',read_only=True)
+#     sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
+#     product_name = serializers.CharField(source='products.name',read_only=True)
+#     points = serializers.IntegerField(source='products.points',read_only=True)
+#     product_id = serializers.IntegerField(source='products.id',read_only=True)
+
+#     class Meta:
+#         model = Cart_Products
+#         fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points']
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
@@ -415,7 +444,7 @@ class OrderSerializer2(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['client_id','address','name','phonenumber','products','total','products_num','created','longitude','latitude']
+        fields = ['client_id','address','name','phonenumber','products','total','products_num','created', 'delivery_date','longitude','latitude']
 
     def get_longitude(self, obj):
         return obj.client.location.x or 0
