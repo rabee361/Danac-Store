@@ -91,7 +91,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     form = CustomUserChangeForm
     list_filter = ['is_accepted']
     actions = ['Accept_User', 'Refusal_User']
-    list_display = ['id', 'email', 'is_staff', 'is_accepted']    
+    list_display = ['id', 'phonenumber','username', 'is_staff', 'is_accepted']    
     ordering = ['-id']
 
     def Accept_User(self, request, queryset):
@@ -492,6 +492,7 @@ admin.site.register(Points,PointsAdmin)
 
 #### Cart & Products ####
 admin.site.register(Product, ProductAdmin)
+admin.site.register(Ad)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(ProductType,ProductTypeAdmin)
 admin.site.register(Cart, CartAdmin)

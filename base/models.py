@@ -202,6 +202,7 @@ class Product(models.Model):
     added = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200,default=' ',blank=True)
     points = models.IntegerField()
+
     class Meta:
         ordering = ['-added']
         app_label = 'Clients_and_Products'
@@ -210,6 +211,17 @@ class Product(models.Model):
         return self.name
     
 
+
+class Ad(models.Model):
+    product = models.ForeignKey(Product , on_delete=models.CASCADE ,blank=True, null=True)
+    name = models.CharField(max_length=100)
+    image_ad = models.ImageField(upload_to='images/ads')
+
+    class Meta:
+        app_label = 'Clients_and_Products'
+
+    def __str__(self):
+        return self.name
     
     
 ##############################################CART HANDLING ###########################################################################################################

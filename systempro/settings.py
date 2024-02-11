@@ -241,14 +241,12 @@ SIMPLE_JWT = {
 }
 
 
-# EMAIL_BACKEND = 'django_smtp_ssl_SSLEmailBackend'  # Replace with your preferred backend
-# EMAIL_USE_SSL = True
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Replace with your preferred backend
-EMAIL_HOST = 'smtp.gmail.com' # Replace with your email host for gmail -> 'smtp.gmail.com'
-EMAIL_PORT = 587  # Replace with your email port
-EMAIL_USE_TLS = True  # Set to False if your email server doesn't use TLS
-EMAIL_HOST_USER = 'jacoubakizi81@gmail.com'  # Replace with your email username
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587  
+EMAIL_USE_TLS = True  
+EMAIL_HOST_USER = 'jacoubakizi81@gmail.com'
 EMAIL_HOST_PASSWORD = 'eabqhwegdhezskam'     
 
 
@@ -264,7 +262,6 @@ class CustomFirebaseCredentials(credentials.ApplicationDefault):
 
 
 custom_credentials = CustomFirebaseCredentials('C:/Users/eng.Rabee/systempro/storeapp-8cc25-firebase-adminsdk-63jeh-3a5b5e4884.json')
-# FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, name='messaging')
 FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, options={'projectId': 'test-9c6e8'}, name='messaging')
 
 
@@ -274,7 +271,7 @@ FCM_DJANGO_SETTINGS = {
      # default: None (the default Firebase app)
     "DEFAULT_FIREBASE_APP": FIREBASE_MESSAGING_APP,
      # default: _('FCM Django')
-    "APP_VERBOSE_NAME": "What ever name",
+    "APP_VERBOSE_NAME": "Notification Devices",
      # true if you want to have only one active device per registered user at a time
      # default: False
     "ONE_DEVICE_PER_USER": False,

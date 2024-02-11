@@ -241,6 +241,13 @@ class GetState(RetrieveAPIView):
 ######################################### CART & PRODUCTS ##########################################################################
 
 
+
+class ListAds(ListAPIView):
+    queryset = Ad.objects.all()
+    serializer_class = AdSerializer
+
+
+
 class ListCreateProductType(ListCreateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = ProductType.objects.all()

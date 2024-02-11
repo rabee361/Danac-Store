@@ -41,6 +41,7 @@ urlpatterns = [
     
     path('products/' , listCreateProducts.as_view() , name="products"),
     path('special-products/' , SpecialProducts.as_view() , name="special-products"),
+    path('ads/' , ListAds.as_view() , name="list-ads"),
     path('get-product/<str:pk>/' , RetUpdDesProduct.as_view() , name="product"),
     path('categories/' , ListCreateCategory.as_view() , name="categories"),
     path('get-category/<str:pk>/' , RetUpdDesCategory.as_view() , name="get-category"),

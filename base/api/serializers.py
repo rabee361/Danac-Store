@@ -191,6 +191,15 @@ class StateSerializer(serializers.ModelSerializer):
 ############################################################### PRODUCT AND CLIENTS AND ORDERS ###########################################
 
 
+
+class AdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ad
+        fields = '__all__'
+
+
+
+
 class ProductTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductType
