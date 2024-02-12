@@ -192,12 +192,6 @@ class StateSerializer(serializers.ModelSerializer):
 
 
 
-class AdSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ad
-        fields = '__all__'
-
-
 
 
 class ProductTypeSerializer(serializers.ModelSerializer):
@@ -466,6 +460,19 @@ class SimpleOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['client_id','id','name','total','products_num']
+
+
+
+
+
+
+class AdSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True,many=False)
+    class Meta:
+        model = Ad
+        fields = '__all__'
+
+
 
 
 ################################################################################################################
