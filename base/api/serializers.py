@@ -250,9 +250,13 @@ class ClientSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.CharField()
+    carton_price = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Product
         fields = '__all__'
+
+    def get_carton_price(self,obj):
+        return obj.item_per_carton * obj.sale_price 
         
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -298,6 +302,7 @@ class ProductSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"category": "Object with name does not exist."})
         return super(ProductSerializer, self).update(instance, validated_data)
 
+
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['name'] = modify_name(repr['name'])
@@ -309,9 +314,13 @@ class ProductSerializer(serializers.ModelSerializer):
 class Product2Serializer(serializers.ModelSerializer):
     category = serializers.CharField()
     image = serializers.SerializerMethodField()
+    carton_price = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Product
         fields = '__all__'
+
+    def get_carton_price(self,obj):
+        return obj.item_per_carton * obj.sale_price 
 
     def get_image(self, obj):
         request = self.context.get('request')
