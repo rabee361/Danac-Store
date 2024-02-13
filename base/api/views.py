@@ -396,26 +396,27 @@ class Add_to_Cart(APIView):
         cart, created = Cart.objects.get_or_create(customer=client)
         quantity = request.data.get('quantity')
         
-        if quantity > 0:
-            product = Cart_Products.objects.filter(products=item, cart=cart).first()
-            if product:
-                serializer = Cart_ProductsSerializer2(product,many=False)
-                return Response(serializer.data)
-            return Response({"error": "Quantity is required"}, status=status.HTTP_400_BAD_REQUEST)
-        cart_products, created = Cart_Products.objects.get_or_create(products=item, cart=cart)
+        if quantity :
+            cart_product = Cart_Products.objects.create(products=item,cart=cart,quantity=quantity)
+            serializer = Cart_ProductsSerializer2(cart_product,many=False)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        
+        else:
+            cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart)
+            serializer = Cart_ProductsSerializer2(cart_product,many=False)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
 
-        if created:
-            Cart_Products.objects.filter(products=item, cart=cart).\
-                                    update(quantity=F('quantity')+request.data['quantity'])
+
         # if not created:
-        #     Cart_Products.objects.filter(products=item, cart=cart).\
-        #                             update(quantity=F('quantity') + 1)
+        #     # Cart_Products.objects.filter(products=item, cart=cart).\
+        #     #                         update(quantity=F('quantity') + 1)
         #     product = Cart_Products.objects.get(products=item, cart=cart)
         #     serializer = Cart_ProductsSerializer2(product,many=False)
-        #     return Response(serializer.data)
-        product = Cart_Products.objects.get(products=item, cart=cart)
-        serializer = Cart_ProductsSerializer2(product,many=False)
-        return Response(serializer.data)
+        #     return Response(serializer.data,status=status.HTTP_201_CREATED)       
+
+
+                        # Cart_Products.objects.filter(products=item, cart=cart).\
+                        #             update(quantity=F('quantity')+request.data['quantity'])
 
 
 
