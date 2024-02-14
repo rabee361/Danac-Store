@@ -237,6 +237,7 @@ class Order(models.Model):
     delivery_date = models.DateField()
     delivered = models.BooleanField(null=True,default=False)
     barcode = models.CharField(max_length=200,null=True)
+    client_service = models.CharField(max_length=20,default='000 208 0660')
 
     class Meta:
         app_label = 'Clients_and_Products'
