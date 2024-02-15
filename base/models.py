@@ -230,9 +230,6 @@ class Ad(models.Model):
 class Order(models.Model):
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     products = models.ManyToManyField(Product,through='Order_Product')
-    total_price = models.IntegerField()
-    total_points = models.IntegerField()####
-    products_num = models.IntegerField(default=0)
     created = models.DateField(auto_now_add=True)
     delivery_date = models.DateField()
     delivered = models.BooleanField(null=True,default=False)
@@ -246,17 +243,24 @@ class Order(models.Model):
     def total(self):
         return (self.total_price + self.shipping_cost)
 
-    # def total_price(self):
-    #     total_price = 0
-    #     for item in self.cart_products_set.all():
-    #         total_price += item.total_price_of_item()
-    #     return total_price
+    @property
+    def total_price(self):
+        total_price = 0
+        for item in self.order_product_set.all():
+            total_price += item.total_price_of_item()
+        return total_price
     
-    # def total_points(self):
-    #     total_points = 0
-    #     for item in self.cart_products_set.all():
-    #         total_points += item.total_points_of_item()
-    #     return total_points
+    def total_points(self):
+        total_points = 0
+        for item in self.order_product_set.all():
+            total_points += item.total_points_of_item()
+        return total_points
+
+    def products_num(self):
+        products_num = 0
+        for item in self.order_product_set.all():
+            products_num += item.total_points_of_item()
+        return products_num
 
     def __str__(self):
         return f'{self.client} : {self.id}'
@@ -272,6 +276,11 @@ class Order_Product(models.Model):
     class Meta:
         app_label = 'Clients_and_Products'
         
+    def total_price_of_item(self):
+        return (self.quantity * self.product.sale_price)
+    
+    def total_points_of_item(self):
+        return (self.quantity * self.product.points)
 
     def __str__(self):
         return f'{self.order.client} - {self.product.name} - {self.quantity}'
@@ -339,8 +348,8 @@ class Cart(models.Model):
 
         order = Order.objects.create(
                 client=self.customer,
-                total=0,
-                total_points=0,
+                # total=0,
+                # total_points=0,
                 delivery_date=date,
                 barcode=self.barcode ##### barcode
                 )
@@ -353,9 +362,9 @@ class Cart(models.Model):
                 total_price=item.total_price_of_item(),
                 total_points=item.total_points_of_item()
             )
-                order.total += item.total_price_of_item()
-                order.total_points += item.total_points_of_item()#########
-                order.products_num += item.quantity
+                # order.total += item.total_price_of_item()
+                # order.total_points += item.total_points_of_item()#########
+                # order.products_num += item.quantity
                 order.save()
         self.items.clear()
         self.barcode = uuid.uuid4

@@ -455,7 +455,6 @@ class OrderSerializer2(serializers.ModelSerializer):
     products = OrderProductsSerializer2(source='order_product_set', many=True)
     longitude = serializers.SerializerMethodField()
     latitude = serializers.SerializerMethodField()
-    # total = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -467,9 +466,7 @@ class OrderSerializer2(serializers.ModelSerializer):
     def get_latitude(self, obj):
         return obj.client.location.y or 0
 
-    # def get_total(self,obj):
-    #     return (obj.shipping_cost + obj.total)
-    
+
 
 
 class SimpleOrderSerializer(serializers.ModelSerializer):
