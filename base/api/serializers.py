@@ -439,10 +439,11 @@ class OrderProductsSerializer2(serializers.ModelSerializer):
     description = serializers.CharField(source='product.description')
     points = serializers.IntegerField(source='product.points',read_only=True)
     product_name = serializers.CharField(source='product.name',read_only=True)
+    num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
 
     class Meta:
         model = Order_Product
-        fields = ['product_name','order','quantity','price','total_price','image','description','points']
+        fields = ['product_name','order','quantity','price','num_per_item','total_price','image','description','points']
 
 
 
