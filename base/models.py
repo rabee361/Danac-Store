@@ -10,7 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
-import random
+from django.contrib.admin import display
 
 
 
@@ -230,17 +230,33 @@ class Ad(models.Model):
 class Order(models.Model):
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     products = models.ManyToManyField(Product,through='Order_Product')
-    total = models.IntegerField()
+    total_price = models.IntegerField()
     total_points = models.IntegerField()####
     products_num = models.IntegerField(default=0)
     created = models.DateField(auto_now_add=True)
     delivery_date = models.DateField()
     delivered = models.BooleanField(null=True,default=False)
     barcode = models.CharField(max_length=200,null=True)
+    shipping_cost = models.FloatField(default=0.0)
     client_service = models.CharField(max_length=20,default='000 208 0660')
 
     class Meta:
         app_label = 'Clients_and_Products'
+
+    def total(self):
+        return (self.total_price + self.shipping_cost)
+
+    # def total_price(self):
+    #     total_price = 0
+    #     for item in self.cart_products_set.all():
+    #         total_price += item.total_price_of_item()
+    #     return total_price
+    
+    # def total_points(self):
+    #     total_points = 0
+    #     for item in self.cart_products_set.all():
+    #         total_points += item.total_points_of_item()
+    #     return total_points
 
     def __str__(self):
         return f'{self.client} : {self.id}'
@@ -323,7 +339,8 @@ class Cart(models.Model):
 
         order = Order.objects.create(
                 client=self.customer,
-                total=0,total_points=0,
+                total=0,
+                total_points=0,
                 delivery_date=date,
                 barcode=self.barcode ##### barcode
                 )
@@ -876,6 +893,7 @@ class Output(models.Model):
     previous_depts = models.FloatField(blank=True,default=0.0)
     remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateTimeField(auto_now_add=True,null=True)
+    # shipping_cost = models.FloatField(default=0.0)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
     location = models.PointField(default=Point(0.0,0.0))
     delivered = models.BooleanField(default=False)
