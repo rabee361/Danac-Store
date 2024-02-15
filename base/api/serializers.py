@@ -382,6 +382,7 @@ class Client_DetailsSerializer(serializers.ModelSerializer):
 class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
     total_points = serializers.IntegerField(source='cart.total_cart_points',read_only=True)
     total_price = serializers.FloatField(source='cart.total_cart_price',read_only=True)
+    barcode = serializers.CharField(source='cart.barcode',read_only=True)
     item_per_carton = serializers.IntegerField(source='products.item_per_carton',read_only=True)
     sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
     product_name = serializers.CharField(source='products.name',read_only=True)
@@ -390,7 +391,7 @@ class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
 
     class Meta:
         model = Cart_Products
-        fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points']
+        fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points','barcode']
 
 
 
@@ -436,9 +437,12 @@ class OrderProductsSerializer2(serializers.ModelSerializer):
     image = serializers.ImageField(source='product.image')
     price = serializers.FloatField(source='product.sale_price',read_only=True)
     description = serializers.CharField(source='product.description')
+    points = serializers.IntegerField(source='product.points',read_only=True)
+    product_name = serializers.CharField(source='product_name',read_only=True)
+
     class Meta:
         model = Order_Product
-        fields = ['product','order','quantity','price','total_price','image','description']
+        fields = ['product_name','order','quantity','price','total_price','image','description','points']
 
 
 
@@ -1611,7 +1615,7 @@ class IncomingSerializer2(serializers.ModelSerializer):
     total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = Incoming
-        fields = ['id','supplier','employee','total_receipt','supplier_phone','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','supplier','employee','total_receipt','supplier_phone','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
     
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
@@ -1701,7 +1705,6 @@ class IncomingSerializer(serializers.ModelSerializer):
 
 
 class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
-    # product = serializers.IntegerField()
     name = serializers.CharField(source='product.name',read_only=True)
     num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
     sale_price = serializers.FloatField(source='price')
@@ -1843,7 +1846,7 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
     client_points = serializers.SerializerMethodField()
     class Meta:
         model = ManualReceipt
-        fields = ['id','client','client_phone','client_points','total_receipt','employee','phonenumber','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','client','client_phone','client_points','total_receipt','employee','client_service','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
 
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()

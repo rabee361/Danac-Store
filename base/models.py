@@ -299,7 +299,6 @@ class Cart(models.Model):
     class Meta:
         app_label = 'Clients_and_Products'
 
-
     def save(self, *args, **kwargs):
         self.barcode = str(uuid.uuid4())
         super(Cart, self).save(*args, **kwargs)
@@ -819,7 +818,7 @@ class Incoming(models.Model):
     products = models.ManyToManyField(Product, through='Incoming_Product')
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    phonenumber = models.CharField(max_length=20,default='000 208 0660')
+    client_service = models.CharField(max_length=20,default='000 208 0660')
     recive_pyement = models.FloatField()
     discount = models.FloatField(null=True,blank=True,default=0.0)
     Reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)
@@ -870,7 +869,7 @@ class Output(models.Model):
     products = models.ManyToManyField(Product, through='Output_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    phonenumber = models.CharField(max_length=20,default='000 208 0660')
+    client_service = models.CharField(max_length=20,default='000 208 0660')
     recive_pyement = models.FloatField()
     discount = models.FloatField(blank=True,default=0.0)
     Reclaimed_products = models.FloatField(blank=True,default=0.0)
@@ -893,6 +892,7 @@ class Output(models.Model):
     def __str__(self):
         return str(self.id)
     
+
 class Output_Products(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE) 
     output = models.ForeignKey(Output, on_delete=models.CASCADE)
@@ -932,7 +932,7 @@ class ManualReceipt(models.Model):
     products = models.ManyToManyField(Product, through='ManualReceipt_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    phonenumber = models.CharField(max_length=20,default='000 208 0660')
+    client_service = models.CharField(max_length=20,default='000 208 0660')
     recive_payment = models.FloatField()
     discount = models.FloatField(null=True,blank=True,default=0.0)
     reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)
@@ -940,6 +940,10 @@ class ManualReceipt(models.Model):
     remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
+
+    class Meta:
+        ordering = ['-date']
+        app_label = 'Receipts'
 
     def calculate_total_receipt(self):
         return self.manualreceipt_products_set.aggregate(
@@ -949,9 +953,7 @@ class ManualReceipt(models.Model):
     def __str__(self) -> str:
         return f'{self.client.name} - {str(self.id)}'
     
-    class Meta:
-        ordering = ['-date']
-        app_label = 'Receipts'
+
   
 
 
