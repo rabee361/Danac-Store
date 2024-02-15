@@ -438,7 +438,7 @@ class OrderProductsSerializer2(serializers.ModelSerializer):
     price = serializers.FloatField(source='product.sale_price',read_only=True)
     description = serializers.CharField(source='product.description')
     points = serializers.IntegerField(source='product.points',read_only=True)
-    product_name = serializers.CharField(source='product_name',read_only=True)
+    product_name = serializers.CharField(source='product.name',read_only=True)
 
     class Meta:
         model = Order_Product
