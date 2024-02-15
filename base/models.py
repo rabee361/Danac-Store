@@ -11,12 +11,17 @@ from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 import random
+import pytz
+from datetime import datetime
 
+# new
+time = pytz.timezone('Asia/Damascus')
+class Day(models.Model):
+    day = models.IntegerField(default = datetime.now(time).day)
 
-
-
-
-
+    def __str__(self) -> str:
+        return str(self.id)
+    
 class UserType(models.Model):
     user_type = models.CharField(max_length=20)
 
@@ -816,6 +821,7 @@ class Products_Medium(models.Model):
 
 class Incoming(models.Model):
     products = models.ManyToManyField(Product, through='Incoming_Product')
+    day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name='days') #new
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     phonenumber = models.CharField(max_length=20,default='000 208 0660')
@@ -826,6 +832,7 @@ class Incoming(models.Model):
     remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
+    number = models.IntegerField() #new
 
     class Meta:
         ordering=['-date']
@@ -835,7 +842,7 @@ class Incoming(models.Model):
         return self.incoming_product_set.aggregate(
             total_receipt=models.Sum('total_price')
         )['total_receipt'] or 0.0
-
+    
     def __str__(self):
         return str(self.id)
         

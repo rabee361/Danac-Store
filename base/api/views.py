@@ -20,7 +20,6 @@ from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
 from .permissions import *
 
-
 ####################################### AUTHENTICATION ###################################################################3#######
 
 class SignUpView(GenericAPIView):
@@ -32,7 +31,6 @@ class SignUpView(GenericAPIView):
         serializer.save()
         user_data = serializer.data
         user = CustomUser.objects.get(phonenumber=user_data['phonenumber'])
-
         device_token = request.data.get('device_token')
         device_type = request.data.get('device_type')
         if device_token:

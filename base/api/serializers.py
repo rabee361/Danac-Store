@@ -5,7 +5,8 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
 from django.db.models import Q , Sum , F
 from deep_translator import GoogleTranslator
-
+import pytz
+from datetime import datetime
 
 ############################################################## AUTHENTICATION ###################################################
 
@@ -1633,44 +1634,51 @@ class IncomingSerializer2(serializers.ModelSerializer):
 class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Incoming
-        exclude = ['employee']
+        exclude = ['employee', 'day', 'number']
         
-    def is_valid(self, raise_exception=False):
-        is_valid = super().is_valid(raise_exception=False)
-        if self._errors:
-            first_error_field = next(iter(self._errors))
-            first_error_message = self._errors[first_error_field][0]
-            if first_error_message == "This field is required.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"{translation} مطلوب"
-            elif first_error_message == "This field may not be blank.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
-            elif first_error_message == "A valid number is required.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"رقم صالح مطلوب لـ {translation}"
-            elif first_error_message == "A valid integer is required.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
-            elif first_error_message == "This field may not be null.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
-            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
-            self._errors = {"error": first_error_message}
-            if raise_exception:
-                raise serializers.ValidationError(self._errors)
-        return not bool(self._errors)
-
+    # def is_valid(self, raise_exception=False):
+    #     is_valid = super().is_valid(raise_exception=False)
+    #     if self._errors:
+    #         first_error_field = next(iter(self._errors))
+    #         first_error_message = self._errors[first_error_field][0]
+    #         if first_error_message == "This field is required.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"{translation} مطلوب"
+    #         elif first_error_message == "This field may not be blank.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+    #         elif first_error_message == "A valid number is required.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"رقم صالح مطلوب لـ {translation}"
+    #         elif first_error_message == "A valid integer is required.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
+    #         elif first_error_message == "This field may not be null.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+    #         elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"يرجى اختيار قيمة لـ {translation}"
+    #         self._errors = {"error": first_error_message}
+    #         if raise_exception:
+    #             raise serializers.ValidationError(self._errors)
+    #     return not bool(self._errors)
 
     def create(self, validated_data):
+        number = 0
+        time = pytz.timezone('Asia/Damascus')
+        day_now = datetime.now(time).day
+        day_number, created = Day.objects.get_or_create(day=day_now)
+        if created:
+            number = 1
+        else:
+            number = day_number.days.all().count() + 1
         request = self.context.get('request')
         supplier_data = validated_data.pop('supplier', None)
         remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         supplier = Supplier.objects.get(id=supplier_data.id)
-        instance = Incoming.objects.create(employee=employee, supplier=supplier,remaining_amount=remaining_amount ,**validated_data)
+        instance = Incoming.objects.create(employee=employee, supplier=supplier,remaining_amount=remaining_amount, day=day_number, number=number, **validated_data)
         supplier.debts += remaining_amount
         supplier.save()
         return instance

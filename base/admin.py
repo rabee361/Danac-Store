@@ -271,7 +271,7 @@ class IncomingProductAdmin(admin.ModelAdmin):
 
 
 class IncomingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date']
+    list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount','number' ,'date']
     search_fields = ['supplier__name', 'employee__name']
     def get_name_supplier(self, obj):
         return obj.supplier.name
@@ -502,3 +502,5 @@ admin.site.register(Notifications)
 
 admin.site.register(Chat)
 admin.site.register(Message)
+
+admin.site.register(Day)
