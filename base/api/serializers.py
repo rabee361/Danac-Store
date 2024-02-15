@@ -457,7 +457,7 @@ class OrderSerializer2(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id','client_id','address','name','phonenumber','client_service','products','total','products_num','created','longitude','latitude','barcode']
+        fields = ['id','client_id','address','name','phonenumber','client_service','products','total','total_points','products_num','created','longitude','latitude','barcode']
 
     def get_longitude(self, obj):
         return obj.client.location.x or 0
