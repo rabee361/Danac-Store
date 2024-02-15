@@ -1,5 +1,4 @@
 from django.contrib.gis.db import models
-from django.contrib.auth.models import AbstractUser
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
@@ -10,7 +9,12 @@ from django.contrib.gis.geos import Point
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
-import phonenumbers
+from django.contrib.auth.models import AbstractUser
+import random
+
+
+
+
 
 
 class UserType(models.Model):
@@ -21,19 +25,19 @@ class UserType(models.Model):
 
 
 class CustomUser(AbstractUser):
-    # email = models.EmailField(max_length=50, unique=True)
+    email = models.EmailField(max_length=50, unique=True,null=True,blank=True)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
+    work_hours = models.CharField(max_length=100)
+    store_name = models.CharField(max_length=100)
+    state = models.CharField(max_length=50 , null=True)
+    town = models.CharField(max_length=100 , null=True)
+    address = models.CharField(max_length=100 , null=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True,default='images/account.jpg')
     location = models.PointField(default=Point(0,0))
     user_type = models.ForeignKey(UserType,on_delete=models.CASCADE,null=True)
     is_accepted = models.BooleanField(default=False)
-    name_store = models.CharField(max_length=50, default='f')
-    time_hours = models.CharField(max_length=50, default='f')
-    state = models.CharField(max_length=50, default='f')
-    address = models.CharField(max_length=100, default='f')
-    town = models.CharField(max_length=50, default='f')
 
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',) 
@@ -81,6 +85,15 @@ class CustomUser(AbstractUser):
 
 
 
+class State(models.Model):
+    name = models.CharField(max_length=100)
+    location = models.PointField()
+
+    def __str__(self):
+        return self.name
+
+
+
 
 class Client(models.Model):
     CHOICES = (
@@ -91,11 +104,12 @@ class Client(models.Model):
         ('مطعم' ,'مطعم'),
         ('تجزئة' , 'تجزئة')
     )
+
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=100)
-    phonenumber = PhoneNumberField(region='DZ',default='+213876543232')
+    phonenumber = PhoneNumberField(region='DZ')
     category = models.CharField(max_length=75,choices=CHOICES)
-    notes = models.TextField(max_length=150,default='note')
+    notes = models.TextField(max_length=150,default='_')
     location = models.PointField(null=True)
     debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
 
@@ -137,22 +151,27 @@ class CodeVerification(models.Model):
     def __str__(self):
         return f'{self.user.username} code:{self.code}'
 
-# class CategoryType(models.Model):
-#     name = models.CharField(max_length=50)
-#     image = models.ImageField(upload_to='images/product_type', null=True, default='images/pruduct.jpg')
 
-#     def __str__(self):
-#         return self.name
+
+
+class ProductType(models.Model):
+    name = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='images/product_types', null=True,default='images/category.webp')
+
+    def __str__(self):
+        return self.name
     
-#     class Meta:
-#         ordering = ['-id']
-#         app_label = 'Clients_and_Products'
+    class Meta:
+        ordering = ['-id']
+        app_label = 'Clients_and_Products'
+
+
 
 
 class Category(models.Model):
+    product_type = models.ForeignKey(ProductType,on_delete=models.CASCADE)
     name = models.CharField(max_length=35)
-    # category_type = models.ForeignKey(CategoryType, on_delete=models.CASCADE)
-    # image = models.ImageField(upload_to='images/categories', null=True,default='images/category.webp')
+    image = models.ImageField(upload_to='images/categories', null=True,default='images/category.webp')
 
     class Meta:
         ordering = ['-id']
@@ -165,12 +184,16 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='images/products',null=True,blank=True)
+    image = models.ImageField(upload_to='images/products',null=True,blank=True,default='images/category.webp')
     description = models.TextField(max_length=2000,null=True,blank=True)
     quantity = models.IntegerField()
     purchasing_price = models.FloatField()
     category = models.ForeignKey(Category , on_delete=models.CASCADE)
     notes = models.TextField(max_length=1000,null=True,blank=True)
+    
+    made_at = models.DateField(null=True,blank=True)
+    expires_at = models.DateField(null=True,blank=True)
+
     limit_less = models.IntegerField()
     limit_more = models.IntegerField()
     num_per_item = models.IntegerField(blank=True,default=0)
@@ -179,6 +202,7 @@ class Product(models.Model):
     added = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200,default=' ',blank=True)
     points = models.IntegerField()
+
     class Meta:
         ordering = ['-added']
         app_label = 'Clients_and_Products'
@@ -187,16 +211,19 @@ class Product(models.Model):
         return self.name
     
 
-# new
-class Advertising(models.Model):
-    image = models.ImageField(upload_to='images/adversting', null=True)
-    # description = models.TextField(max_length=1000)
+
+class Ad(models.Model):
+    product = models.ForeignKey(Product , on_delete=models.CASCADE ,blank=True, null=True)
+    name = models.CharField(max_length=100)
+    image_ad = models.ImageField(upload_to='images/ads')
 
     class Meta:
         app_label = 'Clients_and_Products'
-    
+
     def __str__(self):
-        return str(self.id)
+        return self.name
+    
+    
 ##############################################CART HANDLING ###########################################################################################################
 
 
@@ -204,12 +231,12 @@ class Order(models.Model):
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     products = models.ManyToManyField(Product,through='Order_Product')
     total = models.IntegerField()
-    total_points = models.IntegerField()
+    total_points = models.IntegerField()####
     products_num = models.IntegerField(default=0)
     created = models.DateField(auto_now_add=True)
     delivery_date = models.DateField()
     delivered = models.BooleanField(null=True,default=False)
-    barcode = models.CharField(max_length=200, null=True)
+    barcode = models.CharField(max_length=200,null=True)
 
     class Meta:
         app_label = 'Clients_and_Products'
@@ -237,7 +264,7 @@ class Order_Product(models.Model):
 class Cart_Products(models.Model):
     products = models.ForeignKey(Product, on_delete=models.CASCADE)
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=0)
+    quantity = models.IntegerField(default=1)
 
     class Meta:
         ordering = ['products__added']
@@ -270,6 +297,11 @@ class Cart(models.Model):
 
     class Meta:
         app_label = 'Clients_and_Products'
+
+
+    def save(self, *args, **kwargs):
+        self.barcode = str(uuid.uuid4())
+        super(Cart, self).save(*args, **kwargs)
 
     @property
     def get_items_num(self):
@@ -1006,3 +1038,27 @@ class MediumTwo_Products(models.Model):
 
     def __str__(self) -> str:
         return f'{self.product.name} - {str(self.mediumtwo.id)}'
+    
+
+
+
+
+################# Chat ##################
+
+class Chat(models.Model):
+
+    def __str__(self):
+        return f'{self.id}'
+
+
+class Message(models.Model):
+    sender = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
+    employee = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.sender} : "{self.content[0:20]}..."'
+
+#########################################

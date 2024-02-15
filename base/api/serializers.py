@@ -1,21 +1,19 @@
 from rest_framework import serializers
 from base.models import *
-from rest_framework.response import Response
 from django.contrib.auth import  authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
-from django.db.models import Q , F , Sum
-from phonenumber_field.serializerfields import PhoneNumberField
-from phonenumber_field.phonenumber import to_python, PhoneNumber
+from django.db.models import Q , Sum , F
 from deep_translator import GoogleTranslator
-import uuid
-import barcode
-from barcode.writer import ImageWriter
+
+
+############################################################## AUTHENTICATION ###################################################
+
+
+############## Helper Functions ################
 def translate_to_arabic(text):
     translator = GoogleTranslator(source='auto', target='ar')
     return translator.translate(text)
-
-############################################################## AUTHENTICATION ###################################################
 
 def modify_name(name):
     return name
@@ -23,6 +21,10 @@ def modify_name(name):
 class DateOnlyField(serializers.DateTimeField):
     def to_representation(self, value):
         return value.date()
+
+#################################################
+
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,8 +56,8 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Incorrect Credentials")
             if not user.is_active:
                 raise serializers.ValidationError({'message_error':'this account is not active'})
-            # if not user.is_verified:
-            #     raise serializers.ValidationError({'message_error':'this account is not verified'})
+            if not user.is_verified:
+                raise serializers.ValidationError({'message_error':'this account is not verified'})
             if not user.is_accepted:
                 raise serializers.ValidationError({'message_error':'this account is not accepted'})
         else:
@@ -69,20 +71,20 @@ class LoginSerializer(serializers.Serializer):
 class SignUpSerializer(serializers.ModelSerializer):
     x = serializers.FloatField(write_only=True)
     y = serializers.FloatField(write_only=True)
-    confirmation_password = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+
     class Meta:
         model = CustomUser
-        fields = ['phonenumber', 'username', 'password','x','y', 'name_store', 'state', 'time_hours', 'town', 'address', 'confirmation_password']
+        fields = ['phonenumber', 'username', 'password','password2','x','y','store_name','work_hours' ,'state','town','address']
         extra_kwargs = {
             'password':{'write_only':True,}
         }
-        def validate(self, validated_data):
-            validate_password(validated_data['password'])
-            password = validated_data['password']
-            confirmation_password = validated_data['confirmation_password']
-            if password and confirmation_password and password != confirmation_password:
-                raise serializers.ValidationError("Didn't matches password")
-            return validated_data
+    def validate(self, validated_data):
+        if validated_data['password'] != validated_data['password2']:
+            raise serializers.ValidationError({"password": "Passwords doesn't match."})
+
+        validate_password(validated_data['password'])
+        return validated_data
 
     def create(self, validated_data):
         return CustomUser.objects.create_user(**validated_data)
@@ -92,11 +94,10 @@ class SignUpSerializer(serializers.ModelSerializer):
         y = self.validated_data['y']
         user = CustomUser(
             phonenumber=self.validated_data['phonenumber'],
-            # email = self.validated_data['email'],
             username = self.validated_data['username'],
-            name_store=self.validated_data['name_store'],
-            state = self.validated_data['state'],   
-            time_hours = self.validated_data['time_hours'],
+            work_hours = self.validated_data['work_hours'],
+            store_name = self.validated_data['store_name'],
+            state = self.validated_data['state'],
             town = self.validated_data['town'],
             address = self.validated_data['address'],
             location = Point(x,y)
@@ -111,7 +112,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 
-class SerializerNotificationI(serializers.ModelSerializer):
+class SerializerNotification(serializers.ModelSerializer):
     class Meta:
         model = Notifications
         fields = '__all__'
@@ -166,23 +167,37 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         return user
 
 
-# class CodeVerivecationSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = CodeVerification
-#         fields = '__all__'
-
-############################################################### PRODUCT AND CLIENTS AND ORDERS ###########################################
-
-class AdvertisingSerializer(serializers.ModelSerializer):
+class CodeVerivecationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Advertising
+        model = CodeVerification
         fields = '__all__'
 
 
-# class ProductTypeSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ProductType
-#         fields = '__all__'
+
+class StateSerializer(serializers.ModelSerializer):
+    longitude = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+    class Meta:
+        model = State
+        fields = ['id','name','longitude','latitude']
+
+    def get_longitude(self, obj):
+        return obj.location.x
+
+    def get_latitude(self, obj):
+        return obj.location.y
+
+
+############################################################### PRODUCT AND CLIENTS AND ORDERS ###########################################
+
+
+
+
+
+class ProductTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductType
+        fields = '__all__'
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -235,9 +250,13 @@ class ClientSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.CharField()
+    carton_price = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Product
         fields = '__all__'
+
+    def get_carton_price(self,obj):
+        return obj.item_per_carton * obj.sale_price 
         
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -283,6 +302,7 @@ class ProductSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"category": "Object with name does not exist."})
         return super(ProductSerializer, self).update(instance, validated_data)
 
+
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['name'] = modify_name(repr['name'])
@@ -294,9 +314,13 @@ class ProductSerializer(serializers.ModelSerializer):
 class Product2Serializer(serializers.ModelSerializer):
     category = serializers.CharField()
     image = serializers.SerializerMethodField()
+    carton_price = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Product
         fields = '__all__'
+
+    def get_carton_price(self,obj):
+        return obj.item_per_carton * obj.sale_price 
 
     def get_image(self, obj):
         request = self.context.get('request')
@@ -330,7 +354,7 @@ class Product3Serializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ['id','name', 'points','image','description','sale_price']
+        fields = ['id','name','points','item_per_carton','sale_price','image']
 
     def get_image(self, obj):
         request = self.context.get('request')
@@ -341,32 +365,35 @@ class Product3Serializer(serializers.ModelSerializer):
 
 class Cart_ProductsSerializer(serializers.ModelSerializer):
     products = Product3Serializer()
-    # parcode = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Cart_Products
         fields = ['id','quantity','cart','products','total_price_of_item']
 
-    # def to_representation(self, instance):
-    #     reper = super().to_representation(instance)
-    # #     # reper['']
 
-    # def get_parcode(self, obj):
-    #     request = self.context.get('request')
-    #     # print(Client.objects.filter(phonenumber=request.user.phonenumber).first())
-    #     # client = Client.objects.filter(phonenumber=request.user.phonenumber).first()
-    #     # return {
-    #     #     'username':client.name,
-    #     #     'phonenumber':str(client.phonenumber),
-    #     #     'user_id':client.id,
-    #     #     'address':client.address
-    #     # }
-    #     # parcode = uuid.uuid4
-    #     # print(parcode)
-    #     data = "1234567890"
 
-        # Create the barcode object
-        # barcode_generator = barcode.get('code39', data, writer=ImageWriter())
-        # return str(barcode_generator)
+class Client_DetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Client
+        fields = ['id','name','phonenumber','address']
+
+
+
+class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
+    total_points = serializers.IntegerField(source='cart.total_cart_points',read_only=True)
+    total_price = serializers.FloatField(source='cart.total_cart_price',read_only=True)
+    item_per_carton = serializers.IntegerField(source='products.item_per_carton',read_only=True)
+    sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
+    product_name = serializers.CharField(source='products.name',read_only=True)
+    points = serializers.IntegerField(source='products.points',read_only=True)
+    product_id = serializers.IntegerField(source='products.id',read_only=True)
+
+    class Meta:
+        model = Cart_Products
+        fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points']
+
+
+
 
 class Cart_ProductsSerializer2(serializers.ModelSerializer):
     class Meta:
@@ -374,24 +401,6 @@ class Cart_ProductsSerializer2(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class Client_DetailsSerializer(serializers.ModelSerializer):
-
-#     class Meta:
-#         model = Client
-#         fields = ['id','name','phonenumber','address']
-        
-# class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
-#     total_points = serializers.IntegerField(source='cart.total_cart_points',read_only=True)
-#     total_price = serializers.FloatField(source='cart.total_cart_price',read_only=True)
-#     item_per_carton = serializers.IntegerField(source='products.item_per_carton',read_only=True)
-#     sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
-#     product_name = serializers.CharField(source='products.name',read_only=True)
-#     points = serializers.IntegerField(source='products.points',read_only=True)
-#     product_id = serializers.IntegerField(source='products.id',read_only=True)
-
-#     class Meta:
-#         model = Cart_Products
-#         fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points']
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
@@ -425,11 +434,12 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderProductsSerializer2(serializers.ModelSerializer):
     image = serializers.ImageField(source='product.image')
+    name = serializers.CharField(source='product.name', read_only=True)
     price = serializers.FloatField(source='product.sale_price',read_only=True)
     description = serializers.CharField(source='product.description')
     class Meta:
         model = Order_Product
-        fields = ['product','order','quantity','price','total_price','image','description']
+        fields = ['product','name', 'order','quantity','price','total_price','image','description']
 
 
 
@@ -444,7 +454,7 @@ class OrderSerializer2(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['client_id','address','name','phonenumber','products','total','products_num','created', 'delivery_date','longitude','latitude']
+        fields = ['id', 'client_id','address','name','phonenumber','products','total','products_num','total_points','created','longitude','latitude', 'barcode']
 
     def get_longitude(self, obj):
         return obj.client.location.x or 0
@@ -452,7 +462,8 @@ class OrderSerializer2(serializers.ModelSerializer):
     def get_latitude(self, obj):
         return obj.client.location.y or 0
     
-
+    # def to_representation(self, instance):
+    #     reper = super().to_representation(instance)
 
 class SimpleOrderSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id')
@@ -460,6 +471,19 @@ class SimpleOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['client_id','id','name','total','products_num']
+
+
+
+
+
+
+class AdSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True,many=False)
+    class Meta:
+        model = Ad
+        fields = '__all__'
+
+
 
 
 ################################################################################################################
@@ -1611,7 +1635,6 @@ class IncomingSerializer(serializers.ModelSerializer):
         model = Incoming
         exclude = ['employee']
         
-
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
         if self._errors:
@@ -1998,7 +2021,8 @@ class OutputSerializer2(serializers.ModelSerializer):
         remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         client = Client.objects.get(id=client_data.id)
-        instance = Output.objects.create(employee=employee, client=client, **validated_data)
+        barcode = Cart.objects.get(customer=client)
+        instance = Output.objects.create(employee=employee, client=client,barcode=barcode, **validated_data)
         client.debts += remaining_amount
         client.save()
         return instance
@@ -2124,11 +2148,20 @@ class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
         reper['description'] = instance.product.description
 
         return reper
+    
 
 
-########################### Serializer Chatting ###########################
-from Clients_and_Products.models import Message
-class SerializerMessaeg(serializers.ModelSerializer):
+
+
+
+class ChatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chat
+        fields = '__all__'
+
+
+
+class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fiels = '__all__'
+        fields = '__all__'

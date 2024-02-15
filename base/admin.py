@@ -5,7 +5,7 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.admin import UserAdmin
 import random
 from base.api.utils import Utlil
-# from base.api.serializers import CodeVerivecationSerializer
+from base.api.serializers import CodeVerivecationSerializer
 from import_export.admin import ImportExportModelAdmin
 from base.resources import ProductResource
 from arabic_reshaper import reshape
@@ -86,13 +86,12 @@ export_to_pdf_reportlab.short_description = "Export selected objects to PDF"
 
 
 
-
 class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     list_filter = ['is_accepted']
     actions = ['Accept_User', 'Refusal_User']
-    list_display = ['id', 'is_staff', 'is_accepted']    
+    list_display = ['id', 'phonenumber','username', 'is_staff', 'is_accepted']    
     ordering = ['-id']
 
     def Accept_User(self, request, queryset):
@@ -100,37 +99,37 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         user_type = UserType.objects.get(user_type='عميل')
         queryset.update(is_accepted=True, user_type=user_type)
         user = queryset.get(is_active=True)
-        # rand_num = random.randint(1,10000)
+        rand_num = random.randint(1,10000)
         client = Client.objects.create(
             name=user.username,
             address = "syria/homs",
             phonenumber = user.phonenumber,
             location = user.location
         )
-        # code_verivecation = random.randint(1000,9999)
-        # # email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
-        # data= {'to_email':user.email, 'email_subject':'Verify your email','username':user.username, 'code': str(code_verivecation)}
-        # Utlil.send_email(data)
-        # serializer = CodeVerivecationSerializer(data ={
-        #         'user':user.id,
-        #         'code':code_verivecation,
-        #         'expires_at' : timezone.now() + timedelta(minutes=10)
-        #     })
-        # serializer.is_valid(raise_exception=True)
-        # serializer.save()
+        code_verivecation = random.randint(1000,9999)
+        # email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
+        data= {'to_email':user.email, 'email_subject':'Verify your email','username':user.username, 'code': str(code_verivecation)}
+        Utlil.send_email(data)
+        serializer = CodeVerivecationSerializer(data ={
+                'user':user.id,
+                'code':code_verivecation,
+                'expires_at' : timezone.now() + timedelta(minutes=10)
+            })
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         cart = Cart.objects.create(customer=client)
         cart.save()
 
     def Refusal_User(self, request, queryset):
         user = queryset.get(is_accepted=False)
         # email_body = 'Hi '+user.username+' نعتذر منك لقد تم رفض حسابك لأن موقعك بعيد ولا يمكن توصيل طلبات إليه \n'
-        # data = {'to_email':user.email, 'email_subject':'Account Refused','username':user.username}
-        # Utlil.send_email2(data)
+        data = {'to_email':user.email, 'email_subject':'Account Refused','username':user.username}
+        Utlil.send_email2(data)
         user.delete()
 
     fieldsets = (
         (None, 
-                {'fields':('phonenumber', 'password',)}
+                {'fields':('phonenumber','email', 'password',)}
             ),
             ('User Information',
                 {'fields':('username', 'first_name', 'last_name','image','location')}
@@ -146,13 +145,21 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     add_fieldsets = (
         (None, {'classes':('wide',),
             'fields':(
-                'phonenumber', 'username', 'password1', 'password2', 'user_type'
+                'phonenumber','email' , 'username', 'password1', 'password2', 'user_type'
             ),}
             ),
     )
 
     # accept_user.short_descreption = 'Accept User For complet registration'
     # accept_user.short_descreption = 'print_user'
+
+
+@admin.register(State)
+class StateAdmin(LeafletGeoAdmin):
+    list_display = ['name','location']
+    search_fields = ['name']
+    ordering = ['-id']
+
 
 @admin.register(Client)
 class ClientAdmin(LeafletGeoAdmin):
@@ -162,7 +169,7 @@ class ClientAdmin(LeafletGeoAdmin):
     ordering = ['-id']
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'get_client_name','products_num' ,'total' , 'delivery_date', 'delivered']
+    list_display = ['id', 'get_client_name','products_num' ,'total' ,'total_points', 'delivery_date', 'delivered']
     search_fields = ['client__name',]
     list_filter = ['delivered']
 
@@ -190,6 +197,10 @@ class ProductAdmin(ImportExportModelAdmin):
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display= ['id','name']
+
+
+class ProductTypeAdmin(admin.ModelAdmin):
+    list_display = ['name']
 
 
 class CodeVerivecationAdmin(admin.ModelAdmin):
@@ -238,7 +249,7 @@ class UserTypeAdmin(admin.ModelAdmin):
 
 
 class OrderProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'get_name_product', 'order', 'quantity', 'total_price']
+    list_display = ['id', 'get_name_product', 'order', 'quantity', 'total_price' , 'total_points']
     search_fields = ['order__client__name']
     list_per_page = 25
     def get_name_product(self, obj):
@@ -481,13 +492,13 @@ admin.site.register(Points,PointsAdmin)
 
 #### Cart & Products ####
 admin.site.register(Product, ProductAdmin)
+admin.site.register(Ad)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(ProductType,ProductTypeAdmin)
 admin.site.register(Cart, CartAdmin)
 admin.site.register(Cart_Products, CartProductsAdmin)
 
-admin.site.register(Notifications)
+admin.site.register(Notifications) 
 
-from Clients_and_Products.models import *
-class MessageAdmin(admin.ModelAdmin):
-    list_display = ['id', 'content']
-admin.site.register(Message, MessageAdmin)
+admin.site.register(Chat)
+admin.site.register(Message)

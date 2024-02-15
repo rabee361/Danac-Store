@@ -8,10 +8,11 @@ class ProductFilter(django_filters.FilterSet):
     category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
     barcode = django_filters.CharFilter(field_name="barcode", lookup_expr='iexact')
     name = django_filters.CharFilter(field_name="name", lookup_expr='startswith')
+    product_type = django_filters.CharFilter(field_name="category__product_type__name" , lookup_expr="iexact")
 
-    class Meta: 
+    class Meta:
         model = Product
-        fields = ['category','name','barcode']
+        fields = ['category','name','barcode','product_type']
 
 
 class EmployeeFilter(django_filters.FilterSet):
@@ -48,8 +49,15 @@ class SalesEmployeeFilter(django_filters.FilterSet):
 
 
 class CategoryFilter(django_filters.FilterSet):
+    product_type = django_filters.CharFilter(field_name="product_type__name" , lookup_expr="iexact")
     class Meta:
         model = Category
+        fields = ['name','product_type']
+
+
+class ProductTypeFilter(django_filters.FilterSet):
+    class Meta:
+        model = ProductType
         fields = ['name']
 
 ############################### Registry #################################
@@ -206,10 +214,11 @@ class ReturnedGoodsSupplierFilter(django_filters.FilterSet):
 class IncomingFilter(django_filters.FilterSet):
     supplier_name = django_filters.CharFilter(field_name="supplier__name", lookup_expr="startswith")
     employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    
 
     class Meta:
         model = Incoming
-        fields = ['supplier_name', 'employee_name']
+        fields = ['supplier_name', 'employee_name', 'id']
 
 
 class OutputFilter(django_filters.FilterSet):
@@ -218,7 +227,7 @@ class OutputFilter(django_filters.FilterSet):
 
     class Meta:
         model = Output
-        fields = ['client_name', 'employee_name']
+        fields = ['client_name', 'employee_name', 'id']
 
 
 class ManualFilter(django_filters.FilterSet):
@@ -227,7 +236,7 @@ class ManualFilter(django_filters.FilterSet):
 
     class Meta:
         model = ManualReceipt
-        fields = ['client_name', 'employee_name']
+        fields = ['client_name', 'employee_name', 'id']
 
 
 class OrderFilter(django_filters.FilterSet):
@@ -235,7 +244,7 @@ class OrderFilter(django_filters.FilterSet):
 
     class Meta:
         model = Order
-        fields = ['client_name']
+        fields = ['client_name', 'delivered']
 
 
 class DelivaryFilter(django_filters.FilterSet):

@@ -36,11 +36,11 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'daphne',
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'rest_framework',   
@@ -59,18 +59,8 @@ INSTALLED_APPS = [
     'Human_Resources',
     'Company_Fund',
     'Clients_and_Products',
-    # 'auth-social-media',
-    'twilio',
-    # 'django.contrib.sites',
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
-    # 'allauth.socialaccount.providers.google',    
+    
 ]
-
-# SITE_ID = 1
-
-
 X_FRAME_OPTIONS = "SAMEORIGIN"
 SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
@@ -83,12 +73,7 @@ LEAFLET_CONFIG = {
 }
 
 
-# AUTHENTICATION_BACKENDS = [
-#     'base.api.backend.CustomUserModelBackend',
-#     # #new
-#     # 'django.contrib.auth.backends.ModelBackend',
-#     # 'allauth.account.auth_backends.AuthenticationBackend',
-#     ]
+AUTHENTICATION_BACKENDS = ['base.api.backend.CustomUserModelBackend']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -98,7 +83,13 @@ REST_FRAMEWORK = {
 
 }
 
+ASGI_APPLICATION = 'systempro.asgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 AUTH_USER_MODEL = 'base.CustomUser'
 
@@ -111,8 +102,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #new
-    # "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'systempro.urls'
@@ -127,7 +116,6 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                #new
                 'django.contrib.messages.context_processors.messages',
             ],
         },
@@ -135,30 +123,21 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'systempro.wsgi.application'
-ASGI_APPLICATION = 'systempro.asgi.application'
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#         'APP': {
-#             'client_id': '879471682676-gl1srbbbb62ftujcjtv8ebepr80mebl8.apps.googleusercontent.com',
-#             'secret': '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',
-#             'key': ''
-#         }
-#     }
-# }
+
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-       'default': {
-           'ENGINE': 'django.contrib.gis.db.backends.postgis',
-           'NAME': 'pro_db',
-           'USER': 'postgres',
-           'PASSWORD': 'po23ST@gre432',
-           'HOST': 'localhost',
-           'PORT': '5432',
-       }
-   }
+        'default': {
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'NAME': 'danac',
+            'USER': 'postgres',
+            'PASSWORD': 'po23ST@gre432',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 
 # Password validation
@@ -217,7 +196,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR , 'media')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-# GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH')
 GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal308.dll'
 
 
@@ -263,14 +241,12 @@ SIMPLE_JWT = {
 }
 
 
-# EMAIL_BACKEND = 'django_smtp_ssl_SSLEmailBackend'  # Replace with your preferred backend
-# EMAIL_USE_SSL = True
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Replace with your preferred backend
-EMAIL_HOST = 'smtp.gmail.com' # Replace with your email host for gmail -> 'smtp.gmail.com'
-EMAIL_PORT = 587  # Replace with your email port
-EMAIL_USE_TLS = True  # Set to False if your email server doesn't use TLS
-EMAIL_HOST_USER = 'jacoubakizi81@gmail.com'  # Replace with your email username
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587  
+EMAIL_USE_TLS = True  
+EMAIL_HOST_USER = 'jacoubakizi81@gmail.com'
 EMAIL_HOST_PASSWORD = 'eabqhwegdhezskam'     
 
 
@@ -286,7 +262,6 @@ class CustomFirebaseCredentials(credentials.ApplicationDefault):
 
 
 custom_credentials = CustomFirebaseCredentials('C:/Users/eng.Rabee/systempro/storeapp-8cc25-firebase-adminsdk-63jeh-3a5b5e4884.json')
-# FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, name='messaging')
 FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, options={'projectId': 'test-9c6e8'}, name='messaging')
 
 
@@ -296,7 +271,7 @@ FCM_DJANGO_SETTINGS = {
      # default: None (the default Firebase app)
     "DEFAULT_FIREBASE_APP": FIREBASE_MESSAGING_APP,
      # default: _('FCM Django')
-    "APP_VERBOSE_NAME": "What ever name",
+    "APP_VERBOSE_NAME": "Notification Devices",
      # true if you want to have only one active device per registered user at a time
      # default: False
     "ONE_DEVICE_PER_USER": False,
@@ -308,12 +283,3 @@ FCM_DJANGO_SETTINGS = {
 
 
 
-#new
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [('localhost',  6379)],
-        },
-    },
-}

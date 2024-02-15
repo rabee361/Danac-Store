@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript">
+        function refreshPage() {
+            location.reload();
+        }
+        setInterval(refreshPage,  3000);
+    </script>
+</head>
+<body>
+    {% for msg in messages %}
+    <h1><small>{{msg.sender}}: </small>{{msg.content}}</h1>
+    {% endfor %}
+</body>
+</html>

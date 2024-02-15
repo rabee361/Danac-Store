@@ -57,7 +57,7 @@ class UserLoginApiView(GenericAPIView):
     def post(self, request, *args, **kwargs):  
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        user = CustomUser.objects.filter(phonenumber = request.data['username']).first()
+        user = CustomUser.objects.filter(email = request.data['username']).first()
         if not user:
             user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
@@ -91,7 +91,7 @@ class GetNotificationView(APIView):
     def get(self, request):
         user = request.user
         notification = Notifications.objects.filter(user__id=user.id)
-        serializer = SerializerNotificationI(notification, many=True)
+        serializer = SerializerNotification(notification, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -101,8 +101,7 @@ class ResetPasswordView(UpdateAPIView):
     permission_classes = [permissions.AllowAny,]
     def put(self, request, user_id):
         user = CustomUser.objects.get(id=user_id)
-        # try:
-            # ver_user = user.codeverification_set.filter(user__id=user_id).first()
+        
         if user.is_verified:
             data = request.data
             serializer = self.get_serializer(data=data, context={'user_id':user_id})
@@ -116,8 +115,7 @@ class ResetPasswordView(UpdateAPIView):
             return Response(messages, status=status.HTTP_200_OK)
         else:
             return Response({'error':'ليس لديك صلاحية لتغيير كلمة المرور'})
-        # except CodeVerification.DoesNotExist:
-        #     return Response({'message':'ليس لديك صلاحية لتغيير كبمة المرور'})
+
 
 
 
@@ -168,11 +166,12 @@ class ListInformationUserView(RetrieveAPIView):
 #             raise serializers.ValidationError({'error':'pleace enter valid email'})
 
 
+
 class VerefyPhonenumberView(APIView):
     def post(self, request):
         phonenumber = request.data['phonenumber']
         user_id = request.data['user_id']
-        user = CustomUser.objects.filter(phonenumber = phonenumber).first()
+        user = CustomUser.objects.filter(phonenumber=phonenumber).first()
         if user.id != int(user_id):
             return Response({'error':"user not found"})
         user.is_verified = True
@@ -181,19 +180,18 @@ class VerefyPhonenumberView(APIView):
 
 
 
-
-# class VerifyCodeToChangePassword(APIView):
-#     def post(self, request):
-#         code = request.data['code']
-#         code_ver = CodeVerification.objects.filter(code=code).first()
-#         if code_ver:
-#             if timezone.now() > code_ver.expires_at:
-#                 return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
-#             code_ver.is_verified = True
-#             code_ver.save()
-#             return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
-#         else:
-#             raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
+class VerifyCodeToChangePassword(APIView):
+    def post(self, request):
+        code = request.data['code']
+        code_ver = CodeVerification.objects.filter(code=code).first()
+        if code_ver:
+            if timezone.now() > code_ver.expires_at:
+                return Response({"message":"Verification code has expired"}, status=status.HTTP_400_BAD_REQUEST)
+            code_ver.is_verified = True
+            code_ver.save()
+            return Response({"message":"تم التحقق من الرمز", 'user_id':code_ver.user.id},status=status.HTTP_200_OK)
+        else:
+            raise serializers.ValidationError({'message':'الرمز خاطئ, يرجى إعادة إدخال الرمز بشكل صحيح'})
 
 
 
@@ -229,75 +227,55 @@ class GetSalesEmployeeLocation(APIView):
 
 
 
+class States(ListAPIView):
+    queryset = State.objects.all()
+    serializer_class = StateSerializer
+
+
+
+class GetState(RetrieveAPIView):
+    queryset = State.objects.all()
+    serializer_class = StateSerializer
 
 
 ######################################### CART & PRODUCTS ##########################################################################
 
-class ListCreateAdvertising(ListCreateAPIView):
-    queryset = Advertising.objects.all()
-    serializer_class = AdvertisingSerializer
 
 
-# class listCreateProductType(ListCreateAPIView):
-#     # permission_classes = [IsAuthenticated]
-#     queryset = ProductType.objects.all()
-#     serializer_class = ProductTypeSerializer
-#     filter_backends = [DjangoFilterBackend]
-#     filterset_class = ProductTypeFilter
-
-#     def create(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
-#         if serializer.is_valid():
-#             self.perform_create(serializer)
-#             headers = self.get_success_headers(serializer.data)
-#             return Response(
-#                 {"message": "تمت الإضافة بنجاح"},
-#                 status=status.HTTP_201_CREATED,
-#                 headers=headers
-#             )
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ListAds(ListAPIView):
+    queryset = Ad.objects.all()
+    serializer_class = AdSerializer
 
 
-# class RetUpdDesProductType(RetrieveUpdateDestroyAPIView):
-#     # pagination_class = [IsAuthenticated]
-#     queryset = ProductType.objects.all()
-#     serializer_class = ProductTypeSerializer
 
-
-class listCreateProducts(ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+class ListCreateProductType(ListCreateAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = ProductType.objects.all()
+    serializer_class = ProductTypeSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_class = ProductFilter
+    filterset_class = ProductTypeFilter
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                {"message": "تمت الإضافة بنجاح"},
+                status=status.HTTP_201_CREATED,
+                headers=headers
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SpecialProducts(APIView):
-    permission_classes = [IsAuthenticated]
-    def get(self,request):
-        products = Product.objects.all().order_by('?')
-        serializer = Product2Serializer(products,many=True,context={'request': request})
-        return Response(serializer.data)
 
 
-class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
-    permession_classes = [IsAuthenticated,Is_Client]
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+class RetUpdDesProductType(RetrieveUpdateDestroyAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = ProductType.objects.all()
+    serializer_class = ProductTypeSerializer
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
 
-        if getattr(instance, '_prefetched_objects_cache', None):
-            instance._prefetched_objects_cache = {}
-
-        return Response(serializer.data)
-
-    def perform_update(self, serializer):
-        serializer.save()
 
 
 class ListCreateCategory(ListCreateAPIView):
@@ -321,10 +299,51 @@ class ListCreateCategory(ListCreateAPIView):
     
 
 
+
 class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
     pagination_class = [IsAuthenticated]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+class listCreateProducts(ListCreateAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilter
+
+
+class SpecialProducts(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        products = Product.objects.all().order_by('?')
+        serializer = Product2Serializer(products,many=True,context={'request': request})
+        return Response(serializer.data)
+
+
+class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
+    [IsAuthenticated,Is_Client]
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+
+
+
 
 #################################################### CART HNADLING #####################################################################
 
@@ -336,6 +355,18 @@ class Cart_Items(APIView):
         return Response(serializer.data)
 
 
+class Client_Details(RetrieveAPIView):
+    queryset = Client.objects.all()
+    serializer_class = Client_DetailsSerializer
+
+
+class Cart_Items_Details(APIView):
+    # permission_classes = [IsAuthenticated,Is_Client]
+    def get(self,request,pk):
+        products = Cart_Products.objects.filter(cart=pk)
+        serializer = Cart_Product_DetailsSerialzier(products,many=True, context={'request': request})
+        return Response(serializer.data)
+    
 
 
 class Quantity_Handler(APIView):
@@ -357,32 +388,35 @@ class Quantity_Handler(APIView):
 
 
 class Add_to_Cart(APIView):
-    # permission_classes = [IsAuthenticated,Is_Client]
+    permission_classes = [IsAuthenticated,Is_Client]
     def post(self,request,pk,pk2):
         user = CustomUser.objects.get(id=pk2)
         client = Client.objects.get(phonenumber=user.phonenumber)
         item = Product.objects.get(id=pk)
         cart, created = Cart.objects.get_or_create(customer=client)
         quantity = request.data.get('quantity')
-        if not quantity:
-            product = Cart_Products.objects.filter(products=item, cart=cart).first()
-            if product:
-                serializer = Cart_ProductsSerializer2(product,many=False)
-                return Response(serializer.data)
-            return Response({"error": "Quantity is required"}, status=status.HTTP_400_BAD_REQUEST)
-        cart_products, created = Cart_Products.objects.get_or_create(products=item, cart=cart)
-        if created:
-            Cart_Products.objects.filter(products=item, cart=cart).\
-                                    update(quantity=F('quantity')+request.data['quantity'])
+        
+        if quantity :
+            cart_product = Cart_Products.objects.create(products=item,cart=cart,quantity=quantity)
+            serializer = Cart_ProductsSerializer2(cart_product,many=False)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        
+        else:
+            cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart)
+            serializer = Cart_ProductsSerializer2(cart_product,many=False)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+
         # if not created:
         #     # Cart_Products.objects.filter(products=item, cart=cart).\
         #     #                         update(quantity=F('quantity') + 1)
         #     product = Cart_Products.objects.get(products=item, cart=cart)
         #     serializer = Cart_ProductsSerializer2(product,many=False)
-        #     return Response(serializer.data)
-        product = Cart_Products.objects.get(products=item, cart=cart)
-        serializer = Cart_ProductsSerializer2(product,many=False)
-        return Response(serializer.data)
+        #     return Response(serializer.data,status=status.HTTP_201_CREATED)       
+
+
+                        # Cart_Products.objects.filter(products=item, cart=cart).\
+                        #             update(quantity=F('quantity')+request.data['quantity'])
 
 
 
@@ -445,13 +479,24 @@ class ListSimpleOrders(ListAPIView):
 class ListClientOrders(GenericAPIView):
     permission_classes = [IsAuthenticated,Is_Client]
     serializer_class = OrderSerializer
+    # filter_backends = [DjangoFilterBackend]
+    # serializer_class = OrderSerializer
     def get(self,request):
         user = request.user
         client = Client.objects.get(phonenumber=user.phonenumber)
         orders = client.order_set.all()
         serializer = self.get_serializer(orders,many=True)
         return Response(serializer.data,)
-        
+
+# class ListClientOrdersDelivered(GenericAPIView):
+#     permission_classes = [IsAuthenticated,Is_Client]
+#     serializer_class = OrderSerializer
+#     def get(self,request):
+#         user = request.user
+#         client = Client.objects.get(phonenumber=user.phonenumber)
+#         orders = client.order_set.filter(delivered=True)
+#         serializer = self.get_serializer(orders,many=True)
+#         return Response(serializer.data,)    
 
 class DeleteOrder(DestroyAPIView):
     queryset = Order.objects.all()
@@ -1363,16 +1408,20 @@ class ListOrderEnvoy(APIView):
         })
     
 
-###################### View Chatting ######################
-from base.client import send_mssage
-class CreateMessage(CreateAPIView):
-    permission_classes = [IsAuthenticated,]
-    serializer_class = SerializerMessaeg
 
-    def post(self, request):
-        data = request.data
-        # user = request.user
-        client = Client.objects.filter(phonenumber=request.user.phonenumber).first()
-        print(client)
-        send_mssage(data, client.id)
-        return Response(status=status.HTTP_201_CREATED)
+
+########################### chat ##########################
+    
+class ChatMessages(APIView):
+    def get(self,request,chat_id):
+        chat = Chat.objects.get(id=chat_id)
+        messages = Message.objects.filter(chat=chat)
+        serializer = MessageSerializer(messages,many=True)
+        return Response(serializer.data)
+    
+
+class Chats(APIView):
+    def get(self,request):
+        chats = Chat.objects.all()
+        serializer = ChatSerializer(chats,many=True)
+        return Response(serializer.data)

@@ -2,38 +2,56 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from .models import Client
+from asgiref.sync import async_to_sync
+import json
+from .models import *
+from .api.serializers import *
 
-class ChatConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        await self.accept()
 
-    async def disconnect(self, close_code):
-        pass
+class CreateMessage(AsyncWebsocketConsumer):
+	async def connect(self):
+		await self.accept()
 
-    @database_sync_to_async
-    def save_message(self, message, client):
-        from Clients_and_Products.models import Message
-        print(type(client))
-        print(message)
-        client_id = Client.objects.get(id=client)
-        msg = Message.objects.create(client=client_id, content=message)
-        print(client)
-        return msg
-    
+	async def receive(self, text_data):
+		text_data_json = json.loads(text_data)
+		message = text_data_json['message']
+		user_id = text_data_json['user_id']
+		chat_id = text_data_json['chat_id']
 
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        client = text_data_json['client']
+		user = await self.get_user(user_id)
+		chat = await self.get_chat(chat_id)
 
-        try:
-            await self.send(text_data=json.dumps({
-                'message': message,
-                'client':client
-            }))
-            msg = await self.save_message(message, client)
-        except Exception as e:
-            # Handle the exception appropriately, e.g., log the error
-            print(f"Failed to save Message: {e}")
+		try:
+			await self.get_employee(user.phonenumber)
+			msg = Message(sender=user,content=message, chat=chat, employee=True)
+		except Employee.DoesNotExist:
+			msg = Message(sender=user,content=message, chat=chat, employee=False)
 
+		serializer = MessageSerializer(msg,many=False)
+		await self.save_message(msg)
+
+		await self.send(text_data=json.dumps({
+			'sender' : serializer.data['sender'],
+			'message': serializer.data['content'],
+			'timestamp': serializer.data['timestamp'],
+			'employee': serializer.data['employee']
+		}))
+
+	@database_sync_to_async
+	def get_employee(self,phonenumber):
+		return Employee.objects.get(phonenumber=phonenumber) or None
+
+	@database_sync_to_async
+	def get_user(self, user_id):
+		return CustomUser.objects.get(id=user_id)
+
+	@database_sync_to_async
+	def get_chat(self, chat_id):
+		return Chat.objects.get(id=chat_id)
+
+	@database_sync_to_async
+	def save_message(self, msg):
+		msg.save()
+
+	async def disconnect(self, close_code):
+		pass
