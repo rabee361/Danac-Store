@@ -29,7 +29,7 @@ class DateOnlyField(serializers.DateTimeField):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'username', 'phonenumber', 'password', 'image']
+        fields = ['id', 'username', 'phonenumber', 'password', 'image']
 
 
 class UpdateUserSerializer(serializers.ModelSerializer):
