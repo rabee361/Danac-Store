@@ -23,9 +23,9 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 		try:
 			await self.get_employee(user.phonenumber)
-			msg = Message(sender=user,content=message, chat=chat, employee=True)
+			msg = ChatMessage(sender=user,content=message, chat=chat, employee=True)
 		except Employee.DoesNotExist:
-			msg = Message(sender=user,content=message, chat=chat, employee=False)
+			msg = ChatMessage(sender=user,content=message, chat=chat, employee=False)
 
 		serializer = MessageSerializer(msg,many=False)
 		await self.save_message(msg)

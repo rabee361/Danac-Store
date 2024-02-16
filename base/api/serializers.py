@@ -2168,5 +2168,5 @@ class ChatSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Message
+        model = ChatMessage
         fields = '__all__'
