@@ -48,23 +48,45 @@ class SignUpView(GenericAPIView):
 
 
 
+class RefreshFirebaseToken(GenericAPIView):
+    # permission_classes = [IsAuthenticated]
+    def post(self,request):
+        token = request.data['firebase-token']
+        user_id = request.data['user_id']
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            device = FCMDevice.objects.get(user=user)
+            device.registration_id = token
+            device.save()
+        except:
+            raise CustomUser.DoesNotExist
+
+        return Response({
+            "msg" : "firebase token changed successfully"
+        })
+
+
+
+
 
 
 class UserLoginApiView(GenericAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = LoginSerializer
 
-    def post(self, request, *args, **kwargs):  
+    def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        user = CustomUser.objects.filter(email = request.data['username']).first()
-        if not user:
-            user = CustomUser.objects.get(phonenumber = request.data['username'])
+        # user = CustomUser.objects.filter(email = request.data['username']).first()
+        # if not user:
+        user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
 
         data = serializer.data
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
+        # data['username'] = user.username
+        # data['phonenumber'] = user.phonenumber
         data['address'] = user.address
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)

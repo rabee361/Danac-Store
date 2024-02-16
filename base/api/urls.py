@@ -9,6 +9,7 @@ urlpatterns = [
     # path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
+    path('firebase-token/refresh/',RefreshFirebaseToken.as_view(),name="refresh-firebase-token"),
     path('auth/sign-up/' , SignUpView.as_view()),
     path('auth/log-in/', UserLoginApiView.as_view(), name='sign-in'),
     path('auth/logout/', LogoutAPIView.as_view(), name='logout'),

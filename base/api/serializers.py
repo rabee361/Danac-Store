@@ -46,10 +46,12 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only = True)
+    # phonenumber = serializers.CharField(read_only=True)
 
     def validate(self, data):
         username = data.get('username')
         password = data.get('password')
+
         if username and password:
             user = authenticate(request=self.context.get('request'), username=username, password=password)
             if not user:
