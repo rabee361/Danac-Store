@@ -148,7 +148,7 @@ class Points(models.Model):
 
 
 
-class Notification(models.Model):
+class UserNotification(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     body = models.CharField(max_length=500)
     title = models.CharField(max_length=100)

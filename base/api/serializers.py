@@ -58,8 +58,6 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Incorrect Credentials")
             if not user.is_active:
                 raise serializers.ValidationError({'message_error':'this account is not active'})
-            if not user.is_verified:
-                raise serializers.ValidationError({'message_error':'this account is not verified'})
             if not user.is_accepted:
                 raise serializers.ValidationError({'message_error':'this account is not accepted'})
         else:
@@ -116,7 +114,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 class SerializerNotification(serializers.ModelSerializer):
     class Meta:
-        model = Notification
+        model = UserNotification
         fields = '__all__'
     def to_representation(self, instance):
         reper = super().to_representation(instance)

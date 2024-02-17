@@ -112,7 +112,7 @@ class GetNotificationView(APIView):
 
     def get(self, request):
         user = request.user
-        notification = Notification.objects.filter(user__id=user.id)
+        notification = UserNotification.objects.filter(user__id=user.id)
         serializer = SerializerNotification(notification, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -472,7 +472,7 @@ class CreateOrderView(APIView):
                     ),
                 ),
             )
-        Notification.objects.create(user=user,body=body,title=title)
+        UserNotification.objects.create(user=user,body=body,title=title)
         ###################################
         order.save()
         order_serializer = OrderSerializer(order)
@@ -1060,7 +1060,7 @@ class ReceiptOrdersView(APIView):
                             ),
                         ),
                     )
-                    Notification.objects.create(
+                    UserNotification.objects.create(
                         user = user,
                         title = title,
                         body = body
@@ -1135,7 +1135,7 @@ class ListCreateDeliveryArrived(APIView):
                 ),
             ),
         )
-        Notification.objects.create(
+        UserNotification.objects.create(
             user=user,
             title = title,
             body=body
@@ -1291,7 +1291,7 @@ class CreateManualReceiptView(APIView):
                             ),
                         ),
                     )
-                    Notification.objects.create(
+                    UserNotification.objects.create(
                         user = user,
                         title = title,
                         body = body
