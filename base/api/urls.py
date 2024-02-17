@@ -32,7 +32,7 @@ urlpatterns = [
 
     path('clients/' , ListCreateClient.as_view() , name="clients"),
     path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),
-    path('client-info/' , Client_Details.as_view(), name="client-info"),
+    path('client-info/<str:pk>/' , Client_Details.as_view(), name="client-info"),
     path('client-orders/' , ListClientOrders.as_view() , name="client-orders"),
 
     path('total-points/', TotalClientPointsView.as_view(), name='total-points'),

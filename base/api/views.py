@@ -377,9 +377,13 @@ class Cart_Items(APIView):
         return Response(serializer.data)
 
 
-class Client_Details(RetrieveAPIView):
-    queryset = Client.objects.all()
-    serializer_class = Client_DetailsSerializer
+class Client_Details(APIView):
+    def get(self,request,pk):
+        user = CustomUser.objects.get(id=pk)
+        client = Client.objects.get(phonenumber=user.phonenumber)
+        serializer = Client_DetailsSerializer(client,many=False)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
 
 
 class Cart_Items_Details(APIView):
