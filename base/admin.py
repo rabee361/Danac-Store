@@ -197,7 +197,7 @@ class ProductAdmin(ImportExportModelAdmin):
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display= ['id','name']
+    list_display= ['id','name','product_type']
 
 
 class ProductTypeAdmin(admin.ModelAdmin):

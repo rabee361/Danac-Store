@@ -221,7 +221,7 @@ class Product(models.Model):
     item_per_carton = models.IntegerField(blank=True,default=0)
     sale_price = models.IntegerField()
     added = models.DateTimeField(auto_now_add=True)
-    barcode = models.CharField(max_length=200,default=' ',blank=True)
+    barcode = models.CharField(max_length=200,default=generate_barcode,blank=True)
     points = models.IntegerField()
 
     class Meta:
