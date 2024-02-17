@@ -10,6 +10,7 @@ from .api.serializers import *
 
 class CreateMessage(AsyncWebsocketConsumer):
 	async def connect(self):
+		self.chat_id = self.scope['url_route']['kwargs']['id']
 		await self.accept()
 
 	async def receive(self, text_data):
@@ -19,7 +20,7 @@ class CreateMessage(AsyncWebsocketConsumer):
 		# chat_id = text_data_json['chat_id']
 
 		user = await self.get_user(user_id)
-		chat = await self.get_chat(user)
+		chat = await self.get_chat(self.chat_id)
 
 		try:
 			await self.get_employee(user.phonenumber)
@@ -46,8 +47,8 @@ class CreateMessage(AsyncWebsocketConsumer):
 		return CustomUser.objects.get(id=user_id)
 
 	@database_sync_to_async
-	def get_chat(self, user):
-		return Chat.objects.get(user=user)
+	def get_chat(self, chat_id):
+		return Chat.objects.get(id=chat_id)
 
 	@database_sync_to_async
 	def save_message(self, msg):
