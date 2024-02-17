@@ -13,6 +13,11 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.admin import display
 
 
+def get_expiration_time():
+    return timezone.now() + timedelta(minutes=10)
+
+def get_expiration_date():
+    return timezone.now() + timedelta(days=30)
 
 
 
@@ -122,6 +127,22 @@ class Client(models.Model):
 
 
 
+
+class Points(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    number = models.FloatField()
+    expire_date = models.DateField(default=get_expiration_date)
+    date = models.DateField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        app_label = 'Clients_and_Products'
+
+    def __str__(self) -> str:
+        return f'{self.client.name} {self.number}'
+
+
+
 class Notifications(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     body = models.CharField(max_length=500)
@@ -137,10 +158,7 @@ class Notifications(models.Model):
 
 
 
-
-def get_expiration_time():
-    return timezone.now() + timedelta(minutes=10)
-
+######### delete
 class CodeVerification(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     is_verified = models.BooleanField(default=False)
@@ -190,10 +208,8 @@ class Product(models.Model):
     purchasing_price = models.FloatField()
     category = models.ForeignKey(Category , on_delete=models.CASCADE)
     notes = models.TextField(max_length=1000,null=True,blank=True)
-    
     made_at = models.DateField(null=True,blank=True)
     expires_at = models.DateField(null=True,blank=True)
-
     limit_less = models.IntegerField()
     limit_more = models.IntegerField()
     num_per_item = models.IntegerField(blank=True,default=0)
@@ -224,67 +240,7 @@ class Ad(models.Model):
         return self.name
     
     
-##############################################CART HANDLING ###########################################################################################################
-
-
-class Order(models.Model):
-    client = models.ForeignKey(Client,on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product,through='Order_Product')
-    created = models.DateField(auto_now_add=True)
-    delivery_date = models.DateField()
-    delivered = models.BooleanField(null=True,default=False)
-    barcode = models.CharField(max_length=200,null=True)
-    shipping_cost = models.FloatField(default=0.0)
-    client_service = models.CharField(max_length=20,default='000 208 0660')
-
-    class Meta:
-        app_label = 'Clients_and_Products'
-
-    def total(self):
-        return (self.total_price + self.shipping_cost)
-
-    @property
-    def total_price(self):
-        total_price = 0
-        for item in self.order_product_set.all():
-            total_price += item.total_price_of_item()
-        return total_price
-    
-    def total_points(self):
-        total_points = 0
-        for item in self.order_product_set.all():
-            total_points += item.total_points_of_item()
-        return total_points
-
-    def products_num(self):
-        products_num = 0
-        for item in self.order_product_set.all():
-            products_num += item.total_points_of_item()
-        return products_num
-
-    def __str__(self):
-        return f'{self.client} : {self.id}'
-
-
-class Order_Product(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    total_price = models.FloatField()
-    total_points = models.IntegerField()
-
-    class Meta:
-        app_label = 'Clients_and_Products'
-        
-    def total_price_of_item(self):
-        return (self.quantity * self.product.sale_price)
-    
-    def total_points_of_item(self):
-        return (self.quantity * self.product.points)
-
-    def __str__(self):
-        return f'{self.order.client} - {self.product.name} - {self.quantity}'
-
+####################################CART HANDLING #######################################
 
 
 class Cart_Products(models.Model):
@@ -351,7 +307,7 @@ class Cart(models.Model):
                 # total=0,
                 # total_points=0,
                 delivery_date=date,
-                barcode=self.barcode ##### barcode
+                barcode=self.barcode
                 )
         
         for item in self.cart_products_set.all():
@@ -363,7 +319,7 @@ class Cart(models.Model):
                 total_points=item.total_points_of_item()
             )
                 # order.total += item.total_price_of_item()
-                # order.total_points += item.total_points_of_item()#########
+                # order.total_points += item.total_points_of_item()
                 # order.products_num += item.quantity
                 order.save()
         self.items.clear()
@@ -375,7 +331,72 @@ class Cart(models.Model):
         return f'{self.customer} cart'
     
 
+
+
+
+
+class Order(models.Model):
+    client = models.ForeignKey(Client,on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product,through='Order_Product')
+    created = models.DateField(auto_now_add=True)
+    delivery_date = models.DateField()
+    delivered = models.BooleanField(null=True,default=False)
+    barcode = models.CharField(max_length=200,null=True)
+    shipping_cost = models.FloatField(default=0.0)
+    client_service = models.CharField(max_length=20,default='000 208 0660')
+
+    class Meta:
+        app_label = 'Clients_and_Products'
+
+    def total(self):
+        return (self.total_price + self.shipping_cost)
+
+    @property 
+    def total_price(self):
+        total_price = 0
+        for item in self.order_product_set.all():
+            total_price += item.total_price_of_item()
+        return total_price
     
+    def total_points(self):
+        total_points = 0
+        for item in self.order_product_set.all():
+            total_points += item.total_points_of_item()
+        return total_points
+
+    def products_num(self):
+        products_num = 0
+        for item in self.order_product_set.all():
+            products_num += item.total_points_of_item()
+        return products_num
+
+    def __str__(self):
+        return f'{self.client} : {self.id}'
+
+
+class Order_Product(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+    total_points = models.IntegerField()
+
+    class Meta:
+        app_label = 'Clients_and_Products'
+        
+    def total_price_of_item(self):
+        return (self.quantity * self.product.sale_price)
+    
+    def total_points_of_item(self):
+        return (self.quantity * self.product.points)
+
+    def __str__(self):
+        return f'{self.order.client} - {self.product.name} - {self.quantity}'
+
+
+
+
+
 ##################################################################################################################
 
 
@@ -418,21 +439,6 @@ class Employee(models.Model):
         return f'{self.name}'
 
 
-def get_expiration_date():
-    return timezone.now() + timedelta(days=30)
-
-class Points(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    number = models.FloatField()
-    expire_date = models.DateField(default=get_expiration_date)
-    date = models.DateField(auto_now_add=True)
-    is_used = models.BooleanField(default=False)
-
-    class Meta:
-        app_label = 'Clients_and_Products'
-
-    def __str__(self) -> str:
-        return f'{self.client.name} {self.number}'
 
 
 
@@ -746,7 +752,7 @@ class Payment(models.Model):
 
 
 
-############################################-RETURNED GOODS-----###############################################################################
+############################################-Returned & Damaged Goods-----###############################################################################
         
 class ReturnedGoodsSupplier(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -762,6 +768,7 @@ class ReturnedGoodsSupplier(models.Model):
 
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
+    
     
 class ReturnedGoodsClient(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -795,15 +802,14 @@ class DamagedProduct(models.Model):
 
 
 
-
-
-#########################################--------CREATE MEDIUM---------###########################################################
+#########################################-------- Medium & Medium 2---------###########################################################
 
 class Medium(models.Model):
     products = models.ManyToManyField(Product, through='Products_Medium')
 
     def __str__(self) -> str:
         return str(self.id)
+
 
 class Products_Medium(models.Model):
     medium = models.ForeignKey(Medium, on_delete=models.CASCADE)
@@ -833,7 +839,28 @@ class Products_Medium(models.Model):
     
 
 
+class MediumTwo(models.Model):
+    products = models.ManyToManyField(Product, through='MediumTwo_Products')
 
+    def __str__(self) -> str:
+        return f'medium_two - {str(self.id)}'
+
+
+class MediumTwo_Products(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    mediumtwo = models.ForeignKey(MediumTwo, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default= 0)
+
+    def add_item(self):
+        self.quantity += 1
+        self.save()
+
+    def sub_item(self):
+        self.quantity -= 1
+        self.save()
+
+    def __str__(self) -> str:
+        return f'{self.product.name} - {str(self.mediumtwo.id)}'
 
 
 
@@ -852,6 +879,7 @@ class Incoming(models.Model):
     remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
+    freeze = models.BooleanField(default=False)
 
     class Meta:
         ordering=['-date']
@@ -880,10 +908,6 @@ class Incoming_Product(models.Model):
     #     self.total_price = self.num_item * self.product.price
     #     super().save(*args, **kwargs)
 
-    def all_item(self):
-        pass
-    def total(self):
-        pass
 
     def __str__(self) -> str:
         return f'{self.incoming.supplier.name}:{str(self.incoming.id)}'
@@ -906,6 +930,7 @@ class Output(models.Model):
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
     location = models.PointField(default=Point(0.0,0.0))
     delivered = models.BooleanField(default=False)
+    freeze = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-date']
@@ -928,13 +953,13 @@ class Output_Products(models.Model):
     discount = models.FloatField(default=0)
     product_points = models.IntegerField()
 
-    def save(self, *args, **kwargs):
-        self.product_points = self.quantity * self.product.points
-        super().save(*args, **kwargs)
-
     class Meta:
         ordering = ['-product_id']
         app_label = 'Receipts'
+
+    def save(self, *args, **kwargs):
+        self.product_points = self.quantity * self.product.points
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f'{self.products.name} {self.output.id}'
@@ -967,6 +992,7 @@ class ManualReceipt(models.Model):
     remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
+    freeze = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-date']
@@ -994,14 +1020,13 @@ class ManualReceipt_Products(models.Model):
     total_price = models.FloatField(default=0)
     product_points = models.IntegerField()
 
-    def save(self, *args, **kwargs):
-        self.product_points = self.num_item * self.product.points
-        super().save(*args, **kwargs)
-
-
     class Meta:
         ordering = ['-product_id']
         app_label = 'Receipts'
+
+    def save(self, *args, **kwargs):
+        self.product_points = self.num_item * self.product.points
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
@@ -1046,28 +1071,7 @@ class Product_Order_Envoy(models.Model):
 
     
 
-class MediumTwo(models.Model):
-    products = models.ManyToManyField(Product, through='MediumTwo_Products')
 
-    def __str__(self) -> str:
-        return f'medium_two - {str(self.id)}'
-
-class MediumTwo_Products(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    mediumtwo = models.ForeignKey(MediumTwo, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default= 0)
-    # total_price = models.FloatField()
-
-    def add_item(self):
-        self.quantity += 1
-        self.save()
-
-    def sub_item(self):
-        self.quantity -= 1
-        self.save()
-
-    def __str__(self) -> str:
-        return f'{self.product.name} - {str(self.mediumtwo.id)}'
     
 
 

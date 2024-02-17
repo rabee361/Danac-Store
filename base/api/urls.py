@@ -111,6 +111,7 @@ urlpatterns = [
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
 
     path('get-receipt-manual/<str:pk>/', GetManualReceipt.as_view(), name="get-manuals"),
+    path('freeze-manual/<str:receipt_id>/' , FreezeManualReceipt.as_view(),name="freeze-manual"),
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
     path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),
     path('update-manual/<str:pk>/' , UpdateManualReceipt.as_view() , name="update-manual"),
@@ -118,6 +119,7 @@ urlpatterns = [
     path('create-manual-product/' , CreateManualProduct.as_view()),
  
     path('get-receipt-output/<str:pk>/', GetOutput.as_view(), name='get-output'),
+    path('freeze-output/<str:receipt_id>/' , FreezeOutputReceipt.as_view(),name="freeze-output"),
     path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()),
     path('list-outputs/' , ListOutputs.as_view() , name="list-outputs"),
     path('update-output/<str:pk>/' , UpdateOutputReceipt.as_view() , name="update-output"),
@@ -125,6 +127,7 @@ urlpatterns = [
     path('create-output-product/' , CreateOutputProduct.as_view()),
  
     path('get-receipt-incoming/<str:pk>/' , GetIncoming.as_view() , name="get-incoming"),
+    path('freeze-incoming/<str:receipt_id>/' , FreezeIncomingReceipt.as_view(),name="freeze-incoming"),
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),
     path('list-incoming/' , ListIncomings.as_view() , name="list-incomings"),
     path('update-incoming/<str:pk>/' , UpdateIncomingReceipt.as_view() , name="update-incoming"),

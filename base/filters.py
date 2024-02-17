@@ -236,7 +236,7 @@ class ManualFilter(django_filters.FilterSet):
 
     class Meta:
         model = ManualReceipt
-        fields = ['client_name', 'employee_name', 'id']
+        fields = ['client_name', 'employee_name', 'id','freeze']
 
 
 class OrderFilter(django_filters.FilterSet):

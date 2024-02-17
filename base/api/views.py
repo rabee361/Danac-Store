@@ -2,23 +2,19 @@ from rest_framework.response import Response
 from base.models import *
 from .serializers import *
 from rest_framework.generics import ListAPIView, DestroyAPIView ,RetrieveAPIView,UpdateAPIView ,RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView , ListCreateAPIView , RetrieveUpdateAPIView , RetrieveDestroyAPIView
-from .validation import custom_validation
 from rest_framework import permissions
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated  ,AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from base.filters import *
-import random
 from django.shortcuts import get_object_or_404
-from django.db.models import F
 from rest_framework.exceptions import NotFound
-# from .utils import send_email
-from .utils import Utlil
 from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
 from .permissions import *
+
 
 
 ####################################### AUTHENTICATION ###################################################################3#######
@@ -978,7 +974,23 @@ class DeleteProductsMediumView(RetrieveDestroyAPIView):
  
 
  ##################################################RECEIPTS ######################################################################
+
+
+class FreezeOutputReceipt(APIView):
+    def post(self,request,receipt_id):
+        try:
+            receipt = Output.objects.get(id=receipt_id)
+            receipt.freeze = True
+            receipt.save()
+            return Response({
+                "msg":"receipt freezed"
+            })
+        except:
+            raise Output.DoesNotExist
         
+
+
+
 
 class GetOutput(RetrieveAPIView):
     # permission_classes = [permissions.IsAuthenticated]
@@ -1234,6 +1246,20 @@ class CreateIncomingProduct(CreateAPIView):
     serializer_class = IncomingProductsSerializer2
 
 
+
+class FreezeIncomingReceipt(APIView):
+    def post(self,request,receipt_id):
+        try:
+            receipt = Incoming.objects.get(id=receipt_id)
+            receipt.freeze = True
+            receipt.save()
+            return Response({
+                "msg":"receipt freezed"
+            })
+        except:
+            raise Incoming.DoesNotExist
+        
+
 ############################### MANUAL RECEIPT #####################################################
     
 
@@ -1324,6 +1350,19 @@ class CreateManualProduct(CreateAPIView):
     queryset = ManualReceipt_Products.objects.all()
     serializer_class = ManualRecieptProductsSerializer2
 
+
+
+class FreezeManualReceipt(APIView):
+    def post(self,request,receipt_id):
+        try:
+            receipt = ManualReceipt.objects.get(id=receipt_id)
+            receipt.freeze = True
+            receipt.save()
+            return Response({
+                "msg":"receipt freezed"
+            })
+        except:
+            raise ManualReceipt.DoesNotExist
 
 ########################## MEDIUM 2 #######################################################################################
 
@@ -1427,7 +1466,7 @@ class ListOrderEnvoy(APIView):
 class ChatMessages(APIView):
     def get(self,request,chat_id):
         chat = Chat.objects.get(id=chat_id)
-        messages = Message.objects.filter(chat=chat)
+        messages = ChatMessage.objects.filter(chat=chat)
         serializer = MessageSerializer(messages,many=True)
         return Response(serializer.data)
     

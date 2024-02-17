@@ -271,7 +271,7 @@ class IncomingProductAdmin(admin.ModelAdmin):
 
 
 class IncomingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date']
+    list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date','freeze']
     search_fields = ['supplier__name', 'employee__name']
     def get_name_supplier(self, obj):
         return obj.supplier.name
@@ -294,7 +294,7 @@ class ManualReceiptProductAdmin(admin.ModelAdmin):
         return obj.manualreceipt.id
 
 class ManualReceiptAdmin(admin.ModelAdmin):
-    list_display = ['id', 'client', 'employee', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
+    list_display = ['id', 'client', 'employee', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
 
     class Meta:
@@ -303,7 +303,7 @@ class ManualReceiptAdmin(admin.ModelAdmin):
 
 
 class OutputsproductAdmin(LeafletGeoAdmin):
-    list_display = ['id', 'client', 'employee', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
+    list_display = ['id', 'client', 'employee', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
 
 
