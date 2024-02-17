@@ -7,6 +7,7 @@ urlpatterns = [
     # path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
     # path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
     # path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
+    # path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('firebase-token/refresh/',RefreshFirebaseToken.as_view(),name="refresh-firebase-token"),
@@ -16,10 +17,9 @@ urlpatterns = [
     path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),
     path('verify-code/', VerefyPhonenumberView.as_view(), name='verify-code'),
 
-    path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
     path('notifications/', GetNotificationView.as_view()),
     path('settings/<str:pk>/', ListInformationUserView.as_view(), name='settings'),
-    path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
+    path('settings/update-image/<str:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
 
     path('update-location/' , UpdateLocationView.as_view() , name="update-location"),
     path('get-location/<str:employee_id>/' , GetSalesEmployeeLocation.as_view() , name="get-location"),

@@ -98,7 +98,7 @@ class UpdateImageUserView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {'success':"The changed image Profile has been successfully.",
+                {'success':"The Profile Image has been changed successfully.",
                  'image' : serializer.data},
                 status=status.HTTP_200_OK
             )
