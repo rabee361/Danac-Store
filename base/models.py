@@ -1081,7 +1081,7 @@ class Product_Order_Envoy(models.Model):
 
 class Chat(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True,null=True)
 
     def __str__(self):
         return f'{self.id}'
