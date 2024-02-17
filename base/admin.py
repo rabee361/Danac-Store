@@ -99,6 +99,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         user_type = UserType.objects.get(user_type='عميل')
         queryset.update(is_accepted=True, user_type=user_type)
         user = queryset.get(is_active=True)
+        chat = Chat.objects.create(user=user)
         rand_num = random.randint(1,10000)
         client = Client.objects.create(
             name=user.username,

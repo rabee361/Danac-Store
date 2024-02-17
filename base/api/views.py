@@ -78,9 +78,12 @@ class UserLoginApiView(GenericAPIView):
         user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
 
+        chat = Chat.objects.get(user=user)
+
         data = serializer.data
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
+        data['chat_id'] = chat.id
         # data['username'] = user.username
         # data['phonenumber'] = user.phonenumber
         data['address'] = user.address
