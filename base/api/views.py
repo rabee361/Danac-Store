@@ -17,10 +17,24 @@ from rest_framework.exceptions import NotFound
 # from .utils import send_email
 from .utils import Utlil
 from fcm_django.models import FCMDevice
-from firebase_admin.messaging import Message, Notification
+from firebase_admin.messaging import Notification
 from .permissions import *
 
 ####################################### AUTHENTICATION ###################################################################3#######
+
+class UpdateFcmDevice(APIView):
+
+    def post(self, request, user_id):
+        print(user_id)
+        user = CustomUser.objects.filter(pk=user_id).first()
+        print(user)
+        device_token = request.data.get('device_token')
+        device_type = request.data.get('device_type')
+        device = FCMDevice.objects.get(user=user)
+        device.registration_id = device_token
+        device.type = device_type
+        device.save()
+        return Response({'message':'update success'})
 
 class SignUpView(GenericAPIView):
     serializer_class  = SignUpSerializer
@@ -102,13 +116,15 @@ class ResetPasswordView(UpdateAPIView):
         
         if user.is_verified:
             data = request.data
-            serializer = self.get_serializer(data=data, context={'user_id':user_id})
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            serializer_pass = self.get_serializer(data=data, context={'user_id':user_id})
+            serializer_pass.is_valid(raise_exception=True)
+            # serializer_pass.save()
             messages = {
                 'message':'Password Changed Successfully.'
             }
             user.is_verified = False
+            password = request.data.get('password')
+            user.set_password(password)
             user.save()
             return Response(messages, status=status.HTTP_200_OK)
         else:
@@ -1413,7 +1429,7 @@ class ListOrderEnvoy(APIView):
 class ChatMessages(APIView):
     def get(self,request,chat_id):
         chat = Chat.objects.get(id=chat_id)
-        messages = Message.objects.filter(chat=chat)
+        messages = Message.objects.filter(chat=chat).all()
         serializer = MessageSerializer(messages,many=True)
         return Response(serializer.data)
     

@@ -271,13 +271,16 @@ class IncomingProductAdmin(admin.ModelAdmin):
 
 
 class IncomingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount','number' ,'date']
+    list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount','number','get_day' ,'date']
     search_fields = ['supplier__name', 'employee__name']
     def get_name_supplier(self, obj):
         return obj.supplier.name
     
     def get_name_employee(self, obj):
         return obj.employee.name
+    
+    def get_day(self, obj):
+        return obj.day.day
     
     get_name_employee.short_descreption = 'employee'
     get_name_supplier.short_descreption = 'supplier'

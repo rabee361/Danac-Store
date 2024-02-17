@@ -7,6 +7,7 @@ urlpatterns = [
     # path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
     # path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
     # path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
+    path('update-fcm-device/<str:user_id>/', UpdateFcmDevice.as_view()),
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/sign-up/' , SignUpView.as_view()),
@@ -31,7 +32,7 @@ urlpatterns = [
 
     path('clients/' , ListCreateClient.as_view() , name="clients"),
     path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),
-    path('client-info/' , Client_Details.as_view(), name="client-info"),
+    path('client-info/<str:pk>/' , Client_Details.as_view(), name="client-info"),
     path('client-orders/' , ListClientOrders.as_view() , name="client-orders"),
     # path(),
 

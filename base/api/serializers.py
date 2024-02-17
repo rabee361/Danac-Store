@@ -57,8 +57,8 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Incorrect Credentials")
             if not user.is_active:
                 raise serializers.ValidationError({'message_error':'this account is not active'})
-            if not user.is_verified:
-                raise serializers.ValidationError({'message_error':'this account is not verified'})
+            # if not user.is_verified:
+            #     raise serializers.ValidationError({'message_error':'this account is not verified'})
             if not user.is_accepted:
                 raise serializers.ValidationError({'message_error':'this account is not accepted'})
         else:
@@ -159,13 +159,15 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         
         return attrs
     
-    def save(self, **kwargs):
-        user_id = self.context.get('user_id')
-        user = CustomUser.objects.get(id=user_id)
-        password = self.validated_data['newpassword']
-        user.set_password(password)
-        user.save()
-        return user
+    # def save(self, **kwargs):
+    #     user_id = self.context.get('user_id')
+    #     user = CustomUser.objects.get(id=user_id)
+    #     password = self.validated_data['password']
+    #     print(password)
+    #     print(user)
+    #     user.set_password(password)
+    #     user.save()
+    #     return user
 
 
 class CodeVerivecationSerializer(serializers.ModelSerializer):
