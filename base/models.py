@@ -11,6 +11,8 @@ from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 from django.contrib.admin import display
+import random
+import string
 
 
 def get_expiration_time():
@@ -19,7 +21,10 @@ def get_expiration_time():
 def get_expiration_date():
     return timezone.now() + timedelta(days=30)
 
-
+def generate_barcode():
+    characters = string.ascii_letters + string.digits
+    code = ''.join(random.choice(characters) for _ in range(8))
+    return code
 
 
 class UserType(models.Model):
@@ -275,13 +280,13 @@ class Cart_Products(models.Model):
 class Cart(models.Model):
     customer = models.ForeignKey(Client , on_delete=models.CASCADE)
     items = models.ManyToManyField(Product ,through='Cart_Products')
-    barcode = models.CharField(max_length=200, default=uuid.uuid4)
+    barcode = models.CharField(max_length=200, default=generate_barcode)
 
     class Meta:
         app_label = 'Clients_and_Products'
 
     def save(self, *args, **kwargs):
-        self.barcode = str(uuid.uuid4())
+        self.barcode = str(generate_barcode())
         super(Cart, self).save(*args, **kwargs)
 
     @property
@@ -323,7 +328,7 @@ class Cart(models.Model):
                 # order.products_num += item.quantity
                 order.save()
         self.items.clear()
-        self.barcode = uuid.uuid4
+        self.barcode = generate_barcode()
         self.save()
         return order
 
@@ -878,7 +883,7 @@ class Incoming(models.Model):
     previous_depts = models.FloatField(null=True,blank=True,default=0.0)
     remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateTimeField(auto_now_add=True)
-    barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
+    barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
     freeze = models.BooleanField(default=False)
 
     class Meta:
@@ -927,7 +932,7 @@ class Output(models.Model):
     remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateTimeField(auto_now_add=True,null=True)
     # shipping_cost = models.FloatField(default=0.0)
-    barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
+    barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
     location = models.PointField(default=Point(0.0,0.0))
     delivered = models.BooleanField(default=False)
     freeze = models.BooleanField(default=False)
@@ -991,7 +996,7 @@ class ManualReceipt(models.Model):
     previous_depts = models.FloatField(null=True,blank=True,default=0.0)
     remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateTimeField(auto_now_add=True)
-    barcode = models.CharField(max_length=200, default=uuid.uuid4, editable=False)
+    barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
     freeze = models.BooleanField(default=False)
 
     class Meta:

@@ -218,7 +218,7 @@ class IncomingFilter(django_filters.FilterSet):
 
     class Meta:
         model = Incoming
-        fields = ['supplier_name', 'employee_name', 'id']
+        fields = ['supplier_name', 'employee_name', 'id','freeze']
 
 
 class OutputFilter(django_filters.FilterSet):
