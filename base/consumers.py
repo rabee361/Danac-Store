@@ -16,10 +16,10 @@ class CreateMessage(AsyncWebsocketConsumer):
 		text_data_json = json.loads(text_data)
 		message = text_data_json['message']
 		user_id = text_data_json['user_id']
-		chat_id = text_data_json['chat_id']
+		# chat_id = text_data_json['chat_id']
 
 		user = await self.get_user(user_id)
-		chat = await self.get_chat(chat_id)
+		chat = await self.get_chat(user)
 
 		try:
 			await self.get_employee(user.phonenumber)
@@ -46,8 +46,8 @@ class CreateMessage(AsyncWebsocketConsumer):
 		return CustomUser.objects.get(id=user_id)
 
 	@database_sync_to_async
-	def get_chat(self, chat_id):
-		return Chat.objects.get(id=chat_id)
+	def get_chat(self, user):
+		return Chat.objects.get(user=user)
 
 	@database_sync_to_async
 	def save_message(self, msg):
