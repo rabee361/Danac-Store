@@ -148,7 +148,7 @@ class Points(models.Model):
 
 
 
-class Notifications(models.Model):
+class Notification(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     body = models.CharField(max_length=500)
     title = models.CharField(max_length=100)
@@ -370,11 +370,12 @@ class Order(models.Model):
         return total_points
 
     def products_num(self):
-        products_num = 0
+        total_items =  0
         for item in self.order_product_set.all():
-            products_num += item.total_points_of_item()
-        return products_num
-
+            total_items += item.quantity
+        return total_items
+    
+    
     def __str__(self):
         return f'{self.client} : {self.id}'
 

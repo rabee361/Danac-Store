@@ -499,7 +499,7 @@ admin.site.register(ProductType,ProductTypeAdmin)
 admin.site.register(Cart, CartAdmin)
 admin.site.register(Cart_Products, CartProductsAdmin)
 
-admin.site.register(Notifications) 
+admin.site.register(Notification) 
 
 admin.site.register(Chat)
 admin.site.register(ChatMessage)

@@ -116,7 +116,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 class SerializerNotification(serializers.ModelSerializer):
     class Meta:
-        model = Notifications
+        model = Notification
         fields = '__all__'
     def to_representation(self, instance):
         reper = super().to_representation(instance)
