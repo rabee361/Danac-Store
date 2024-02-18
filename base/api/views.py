@@ -133,6 +133,7 @@ class ResetPasswordView(UpdateAPIView):
                 'message':'تم تغيير كلمة المرور بنجاح'
             }
             return Response(messages, status=status.HTTP_200_OK)
+        
         else:
             return Response({'error':'ليس لديك صلاحية لتغيير كلمة المرور'})
 
