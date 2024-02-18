@@ -136,37 +136,32 @@ class UserLogoutSerializer(serializers.Serializer):
 
 
 
-class ResetPasswordSerializer(serializers.ModelSerializer):
-
-    newpassword = serializers.CharField(style={"input_type":"password"}, write_only=True)
-    class Meta:
-        model = CustomUser
-        fields = ['password', 'newpassword']
-
-        extra_kwargs = {
-            'password':{'write_only':True,}
-        }
+class ResetPasswordSerializer(serializers.Serializer):
+    newpassword = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
         password = attrs.get('password', '')
         newpassword = attrs.get('newpassword', '')
         validate_password(password)
         validate_password(newpassword)
-        
         if password != newpassword:
-            raise serializers.ValidationError({'message_error':'The password and newpassword didnt matched.'})
+            raise serializers.ValidationError({'message_error':'كلمات المرور لم تتطابق'})
         
         return attrs
     
+
     def save(self, **kwargs):
         user_id = self.context.get('user_id')
         user = CustomUser.objects.get(id=user_id)
         password = self.validated_data['newpassword']
         user.set_password(password)
+        user.is_verified=False
         user.save()
         return user
 
 
+### delete
 class CodeVerivecationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CodeVerification

@@ -5,7 +5,6 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.admin import UserAdmin
 import random
 from base.api.utils import Utlil
-from base.api.serializers import CodeVerivecationSerializer
 from import_export.admin import ImportExportModelAdmin
 from base.resources import ProductResource
 from arabic_reshaper import reshape
@@ -99,33 +98,35 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         user_type = UserType.objects.get(user_type='عميل')
         queryset.update(is_accepted=True, user_type=user_type)
         user = queryset.get(is_active=True)
-        chat = Chat.objects.create(user=user)
-        rand_num = random.randint(1,10000)
-        client = Client.objects.create(
+        client,created = Client.objects.get_or_create(
             name=user.username,
             address = "syria/homs",
             phonenumber = user.phonenumber,
             location = user.location
         )
-        code_verivecation = random.randint(1000,9999)
+        cart,created = Cart.objects.get_or_create(customer=client)
+        chat,created = Chat.objects.get_or_create(user=user)
+
+        # rand_num = random.randint(1,10000)
+        # code_verivecation = random.randint(1000,9999)
         # email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
-        data= {'to_email':user.email, 'email_subject':'Verify your email','username':user.username, 'code': str(code_verivecation)}
-        Utlil.send_email(data)
-        serializer = CodeVerivecationSerializer(data ={
-                'user':user.id,
-                'code':code_verivecation,
-                'expires_at' : timezone.now() + timedelta(minutes=10)
-            })
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        cart = Cart.objects.create(customer=client)
-        cart.save()
+        # data= {'to_email':user.email, 'email_subject':'Verify your email','username':user.username, 'code': str(code_verivecation)}
+        # Utlil.send_email(data)
+        # serializer = CodeVerivecationSerializer(data ={
+        #         'user':user.id,
+        #         'code':code_verivecation,
+        #         'expires_at' : timezone.now() + timedelta(minutes=10)
+        #     })
+        # serializer.is_valid(raise_exception=True)
+        # serializer.save()
+        # cart.save()
+
 
     def Refusal_User(self, request, queryset):
         user = queryset.get(is_accepted=False)
         # email_body = 'Hi '+user.username+' نعتذر منك لقد تم رفض حسابك لأن موقعك بعيد ولا يمكن توصيل طلبات إليه \n'
-        data = {'to_email':user.email, 'email_subject':'Account Refused','username':user.username}
-        Utlil.send_email2(data)
+        # data = {'to_email':user.email, 'email_subject':'Account Refused','username':user.username}
+        # Utlil.send_email2(data)
         user.delete()
 
     fieldsets = (

@@ -121,19 +121,17 @@ class GetNotificationView(APIView):
 class ResetPasswordView(UpdateAPIView):
     serializer_class = ResetPasswordSerializer
     permission_classes = [permissions.AllowAny,]
+
     def put(self, request, user_id):
         user = CustomUser.objects.get(id=user_id)
-        
         if user.is_verified:
             data = request.data
             serializer = self.get_serializer(data=data, context={'user_id':user_id})
             serializer.is_valid(raise_exception=True)
             serializer.save()
             messages = {
-                'message':'Password Changed Successfully.'
+                'message':'تم تغيير كلمة المرور بنجاح'
             }
-            user.is_verified = False
-            user.save()
             return Response(messages, status=status.HTTP_200_OK)
         else:
             return Response({'error':'ليس لديك صلاحية لتغيير كلمة المرور'})
@@ -201,7 +199,7 @@ class VerefyPhonenumberView(APIView):
         return Response({'user_id':user.id}, status=status.HTTP_200_OK)
 
 
-
+#### delete
 class VerifyCodeToChangePassword(APIView):
     def post(self, request):
         code = request.data['code']
@@ -457,13 +455,20 @@ class Delete_From_Cart(DestroyAPIView):
 
 class CreateOrderView(APIView):
     # permission_classes = [IsAuthenticated,Is_Client]
+
     def post(self, request, cart_id):
+
+        ### check if the cart is empty
+        cart = get_object_or_404(Cart, id=cart_id)
+        if cart.get_items_num == 0: 
+            return Response({"error": "السلة فارغة لا يمكن إنشاء طلب"}, status=status.HTTP_400_BAD_REQUEST)
+        
         delivery_date = request.data.get('delivery_date')
         if not delivery_date:
             return Response({"error": "Delivery date is required"}, status=status.HTTP_400_BAD_REQUEST)
-        cart = get_object_or_404(Cart, id=cart_id)
         order = cart.create_order(delivery_date)
-        ###################################
+
+        ### sending a notification
         user = CustomUser.objects.get(phonenumber=cart.customer.phonenumber)
         devices = FCMDevice.objects.filter(user=user.id)
         title = 'انشاء طلب'
@@ -477,11 +482,12 @@ class CreateOrderView(APIView):
                 ),
             )
         UserNotification.objects.create(user=user,body=body,title=title)
-        ###################################
+
         order.save()
         order_serializer = OrderSerializer(order)
         return Response(order_serializer.data, status=status.HTTP_201_CREATED)
      
+
 
 class ListOrders(ListAPIView):
     filter_backends = [DjangoFilterBackend]

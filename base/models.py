@@ -306,7 +306,7 @@ class Cart(models.Model):
         return points
     
     def create_order(self,date):
-
+        
         order = Order.objects.create(
                 client=self.customer,
                 # total=0,
