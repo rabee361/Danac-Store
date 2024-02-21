@@ -422,7 +422,7 @@ class Add_to_Cart(APIView):
         quantity = request.data.get('quantity')
         
         if quantity :
-            cart_product = Cart_Products.objects.create(products=item,cart=cart,quantity=quantity)
+            cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart,quantity=quantity)
             serializer = Cart_ProductsSerializer2(cart_product,many=False)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         
