@@ -425,23 +425,10 @@ class Add_to_Cart(APIView):
             cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart,quantity=quantity)
             serializer = Cart_ProductsSerializer2(cart_product,many=False)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
-        
         else:
             cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart)
             serializer = Cart_ProductsSerializer2(cart_product,many=False)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
-
-
-        # if not created:
-        #     # Cart_Products.objects.filter(products=item, cart=cart).\
-        #     #                         update(quantity=F('quantity') + 1)
-        #     product = Cart_Products.objects.get(products=item, cart=cart)
-        #     serializer = Cart_ProductsSerializer2(product,many=False)
-        #     return Response(serializer.data,status=status.HTTP_201_CREATED)       
-
-
-                        # Cart_Products.objects.filter(products=item, cart=cart).\
-                        #             update(quantity=F('quantity')+request.data['quantity'])
 
 
 
