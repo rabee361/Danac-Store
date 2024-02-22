@@ -563,9 +563,10 @@ class SalesEmployeeLocationSerializer(serializers.ModelSerializer):
 
 
 class SupplierSerializer(serializers.ModelSerializer):
+    total_receipts = serializers.SerializerMethodField()
     class Meta:
         model = Supplier
-        fields = ['id','name','company_name','address','phone_number','info','debts']
+        fields = ['id','name','company_name','address','phone_number','info','debts','total_receipts']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -599,6 +600,11 @@ class SupplierSerializer(serializers.ModelSerializer):
         repr = super().to_representation(instance)
         repr['name'] = modify_name(repr['name'])
         return repr
+    
+    def get_total_receipts(self,obj):
+        total = Incoming.objects.filter(supplier=obj).count()
+        return total
+
     
 
 ############################################################## HR ##################################################################

@@ -4,7 +4,8 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Sum
-import uuid
+from django.utils import timezone
+from datetime import date
 from django.contrib.gis.geos import Point
 from django.utils import timezone
 from datetime import timedelta
@@ -875,6 +876,7 @@ class MediumTwo_Products(models.Model):
 
 
 class Incoming(models.Model):
+    serial = models.IntegerField(null=True,blank=True,editable=False)
     products = models.ManyToManyField(Product, through='Incoming_Product')
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -901,6 +903,18 @@ class Incoming(models.Model):
         return str(self.id)
         
 
+
+class FrozenIncomingReceipts(models.Model):
+    receipt = models.ForeignKey(Incoming,on_delete=models.CASCADE)
+    reason = models.TextField()
+
+    class Meta:
+        app_label = 'Receipts'
+
+    def __str__(self):
+        return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
+
+
 class Incoming_Product(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     incoming = models.ForeignKey(Incoming, on_delete=models.CASCADE)
@@ -923,6 +937,7 @@ class Incoming_Product(models.Model):
 
 
 class Output(models.Model):
+    serial = models.IntegerField(null=True,blank=True,editable=False)
     products = models.ManyToManyField(Product, through='Output_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -951,6 +966,19 @@ class Output(models.Model):
     def __str__(self):
         return str(self.id)
     
+
+
+
+class FrozenOutputReceipts(models.Model):
+    receipt = models.ForeignKey(Output,on_delete=models.CASCADE)
+    reason = models.TextField()
+
+    class Meta:
+        app_label = 'Receipts'
+
+    def __str__(self):
+        return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
+
 
 class Output_Products(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE) 
@@ -988,6 +1016,7 @@ class DelievaryArrived(models.Model):
 
 
 class ManualReceipt(models.Model):
+    serial = models.IntegerField(null=True,blank=True,editable=False)
     products = models.ManyToManyField(Product, through='ManualReceipt_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -1005,6 +1034,22 @@ class ManualReceipt(models.Model):
         ordering = ['-date']
         app_label = 'Receipts'
 
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            today = timezone.now().date()
+            last_instance = ManualReceipt.objects.filter(date=today).order_by('-serial').first()
+
+            if last_instance:
+                if last_instance.date != date.today():
+                    self.serial = 1
+                else:
+                    self.serial = last_instance.counter + 1
+            else:
+                self.serial = 1
+        super(ManualReceipt, self).save(*args, **kwargs)
+
+
     def calculate_total_receipt(self):
         return self.manualreceipt_products_set.aggregate(
             total_receipt=models.Sum('total_price')
@@ -1014,7 +1059,16 @@ class ManualReceipt(models.Model):
         return f'{self.client.name} - {str(self.id)}'
     
 
-  
+
+class FrozenManualReceipts(models.Model):
+    receipt = models.ForeignKey(ManualReceipt,on_delete=models.CASCADE)
+    reason = models.TextField()
+
+    class Meta:
+        app_label = 'Receipts'
+
+    def __str__(self):
+        return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
 
 
 
@@ -1105,3 +1159,6 @@ class ChatMessage(models.Model):
         return f'{self.sender} : "{self.content[0:20]}..."'
 
 #########################################
+    
+
+

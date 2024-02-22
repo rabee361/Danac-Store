@@ -94,7 +94,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     ordering = ['-id']
 
     def Accept_User(self, request, queryset):
-        queryset.update(is_active=True) 
+        queryset.update(is_active=True)
         user_type = UserType.objects.get(user_type='عميل')
         queryset.update(is_accepted=True, user_type=user_type)
         user = queryset.get(is_active=True)
@@ -275,6 +275,8 @@ class IncomingProductAdmin(admin.ModelAdmin):
 class IncomingAdmin(admin.ModelAdmin):
     list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date','freeze']
     search_fields = ['supplier__name', 'employee__name']
+    readonly_fields = ['serial']
+
     def get_name_supplier(self, obj):
         return obj.supplier.name
     
@@ -283,6 +285,14 @@ class IncomingAdmin(admin.ModelAdmin):
     
     get_name_employee.short_descreption = 'employee'
     get_name_supplier.short_descreption = 'supplier'
+
+
+
+class FreezeIncomingAdmin(admin.ModelAdmin):
+    list_display = ['receipt','reason']
+    class Meta:
+        app_label = 'Receipts'
+
 
 
 class ManualReceiptProductAdmin(admin.ModelAdmin):
@@ -295,18 +305,33 @@ class ManualReceiptProductAdmin(admin.ModelAdmin):
     def num_manul_receipt(self, obj):
         return obj.manualreceipt.id
 
+
 class ManualReceiptAdmin(admin.ModelAdmin):
     list_display = ['id', 'client', 'employee', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
+    readonly_fields = ['serial']
 
     class Meta:
         app_label = 'Receipts'
         admin_order = 1 
 
 
+class FreezeManualAdmin(admin.ModelAdmin):
+    list_display = ['receipt','reason']
+    class Meta:
+        app_label = 'Receipts'
+
+
 class OutputsproductAdmin(LeafletGeoAdmin):
     list_display = ['id', 'client', 'employee', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
+    readonly_fields = ['serial']
+
+
+class FreezeOuyputAdmin(admin.ModelAdmin):
+    list_display = ['receipt','reason']
+    class Meta:
+        app_label = 'Receipts'
 
 
 class OutputProductAdmin(admin.ModelAdmin):
@@ -476,6 +501,7 @@ admin.site.register(Incoming_Product, IncomingProductAdmin)
 admin.site.register(Incoming, IncomingAdmin)
 admin.site.register(ManualReceipt_Products, ManualReceiptProductAdmin)
 admin.site.register(ManualReceipt, ManualReceiptAdmin)
+admin.site.register(FrozenManualReceipts , FreezeManualAdmin)
 admin.site.register(Output, OutputsproductAdmin)
 admin.site.register(Output_Products, OutputProductAdmin)
 admin.site.register(DelievaryArrived, DElevaryArrivedAdmin)

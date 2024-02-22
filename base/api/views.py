@@ -420,16 +420,14 @@ class Add_to_Cart(APIView):
         item = Product.objects.get(id=pk)
         cart, created = Cart.objects.get_or_create(customer=client)
         quantity = request.data.get('quantity')
-        
+        cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart)
+
         if quantity :
-            cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart,quantity=quantity)
-            serializer = Cart_ProductsSerializer2(cart_product,many=False)
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        
-        else:
-            cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart)
-            serializer = Cart_ProductsSerializer2(cart_product,many=False)
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
+            cart_product.quantity = quantity
+            cart_product.save()
+
+        serializer = Cart_ProductsSerializer2(cart_product,many=False)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
 
 
         # if not created:
@@ -1370,8 +1368,11 @@ class FreezeManualReceipt(APIView):
     def post(self,request,receipt_id):
         try:
             receipt = ManualReceipt.objects.get(id=receipt_id)
+            reason = request.data['reason']
             receipt.freeze = True
             receipt.save()
+            freeze_receipt = FrozenManualReceipts.objects.create(receipt=receipt,reason=reason)
+            freeze_receipt.save()
             return Response({
                 "msg":"receipt freezed"
             })
