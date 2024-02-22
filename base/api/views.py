@@ -77,10 +77,11 @@ class UserLoginApiView(GenericAPIView):
         token = RefreshToken.for_user(user)
 
         chat = Chat.objects.filter(user=user).first()
-        if chat:
-            data['chat_id'] = chat.id
+
 
         data = serializer.data
+        if chat:
+            data['chat_id'] = chat.id
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
         # data['username'] = user.username
