@@ -131,9 +131,9 @@ WSGI_APPLICATION = 'systempro.wsgi.application'
 DATABASES = {
         'default': {
             'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': 'pro_db',
+            'NAME': 'danac',
             'USER': 'postgres',
-            'PASSWORD': 'rabee123',
+            'PASSWORD': 'po23ST@gre432',
             'HOST': 'localhost',
             'PORT': '5432',
         }

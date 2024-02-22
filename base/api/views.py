@@ -326,6 +326,14 @@ class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
+class ListCategoryProductType(ListAPIView):
+    serializer_class = CategorySerializer2
+
+    def get(self, request, product_type_id):
+        product_type = ProductType.objects.filter(id=product_type_id).first()
+        category = product_type.category_set.all()
+        serializer = self.get_serializer(category, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class listCreateProducts(ListCreateAPIView):
     # permission_classes = [IsAuthenticated]

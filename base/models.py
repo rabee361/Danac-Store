@@ -213,6 +213,7 @@ class Product(models.Model):
     quantity = models.IntegerField()
     purchasing_price = models.FloatField()
     category = models.ForeignKey(Category , on_delete=models.CASCADE)
+    product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE) ###new
     notes = models.TextField(max_length=1000,null=True,blank=True)
     made_at = models.DateField(null=True,blank=True)
     expires_at = models.DateField(null=True,blank=True)

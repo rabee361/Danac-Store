@@ -200,6 +200,11 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
+### new
+class CategorySerializer2(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name']
 
 class ClientSerializer(serializers.ModelSerializer):
     total_points = serializers.SerializerMethodField()
