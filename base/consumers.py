@@ -10,22 +10,23 @@ from .api.serializers import *
 
 class CreateMessage(AsyncWebsocketConsumer):
 	async def connect(self):
+		self.chat_id = self.scope['url_route']['kwargs']['id']
 		await self.accept()
 
 	async def receive(self, text_data):
 		text_data_json = json.loads(text_data)
 		message = text_data_json['message']
 		user_id = text_data_json['user_id']
-		chat_id = text_data_json['chat_id']
+		# chat_id = text_data_json['chat_id']
 
 		user = await self.get_user(user_id)
-		chat = await self.get_chat(chat_id)
+		chat = await self.get_chat(self.chat_id)
 
 		try:
 			await self.get_employee(user.phonenumber)
-			msg = Message(sender=user,content=message, chat=chat, employee=True)
+			msg = ChatMessage(sender=user,content=message, chat=chat, employee=True)
 		except Employee.DoesNotExist:
-			msg = Message(sender=user,content=message, chat=chat, employee=False)
+			msg = ChatMessage(sender=user,content=message, chat=chat, employee=False)
 
 		serializer = MessageSerializer(msg,many=False)
 		await self.save_message(msg)

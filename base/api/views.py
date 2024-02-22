@@ -2,39 +2,22 @@ from rest_framework.response import Response
 from base.models import *
 from .serializers import *
 from rest_framework.generics import ListAPIView, DestroyAPIView ,RetrieveAPIView,UpdateAPIView ,RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView , ListCreateAPIView , RetrieveUpdateAPIView , RetrieveDestroyAPIView
-from .validation import custom_validation
 from rest_framework import permissions
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated  ,AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from base.filters import *
-import random
 from django.shortcuts import get_object_or_404
-from django.db.models import F
 from rest_framework.exceptions import NotFound
-# from .utils import send_email
-from .utils import Utlil
 from fcm_django.models import FCMDevice
-from firebase_admin.messaging import Notification
+from firebase_admin.messaging import Message, Notification
 from .permissions import *
 
+
+
 ####################################### AUTHENTICATION ###################################################################3#######
-
-class UpdateFcmDevice(APIView):
-
-    def post(self, request, user_id):
-        print(user_id)
-        user = CustomUser.objects.filter(pk=user_id).first()
-        print(user)
-        device_token = request.data.get('device_token')
-        device_type = request.data.get('device_type')
-        device = FCMDevice.objects.get(user=user)
-        device.registration_id = device_token
-        device.type = device_type
-        device.save()
-        return Response({'message':'update success'})
 
 class SignUpView(GenericAPIView):
     serializer_class  = SignUpSerializer
@@ -45,6 +28,7 @@ class SignUpView(GenericAPIView):
         serializer.save()
         user_data = serializer.data
         user = CustomUser.objects.get(phonenumber=user_data['phonenumber'])
+
         device_token = request.data.get('device_token')
         device_type = request.data.get('device_type')
         if device_token:
@@ -60,23 +44,49 @@ class SignUpView(GenericAPIView):
 
 
 
+class RefreshFirebaseToken(GenericAPIView):
+    # permission_classes = [IsAuthenticated]
+    def post(self,request):
+        token = request.data['firebase-token']
+        user_id = request.data['user_id']
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            device = FCMDevice.objects.get(user=user)
+            device.registration_id = token
+            device.save()
+        except:
+            raise CustomUser.DoesNotExist
+
+        return Response({
+            "msg" : "firebase token changed successfully"
+        })
+
+
+
+
 
 
 class UserLoginApiView(GenericAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = LoginSerializer
 
-    def post(self, request, *args, **kwargs):  
+    def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        user = CustomUser.objects.filter(email = request.data['username']).first()
-        if not user:
-            user = CustomUser.objects.get(phonenumber = request.data['username'])
+        # user = CustomUser.objects.filter(email = request.data['username']).first()
+        # if not user:
+        user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
+
+        chat = Chat.objects.get(user=user)
 
         data = serializer.data
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
+        data['chat_id'] = chat.id
+        # data['username'] = user.username
+        # data['phonenumber'] = user.phonenumber
+        data['address'] = user.address
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)
     
@@ -88,7 +98,7 @@ class UpdateImageUserView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {'success':"The changed image Profile has been successfully.",
+                {'success':"The Profile Image has been changed successfully.",
                  'image' : serializer.data},
                 status=status.HTTP_200_OK
             )
@@ -102,7 +112,7 @@ class GetNotificationView(APIView):
 
     def get(self, request):
         user = request.user
-        notification = Notifications.objects.filter(user__id=user.id)
+        notification = UserNotification.objects.filter(user__id=user.id)
         serializer = SerializerNotification(notification, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -111,22 +121,19 @@ class GetNotificationView(APIView):
 class ResetPasswordView(UpdateAPIView):
     serializer_class = ResetPasswordSerializer
     permission_classes = [permissions.AllowAny,]
+
     def put(self, request, user_id):
         user = CustomUser.objects.get(id=user_id)
-        
         if user.is_verified:
             data = request.data
-            serializer_pass = self.get_serializer(data=data, context={'user_id':user_id})
-            serializer_pass.is_valid(raise_exception=True)
-            # serializer_pass.save()
+            serializer = self.get_serializer(data=data, context={'user_id':user_id})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             messages = {
-                'message':'Password Changed Successfully.'
+                'message':'تم تغيير كلمة المرور بنجاح'
             }
-            user.is_verified = False
-            password = request.data.get('password')
-            user.set_password(password)
-            user.save()
             return Response(messages, status=status.HTTP_200_OK)
+        
         else:
             return Response({'error':'ليس لديك صلاحية لتغيير كلمة المرور'})
 
@@ -193,7 +200,7 @@ class VerefyPhonenumberView(APIView):
         return Response({'user_id':user.id}, status=status.HTTP_200_OK)
 
 
-
+#### delete
 class VerifyCodeToChangePassword(APIView):
     def post(self, request):
         code = request.data['code']
@@ -369,9 +376,13 @@ class Cart_Items(APIView):
         return Response(serializer.data)
 
 
-class Client_Details(RetrieveAPIView):
-    queryset = Client.objects.all()
-    serializer_class = Client_DetailsSerializer
+class Client_Details(APIView):
+    def get(self,request,pk):
+        user = CustomUser.objects.get(id=pk)
+        client = Client.objects.get(phonenumber=user.phonenumber)
+        serializer = Client_DetailsSerializer(client,many=False)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
 
 
 class Cart_Items_Details(APIView):
@@ -411,7 +422,7 @@ class Add_to_Cart(APIView):
         quantity = request.data.get('quantity')
         
         if quantity :
-            cart_product = Cart_Products.objects.create(products=item,cart=cart,quantity=quantity)
+            cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart,quantity=quantity)
             serializer = Cart_ProductsSerializer2(cart_product,many=False)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         
@@ -445,13 +456,20 @@ class Delete_From_Cart(DestroyAPIView):
 
 class CreateOrderView(APIView):
     # permission_classes = [IsAuthenticated,Is_Client]
+
     def post(self, request, cart_id):
+
+        ### check if the cart is empty
+        cart = get_object_or_404(Cart, id=cart_id)
+        if cart.get_items_num == 0: 
+            return Response({"error": "السلة فارغة لا يمكن إنشاء طلب"}, status=status.HTTP_400_BAD_REQUEST)
+        
         delivery_date = request.data.get('delivery_date')
         if not delivery_date:
             return Response({"error": "Delivery date is required"}, status=status.HTTP_400_BAD_REQUEST)
-        cart = get_object_or_404(Cart, id=cart_id)
         order = cart.create_order(delivery_date)
-        ###################################
+
+        ### sending a notification
         user = CustomUser.objects.get(phonenumber=cart.customer.phonenumber)
         devices = FCMDevice.objects.filter(user=user.id)
         title = 'انشاء طلب'
@@ -464,12 +482,13 @@ class CreateOrderView(APIView):
                     ),
                 ),
             )
-        Notifications.objects.create(user=user,body=body,title=title)
-        ###################################
+        UserNotification.objects.create(user=user,body=body,title=title)
+
         order.save()
         order_serializer = OrderSerializer(order)
         return Response(order_serializer.data, status=status.HTTP_201_CREATED)
      
+
 
 class ListOrders(ListAPIView):
     filter_backends = [DjangoFilterBackend]
@@ -493,24 +512,13 @@ class ListSimpleOrders(ListAPIView):
 class ListClientOrders(GenericAPIView):
     permission_classes = [IsAuthenticated,Is_Client]
     serializer_class = OrderSerializer
-    # filter_backends = [DjangoFilterBackend]
-    # serializer_class = OrderSerializer
     def get(self,request):
         user = request.user
         client = Client.objects.get(phonenumber=user.phonenumber)
         orders = client.order_set.all()
         serializer = self.get_serializer(orders,many=True)
         return Response(serializer.data,)
-
-# class ListClientOrdersDelivered(GenericAPIView):
-#     permission_classes = [IsAuthenticated,Is_Client]
-#     serializer_class = OrderSerializer
-#     def get(self,request):
-#         user = request.user
-#         client = Client.objects.get(phonenumber=user.phonenumber)
-#         orders = client.order_set.filter(delivered=True)
-#         serializer = self.get_serializer(orders,many=True)
-#         return Response(serializer.data,)    
+        
 
 class DeleteOrder(DestroyAPIView):
     queryset = Order.objects.all()
@@ -980,7 +988,23 @@ class DeleteProductsMediumView(RetrieveDestroyAPIView):
  
 
  ##################################################RECEIPTS ######################################################################
+
+
+class FreezeOutputReceipt(APIView):
+    def post(self,request,receipt_id):
+        try:
+            receipt = Output.objects.get(id=receipt_id)
+            receipt.freeze = True
+            receipt.save()
+            return Response({
+                "msg":"receipt freezed"
+            })
+        except:
+            raise Output.DoesNotExist
         
+
+
+
 
 class GetOutput(RetrieveAPIView):
     # permission_classes = [permissions.IsAuthenticated]
@@ -1047,7 +1071,7 @@ class ReceiptOrdersView(APIView):
                             ),
                         ),
                     )
-                    Notifications.objects.create(
+                    UserNotification.objects.create(
                         user = user,
                         title = title,
                         body = body
@@ -1122,7 +1146,7 @@ class ListCreateDeliveryArrived(APIView):
                 ),
             ),
         )
-        Notifications.objects.create(
+        UserNotification.objects.create(
             user=user,
             title = title,
             body=body
@@ -1236,6 +1260,20 @@ class CreateIncomingProduct(CreateAPIView):
     serializer_class = IncomingProductsSerializer2
 
 
+
+class FreezeIncomingReceipt(APIView):
+    def post(self,request,receipt_id):
+        try:
+            receipt = Incoming.objects.get(id=receipt_id)
+            receipt.freeze = True
+            receipt.save()
+            return Response({
+                "msg":"receipt freezed"
+            })
+        except:
+            raise Incoming.DoesNotExist
+        
+
 ############################### MANUAL RECEIPT #####################################################
     
 
@@ -1264,7 +1302,7 @@ class CreateManualReceiptView(APIView):
                             ),
                         ),
                     )
-                    Notifications.objects.create(
+                    UserNotification.objects.create(
                         user = user,
                         title = title,
                         body = body
@@ -1326,6 +1364,19 @@ class CreateManualProduct(CreateAPIView):
     queryset = ManualReceipt_Products.objects.all()
     serializer_class = ManualRecieptProductsSerializer2
 
+
+
+class FreezeManualReceipt(APIView):
+    def post(self,request,receipt_id):
+        try:
+            receipt = ManualReceipt.objects.get(id=receipt_id)
+            receipt.freeze = True
+            receipt.save()
+            return Response({
+                "msg":"receipt freezed"
+            })
+        except:
+            raise ManualReceipt.DoesNotExist
 
 ########################## MEDIUM 2 #######################################################################################
 
@@ -1429,7 +1480,7 @@ class ListOrderEnvoy(APIView):
 class ChatMessages(APIView):
     def get(self,request,chat_id):
         chat = Chat.objects.get(id=chat_id)
-        messages = Message.objects.filter(chat=chat).all()
+        messages = ChatMessage.objects.filter(chat=chat)
         serializer = MessageSerializer(messages,many=True)
         return Response(serializer.data)
     

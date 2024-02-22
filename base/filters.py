@@ -117,19 +117,70 @@ class DebtSupplierFilter(django_filters.FilterSet):
 
 ################################# HR #############################################
         
-class MonthFilter(filters.Filter):
+# class MonthFilter(filters.Filter):
+#     def filter(self, qs, value):
+#         if value:
+#             date = datetime.strptime(value, "%Y-%m")
+#             return qs.filter(date__year=date.year, date__month=date.month)
+#         return qs
+
+# class SalaryFilter(django_filters.FilterSet):
+#     date = MonthFilter(field_name="date")
+
+#     class Meta: 
+#         model = Salary
+#         fields = ['date']
+
+
+
+
+
+
+
+
+
+
+class DateRangeFilter(filters.Filter):
     def filter(self, qs, value):
         if value:
-            date = datetime.strptime(value, "%Y-%m")
-            return qs.filter(date__year=date.year, date__month=date.month)
+            # Assuming value is a dictionary with 'from_date' and 'to_date' keys
+            from_date = value.get('from_date')
+            to_date = value.get('to_date')
+
+            if from_date and to_date:
+                # Parse the dates and filter the queryset
+                from_date_obj = datetime.strptime(from_date, "%Y-%m-%d")
+                to_date_obj = datetime.strptime(to_date, "%Y-%m-%d")
+                return qs.filter(date__range=(from_date_obj, to_date_obj))
+            elif from_date:
+                # Filter by from_date only
+                from_date_obj = datetime.strptime(from_date, "%Y-%m-%d")
+                return qs.filter(date__gte=from_date_obj)
+            elif to_date:
+                # Filter by to_date only
+                to_date_obj = datetime.strptime(to_date, "%Y-%m-%d")
+                return qs.filter(date__lte=to_date_obj)
         return qs
 
 class SalaryFilter(django_filters.FilterSet):
-    date = MonthFilter(field_name="date")
+    date_range = DateRangeFilter(field_name="date")
 
-    class Meta: 
+    class Meta:  
         model = Salary
-        fields = ['date']
+        fields = ['date_range']
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class OverTimeFilter(django_filters.FilterSet):
@@ -218,7 +269,7 @@ class IncomingFilter(django_filters.FilterSet):
 
     class Meta:
         model = Incoming
-        fields = ['supplier_name', 'employee_name', 'id']
+        fields = ['supplier_name', 'employee_name', 'id','freeze']
 
 
 class OutputFilter(django_filters.FilterSet):
@@ -236,7 +287,7 @@ class ManualFilter(django_filters.FilterSet):
 
     class Meta:
         model = ManualReceipt
-        fields = ['client_name', 'employee_name', 'id']
+        fields = ['client_name', 'employee_name', 'id','freeze']
 
 
 class OrderFilter(django_filters.FilterSet):
@@ -244,7 +295,7 @@ class OrderFilter(django_filters.FilterSet):
 
     class Meta:
         model = Order
-        fields = ['client_name', 'delivered']
+        fields = ['client_name']
 
 
 class DelivaryFilter(django_filters.FilterSet):

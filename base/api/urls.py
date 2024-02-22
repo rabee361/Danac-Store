@@ -7,19 +7,19 @@ urlpatterns = [
     # path('get-code/', GetPhonenumberView.as_view(), name='get-code'),
     # path('verify-code-password/', VerifyCodeToChangePassword.as_view()),
     # path('get-number/', GetPhonenumberView.as_view(), name='get-number'),
-    path('update-fcm-device/<str:user_id>/', UpdateFcmDevice.as_view()),
+    # path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
+    path('firebase-token/refresh/',RefreshFirebaseToken.as_view(),name="refresh-firebase-token"),
     path('auth/sign-up/' , SignUpView.as_view()),
     path('auth/log-in/', UserLoginApiView.as_view(), name='sign-in'),
     path('auth/logout/', LogoutAPIView.as_view(), name='logout'),
     path('auth/reset-password/<str:user_id>/' , ResetPasswordView.as_view(), name='reset-password'),
     path('verify-code/', VerefyPhonenumberView.as_view(), name='verify-code'),
 
-    path('change-image/<str:user_pk>/' , UpdateImageUserView.as_view(), name="change-view"),
     path('notifications/', GetNotificationView.as_view()),
     path('settings/<str:pk>/', ListInformationUserView.as_view(), name='settings'),
-    path('settings/update-image/<int:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
+    path('settings/update-image/<str:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
 
     path('update-location/' , UpdateLocationView.as_view() , name="update-location"),
     path('get-location/<str:employee_id>/' , GetSalesEmployeeLocation.as_view() , name="get-location"),
@@ -34,7 +34,6 @@ urlpatterns = [
     path('get-client/<str:pk>/' , RetUpdDesClient.as_view() , name="get-client"),
     path('client-info/<str:pk>/' , Client_Details.as_view(), name="client-info"),
     path('client-orders/' , ListClientOrders.as_view() , name="client-orders"),
-    # path(),
 
     path('total-points/', TotalClientPointsView.as_view(), name='total-points'),
     path('used-points/', UsedClientPointsView.as_view(), name='used-points'),
@@ -112,6 +111,7 @@ urlpatterns = [
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
 
     path('get-receipt-manual/<str:pk>/', GetManualReceipt.as_view(), name="get-manuals"),
+    path('freeze-manual/<str:receipt_id>/' , FreezeManualReceipt.as_view(),name="freeze-manual"),
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
     path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),
     path('update-manual/<str:pk>/' , UpdateManualReceipt.as_view() , name="update-manual"),
@@ -119,6 +119,7 @@ urlpatterns = [
     path('create-manual-product/' , CreateManualProduct.as_view()),
  
     path('get-receipt-output/<str:pk>/', GetOutput.as_view(), name='get-output'),
+    path('freeze-output/<str:receipt_id>/' , FreezeOutputReceipt.as_view(),name="freeze-output"),
     path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()),
     path('list-outputs/' , ListOutputs.as_view() , name="list-outputs"),
     path('update-output/<str:pk>/' , UpdateOutputReceipt.as_view() , name="update-output"),
@@ -126,6 +127,7 @@ urlpatterns = [
     path('create-output-product/' , CreateOutputProduct.as_view()),
  
     path('get-receipt-incoming/<str:pk>/' , GetIncoming.as_view() , name="get-incoming"),
+    path('freeze-incoming/<str:receipt_id>/' , FreezeIncomingReceipt.as_view(),name="freeze-incoming"),
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),
     path('list-incoming/' , ListIncomings.as_view() , name="list-incomings"),
     path('update-incoming/<str:pk>/' , UpdateIncomingReceipt.as_view() , name="update-incoming"),

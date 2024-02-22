@@ -5,7 +5,6 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.admin import UserAdmin
 import random
 from base.api.utils import Utlil
-from base.api.serializers import CodeVerivecationSerializer
 from import_export.admin import ImportExportModelAdmin
 from base.resources import ProductResource
 from arabic_reshaper import reshape
@@ -99,32 +98,35 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         user_type = UserType.objects.get(user_type='عميل')
         queryset.update(is_accepted=True, user_type=user_type)
         user = queryset.get(is_active=True)
-        rand_num = random.randint(1,10000)
-        client = Client.objects.create(
+        client,created = Client.objects.get_or_create(
             name=user.username,
             address = "syria/homs",
             phonenumber = user.phonenumber,
             location = user.location
         )
-        code_verivecation = random.randint(1000,9999)
+        cart,created = Cart.objects.get_or_create(customer=client)
+        chat,created = Chat.objects.get_or_create(user=user)
+
+        # rand_num = random.randint(1,10000)
+        # code_verivecation = random.randint(1000,9999)
         # email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
-        data= {'to_email':user.email, 'email_subject':'Verify your email','username':user.username, 'code': str(code_verivecation)}
-        Utlil.send_email(data)
-        serializer = CodeVerivecationSerializer(data ={
-                'user':user.id,
-                'code':code_verivecation,
-                'expires_at' : timezone.now() + timedelta(minutes=10)
-            })
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        cart = Cart.objects.create(customer=client)
-        cart.save()
+        # data= {'to_email':user.email, 'email_subject':'Verify your email','username':user.username, 'code': str(code_verivecation)}
+        # Utlil.send_email(data)
+        # serializer = CodeVerivecationSerializer(data ={
+        #         'user':user.id,
+        #         'code':code_verivecation,
+        #         'expires_at' : timezone.now() + timedelta(minutes=10)
+        #     })
+        # serializer.is_valid(raise_exception=True)
+        # serializer.save()
+        # cart.save()
+
 
     def Refusal_User(self, request, queryset):
         user = queryset.get(is_accepted=False)
         # email_body = 'Hi '+user.username+' نعتذر منك لقد تم رفض حسابك لأن موقعك بعيد ولا يمكن توصيل طلبات إليه \n'
-        data = {'to_email':user.email, 'email_subject':'Account Refused','username':user.username}
-        Utlil.send_email2(data)
+        # data = {'to_email':user.email, 'email_subject':'Account Refused','username':user.username}
+        # Utlil.send_email2(data)
         user.delete()
 
     fieldsets = (
@@ -135,7 +137,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
                 {'fields':('username', 'first_name', 'last_name','image','location')}
             ),
             ('Permissions', 
-                {'fields':('is_verified', 'is_accepted', 'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type')}
+                {'fields':('is_verified', 'is_accepted', 'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type','address','state','town','store_name','work_hours')}
             ),
             ('Registration', 
                 {'fields':('date_joined', 'last_login',)}
@@ -169,7 +171,7 @@ class ClientAdmin(LeafletGeoAdmin):
     ordering = ['-id']
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'get_client_name','products_num' ,'total' ,'total_points', 'delivery_date', 'delivered']
+    list_display = ['id', 'get_client_name','products_num' ,'total_price','shipping_cost','total' ,'total_points', 'delivery_date', 'delivered']
     search_fields = ['client__name',]
     list_filter = ['delivered']
 
@@ -196,7 +198,7 @@ class ProductAdmin(ImportExportModelAdmin):
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display= ['id','name']
+    list_display= ['id','name','product_type']
 
 
 class ProductTypeAdmin(admin.ModelAdmin):
@@ -271,16 +273,13 @@ class IncomingProductAdmin(admin.ModelAdmin):
 
 
 class IncomingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount','number','get_day' ,'date']
+    list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date','freeze']
     search_fields = ['supplier__name', 'employee__name']
     def get_name_supplier(self, obj):
         return obj.supplier.name
     
     def get_name_employee(self, obj):
         return obj.employee.name
-    
-    def get_day(self, obj):
-        return obj.day.day
     
     get_name_employee.short_descreption = 'employee'
     get_name_supplier.short_descreption = 'supplier'
@@ -297,7 +296,7 @@ class ManualReceiptProductAdmin(admin.ModelAdmin):
         return obj.manualreceipt.id
 
 class ManualReceiptAdmin(admin.ModelAdmin):
-    list_display = ['id', 'client', 'employee', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
+    list_display = ['id', 'client', 'employee', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
 
     class Meta:
@@ -306,7 +305,7 @@ class ManualReceiptAdmin(admin.ModelAdmin):
 
 
 class OutputsproductAdmin(LeafletGeoAdmin):
-    list_display = ['id', 'client', 'employee', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date']
+    list_display = ['id', 'client', 'employee', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
 
 
@@ -501,9 +500,7 @@ admin.site.register(ProductType,ProductTypeAdmin)
 admin.site.register(Cart, CartAdmin)
 admin.site.register(Cart_Products, CartProductsAdmin)
 
-admin.site.register(Notifications) 
+admin.site.register(UserNotification) 
 
 admin.site.register(Chat)
-admin.site.register(Message)
-
-admin.site.register(Day)
+admin.site.register(ChatMessage)

@@ -5,8 +5,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
 from django.db.models import Q , Sum , F
 from deep_translator import GoogleTranslator
-import pytz
-from datetime import datetime
+
 
 ############################################################## AUTHENTICATION ###################################################
 
@@ -30,7 +29,7 @@ class DateOnlyField(serializers.DateTimeField):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'username', 'phonenumber', 'password', 'image']
+        fields = ['id', 'username', 'phonenumber', 'address','password', 'image']
 
 
 class UpdateUserSerializer(serializers.ModelSerializer):
@@ -47,18 +46,18 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only = True)
+    # phonenumber = serializers.CharField(read_only=True)
 
     def validate(self, data):
         username = data.get('username')
         password = data.get('password')
+
         if username and password:
             user = authenticate(request=self.context.get('request'), username=username, password=password)
             if not user:
                 raise serializers.ValidationError("Incorrect Credentials")
             if not user.is_active:
                 raise serializers.ValidationError({'message_error':'this account is not active'})
-            # if not user.is_verified:
-            #     raise serializers.ValidationError({'message_error':'this account is not verified'})
             if not user.is_accepted:
                 raise serializers.ValidationError({'message_error':'this account is not accepted'})
         else:
@@ -115,7 +114,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 class SerializerNotification(serializers.ModelSerializer):
     class Meta:
-        model = Notifications
+        model = UserNotification
         fields = '__all__'
     def to_representation(self, instance):
         reper = super().to_representation(instance)
@@ -137,39 +136,32 @@ class UserLogoutSerializer(serializers.Serializer):
 
 
 
-class ResetPasswordSerializer(serializers.ModelSerializer):
-
-    newpassword = serializers.CharField(style={"input_type":"password"}, write_only=True)
-    class Meta:
-        model = CustomUser
-        fields = ['password', 'newpassword']
-
-        extra_kwargs = {
-            'password':{'write_only':True,}
-        }
+class ResetPasswordSerializer(serializers.Serializer):
+    newpassword = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
         password = attrs.get('password', '')
         newpassword = attrs.get('newpassword', '')
         validate_password(password)
         validate_password(newpassword)
-        
         if password != newpassword:
-            raise serializers.ValidationError({'message_error':'The password and newpassword didnt matched.'})
+            raise serializers.ValidationError({'message_error':'كلمات المرور لم تتطابق'})
         
         return attrs
     
-    # def save(self, **kwargs):
-    #     user_id = self.context.get('user_id')
-    #     user = CustomUser.objects.get(id=user_id)
-    #     password = self.validated_data['password']
-    #     print(password)
-    #     print(user)
-    #     user.set_password(password)
-    #     user.save()
-    #     return user
+
+    def save(self, **kwargs):
+        user_id = self.context.get('user_id')
+        user = CustomUser.objects.get(id=user_id)
+        password = self.validated_data['newpassword']
+        user.set_password(password)
+        user.is_verified=False
+        user.save()
+        return user
 
 
+### delete
 class CodeVerivecationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CodeVerification
@@ -211,10 +203,12 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ClientSerializer(serializers.ModelSerializer):
     total_points = serializers.SerializerMethodField()
+    total_receipts = serializers.SerializerMethodField()
     phonenumber = serializers.CharField()
+    # phonenumber2
     class Meta:
         model = Client
-        fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points','debts']
+        fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points','debts','total_receipts']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -246,6 +240,12 @@ class ClientSerializer(serializers.ModelSerializer):
     
     def get_total_points(self,obj):
         total = Points.objects.filter(Q(client=obj)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).aggregate(total_points=models.Sum('number'))['total_points'] or 0
+        return total
+    
+    def get_total_receipts(self,obj):
+        manuals = ManualReceipt.objects.filter(client=obj).count()
+        outputs = Output.objects.filter(client=obj).count()
+        total = manuals + outputs
         return total
 
 
@@ -385,6 +385,7 @@ class Client_DetailsSerializer(serializers.ModelSerializer):
 class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
     total_points = serializers.IntegerField(source='cart.total_cart_points',read_only=True)
     total_price = serializers.FloatField(source='cart.total_cart_price',read_only=True)
+    barcode = serializers.CharField(source='cart.barcode',read_only=True)
     item_per_carton = serializers.IntegerField(source='products.item_per_carton',read_only=True)
     sale_price = serializers.FloatField(source='products.sale_price',read_only=True)
     product_name = serializers.CharField(source='products.name',read_only=True)
@@ -393,7 +394,7 @@ class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
 
     class Meta:
         model = Cart_Products
-        fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points']
+        fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points','barcode']
 
 
 
@@ -437,12 +438,15 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderProductsSerializer2(serializers.ModelSerializer):
     image = serializers.ImageField(source='product.image')
-    name = serializers.CharField(source='product.name', read_only=True)
     price = serializers.FloatField(source='product.sale_price',read_only=True)
     description = serializers.CharField(source='product.description')
+    points = serializers.IntegerField(source='product.points',read_only=True)
+    product_name = serializers.CharField(source='product.name',read_only=True)
+    num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
+
     class Meta:
         model = Order_Product
-        fields = ['product','name', 'order','quantity','price','total_price','image','description']
+        fields = ['product_name','order','quantity','price','num_per_item','total_price','image','description','points']
 
 
 
@@ -457,16 +461,16 @@ class OrderSerializer2(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'client_id','address','name','phonenumber','products','total','products_num','total_points','created','longitude','latitude', 'barcode']
+        fields = ['id','client_id','address','name','phonenumber','client_service','products','total_price','shipping_cost','total','total_points','products_num','created','longitude','latitude','barcode']
 
     def get_longitude(self, obj):
         return obj.client.location.x or 0
 
     def get_latitude(self, obj):
         return obj.client.location.y or 0
-    
-    # def to_representation(self, instance):
-    #     reper = super().to_representation(instance)
+
+
+
 
 class SimpleOrderSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id')
@@ -1616,7 +1620,7 @@ class IncomingSerializer2(serializers.ModelSerializer):
     total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = Incoming
-        fields = ['id','supplier','employee','total_receipt','supplier_phone','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','supplier','employee','total_receipt','supplier_phone','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
     
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
@@ -1636,51 +1640,44 @@ class IncomingSerializer2(serializers.ModelSerializer):
 class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Incoming
-        exclude = ['employee', 'day', 'number']
+        exclude = ['employee']
         
-    # def is_valid(self, raise_exception=False):
-    #     is_valid = super().is_valid(raise_exception=False)
-    #     if self._errors:
-    #         first_error_field = next(iter(self._errors))
-    #         first_error_message = self._errors[first_error_field][0]
-    #         if first_error_message == "This field is required.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"{translation} مطلوب"
-    #         elif first_error_message == "This field may not be blank.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
-    #         elif first_error_message == "A valid number is required.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"رقم صالح مطلوب لـ {translation}"
-    #         elif first_error_message == "A valid integer is required.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
-    #         elif first_error_message == "This field may not be null.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
-    #         elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"يرجى اختيار قيمة لـ {translation}"
-    #         self._errors = {"error": first_error_message}
-    #         if raise_exception:
-    #             raise serializers.ValidationError(self._errors)
-    #     return not bool(self._errors)
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
+            elif first_error_message == "This field may not be blank.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+            elif first_error_message == "A valid number is required.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
+            elif first_error_message == "A valid integer is required.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
+            elif first_error_message == "This field may not be null.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+
 
     def create(self, validated_data):
-        number = 0
-        time = pytz.timezone('Asia/Damascus')
-        day_now = datetime.now(time).day
-        day_number, created = Day.objects.get_or_create(day=day_now)
-        if created:
-            number = 1
-        else:
-            number = day_number.days.all().count() + 1
         request = self.context.get('request')
         supplier_data = validated_data.pop('supplier', None)
         remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         supplier = Supplier.objects.get(id=supplier_data.id)
-        instance = Incoming.objects.create(employee=employee, supplier=supplier,remaining_amount=remaining_amount, day=day_number, number=number, **validated_data)
+        instance = Incoming.objects.create(employee=employee, supplier=supplier,remaining_amount=remaining_amount ,**validated_data)
         supplier.debts += remaining_amount
         supplier.save()
         return instance
@@ -1713,7 +1710,6 @@ class IncomingSerializer(serializers.ModelSerializer):
 
 
 class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
-    # product = serializers.IntegerField()
     name = serializers.CharField(source='product.name',read_only=True)
     num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
     sale_price = serializers.FloatField(source='price')
@@ -1855,7 +1851,7 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
     client_points = serializers.SerializerMethodField()
     class Meta:
         model = ManualReceipt
-        fields = ['id','client','client_phone','client_points','total_receipt','employee','phonenumber','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products']
+        fields = ['id','client','client_phone','client_points','total_receipt','employee','client_service','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
 
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
@@ -1886,7 +1882,7 @@ class OutputSerializer(serializers.ModelSerializer):
     address = serializers.CharField(source='client.address',read_only=True)
     class Meta:
         model = Output
-        fields = ['id','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered']
+        fields = ['id','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered','freeze']
 
 
 class ProductsOutputSerializer2(serializers.ModelSerializer):
@@ -2173,5 +2169,5 @@ class ChatSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Message
+        model = ChatMessage
         fields = '__all__'
