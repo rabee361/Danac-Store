@@ -40,7 +40,7 @@ urlpatterns = [
     path('expired-points/', ExpiredClientPointsView.as_view(), name='expired-points'),
     path('points/', ClientPointsView.as_view(), name='client-points'),
     
-    path('get-category-product-type/<str:product_type_id>/', ListCategoryProductType.as_view()),
+    path('get-category-product-type/<str:product_type_id>/', ListCategoryProductType.as_view()), ### new
     path('products/' , listCreateProducts.as_view() , name="products"),
     path('special-products/' , SpecialProducts.as_view() , name="special-products"),
     path('ads/' , ListAds.as_view() , name="list-ads"),

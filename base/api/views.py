@@ -326,6 +326,7 @@ class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
+#### new
 class ListCategoryProductType(ListAPIView):
     serializer_class = CategorySerializer2
 
