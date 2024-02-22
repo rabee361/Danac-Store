@@ -117,7 +117,8 @@ class Client(models.Model):
     )
 
     name = models.CharField(max_length=30)
-    address = models.CharField(max_length=100)
+    address = models.CharField(max_length=100 , null=True)
+    store_name = models.CharField(max_length=100 , null=True)
     phonenumber = PhoneNumberField(region='DZ')
     # phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
     category = models.CharField(max_length=75,choices=CHOICES)
@@ -902,7 +903,6 @@ class Incoming(models.Model):
     def __str__(self):
         return str(self.id)
         
-
 
 class FrozenIncomingReceipts(models.Model):
     receipt = models.ForeignKey(Incoming,on_delete=models.CASCADE)

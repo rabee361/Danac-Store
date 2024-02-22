@@ -992,8 +992,12 @@ class FreezeOutputReceipt(APIView):
     def post(self,request,receipt_id):
         try:
             receipt = Output.objects.get(id=receipt_id)
+            reason = request.data['reason']
             receipt.freeze = True
             receipt.save()
+            freeze_receipt,created = FrozenOutputReceipts.objects.get_or_create(receipt=receipt)
+            freeze_receipt.reason = reason
+            freeze_receipt.save()
             return Response({
                 "msg":"receipt freezed"
             })
@@ -1261,15 +1265,19 @@ class CreateIncomingProduct(CreateAPIView):
 
 class FreezeIncomingReceipt(APIView):
     def post(self,request,receipt_id):
-        try:
-            receipt = Incoming.objects.get(id=receipt_id)
-            receipt.freeze = True
-            receipt.save()
-            return Response({
-                "msg":"receipt freezed"
-            })
-        except:
-            raise Incoming.DoesNotExist
+        # try:
+        receipt = Incoming.objects.get(id=receipt_id)
+        reason = request.data['reason']
+        receipt.freeze = True
+        receipt.save()
+        freeze_receipt,created = FrozenIncomingReceipts.objects.get_or_create(receipt=receipt)
+        freeze_receipt.reason = reason
+        freeze_receipt.save()
+        return Response({
+            "msg":"receipt freezed"
+        })
+        # except:
+        #     raise Incoming.DoesNotExist
         
 
 ############################### MANUAL RECEIPT #####################################################
@@ -1366,18 +1374,19 @@ class CreateManualProduct(CreateAPIView):
 
 class FreezeManualReceipt(APIView):
     def post(self,request,receipt_id):
-        try:
-            receipt = ManualReceipt.objects.get(id=receipt_id)
-            reason = request.data['reason']
-            receipt.freeze = True
-            receipt.save()
-            freeze_receipt = FrozenManualReceipts.objects.create(receipt=receipt,reason=reason)
-            freeze_receipt.save()
-            return Response({
-                "msg":"receipt freezed"
-            })
-        except:
-            raise ManualReceipt.DoesNotExist
+        # try:
+        receipt = ManualReceipt.objects.get(id=receipt_id)
+        reason = request.data['reason']
+        receipt.freeze = True
+        receipt.save()
+        freeze_receipt,created = FrozenManualReceipts.objects.get_or_create(receipt=receipt)
+        freeze_receipt.reason = reason
+        freeze_receipt.save()
+        return Response({
+            "msg":"receipt freezed"
+        })
+        # except:
+        #     raise ManualReceipt.DoesNotExist
 
 ########################## MEDIUM 2 #######################################################################################
 

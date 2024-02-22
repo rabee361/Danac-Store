@@ -100,10 +100,11 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         user = queryset.get(is_active=True)
         client,created = Client.objects.get_or_create(
             name=user.username,
-            address = "syria/homs",
             phonenumber = user.phonenumber,
             location = user.location
         )
+        client.address = f'{user.state}-{user.town}-{user.address}'
+        client.save()
         cart,created = Cart.objects.get_or_create(customer=client)
         chat,created = Chat.objects.get_or_create(user=user)
 
@@ -328,7 +329,7 @@ class OutputsproductAdmin(LeafletGeoAdmin):
     readonly_fields = ['serial']
 
 
-class FreezeOuyputAdmin(admin.ModelAdmin):
+class FreezeOutputAdmin(admin.ModelAdmin):
     list_display = ['receipt','reason']
     class Meta:
         app_label = 'Receipts'
@@ -497,12 +498,14 @@ admin.site.register(MediumTwo,MediumTwoAdmin)
 admin.site.register(MediumTwo_Products,MediumTwo_ProductsAdmin)
 
 #### Rceipts ###
-admin.site.register(Incoming_Product, IncomingProductAdmin)
 admin.site.register(Incoming, IncomingAdmin)
-admin.site.register(ManualReceipt_Products, ManualReceiptProductAdmin)
+admin.site.register(FrozenIncomingReceipts , FreezeIncomingAdmin)
+admin.site.register(Incoming_Product, IncomingProductAdmin)
 admin.site.register(ManualReceipt, ManualReceiptAdmin)
 admin.site.register(FrozenManualReceipts , FreezeManualAdmin)
+admin.site.register(ManualReceipt_Products, ManualReceiptProductAdmin)
 admin.site.register(Output, OutputsproductAdmin)
+admin.site.register(FrozenOutputReceipts , FreezeOutputAdmin)
 admin.site.register(Output_Products, OutputProductAdmin)
 admin.site.register(DelievaryArrived, DElevaryArrivedAdmin)
 admin.site.register(OrderEnvoy, OrderEnvoyAdmin)
