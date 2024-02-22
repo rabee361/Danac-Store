@@ -73,17 +73,16 @@ class UserLoginApiView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        # user = CustomUser.objects.filter(email = request.data['username']).first()
-        # if not user:
         user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
 
-        chat = Chat.objects.get(user=user)
+        chat = Chat.objects.filter(user=user).first()
+        if chat:
+            data['chat_id'] = chat.id
 
         data = serializer.data
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
-        data['chat_id'] = chat.id
         # data['username'] = user.username
         # data['phonenumber'] = user.phonenumber
         data['address'] = user.address
@@ -333,6 +332,7 @@ class listCreateProducts(ListCreateAPIView):
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
+
 
 
 class SpecialProducts(APIView):
@@ -995,7 +995,7 @@ class FreezeOutputReceipt(APIView):
             reason = request.data['reason']
             receipt.freeze = True
             receipt.save()
-            freeze_receipt,created = FrozenOutputReceipts.objects.get_or_create(receipt=receipt)
+            freeze_receipt,created = FrozenOutputReceipt.objects.get_or_create(receipt=receipt)
             freeze_receipt.reason = reason
             freeze_receipt.save()
             return Response({
@@ -1270,7 +1270,7 @@ class FreezeIncomingReceipt(APIView):
         reason = request.data['reason']
         receipt.freeze = True
         receipt.save()
-        freeze_receipt,created = FrozenIncomingReceipts.objects.get_or_create(receipt=receipt)
+        freeze_receipt,created = FrozenIncomingReceipt.objects.get_or_create(receipt=receipt)
         freeze_receipt.reason = reason
         freeze_receipt.save()
         return Response({
@@ -1379,7 +1379,7 @@ class FreezeManualReceipt(APIView):
         reason = request.data['reason']
         receipt.freeze = True
         receipt.save()
-        freeze_receipt,created = FrozenManualReceipts.objects.get_or_create(receipt=receipt)
+        freeze_receipt,created = FrozenManualReceipt.objects.get_or_create(receipt=receipt)
         freeze_receipt.reason = reason
         freeze_receipt.save()
         return Response({
@@ -1498,5 +1498,10 @@ class ChatMessages(APIView):
 class Chats(APIView):
     def get(self,request):
         chats = Chat.objects.all()
-        serializer = ChatSerializer(chats,many=True)
+        serializer = ChatSerializer(chats,many=True, context={'request': request})
         return Response(serializer.data)
+    
+
+class GetChat(RetrieveAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer

@@ -904,7 +904,7 @@ class Incoming(models.Model):
         return str(self.id)
         
 
-class FrozenIncomingReceipts(models.Model):
+class FrozenIncomingReceipt(models.Model):
     receipt = models.ForeignKey(Incoming,on_delete=models.CASCADE)
     reason = models.TextField()
 
@@ -969,7 +969,7 @@ class Output(models.Model):
 
 
 
-class FrozenOutputReceipts(models.Model):
+class FrozenOutputReceipt(models.Model):
     receipt = models.ForeignKey(Output,on_delete=models.CASCADE)
     reason = models.TextField()
 
@@ -1060,7 +1060,7 @@ class ManualReceipt(models.Model):
     
 
 
-class FrozenManualReceipts(models.Model):
+class FrozenManualReceipt(models.Model):
     receipt = models.ForeignKey(ManualReceipt,on_delete=models.CASCADE)
     reason = models.TextField()
 

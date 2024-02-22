@@ -302,7 +302,7 @@ class ProductSerializer(serializers.ModelSerializer):
                 category = Category.objects.get(name=category_name)
                 validated_data['category'] = category
             except Category.DoesNotExist:
-                raise serializers.ValidationError({"category": "Object with name does not exist."})
+                raise serializers.ValidationError({"category": "Object with this name does not exist."})
         return super(ProductSerializer, self).update(instance, validated_data)
 
 
@@ -2167,9 +2167,18 @@ class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
 
 
 class ChatSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    username = serializers.CharField(source='user.username',read_only=True)
+
     class Meta:
         model = Chat
         fields = '__all__'
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.user.image:
+            return request.build_absolute_uri(obj.user.image.url)
+        return None
 
 
 
