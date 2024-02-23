@@ -1688,6 +1688,13 @@ class IncomingSerializer2(serializers.ModelSerializer):
 
 
 
+class FrozenIncomingReceiptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FrozenIncomingReceipt
+        fields = '__all__'
+
+
+
 class IncomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Incoming
@@ -1926,6 +1933,14 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
         repr['client'] = instance.client.name
         return repr
 
+
+
+
+class FrozenManualReceiptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FrozenManualReceipt
+        fields = '__all__'
+
 ########################################## OUTPUT ##############################################
         
 class OutputSerializer(serializers.ModelSerializer):
@@ -2108,6 +2123,16 @@ class OutputSerializer2(serializers.ModelSerializer):
         repr['client'] = instance.client.name
         repr['employee'] = instance.employee.name
         return repr
+
+
+
+
+
+class FrozenOutputReceiptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FrozenOutputReceipt
+        fields = '__all__'
+
 
 ##########################################
 

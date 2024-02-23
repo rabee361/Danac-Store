@@ -1104,6 +1104,12 @@ class ListOutputs(ListAPIView):
         return {'show_datetime': False}
 
 
+class ListFrozenOutputReceipts(ListAPIView):
+    queryset = FrozenOutputReceipt.objects.all()
+    serializer_class = FrozenOutputReceiptSerializer
+
+
+
 class UpdateOutputReceipt(RetrieveUpdateDestroyAPIView):
     queryset = Output.objects.all()
     serializer_class = OutputSerializer2
@@ -1318,6 +1324,13 @@ class ListIncomings(ListAPIView):
         return {'show_datetime': False}
 
 
+
+class ListFrozenIncomingReceipts(ListAPIView):
+    queryset = FrozenIncomingReceipt.objects.all()
+    serializer_class = FrozenIncomingReceiptSerializer
+
+
+
 class UpdateIncomingReceipt(RetrieveUpdateDestroyAPIView):
     queryset = Incoming.objects.all()
     serializer_class = IncomingSerializer
@@ -1449,6 +1462,11 @@ class ListManualReceipt(ListAPIView):
 
     def get_serializer_context(self):
         return {'show_datetime': False}
+
+
+class ListFrozenManualReceipts(ListAPIView):
+    queryset = FrozenManualReceipt.objects.all()
+    serializer_class = FrozenManualReceiptSerializer
 
 
 class UpdateManualReceipt(RetrieveUpdateDestroyAPIView):
