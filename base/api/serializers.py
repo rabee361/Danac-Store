@@ -1495,7 +1495,10 @@ class DamagedProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = DamagedProduct
         fields  = ['id','product','quantity','total_price', 'employee','product_id', 'package_id']
-
+        # exclude = ['employee'
+        extra_kwargs = {
+            'employee':{'read_only':True,}
+        }
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
         if self._errors:
@@ -1552,7 +1555,6 @@ class DamagedProductSerializer(serializers.ModelSerializer):
         representation['employee'] = instance.employee.name
         return representation
 
-    
 class ReturnedDamagedPackageSerializer(serializers.ModelSerializer):
     goods = DamagedProductSerializer(many=True, read_only=True)
 

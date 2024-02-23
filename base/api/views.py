@@ -956,8 +956,12 @@ class ListCreateDamagedProduct(ListCreateAPIView):
     filterset_class = DamagedProductFilter
     queryset = DamagedProduct.objects.all()
     serializer_class = DamagedProductSerializer    
-    # permission_classes = [permissions.IsAuthenticated]    
+    permission_classes = [permissions.IsAuthenticated]    
 
+    def perform_create(self, serializer):
+        user = self.request.user
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        serializer.save(employee=employee)
 
 class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
     queryset = DamagedProduct.objects.all()
