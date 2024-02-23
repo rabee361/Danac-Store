@@ -905,8 +905,8 @@ class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
 
 
 class ListReturnedClientPackages(ListCreateAPIView):
-    queryset = ReturnedSupplierPackage.objects.all()
-    serializer_class = ReturnedSupplierPackageSerializer
+    queryset = ReturnedClientPackage.objects.all()
+    serializer_class = ReturnedClientPackageSerializer
 
 
 class RetReturnedClientPackages(RetrieveAPIView):

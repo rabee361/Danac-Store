@@ -1405,7 +1405,7 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
 
 
 class ReturnedClientPackageSerializer(serializers.ModelSerializer):
-    goods = ReturnedGoodsClientSerializer(many=True)
+    goods = ReturnedGoodsClientSerializer(many=True,read_only=True)
     class Meta:
         model = ReturnedClientPackage
         fields = '__all__'
@@ -1483,7 +1483,7 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
 
 ###### new
 class ReturnedSupplierPackageSerializer(serializers.ModelSerializer):
-    goods = ReturnedGoodsSupplierSerializer(many=True)
+    goods = ReturnedGoodsSupplierSerializer(many=True,read_only=True)
     class Meta:
         model = ReturnedSupplierPackage
         fields = '__all__'
