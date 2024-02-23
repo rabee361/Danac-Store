@@ -896,22 +896,35 @@ class ListCreateRetGoodsSupplier(ListCreateAPIView):
     filterset_class = ReturnedGoodsSupplierFilter
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
-    # permission_classes = [permissions.IsAuthenticated]    
+    # permission_classes = [permissions.IsAuthenticated]
+    # def get()   
 
-# class CreateReturnedGoodsSupplier(CreateAPIView):
-#     def post(self, request, pk):
-#         returned_good = ReturnedGoods.objects.get(id=pk)
-#         serializer = ReturnedGoodsSupplierSerializer(data=request.data, context={'returned_good':returned_good}
-#         )
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CreateReturnedGoodsSupplier(CreateAPIView):
+    def post(self, request, pk):
+        returned_good = ReturnedGoods.objects.get(id=pk)
+        serializer = ReturnedGoodsSupplierSerializer(data=request.data, context={'returned_good':returned_good}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
     # permission_classes = [permissions.IsAuthenticated]    
+
+
+
+
+class ListReturnedClientPackages(ListCreateAPIView):
+    queryset = ReturnedClientPackage.objects.all()
+    serializer_class = ReturnedClientPackageSerializer
+
+
+class RetReturnedClientPackages(RetrieveAPIView):
+    queryset = ReturnedClientPackage.objects.all()
+    serializer_class = ReturnedClientPackageSerializer
 
 
 class ListCreateRetGoodsClient(ListCreateAPIView):
@@ -927,6 +940,15 @@ class RetUpdDesReturnGoodClient(RetrieveUpdateDestroyAPIView):
     queryset = ReturnedGoodsClient.objects.all()
     serializer_class = ReturnedGoodsClientSerializer
     # permission_classes = [permissions.IsAuthenticated]
+
+
+class ListCreateDamagedProductPackage(ListCreateAPIView):
+    queryset = ReturnedDamagedPackage.objects.all()
+    serializer_class = ReturnedDamagedPackageSerializer
+
+class RetDamagedProductPackage(RetrieveUpdateDestroyAPIView):
+    queryset = ReturnedDamagedPackage.objects.all()
+    serializer_class = ReturnedDamagedPackageSerializer
 
 
 class ListCreateDamagedProduct(ListCreateAPIView):

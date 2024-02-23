@@ -105,9 +105,14 @@ urlpatterns = [
 
     path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),#####
     path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
+
+    path('returned-client-package/',ListReturnedClientPackages.as_view()),##### new
+    path('get-package-client/<str:pk>/',RetReturnedClientPackages.as_view()),#### new
     path('returned-goods-client/', ListCreateRetGoodsClient.as_view()),
     path('get-returned-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
 
+    path('damaged-product-package/',ListCreateDamagedProductPackage.as_view()),##### new
+    path('get-package-damaged/<str:pk>/',RetDamagedProductPackage.as_view()),#### new
     path('damaged-product/', ListCreateDamagedProduct.as_view()),
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
 
@@ -161,5 +166,5 @@ urlpatterns = [
     ##### new
     path('returned-goods/', ListCreateReturnedGoods.as_view()),
     path('return-good/<str:pk>/', RetReturnedGoods.as_view()),
-    # path('create-returned-goods-supplier/<str:pk>/', CreateReturnedGoodsSupplier.as_view()),
+    path('create-returned-goods-supplier/<str:pk>/', CreateReturnedGoodsSupplier.as_view()),
     ]

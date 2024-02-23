@@ -251,10 +251,11 @@ class ReturnedGoodsSupplierFilter(django_filters.FilterSet):
     supplier_name = django_filters.CharFilter(field_name='supplier__name',lookup_expr='startswith')
     product_name = django_filters.CharFilter(field_name='product__name',lookup_expr='startswith')
     employee_name = django_filters.CharFilter(field_name='employee_name' , lookup_expr='startswith')
+    returned_goods = django_filters.CharFilter(field_name='returned_goods', lookup_expr="exact")
     
     class Meta:
         model = ReturnedGoodsSupplier
-        fields = ['product_name','supplier_name','employee_name']
+        fields = ['product_name','supplier_name','employee_name', 'returned_goods']
 
 
 
@@ -284,10 +285,11 @@ class OutputFilter(django_filters.FilterSet):
 class ManualFilter(django_filters.FilterSet):
     client_name = django_filters.CharFilter(field_name='client__name', lookup_expr='startswith')
     employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    date_range = DateRangeFilter(field_name="date")
 
     class Meta:
         model = ManualReceipt
-        fields = ['client_name', 'employee_name', 'id','freeze']
+        fields = ['client_name', 'employee_name', 'id','freeze', 'date_range']
 
 
 class OrderFilter(django_filters.FilterSet):

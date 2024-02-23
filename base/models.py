@@ -803,12 +803,18 @@ class ReturnedGoodsClient(models.Model):
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
 
+class ReturnedClientPackage(models.Model):
+    goods = models.ManyToManyField(ReturnedGoodsClient)
+    date = models.DateField(auto_now_add=True,null=True)
+
+
+
 
 class DamagedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
-    date = models.DateField(auto_now_add=True)
 
     class Meta:
         ordering = ['-id']
@@ -817,10 +823,14 @@ class DamagedProduct(models.Model):
         return self.product.name
     
 
+class ReturnedDamagedPackage(models.Model):
+    goods = models.ManyToManyField(DamagedProduct)
+    date = models.DateField(auto_now_add=True)
 
 #########################################-------- Medium & Medium 2---------###########################################################
 
 class Medium(models.Model):
+
     products = models.ManyToManyField(Product, through='Products_Medium')
 
     def __str__(self) -> str:
