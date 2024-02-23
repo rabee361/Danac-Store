@@ -907,7 +907,7 @@ class Incoming(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
     freeze = models.BooleanField(default=False)
-    # adjustment_applied = models.BooleanField(default=False) 
+    adjustment_applied = models.BooleanField(default=False) 
 
 
     class Meta:
@@ -933,25 +933,25 @@ class FrozenIncomingReceipt(models.Model):
     def __str__(self):
         return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
     
-    # def save(self, *args, **kwargs):
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
-    #     if not self.receipt.adjustment_applied:
-    #         if self.receipt.freeze:
-    #             self.adjust_product_quantities(True)
-    #         else:
-    #             self.adjust_product_quantities(False)
-    #         self.receipt.adjustment_applied = True
-    #         self.receipt.save()
+        if not self.receipt.adjustment_applied:
+            if self.receipt.freeze:
+                self.adjust_product_quantities(True)
+            else:
+                self.adjust_product_quantities(False)
+            self.receipt.adjustment_applied = True
+            self.receipt.save()
 
-    # def adjust_product_quantities(self, freeze):
-    #     for receipt_product in self.receipt.manualreceipt_products_set.all():
-    #         product = receipt_product.product
-    #         if freeze:
-    #             product.quantity -= receipt_product.num_item
-    #         else:
-    #             product.quantity += receipt_product.num_item
-    #         product.save()
+    def adjust_product_quantities(self, freeze):
+        for receipt_product in self.receipt.incoming_product_set.all():
+            product = receipt_product.product
+            if freeze:
+                product.quantity += receipt_product.num_item
+            else:
+                product.quantity -= receipt_product.num_item
+            product.save()
 
 
 
@@ -993,7 +993,7 @@ class Output(models.Model):
     location = models.PointField(default=Point(0.0,0.0))
     delivered = models.BooleanField(default=False)
     freeze = models.BooleanField(default=False)
-    # adjustment_applied = models.BooleanField(default=False) 
+    adjustment_applied = models.BooleanField(default=False) 
 
     class Meta:
         ordering = ['-date']
@@ -1020,25 +1020,25 @@ class FrozenOutputReceipt(models.Model):
     def __str__(self):
         return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
 
-    # def save(self, *args, **kwargs):
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
-    #     if not self.receipt.adjustment_applied:
-    #         if self.receipt.freeze:
-    #             self.adjust_product_quantities(True)
-    #         else:
-    #             self.adjust_product_quantities(False)
-    #         self.receipt.adjustment_applied = True
-    #         self.receipt.save()
+        if not self.receipt.adjustment_applied:
+            if self.receipt.freeze:
+                self.adjust_product_quantities(True)
+            else:
+                self.adjust_product_quantities(False)
+            self.receipt.adjustment_applied = True
+            self.receipt.save()
 
-    # def adjust_product_quantities(self, freeze):
-    #     for receipt_product in self.receipt.manualreceipt_products_set.all():
-    #         product = receipt_product.product
-    #         if freeze:
-    #             product.quantity -= receipt_product.num_item
-    #         else:
-    #             product.quantity += receipt_product.num_item
-    #         product.save()
+    def adjust_product_quantities(self, freeze):
+        for receipt_product in self.receipt.manualreceipt_products_set.all():
+            product = receipt_product.product
+            if freeze:
+                product.quantity -= receipt_product.num_item
+            else:
+                product.quantity += receipt_product.num_item
+            product.save()
 
 
 
