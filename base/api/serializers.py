@@ -1384,12 +1384,16 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
         return instance
     
     def create(self, validated_data):
+        package_id = validated_data.pop('package_id')#####
         instance = super().create(validated_data)
         product = instance.product
         product.quantity -= instance.quantity
         product.save()
-
+        package = ReturnedClientPackage.objects.get(id=package_id)####
+        package.goods.add(instance)####
+        package.save()#####
         return instance
+    
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['product'] = instance.product.name
@@ -1399,13 +1403,24 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
 
 
 
+
+class ReturnedClientPackageSerializer(serializers.ModelSerializer):
+    goods = ReturnedGoodsClientSerializer(many=True)
+    class Meta:
+        model = ReturnedClientPackage
+        fields = '__all__'
+
+
+
+
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
     employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all())
+    package_id = serializers.CharField(write_only=True)#####
     class Meta:
         model = ReturnedGoodsSupplier
-        fields = ['id', 'supplier', 'product', 'employee', 'quantity', 'total_price', 'reason', 'date']
+        fields = ['id', 'supplier', 'product', 'employee', 'quantity', 'total_price', 'reason','package_id']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1446,18 +1461,32 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
         return instance
     
     def create(self, validated_data):
+        package_id = validated_data.pop('package_id')#####
         instance = super().create(validated_data)
         product = instance.product
         product.quantity -= instance.quantity
         product.save()
+        package = ReturnedSupplierPackage.objects.get(id=package_id)####
+        package.goods.add(instance)####
+        package.save()#####
 
-        return instance    
+        return instance
+    
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['product'] = instance.product.name
         representation['supplier'] = instance.supplier.name
         representation['employee'] = instance.employee.name
         return representation
+
+
+
+###### new
+class ReturnedSupplierPackageSerializer(serializers.ModelSerializer):
+    goods = ReturnedGoodsSupplierSerializer(many=True)
+    class Meta:
+        model = ReturnedSupplierPackage
+        fields = '__all__'
 
     
 ############################################# DAMAGED PRODUCTS #########################################################

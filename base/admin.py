@@ -351,17 +351,18 @@ class DElevaryArrivedAdmin(admin.ModelAdmin):
 
 
 class ReturnedGoodsClientAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'client', 'employee', 'quantity', 'total_price', 'reason', 'date']
+    list_display = ['id', 'name_product', 'client', 'employee', 'quantity', 'total_price', 'reason']
     search_fields = ['client__name']
     def name_product(self, obj):
         return obj.product.name
     
 
 class ReturnedGoodsSupplierAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'supplier', 'employee', 'quantity', 'total_price', 'reason', 'date']
+    list_display = ['id', 'name_product', 'supplier', 'employee', 'quantity', 'total_price', 'reason']
     search_fields = ['supplier__name']
     def name_product(self, obj):
         return obj.product.name
+    
 
 
 class OrderEnvoyAdmin(admin.ModelAdmin):
@@ -488,6 +489,7 @@ admin.site.register(Recieved_Payment,Recieved_PaymentAdmin)
 
 ##### Goods ###
 admin.site.register(ReturnedGoodsClient, ReturnedGoodsClientAdmin)
+admin.site.register(ReturnedSupplierPackage)
 admin.site.register(ReturnedGoodsSupplier, ReturnedGoodsSupplierAdmin)
 admin.site.register(DamagedProduct, DamagedProductAdmin)
 

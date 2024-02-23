@@ -1,3 +1,4 @@
+from django.db import models, IntegrityError
 from django.contrib.gis.db import models
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
@@ -38,15 +39,15 @@ class UserType(models.Model):
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length=50, unique=True,null=True,blank=True)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
-    work_hours = models.CharField(max_length=100)
-    store_name = models.CharField(max_length=100)
+    work_hours = models.CharField(max_length=100,null=True,blank=True)
+    store_name = models.CharField(max_length=100,null=True,blank=True)
     state = models.CharField(max_length=50 , null=True)
     town = models.CharField(max_length=100 , null=True)
     address = models.CharField(max_length=100 , null=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True,default='images/account.jpg')
-    location = models.PointField(default=Point(0,0))
+    location = models.PointField(default=Point(0,0),null=True,blank=True)
     user_type = models.ForeignKey(UserType,on_delete=models.CASCADE,null=True)
     is_accepted = models.BooleanField(default=False)
 
@@ -191,6 +192,9 @@ class ProductType(models.Model):
         ordering = ['-id']
         app_label = 'Clients_and_Products'
 
+    def product_types_num(self):
+        return ProductType.objects.count()
+
 
 
 
@@ -206,6 +210,8 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def categories_num(self):
+        return Category.objects.count()
 
 
 class Product(models.Model):
@@ -770,7 +776,6 @@ class ReturnedGoodsSupplier(models.Model):
     quantity = models.IntegerField()
     total_price = models.FloatField()
     reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
-    date = models.DateField(auto_now_add=True)
 
     class Meta:
         ordering = ['-id']
@@ -778,6 +783,12 @@ class ReturnedGoodsSupplier(models.Model):
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
     
+
+class ReturnedSupplierPackage(models.Model):
+    goods = models.ManyToManyField(ReturnedGoodsSupplier)
+    date = models.DateField(auto_now_add=True,null=True)
+
+
     
 class ReturnedGoodsClient(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -786,13 +797,19 @@ class ReturnedGoodsClient(models.Model):
     quantity = models.IntegerField()
     total_price = models.FloatField()
     reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
-    date = models.DateField(auto_now_add=True)
 
     class Meta:
         ordering = ['-id']
 
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
+
+
+
+class ReturnedClientPackage(models.Model):
+    goods = models.ManyToManyField(ReturnedGoodsClient)
+    date = models.DateField(auto_now_add=True,null=True)
+
 
 
 class DamagedProduct(models.Model):
@@ -890,6 +907,8 @@ class Incoming(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
     freeze = models.BooleanField(default=False)
+    # adjustment_applied = models.BooleanField(default=False) 
+
 
     class Meta:
         ordering=['-date']
@@ -913,6 +932,27 @@ class FrozenIncomingReceipt(models.Model):
 
     def __str__(self):
         return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
+    
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+
+    #     if not self.receipt.adjustment_applied:
+    #         if self.receipt.freeze:
+    #             self.adjust_product_quantities(True)
+    #         else:
+    #             self.adjust_product_quantities(False)
+    #         self.receipt.adjustment_applied = True
+    #         self.receipt.save()
+
+    # def adjust_product_quantities(self, freeze):
+    #     for receipt_product in self.receipt.manualreceipt_products_set.all():
+    #         product = receipt_product.product
+    #         if freeze:
+    #             product.quantity -= receipt_product.num_item
+    #         else:
+    #             product.quantity += receipt_product.num_item
+    #         product.save()
+
 
 
 class Incoming_Product(models.Model):
@@ -953,6 +993,7 @@ class Output(models.Model):
     location = models.PointField(default=Point(0.0,0.0))
     delivered = models.BooleanField(default=False)
     freeze = models.BooleanField(default=False)
+    # adjustment_applied = models.BooleanField(default=False) 
 
     class Meta:
         ordering = ['-date']
@@ -978,6 +1019,27 @@ class FrozenOutputReceipt(models.Model):
 
     def __str__(self):
         return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
+
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+
+    #     if not self.receipt.adjustment_applied:
+    #         if self.receipt.freeze:
+    #             self.adjust_product_quantities(True)
+    #         else:
+    #             self.adjust_product_quantities(False)
+    #         self.receipt.adjustment_applied = True
+    #         self.receipt.save()
+
+    # def adjust_product_quantities(self, freeze):
+    #     for receipt_product in self.receipt.manualreceipt_products_set.all():
+    #         product = receipt_product.product
+    #         if freeze:
+    #             product.quantity -= receipt_product.num_item
+    #         else:
+    #             product.quantity += receipt_product.num_item
+    #         product.save()
+
 
 
 class Output_Products(models.Model):
@@ -1029,6 +1091,7 @@ class ManualReceipt(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
     freeze = models.BooleanField(default=False)
+    adjustment_applied = models.BooleanField(default=False) 
 
     class Meta:
         ordering = ['-date']
@@ -1060,19 +1123,6 @@ class ManualReceipt(models.Model):
     
 
 
-class FrozenManualReceipt(models.Model):
-    receipt = models.ForeignKey(ManualReceipt,on_delete=models.CASCADE)
-    reason = models.TextField()
-
-    class Meta:
-        app_label = 'Receipts'
-
-    def __str__(self):
-        return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
-
-
-
-
 class ManualReceipt_Products(models.Model): 
     product = models.ForeignKey(Product, on_delete= models.CASCADE)
     manualreceipt = models.ForeignKey(ManualReceipt, on_delete= models.CASCADE)
@@ -1092,6 +1142,40 @@ class ManualReceipt_Products(models.Model):
     def __str__(self) -> str:
         return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
     
+
+
+class FrozenManualReceipt(models.Model):
+    receipt = models.ForeignKey(ManualReceipt,on_delete=models.CASCADE)
+    reason = models.TextField()
+
+    class Meta:
+        app_label = 'Receipts'
+
+    def __str__(self):
+        return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if not self.receipt.adjustment_applied:
+            if self.receipt.freeze:
+                self.adjust_product_quantities(True)
+            else:
+                self.adjust_product_quantities(False)
+            self.receipt.adjustment_applied = True
+            self.receipt.save()
+
+    def adjust_product_quantities(self, freeze):
+        for receipt_product in self.receipt.manualreceipt_products_set.all():
+            product = receipt_product.product
+            if freeze:
+                product.quantity -= receipt_product.num_item
+            else:
+                product.quantity += receipt_product.num_item
+            product.save()
+
+
+
 
 
 

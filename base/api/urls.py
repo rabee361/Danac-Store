@@ -103,8 +103,13 @@ urlpatterns = [
     path('expenses/' , ListCreateExpense.as_view() , name="expenses"),
     path('get-expense/<str:pk>/' , RetUpdDesExpense.as_view() , name="get-expense"),
 
-    path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),
-    path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
+    path('returned-supplier-package/',ListReturnedSupplierPackages.as_view()),### new
+    path('get-package-supplier/<str:pk>/',RetReturnedSupplierPackages.as_view()), #### new
+    path('returned-goods-supplier/<str:pk>/', ListCreateRetGoodsSupplier.as_view()),
+    path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),###### delete
+
+    path('returned-client-package/',ListReturnedClientPackages.as_view()),##### new
+    path('get-package-client/<str:pk>/',RetReturnedClientPackages.as_view()),#### new
     path('returned-goods-client/', ListCreateRetGoodsClient.as_view()),
     path('get-returned-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
 
