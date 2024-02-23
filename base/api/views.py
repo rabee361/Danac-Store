@@ -300,7 +300,7 @@ class RetUpdDesProductType(RetrieveUpdateDestroyAPIView):
 
 
 class ListCreateCategory(ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend]
@@ -318,8 +318,16 @@ class ListCreateCategory(ListCreateAPIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
-
+    # def post(self, request, product_type):
+    #     serializer = self.get_serializer(data=request.data, context={'product_type':product_type})
+    #     if serializer.is_valid():
+    #         headers = self.get_success_headers(serializer.data)
+    #         return Response(
+    #             {"message": "تمت الإضافة بنجاح"},
+    #             status=status.HTTP_201_CREATED,
+    #             headers=headers
+    #         )
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
     pagination_class = [IsAuthenticated]
@@ -874,14 +882,37 @@ class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
 
 # ------------------------------------------DAMAGED & RETURNED PRODUCTS------------------------------------------
 
+### new
+class ListCreateReturnedGoods(ListCreateAPIView):
+    queryset = ReturnedGoods.objects.all()
+    serializer_class = ReturnedGoodsSerializer
 
-class ListCreateRetGoodsSupplier(ListCreateAPIView):
+class ListRetGoodsSupplier(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ReturnedGoodsSupplierFilter
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
     # permission_classes = [permissions.IsAuthenticated]    
 
+class CreateReturnedGoodsSupplier(CreateAPIView):
+    def post(self, request, pk):
+        returned_good = ReturnedGoods.objects.get(id=pk)
+        # supplier = Supplier.objects.get(id=request.data['supplier'])
+        # product = Product.objects.get(id=request.data['product'])
+        serializer = ReturnedGoodsSupplierSerializer(data=request.data, context={'returned_good':returned_good}
+        # {
+        #     'returned_goods':returned_good.id,
+        #     'product':product.id,
+        #     'supplier':supplier.id,
+        #     'quantity':request.data['quantity'],
+        #     'total_price':request.data['total_price'],
+        #     'reason':request.data['reason']
+        # }
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
     queryset = ReturnedGoodsSupplier.objects.all()

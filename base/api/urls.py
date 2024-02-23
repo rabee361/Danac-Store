@@ -103,7 +103,7 @@ urlpatterns = [
     path('expenses/' , ListCreateExpense.as_view() , name="expenses"),
     path('get-expense/<str:pk>/' , RetUpdDesExpense.as_view() , name="get-expense"),
 
-    path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),
+    path('returned-goods-supplier/', ListRetGoodsSupplier.as_view()),#####
     path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
     path('returned-goods-client/', ListCreateRetGoodsClient.as_view()),
     path('get-returned-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
@@ -156,6 +156,9 @@ urlpatterns = [
     path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
     path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view()),
     path('delete-medium-two/<str:pk>/' , DeleteMediumTwo.as_view()),
-    path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view())
-    
+    path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view()),
+ 
+    ##### new
+    path('returned-goods/', ListCreateReturnedGoods.as_view()),
+    path('create-returned-goods-supplier/<str:pk>/', CreateReturnedGoodsSupplier.as_view()),
     ]

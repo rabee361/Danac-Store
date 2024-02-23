@@ -100,7 +100,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         user = queryset.get(is_active=True)
         client,created = Client.objects.get_or_create(
             name=user.username,
-            address = "syria/homs",
+            address = f'{user.address}-{user.town}-{user.state}', ### new
             phonenumber = user.phonenumber,
             location = user.location
         )
@@ -332,7 +332,7 @@ class ReturnedGoodsClientAdmin(admin.ModelAdmin):
     
 
 class ReturnedGoodsSupplierAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'supplier', 'employee', 'quantity', 'total_price', 'reason', 'date']
+    list_display = ['id', 'name_product', 'supplier', 'quantity', 'total_price', 'reason']
     search_fields = ['supplier__name']
     def name_product(self, obj):
         return obj.product.name
@@ -504,3 +504,6 @@ admin.site.register(UserNotification)
 
 admin.site.register(Chat)
 admin.site.register(ChatMessage)
+
+
+admin.site.register(ReturnedGoods)

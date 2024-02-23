@@ -117,6 +117,8 @@ class Client(models.Model):
 
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=100)
+    # state = models.CharField(max_length=50 , null=True)
+    # town = models.CharField(max_length=100 , null=True)
     phonenumber = PhoneNumberField(region='DZ')
     # phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
     category = models.CharField(max_length=75,choices=CHOICES)
@@ -566,9 +568,10 @@ class Salary(models.Model):
 
 class Registry(models.Model):
     total = models.FloatField()
+    employee = models.OneToOneField(Employee, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.total}'
+        return self.employee.name
     
     class Meta:
         app_label = 'Company_Fund'
@@ -761,22 +764,29 @@ class Payment(models.Model):
 
 
 ############################################-Returned & Damaged Goods-----###############################################################################
-        
+class ReturnedGoods(models.Model):
+    goods = models.ManyToManyField(Product, through='ReturnedGoodsSupplier')
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return str(self.id)
+    
 class ReturnedGoodsSupplier(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    returned_goods = models.ForeignKey(ReturnedGoods, on_delete=models.CASCADE)
+    # employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
-    reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
-    date = models.DateField(auto_now_add=True)
+    reason = models.CharField(max_length=50,null=True,blank=True,default='')
 
     class Meta:
         ordering = ['-id']
 
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
-    
+
+
     
 class ReturnedGoodsClient(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -806,8 +816,6 @@ class DamagedProduct(models.Model):
     def __str__(self) -> str:
         return self.product.name
     
-
-
 
 
 #########################################-------- Medium & Medium 2---------###########################################################

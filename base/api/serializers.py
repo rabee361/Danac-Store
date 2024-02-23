@@ -201,10 +201,10 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 ### new
-class CategorySerializer2(serializers.ModelSerializer):
+class   CategorySerializer2(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name','product_type']
 
 class ClientSerializer(serializers.ModelSerializer):
     total_points = serializers.SerializerMethodField()
@@ -568,9 +568,11 @@ class SalesEmployeeLocationSerializer(serializers.ModelSerializer):
 
 
 class SupplierSerializer(serializers.ModelSerializer):
+    total_receipts = serializers.SerializerMethodField()
+
     class Meta:
         model = Supplier
-        fields = ['id','name','company_name','address','phone_number','info','debts']
+        fields = ['id','name','company_name','address','phone_number','info','debts', 'total_receipts']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -604,6 +606,10 @@ class SupplierSerializer(serializers.ModelSerializer):
         repr = super().to_representation(instance)
         repr['name'] = modify_name(repr['name'])
         return repr
+    
+    def get_total_receipts(self,obj):
+        manuals = Incoming.objects.filter(supplier=obj).count()
+        return manuals
     
 
 ############################################################## HR ##################################################################
@@ -1332,7 +1338,7 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
 
 ######################################## RETURNED GOODS #####################################################################
 
-
+######### new
 
 
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
@@ -1401,39 +1407,48 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
-    employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all())
+    returned_goods = serializers.IntegerField(source='returned_goods.id', read_only=True)
     class Meta:
         model = ReturnedGoodsSupplier
-        fields = ['id', 'supplier', 'product', 'employee', 'quantity', 'total_price', 'reason', 'date']
+        fields = ['id', 'supplier', 'product', 'quantity', 'total_price', 'reason', 'returned_goods']
 
-    def is_valid(self, raise_exception=False):
-        is_valid = super().is_valid(raise_exception=False)
-        if self._errors:
-            first_error_field = next(iter(self._errors))
-            first_error_message = self._errors[first_error_field][0]
-            if first_error_message == "This field is required.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"{translation} مطلوب"
-            elif first_error_message == "This field may not be blank.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
-            elif first_error_message == "A valid number is required.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"رقم صالح مطلوب لـ {translation}"
-            elif first_error_message == "A valid integer is required.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
-            elif first_error_message == "This field may not be null.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
-            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-                translation = translate_to_arabic(first_error_field.replace('_', ' '))
-                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
-            self._errors = {"error": first_error_message}
-            if raise_exception:
-                raise serializers.ValidationError(self._errors)
-        return not bool(self._errors)
-
+    # def is_valid(self, raise_exception=False):
+    #     is_valid = super().is_valid(raise_exception=False)
+    #     if self._errors:
+    #         first_error_field = next(iter(self._errors))
+    #         first_error_message = self._errors[first_error_field][0]
+    #         # if first_error_message == "This field is required.":
+    #         #     translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #         #     first_error_message = f"{translation} مطلوب"
+    #         if first_error_message == "This field may not be blank.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+    #         elif first_error_message == "A valid number is required.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"رقم صالح مطلوب لـ {translation}"
+    #         elif first_error_message == "A valid integer is required.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
+    #         elif first_error_message == "This field may not be null.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+    #         elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
+    #             first_error_message = f"يرجى اختيار قيمة لـ {translation}"
+    #         self._errors = {"error": first_error_message}
+    #         if raise_exception:
+    #             raise serializers.ValidationError(self._errors)
+    #     return not bool(self._errors)
+        
+    def create(self, validated_data):
+        returend_good = self.context.get('returned_good', None)
+        good = validated_data.pop('product')
+        good_id = Product.objects.get(name= good)
+        instance = ReturnedGoodsSupplier.objects.create(returned_goods=returend_good,product=good_id, **validated_data)
+        good_id.quantity -= instance.quantity
+        good_id.save()
+        return instance 
+     
     def update(self, instance, validated_data):
         original_quantity = instance.quantity
         super().update(instance, validated_data)
@@ -1443,22 +1458,21 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
         product.save()
 
         return instance
+      
     
-    def create(self, validated_data):
-        instance = super().create(validated_data)
-        product = instance.product
-        product.quantity -= instance.quantity
-        product.save()
-
-        return instance    
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['product'] = instance.product.name
         representation['supplier'] = instance.supplier.name
-        representation['employee'] = instance.employee.name
+        # representation['employee'] = instance.employee.name
         return representation
 
-    
+
+class ReturnedGoodsSerializer(serializers.ModelSerializer):
+    # goods = ProductSerializer(read_only=True, many=True)
+    class Meta:
+        model = ReturnedGoods
+        fields = '__all__'
 ############################################# DAMAGED PRODUCTS #########################################################
 
 class DamagedProductSerializer(serializers.ModelSerializer):
@@ -1681,6 +1695,7 @@ class IncomingSerializer(serializers.ModelSerializer):
         supplier_data = validated_data.pop('supplier', None)
         remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
+        print(employee)
         supplier = Supplier.objects.get(id=supplier_data.id)
         instance = Incoming.objects.create(employee=employee, supplier=supplier,remaining_amount=remaining_amount ,**validated_data)
         supplier.debts += remaining_amount
