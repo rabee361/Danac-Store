@@ -15,6 +15,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.admin import display
 import random
 import string
+from django.db.models import Sum, Count
 
 
 def get_expiration_time():
@@ -784,11 +785,22 @@ class ReturnedGoodsSupplier(models.Model):
         return f'{self.product.name}:{self.reason}'
     
 
+
 class ReturnedSupplierPackage(models.Model):
     goods = models.ManyToManyField(ReturnedGoodsSupplier)
     date = models.DateField(auto_now_add=True,null=True)
+    barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
 
+    def total_price(self):
+        total_price = 0
+        for i in self.goods.all():
+            total_price += i.total_price
+        return total_price
 
+    def total_num(self):
+        return self.goods.count()
+    
+    
     
 class ReturnedGoodsClient(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -809,12 +821,22 @@ class ReturnedGoodsClient(models.Model):
 class ReturnedClientPackage(models.Model):
     goods = models.ManyToManyField(ReturnedGoodsClient)
     date = models.DateField(auto_now_add=True,null=True)
+    barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
 
+    def total_price(self):
+        total_price = 0
+        for i in self.goods.all():
+            total_price += i.total_price
+        return total_price
+
+    def total_num(self):
+        return self.goods.count()
 
 
 class DamagedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE,null=True)
     total_price = models.FloatField()
 
     class Meta:
@@ -828,6 +850,18 @@ class DamagedProduct(models.Model):
 class DamagedPackage(models.Model):
     goods = models.ManyToManyField(DamagedProduct)
     date = models.DateField(auto_now_add=True,null=True)
+    barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
+
+    def total_price(self):
+        total_price = 0
+        for i in self.goods.all():
+            total_price += i.total_price
+        return total_price
+
+    def total_num(self):
+        return self.goods.count()
+
+
 
 
 #########################################-------- Medium & Medium 2---------###########################################################

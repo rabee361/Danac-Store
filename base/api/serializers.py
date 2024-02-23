@@ -1498,9 +1498,11 @@ class ReturnedSupplierPackageSerializer(serializers.ModelSerializer):
 
 class DamagedProductSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    employee = serializers.CharField(read_only=True)
+
     class Meta:
         model = DamagedProduct
-        fields  = ['id','product','quantity','total_price','date','product_id']
+        fields  = ['id','product','quantity','employee','total_price','product_id']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1560,8 +1562,8 @@ class DamagedProductSerializer(serializers.ModelSerializer):
 class DamagedPackageSerializer(serializers.ModelSerializer):
     goods = DamagedProductSerializer(many=True,read_only=True)
     class Meta:
-        model = DamagedProduct
-        fields = '__all__'
+        model = DamagedPackage
+        fields = ['id','date','total_num','total_price','barcode','goods']
 
 
 
