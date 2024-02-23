@@ -816,7 +816,6 @@ class DamagedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
-    date = models.DateField(auto_now_add=True)
 
     class Meta:
         ordering = ['-id']
@@ -826,6 +825,9 @@ class DamagedProduct(models.Model):
     
 
 
+class DamagedPackage(models.Model):
+    goods = models.ManyToManyField(DamagedProduct)
+    date = models.DateField(auto_now_add=True,null=True)
 
 
 #########################################-------- Medium & Medium 2---------###########################################################
@@ -1032,18 +1034,18 @@ class FrozenOutputReceipt(models.Model):
             self.receipt.save()
 
     def adjust_product_quantities(self, freeze):
-        for receipt_product in self.receipt.manualreceipt_products_set.all():
+        for receipt_product in self.receipt.output_products_set.all():
             product = receipt_product.product
             if freeze:
-                product.quantity -= receipt_product.num_item
+                product.quantity -= receipt_product.quantity
             else:
-                product.quantity += receipt_product.num_item
+                product.quantity += receipt_product.quantity
             product.save()
 
 
 
 class Output_Products(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE) 
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     output = models.ForeignKey(Output, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField(default=0)
@@ -1059,7 +1061,7 @@ class Output_Products(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f'{self.products.name} {self.output.id}'
+        return f'{self.product.name} {self.output.id}'
 
 
 

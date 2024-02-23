@@ -140,36 +140,43 @@ class DebtSupplierFilter(django_filters.FilterSet):
 
 
 
-class DateRangeFilter(filters.Filter):
-    def filter(self, qs, value):
-        if value:
-            # Assuming value is a dictionary with 'from_date' and 'to_date' keys
-            from_date = value.get('from_date')
-            to_date = value.get('to_date')
+# class DateRangeFilter(filters.Filter):
+#     def filter(self, qs, value):
+#         if value:
+#             # Assuming value is a dictionary with 'from_date' and 'to_date' keys
+#             from_date = value.get('from_date')
+#             to_date = value.get('to_date')
 
-            if from_date and to_date:
-                # Parse the dates and filter the queryset
-                from_date_obj = datetime.strptime(from_date, "%Y-%m-%d")
-                to_date_obj = datetime.strptime(to_date, "%Y-%m-%d")
-                return qs.filter(date__range=(from_date_obj, to_date_obj))
-            elif from_date:
-                # Filter by from_date only
-                from_date_obj = datetime.strptime(from_date, "%Y-%m-%d")
-                return qs.filter(date__gte=from_date_obj)
-            elif to_date:
-                # Filter by to_date only
-                to_date_obj = datetime.strptime(to_date, "%Y-%m-%d")
-                return qs.filter(date__lte=to_date_obj)
-        return qs
+#             if from_date and to_date:
+#                 # Parse the dates and filter the queryset
+#                 from_date_obj = datetime.strptime(from_date, "%Y-%m-%d")
+#                 to_date_obj = datetime.strptime(to_date, "%Y-%m-%d")
+#                 return qs.filter(date__range=(from_date_obj, to_date_obj))
+#             elif from_date:
+#                 # Filter by from_date only
+#                 from_date_obj = datetime.strptime(from_date, "%Y-%m-%d")
+#                 return qs.filter(date__gte=from_date_obj)
+#             elif to_date:
+#                 # Filter by to_date only
+#                 to_date_obj = datetime.strptime(to_date, "%Y-%m-%d")
+#                 return qs.filter(date__lte=to_date_obj)
+#         return qs
+
+
+# class SalaryFilter(django_filters.FilterSet):
+#     date_range = DateRangeFilter(field_name="date")
+
+#     class Meta:  
+#         model = Salary
+#         fields = ['date_range']
 
 class SalaryFilter(django_filters.FilterSet):
-    date_range = DateRangeFilter(field_name="date")
+    date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
 
-    class Meta:  
+    class Meta:
         model = Salary
-        fields = ['date_range']
-
-
+        fields = ['date_from', 'date_to']
 
 
 
@@ -236,6 +243,17 @@ class DamagedProductFilter(django_filters.FilterSet):
         fields = ['product_name']
 
 
+
+class DamagedPackageFilter(django_filters.FilterSet):
+    date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
+    
+    class Meta:
+        model = DamagedPackage
+        fields = ['date_from','date_to']
+
+
+
 class ReturnedGoodsClientFilter(django_filters.FilterSet):
     client_name = django_filters.CharFilter(field_name='client__name',lookup_expr='startswith')
     product_name = django_filters.CharFilter(field_name='product__name',lookup_expr='startswith')
@@ -244,6 +262,16 @@ class ReturnedGoodsClientFilter(django_filters.FilterSet):
     class Meta:
         model = ReturnedGoodsClient
         fields = ['product_name','client_name','employee_name']
+
+
+
+class ReturnedPackageClientFilter(django_filters.FilterSet):
+    date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
+
+    class Meta:
+        model = ReturnedClientPackage
+        fields = ['date_from','date_to']
 
 
 
@@ -258,6 +286,16 @@ class ReturnedGoodsSupplierFilter(django_filters.FilterSet):
 
 
 
+
+class ReturnedPackageSupplierFilter(django_filters.FilterSet):
+    date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
+
+    class Meta:
+        model = ReturnedSupplierPackage
+        fields = ['date_from','date_to']
+
+
 ################################################## Receipts #############################################
         
 
@@ -265,29 +303,34 @@ class ReturnedGoodsSupplierFilter(django_filters.FilterSet):
 class IncomingFilter(django_filters.FilterSet):
     supplier_name = django_filters.CharFilter(field_name="supplier__name", lookup_expr="startswith")
     employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
-    
+    date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
 
     class Meta:
         model = Incoming
-        fields = ['supplier_name', 'employee_name', 'id','freeze']
+        fields = ['supplier_name', 'employee_name', 'id','freeze','date_from','date_to']
 
 
 class OutputFilter(django_filters.FilterSet):
     client_name = django_filters.CharFilter(field_name='client__name', lookup_expr="startswith")
     employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
 
     class Meta:
         model = Output
-        fields = ['client_name', 'employee_name', 'id']
+        fields = ['client_name', 'employee_name', 'id','date_from','date_to']
 
 
 class ManualFilter(django_filters.FilterSet):
     client_name = django_filters.CharFilter(field_name='client__name', lookup_expr='startswith')
     employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
 
     class Meta:
         model = ManualReceipt
-        fields = ['client_name', 'employee_name', 'id','freeze']
+        fields = ['client_name', 'employee_name', 'id','freeze','date_from','date_to']
 
 
 class OrderFilter(django_filters.FilterSet):

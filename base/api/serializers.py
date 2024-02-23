@@ -1341,6 +1341,8 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField(source='product.id',read_only=True)
     employee_id = serializers.IntegerField(source='employee.id',read_only=True)
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    employee = serializers.CharField(read_only=True)
+
     class Meta:
         model = ReturnedGoodsClient
         fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason','date']
@@ -1416,7 +1418,7 @@ class ReturnedClientPackageSerializer(serializers.ModelSerializer):
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
-    employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all())
+    employee = serializers.CharField(read_only=True)
     package_id = serializers.CharField(write_only=True)#####
     class Meta:
         model = ReturnedGoodsSupplier
@@ -1462,7 +1464,7 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         package_id = validated_data.pop('package_id')#####
-        instance = super().create(validated_data)
+        instance = super().create(**validated_data)
         product = instance.product
         product.quantity -= instance.quantity
         product.save()
@@ -1484,9 +1486,12 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
 ###### new
 class ReturnedSupplierPackageSerializer(serializers.ModelSerializer):
     goods = ReturnedGoodsSupplierSerializer(many=True,read_only=True)
+
     class Meta:
         model = ReturnedSupplierPackage
         fields = '__all__'
+
+    
 
     
 ############################################# DAMAGED PRODUCTS #########################################################
@@ -1550,6 +1555,17 @@ class DamagedProductSerializer(serializers.ModelSerializer):
         return representation
 
     
+
+
+class DamagedPackageSerializer(serializers.ModelSerializer):
+    goods = DamagedProductSerializer(many=True,read_only=True)
+    class Meta:
+        model = DamagedProduct
+        fields = '__all__'
+
+
+
+
 
 
 class PointsSerializer(serializers.ModelSerializer):

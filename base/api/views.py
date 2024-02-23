@@ -881,11 +881,14 @@ class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
 class ListReturnedSupplierPackages(ListCreateAPIView):
     queryset = ReturnedSupplierPackage.objects.all()
     serializer_class = ReturnedSupplierPackageSerializer
+ 
 
 
 class RetReturnedSupplierPackages(RetrieveAPIView):
     queryset = ReturnedSupplierPackage.objects.all()
     serializer_class = ReturnedSupplierPackageSerializer
+
+    # manual_receipt_serializer = ManualRecieptSerializer(data=request.data, context={'request': request})
 
 
 class ListCreateRetGoodsSupplier(ListCreateAPIView):
@@ -893,7 +896,12 @@ class ListCreateRetGoodsSupplier(ListCreateAPIView):
     filterset_class = ReturnedGoodsSupplierFilter
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
-    # permission_classes = [permissions.IsAuthenticated]    
+    permission_classes = [permissions.IsAuthenticated]  
+
+    def perform_create(self,serializer):
+        user = self.request.user
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        serializer.save(employee=employee)   
 
 
 class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
@@ -919,7 +927,12 @@ class ListCreateRetGoodsClient(ListCreateAPIView):
     filterset_class = ReturnedGoodsClientFilter
     queryset = ReturnedGoodsClient.objects.all()
     serializer_class = ReturnedGoodsClientSerializer
-    # permission_classes = [permissions.IsAuthenticated]    
+    permission_classes = [permissions.IsAuthenticated]    
+
+    def perform_create(self,serializer):
+        user = self.request.user
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        serializer.save(employee=employee)   
 
 
 
@@ -929,12 +942,27 @@ class RetUpdDesReturnGoodClient(RetrieveUpdateDestroyAPIView):
     # permission_classes = [permissions.IsAuthenticated]
 
 
+
+class ListDamagedPackages(ListCreateAPIView):
+    queryset = DamagedPackage.objects.all()
+    serializer_class = DamagedPackageSerializer
+
+
+
+class RetDamagedPackages(RetrieveUpdateDestroyAPIView):
+    queryset = DamagedPackage.objects.all()
+    serializer_class = DamagedPackageSerializer
+
+
+
 class ListCreateDamagedProduct(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = DamagedProductFilter
     queryset = DamagedProduct.objects.all()
     serializer_class = DamagedProductSerializer    
     # permission_classes = [permissions.IsAuthenticated]    
+
+
 
 
 class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
@@ -1003,6 +1031,7 @@ class CreateMediumForOrderView(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
        
 
+
 class DeleteProductsMediumView(RetrieveDestroyAPIView):
     queryset = Products_Medium.objects.all()
     serializer_class = ProductsMediumSerializer
@@ -1028,8 +1057,10 @@ class FreezeOutputReceipt(APIView):
             return Response({
                 "msg":"receipt freezed"
             })
-        except:
-            raise Output.DoesNotExist
+        except Output.DoesNotExist:
+            return Response({
+                "msg":"receipt doesn't exist"
+            })
         
 
 
@@ -1351,7 +1382,7 @@ class UnFreezeIncomingReceipt(APIView):
             })
 
 ############################### MANUAL RECEIPT #####################################################
-    
+
 
 class CreateManualReceiptView(APIView):
     permission_classes = [IsAuthenticated]
