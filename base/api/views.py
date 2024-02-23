@@ -887,32 +887,26 @@ class ListCreateReturnedGoods(ListCreateAPIView):
     queryset = ReturnedGoods.objects.all()
     serializer_class = ReturnedGoodsSerializer
 
-class ListRetGoodsSupplier(ListAPIView):
+class RetReturnedGoods(RetrieveAPIView):
+    queryset = ReturnedGoods.objects.all()
+    serializer_class = ReturnedGoodsSerializer
+
+class ListCreateRetGoodsSupplier(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ReturnedGoodsSupplierFilter
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
     # permission_classes = [permissions.IsAuthenticated]    
 
-class CreateReturnedGoodsSupplier(CreateAPIView):
-    def post(self, request, pk):
-        returned_good = ReturnedGoods.objects.get(id=pk)
-        # supplier = Supplier.objects.get(id=request.data['supplier'])
-        # product = Product.objects.get(id=request.data['product'])
-        serializer = ReturnedGoodsSupplierSerializer(data=request.data, context={'returned_good':returned_good}
-        # {
-        #     'returned_goods':returned_good.id,
-        #     'product':product.id,
-        #     'supplier':supplier.id,
-        #     'quantity':request.data['quantity'],
-        #     'total_price':request.data['total_price'],
-        #     'reason':request.data['reason']
-        # }
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class CreateReturnedGoodsSupplier(CreateAPIView):
+#     def post(self, request, pk):
+#         returned_good = ReturnedGoods.objects.get(id=pk)
+#         serializer = ReturnedGoodsSupplierSerializer(data=request.data, context={'returned_good':returned_good}
+#         )
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
     queryset = ReturnedGoodsSupplier.objects.all()
@@ -1392,18 +1386,10 @@ class CreateManualProduct(CreateAPIView):
     serializer_class = ManualRecieptProductsSerializer2
 
 
-
-class FreezeManualReceipt(APIView):
-    def post(self,request,receipt_id):
-        try:
-            receipt = ManualReceipt.objects.get(id=receipt_id)
-            receipt.freeze = True
-            receipt.save()
-            return Response({
-                "msg":"receipt freezed"
-            })
-        except:
-            raise ManualReceipt.DoesNotExist
+### new
+class ListCreateFreezeManualReceipt(ListCreateAPIView):
+    queryset = FrozenManualReceipt.objects.all()
+    serializer_class = FrozenManualReceiptSerializer
 
 ########################## MEDIUM 2 #######################################################################################
 

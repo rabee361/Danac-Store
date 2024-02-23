@@ -103,7 +103,7 @@ urlpatterns = [
     path('expenses/' , ListCreateExpense.as_view() , name="expenses"),
     path('get-expense/<str:pk>/' , RetUpdDesExpense.as_view() , name="get-expense"),
 
-    path('returned-goods-supplier/', ListRetGoodsSupplier.as_view()),#####
+    path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),#####
     path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
     path('returned-goods-client/', ListCreateRetGoodsClient.as_view()),
     path('get-returned-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
@@ -112,7 +112,7 @@ urlpatterns = [
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
 
     path('get-receipt-manual/<str:pk>/', GetManualReceipt.as_view(), name="get-manuals"),
-    path('freeze-manual/<str:receipt_id>/' , FreezeManualReceipt.as_view(),name="freeze-manual"),
+    path('freeze-manual/' , ListCreateFreezeManualReceipt.as_view(),name="freeze-manual"),### new
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
     path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),
     path('update-manual/<str:pk>/' , UpdateManualReceipt.as_view() , name="update-manual"),
@@ -160,5 +160,6 @@ urlpatterns = [
  
     ##### new
     path('returned-goods/', ListCreateReturnedGoods.as_view()),
-    path('create-returned-goods-supplier/<str:pk>/', CreateReturnedGoodsSupplier.as_view()),
+    path('return-good/<str:pk>/', RetReturnedGoods.as_view()),
+    # path('create-returned-goods-supplier/<str:pk>/', CreateReturnedGoodsSupplier.as_view()),
     ]

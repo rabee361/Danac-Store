@@ -507,3 +507,5 @@ admin.site.register(ChatMessage)
 
 
 admin.site.register(ReturnedGoods)
+
+admin.site.register(FrozenManualReceipt)

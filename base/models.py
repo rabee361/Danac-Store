@@ -928,6 +928,16 @@ class Incoming_Product(models.Model):
     def __str__(self) -> str:
         return f'{self.incoming.supplier.name}:{str(self.incoming.id)}'
 
+
+# class FrozenIncomingReceipt(models.Model):
+#     receipt = models.ForeignKey(Incoming,on_delete=models.CASCADE)
+#     reason = models.TextField()
+
+#     class Meta:
+#         app_label = 'Receipts'
+
+#     def __str__(self):
+#         return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
 ####################################### OUTPUT #################################################################################
 
 
@@ -1020,7 +1030,7 @@ class ManualReceipt(models.Model):
         )['total_receipt'] or 0.0
 
     def __str__(self) -> str:
-        return f'{self.client.name} - {str(self.id)}'
+        return str(self.id)
     
 
   
@@ -1048,7 +1058,16 @@ class ManualReceipt_Products(models.Model):
         return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
     
 
+### new
+class FrozenManualReceipt(models.Model):
+    receipt = models.ForeignKey(ManualReceipt,on_delete=models.CASCADE)
+    reason = models.TextField()
 
+    class Meta:
+        app_label = 'Receipts'
+
+    def __str__(self):
+        return f'Manual Receipt {str(self.receipt.id)} reason: {self.reason}'
 
 
 

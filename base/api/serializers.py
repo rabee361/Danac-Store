@@ -1895,6 +1895,29 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
         repr['client'] = instance.client.name
         return repr
 
+### new
+class FrozenManualReceiptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FrozenManualReceipt
+        fields = '__all__'
+
+    def create(self, validated_data):
+        receipt = validated_data.pop('receipt')
+        manual_receipt = ManualReceipt.objects.get(id=receipt.id)
+        frozen_receipt = FrozenManualReceipt.objects.filter(receipt=manual_receipt).first()
+        if frozen_receipt:
+            raise serializers.ValidationError({"message":'already exists'})
+        instance = FrozenManualReceipt.objects.create(receipt=manual_receipt, **validated_data)
+        manual_receipt.freeze = True
+        manual_receipt.save()
+        products_manaul = ManualReceipt_Products.objects.filter(manualreceipt=manual_receipt)
+        for product_manaul in products_manaul:
+            product = Product.objects.get(id = product_manaul.product.id)
+            product.quantity += product_manaul.num_item
+            product.save()
+        
+        return instance
+    
 ########################################## OUTPUT ##############################################
         
 class OutputSerializer(serializers.ModelSerializer):
