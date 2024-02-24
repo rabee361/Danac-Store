@@ -11,15 +11,16 @@ from .api.serializers import *
 class CreateMessage(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.chat_id = self.scope['url_route']['kwargs']['id']
+		self.user_id = self.scope['url_route']['kwargs']['id2']
 		await self.accept()
 
 	async def receive(self, text_data):
 		text_data_json = json.loads(text_data)
 		message = text_data_json['message']
-		user_id = text_data_json['user_id']
+		# user_id = text_data_json['user_id']
 		# chat_id = text_data_json['chat_id']
 
-		user = await self.get_user(user_id)
+		user = await self.get_user(self.user_id)
 		chat = await self.get_chat(self.chat_id)
 
 		try:
