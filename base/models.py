@@ -193,7 +193,7 @@ class ProductType(models.Model):
         ordering = ['-id']
         app_label = 'Clients_and_Products'
 
-    def product_types_num(self):
+    def total_product_types(self):
         return ProductType.objects.count()
 
 
@@ -211,8 +211,9 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-    def categories_num(self):
+    def total_categories(self):
         return Category.objects.count()
+
 
 
 class Product(models.Model):

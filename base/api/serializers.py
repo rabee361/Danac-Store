@@ -192,13 +192,13 @@ class StateSerializer(serializers.ModelSerializer):
 class ProductTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductType
-        fields = '__all__'
+        fields = ['id','image','name','total_product_types']
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['id','product_type','name','image','total_categories']
 
 
 class ClientSerializer(serializers.ModelSerializer):
