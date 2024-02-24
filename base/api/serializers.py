@@ -895,19 +895,11 @@ class RegistrySerializer(serializers.ModelSerializer):
 
 
 class Client_DebtSerializer(serializers.ModelSerializer):
-    total_client_debts = serializers.SerializerMethodField()
-    total_sum = serializers.SerializerMethodField()
     client_id = serializers.IntegerField(source='client_name.id',read_only=True)
+
     class Meta :
         model = Debt_Client
         fields = ['id','client_name','client_id','amount','payment_method','bank_name','receipt_num','date','total_client_debts','total_sum']
-
-    def get_total_client_debts(self, obj):
-        return Debt_Client.get_total_client_debts()
-
-    def get_total_sum(self, obj):
-        return Debt_Client.get_total_sum()
-
 
     def create(self, validated_data):
         debt_client = Debt_Client.objects.create(**validated_data)
@@ -965,19 +957,11 @@ class Client_DebtSerializer(serializers.ModelSerializer):
 
 
 class Supplier_DebtSerializer(serializers.ModelSerializer):
-    total_supplier_debts = serializers.SerializerMethodField()
-    total_sum = serializers.SerializerMethodField()
     supplier_id = serializers.IntegerField(source='supplier_name.id',read_only=True)
     class Meta :
         model = Debt_Supplier
         fields = ['id','supplier_name','supplier_id','amount','payment_method','bank_name','check_num','date','total_supplier_debts','total_sum']
 
-    def get_total_supplier_debts(self, obj):
-        return Debt_Supplier.get_total_supplier_debts()
-
-    def get_total_sum(self, obj):
-        return Debt_Supplier.get_total_sum()
-    
     def create(self, validated_data):
         debt_supplier = Debt_Supplier.objects.create(**validated_data)
         supplier = debt_supplier.supplier_name
@@ -1034,18 +1018,10 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
 
 
 class DepositeSerializer(serializers.ModelSerializer):
-    total_deposites = serializers.SerializerMethodField()
-    total_sum = serializers.SerializerMethodField()
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     class Meta:
         model = Deposite
         fields = ['id','client','client_id','deposite_name','detail_deposite','total','verify_code','total_deposites','total_sum','date']
-
-    def get_total_deposites(self, obj):
-        return Deposite.get_total_deposites()
-
-    def get_total_sum(self, obj):
-        return Deposite.get_total_sum()
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1099,18 +1075,10 @@ class DepositeSerializer(serializers.ModelSerializer):
 
 
 class WithDrawSerializer(serializers.ModelSerializer):
-    total_withdraws = serializers.SerializerMethodField()
-    total_sum = serializers.SerializerMethodField()
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     class Meta:
         model = WithDraw
         fields = ['id','client','client_id','withdraw_name','details_withdraw','total','verify_code','total_withdraws','total_sum','date']
-
-    def get_total_withdraws(self, obj):
-        return WithDraw.get_total_withdraws()
-
-    def get_total_sum(self, obj):
-        return WithDraw.get_total_sum()
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1166,17 +1134,9 @@ class WithDrawSerializer(serializers.ModelSerializer):
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
-    total_expenses = serializers.SerializerMethodField()
-    total_amount = serializers.SerializerMethodField()
     class Meta:
         model = Expense
-        fields = '__all__'
-
-    def get_total_expenses(self, obj):
-        return Expense.get_total_expenses()
-
-    def get_total_amount(self, obj):
-        return Expense.get_total_amount()
+        fields = ['id','expense_name','details','name','amount','receipt_num','date','total_expenses','total_amount']
     
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1208,17 +1168,9 @@ class ExpenseSerializer(serializers.ModelSerializer):
 
 
 class PaymentSerializer(serializers.ModelSerializer):
-    total_payments = serializers.SerializerMethodField()
-    total_amount = serializers.SerializerMethodField()
     class Meta:
         model = Payment
-        fields = '__all__'
-
-    def get_total_payments(self, obj):
-        return Payment.get_total_payments()
-
-    def get_total_amount(self, obj):
-        return Payment.get_total_amount()
+        fields = ['id','employee','name','payment_method','bank_name','receipt_num','amount','date','total_payments','total_amount']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1253,13 +1205,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 class RecievedPaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recieved_Payment
-        fields = '__all__'
-
-    def get_total_recieved_payments(self, obj):
-        return Recieved_Payment.get_total_revieved_payments()
-
-    def get_total_amount(self, obj):
-        return Recieved_Payment.get_total_amount()
+        fields = ['id','employee','name','payment_method','bank_name','receipt_num','amount','date','total_recieved_payments','total_amount']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)

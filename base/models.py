@@ -598,13 +598,11 @@ class WithDraw(models.Model):
     def __str__(self):
         return self.client.name
     
-    @classmethod
-    def get_total_withdraws(cls):
-        return cls.objects.count()
+    def total_withdraws(self):
+        return WithDraw.objects.count()
     
-    @classmethod
-    def get_total_sum(cls):
-        return cls.objects.aggregate(Sum('total'))['total__sum'] or 0
+    def total_sum(self):
+        return WithDraw.objects.aggregate(Sum('total'))['total__sum'] or 0
 
 
 
@@ -622,13 +620,11 @@ class Deposite(models.Model):
     def __str__(self):
         return self.client.name
     
-    @classmethod
-    def get_total_deposites(cls):
-        return cls.objects.count()
+    def total_deposites(self):
+        return Deposite.objects.count()
     
-    @classmethod
-    def get_total_sum(cls):
-        return cls.objects.aggregate(Sum('total'))['total__sum'] or 0
+    def total_sum(self):
+        return Deposite.objects.aggregate(Sum('total'))['total__sum'] or 0
 
 
     
@@ -650,13 +646,11 @@ class Debt_Client(models.Model):
     def __str__(self):
         return self.client_name.name
 
-    @classmethod
-    def get_total_client_debts(cls):
-        return cls.objects.count()
+    def total_client_debts(self):
+        return Debt_Client.objects.count()
     
-    @classmethod
-    def get_total_sum(cls):
-        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    def total_sum(self):
+        return Debt_Client.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 
@@ -678,13 +672,11 @@ class Debt_Supplier(models.Model):
     def __str__(self):
         return self.supplier_name.name
     
-    @classmethod
-    def get_total_supplier_debts(cls):
-        return cls.objects.count()
+    def total_supplier_debts(self):
+        return Supplier.objects.count()
     
-    @classmethod
-    def get_total_sum(cls):
-        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    def total_sum(self):
+        return Debt_Supplier.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 
@@ -702,13 +694,11 @@ class Expense(models.Model):
     def __str__(self):
         return self.expense_name
     
-    @classmethod
-    def get_total_expenses(cls):
-        return cls.objects.count()
+    def total_expenses(self):
+        return Expense.objects.count()
 
-    @classmethod
-    def get_total_amount(cls):
-        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    def total_amount(self):
+        return Expense.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 
@@ -728,13 +718,11 @@ class Recieved_Payment(models.Model):
     class Meta:
         app_label = 'Company_Fund'
 
-    @classmethod
-    def get_total_recieved_payments(cls):
-        return cls.objects.count()
+    def total_recieved_payments(self):
+        return Recieved_Payment.objects.count()
 
-    @classmethod
-    def get_total_amount(cls):
-        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    def total_amount(self):
+        return Recieved_Payment.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 
@@ -754,13 +742,11 @@ class Payment(models.Model):
     class Meta:
         app_label = 'Company_Fund'
 
-    @classmethod
-    def get_total_payments(cls):
-        return cls.objects.count()
+    def total_payments(self):
+        return Payment.objects.count()
 
-    @classmethod
-    def get_total_amount(cls):
-        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    def total_amount(cls):
+        return Payment.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 
