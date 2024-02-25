@@ -122,7 +122,7 @@ class Client(models.Model):
     address = models.CharField(max_length=100 , null=True)
     store_name = models.CharField(max_length=100 , null=True)
     phonenumber = PhoneNumberField(region='DZ')
-    # phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
+    phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
     category = models.CharField(max_length=75,choices=CHOICES)
     notes = models.TextField(max_length=150,default='_')
     location = models.PointField(null=True)
@@ -421,6 +421,7 @@ class Supplier(models.Model):
     name = models.CharField(max_length=30)
     company_name = models.CharField(max_length=50)
     phone_number = PhoneNumberField(region='DZ')
+    phone_number2 = PhoneNumberField(region='DZ',null=True,blank=True)
     address = models.CharField(max_length=100)
     info = models.TextField(max_length=500,default='_')
     debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
@@ -430,6 +431,9 @@ class Supplier(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+    
+    def total_receipts(self):
+        return Incoming.objects.filter(supplier=self).count()
 
 
 
