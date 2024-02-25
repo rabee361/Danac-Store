@@ -1287,7 +1287,7 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReturnedGoodsClient
-        fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason','date']
+        fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
