@@ -549,7 +549,6 @@ class Extra_Expense(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     reason = models.TextField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
-    barcode = models.CharField(max_length=200,default=" ")
     date = models.DateField(auto_now_add=True)
 
     class Meta:

@@ -782,7 +782,7 @@ class ExtraExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Extra_Expense
         fields = '__all__'
-        fields = ['id','employee','employee_name','reason','amount','date','barcode']
+        fields = ['id','employee','employee_name','reason','amount','date']
         
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)

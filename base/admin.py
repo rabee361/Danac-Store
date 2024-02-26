@@ -404,7 +404,7 @@ class Advance_On_salaryAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 class Extra_ExpenseAdmin(admin.ModelAdmin):
-    list_display = ['id', 'employee','reason', 'amount', 'barcode', 'date']
+    list_display = ['id', 'employee','reason', 'amount', 'date']
     search_fields = ['employee__name']
     list_per_page = 50
 
