@@ -202,13 +202,13 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ClientSerializer(serializers.ModelSerializer):
-    total_points = serializers.SerializerMethodField()
-    total_receipts = serializers.SerializerMethodField()
     phonenumber = serializers.CharField()
-    # phonenumber2
+    longitude = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+
     class Meta:
         model = Client
-        fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points','debts','total_receipts']
+        fields = ['id','name', 'address', 'phonenumber','phonenumber2', 'category', 'notes', 'longitude','latitude', 'total_points','debts','total_receipts']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -238,15 +238,12 @@ class ClientSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
     
-    def get_total_points(self,obj):
-        total = Points.objects.filter(Q(client=obj)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).aggregate(total_points=models.Sum('number'))['total_points'] or 0
-        return total
+    def get_longitude(self,obj):
+        return obj.location.x
     
-    def get_total_receipts(self,obj):
-        manuals = ManualReceipt.objects.filter(client=obj).count()
-        outputs = Output.objects.filter(client=obj).count()
-        total = manuals + outputs
-        return total
+    def get_latitude(self,obj):
+        return obj.location.y
+
 
 
 

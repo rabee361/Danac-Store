@@ -15,7 +15,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.admin import display
 import random
 import string
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count , Sum ,F , Q
 
 
 def get_expiration_time():
@@ -133,8 +133,16 @@ class Client(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def total_points(self):
+        return Points.objects.filter(Q(client=self)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).\
+                                aggregate(total_points=models.Sum('number'))['total_points'] or 0
 
-
+    def total_receipts(self):
+        manuals = ManualReceipt.objects.filter(client=self).count()
+        outputs = Output.objects.filter(client=self).count()
+        total = manuals + outputs
+        return total
 
 
 
