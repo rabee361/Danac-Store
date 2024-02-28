@@ -527,8 +527,23 @@ class EmployeeSerializer(serializers.ModelSerializer):
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        related_models = {
+            'overtime':'overtime_set',
+            'absence':'absence_set',
+            'bonus':'bonus_set',
+            'discount':'discount_set',
+        }
+        totals = {}
+        for key,value in related_models.items():
+            related_objects = getattr(instance, value).all()
+            total = sum(obj.amount for obj in related_objects)
+            totals[value] = total
+            representation[key] = total
+        return representation
 
-        return not bool(self._errors)
 
         
 class SalesEmployeeSerializer(serializers.ModelSerializer):
@@ -828,7 +843,7 @@ class SalarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Salary
         fields = '__all__'
-        read_only_fields = ('hr',)  # Add 'hr' to the read-only fields
+        read_only_fields = ('hr',)
 
     def create(self, validated_data):
         user = self.context['request'].user
