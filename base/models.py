@@ -46,7 +46,6 @@ class CustomUser(AbstractUser):
     town = models.CharField(max_length=100 , null=True)
     address = models.CharField(max_length=100 , null=True)
     username = models.CharField(max_length=200)
-    store_category = models.CharField(max_length=50,null=True,blank=True)
     is_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True,default='images/account.jpg')
     location = models.PointField(default=Point(3.0589,36.7539),null=True,blank=True)
