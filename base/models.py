@@ -124,7 +124,7 @@ class Client(models.Model):
     store_name = models.CharField(max_length=100 , null=True)
     phonenumber = PhoneNumberField(region='DZ')
     phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
-    category = models.CharField(max_length=75,choices=CHOICES)
+    category = models.CharField(max_length=75,choices=CHOICES,default='سوبرماركت')
     notes = models.TextField(max_length=150,default='_')
     location = models.PointField(null=True)
     debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
