@@ -76,7 +76,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['phonenumber', 'username', 'password','password2','x','y','store_name','work_hours' ,'state','town','address']
+        fields = ['phonenumber', 'username', 'password','password2','x','y','store_name','work_hours' ,'state','town','address','store_category']
         extra_kwargs = {
             'password':{'write_only':True,}
         }
@@ -98,6 +98,7 @@ class SignUpSerializer(serializers.ModelSerializer):
             username = self.validated_data['username'],
             work_hours = self.validated_data['work_hours'],
             store_name = self.validated_data['store_name'],
+            store_category = self.validated_data['store_category'],
             state = self.validated_data['state'],
             town = self.validated_data['town'],
             address = self.validated_data['address'],
