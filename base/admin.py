@@ -104,7 +104,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
             location = user.location
         )
         client.address = f'{user.state}-{user.town}-{user.address}'
-        # client.category = user.store_category
+        client.category = user.store_category
         client.save()
         cart,created = Cart.objects.get_or_create(customer=client)
         chat,created = Chat.objects.get_or_create(user=user)
