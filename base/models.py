@@ -947,10 +947,23 @@ class Incoming(models.Model):
     freeze = models.BooleanField(default=False)
     adjustment_applied = models.BooleanField(default=False) 
 
-
     class Meta:
         ordering=['-date']
         app_label = 'Receipts'
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            today = timezone.now().date()
+            last_instance = Incoming.objects.filter(date__date=today).order_by('-serial').first()
+
+            if last_instance:
+                if last_instance.date.date() != date.today():
+                    self.serial = 1
+                else:
+                    self.serial = last_instance.serial + 1
+            else:
+                self.serial = 1
+        super(Incoming, self).save(*args, **kwargs)
 
     def calculate_total_receipt(self):
         return self.incoming_product_set.aggregate(
@@ -1036,6 +1049,20 @@ class Output(models.Model):
     class Meta:
         ordering = ['-date']
         app_label = 'Receipts'
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            today = timezone.now().date()
+            last_instance = Output.objects.filter(date__date=today).order_by('-serial').first()
+
+            if last_instance:
+                if last_instance.date.date() != date.today():
+                    self.serial = 1
+                else:
+                    self.serial = last_instance.serial + 1
+            else:
+                self.serial = 1
+        super(Output, self).save(*args, **kwargs)
 
     def calculate_total_receipt(self):
         return self.output_products_set.aggregate(
@@ -1139,10 +1166,10 @@ class ManualReceipt(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             today = timezone.now().date()
-            last_instance = ManualReceipt.objects.filter(date=today).order_by('-serial').first()
+            last_instance = ManualReceipt.objects.filter(date__date=today).order_by('-serial').first()
 
             if last_instance:
-                if last_instance.date != date.today():
+                if last_instance.date.date() != date.today():
                     self.serial = 1
                 else:
                     self.serial = last_instance.serial + 1

@@ -1631,7 +1631,7 @@ class IncomingSerializer2(serializers.ModelSerializer):
     total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = Incoming
-        fields = ['id','supplier','employee','total_receipt','supplier_phone','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
+        fields = ['id','serial','supplier','employee','total_receipt','supplier_phone','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
     
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
@@ -1869,7 +1869,7 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
     client_points = serializers.SerializerMethodField()
     class Meta:
         model = ManualReceipt
-        fields = ['id','client','client_phone','client_points','total_receipt','employee','client_service','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
+        fields = ['id','serial','client','client_phone','client_points','total_receipt','employee','client_service','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
 
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
@@ -1908,7 +1908,7 @@ class OutputSerializer(serializers.ModelSerializer):
     address = serializers.CharField(source='client.address',read_only=True)
     class Meta:
         model = Output
-        fields = ['id','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered','freeze']
+        fields = ['id','serial','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered','freeze']
 
 
 class ProductsOutputSerializer2(serializers.ModelSerializer):
