@@ -589,7 +589,7 @@ class Registry(models.Model):
     total = models.FloatField()
 
     def __str__(self):
-        return f'{self.total}'
+        return f'{self.employee} Registry'
     
     class Meta:
         app_label = 'Company_Fund'
