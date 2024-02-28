@@ -16,7 +16,6 @@ from firebase_admin.messaging import Message, Notification
 from .permissions import *
 
 
-
 ####################################### AUTHENTICATION ###################################################################3#######
 
 class SignUpView(GenericAPIView):
@@ -817,23 +816,59 @@ class ListCreateDeposite(ListCreateAPIView):
     filterset_class = DepositeFilter
     queryset = Deposite.objects.all()
     serializer_class = DepositeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        employee = Employee.objects.get(phonenumber=self.request.user.phonenumber)
+        employee_registry = Registry.objects.get(employee=employee)
+        queryset = Deposite.objects.filter(registry=employee_registry)
+        return queryset
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
 
 class RetUpdDesDeposite(RetrieveUpdateDestroyAPIView):
     queryset = Deposite.objects.all()
     serializer_class = DepositeSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
 
 class ListCreateWithDraw(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = WithdrawFilter
     queryset = WithDraw.objects.all()
     serializer_class = WithDrawSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        employee = Employee.objects.get(phonenumber=self.request.user.phonenumber)
+        employee_registry = Registry.objects.get(employee=employee)
+        queryset = WithDraw.objects.filter(registry=employee_registry)
+        return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
 
 
 class RetUpdDesWithDraw(RetrieveUpdateDestroyAPIView):
     queryset = WithDraw.objects.all()
     serializer_class = WithDrawSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
 
 
 class ListCreatePayment(ListCreateAPIView):
@@ -901,7 +936,7 @@ class ListCreateRetGoodsSupplier(ListCreateAPIView):
     def perform_create(self,serializer):
         user = self.request.user
         employee = Employee.objects.get(phonenumber=user.phonenumber)
-        serializer.save(employee=employee)   
+        serializer.save(employee=employee)
 
 
 class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):

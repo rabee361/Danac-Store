@@ -46,6 +46,7 @@ class CustomUser(AbstractUser):
     town = models.CharField(max_length=100 , null=True)
     address = models.CharField(max_length=100 , null=True)
     username = models.CharField(max_length=200)
+    # store_category = models.CharField(max_length=50,null=True,blank=True)
     is_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True,default='images/account.jpg')
     location = models.PointField(default=Point(3.0589,36.7539),null=True,blank=True)
@@ -585,6 +586,7 @@ class Salary(models.Model):
 ################################### Register Department #######################################################
 
 class Registry(models.Model):
+    employee = models.ForeignKey(Employee,on_delete=models.SET_NULL,null=True)
     total = models.FloatField()
 
     def __str__(self):
@@ -592,14 +594,15 @@ class Registry(models.Model):
     
     class Meta:
         app_label = 'Company_Fund'
-    
-    
+
+
 
 class WithDraw(models.Model):
     withdraw_name = models.CharField(max_length=50)
     details_withdraw = models.CharField(max_length=50,null=True,blank=True,default=' ')
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
+    registry = models.ForeignKey(Registry,on_delete=models.CASCADE,null=True)
     verify_code = models.IntegerField(null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
@@ -622,6 +625,7 @@ class Deposite(models.Model):
     detail_deposite = models.CharField(max_length=50,null=True,blank=True,default=' ')
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
+    registry = models.ForeignKey(Registry,on_delete=models.CASCADE,null=True)
     verify_code = models.IntegerField(null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 

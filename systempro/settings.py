@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'Company_Fund',
     'Clients_and_Products',
     
+    
 ]
 X_FRAME_OPTIONS = "SAMEORIGIN"
 SILENCED_SYSTEM_CHECKS = ["security.W019"]
@@ -73,12 +74,13 @@ LEAFLET_CONFIG = {
 }
 
 
-AUTHENTICATION_BACKENDS = ['base.api.backend.CustomUserModelBackend']
+AUTHENTICATION_BACKENDS = [
+    'base.api.backend.CustomUserModelBackend',
+    ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
        'rest_framework_simplejwt.authentication.JWTAuthentication',
-       
     ],
 
 }
@@ -262,7 +264,7 @@ class CustomFirebaseCredentials(credentials.ApplicationDefault):
 
 
 custom_credentials = CustomFirebaseCredentials('C:/Users/eng.Rabee/systempro/storeapp-8cc25-firebase-adminsdk-63jeh-3a5b5e4884.json')
-FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, options={'projectId': 'test-9c6e8'}, name='messaging')
+FIREBASE_MESSAGING_APP = initialize_app(custom_credentials, options={'projectId': 'storeapp-8cc25'}, name='messaging')
 
 
 

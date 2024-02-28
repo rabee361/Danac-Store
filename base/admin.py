@@ -104,6 +104,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
             location = user.location
         )
         client.address = f'{user.state}-{user.town}-{user.address}'
+        # client.category = user.store_category
         client.save()
         cart,created = Cart.objects.get_or_create(customer=client)
         chat,created = Chat.objects.get_or_create(user=user)
@@ -192,7 +193,8 @@ class ProductMediumAdmin(admin.ModelAdmin):
         return obj.product.name
     get_name_product.short_descreption = 'product'
 
-class ProductAdmin(ImportExportModelAdmin):
+
+class ProductAdmin(ImportExportModelAdmin): 
     resource_class = ProductResource
     list_display = ['id', 'name', 'quantity', 'purchasing_price', 'points','category', 'num_per_item', 'item_per_carton']
     search_fields = ['name']
@@ -409,12 +411,12 @@ class Extra_ExpenseAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 class DepositeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'client', 'detail_deposite', 'total', 'verify_code', 'date']
+    list_display = ['id', 'client', 'detail_deposite', 'total', 'registry','verify_code', 'date']
     search_fields = ['client__name']
     list_per_page = 50
 
 class WithDrawAdmin(admin.ModelAdmin):
-    list_display = ['id', 'details_withdraw', 'client', 'total', 'verify_code', 'date']
+    list_display = ['id', 'details_withdraw', 'client', 'total','registry', 'verify_code', 'date']
     search_fields = ['client__name']
     list_per_page = 50
 
@@ -455,7 +457,7 @@ class SalarAdmin(admin.ModelAdmin):
 
 
 class RegistryAdmin(admin.ModelAdmin):
-    list_display = ['total']
+    list_display = ['id','total']
 
 class PaymentAdmin(admin.ModelAdmin):
     list_display = ['id', 'name','employee', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date']

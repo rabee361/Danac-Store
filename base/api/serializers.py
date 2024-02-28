@@ -5,7 +5,8 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
 from django.db.models import Q , Sum , F
 from deep_translator import GoogleTranslator
-
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.validators import ValidationError
 
 ############################################################## AUTHENTICATION ###################################################
 
@@ -1014,7 +1015,7 @@ class DepositeSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     class Meta:
         model = Deposite
-        fields = ['id','client','client_id','deposite_name','detail_deposite','total','verify_code','total_deposites','total_sum','date']
+        fields = ['id','client','client_id','deposite_name','detail_deposite','total','registry','verify_code','total_deposites','total_sum','date']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1045,6 +1046,9 @@ class DepositeSerializer(serializers.ModelSerializer):
         return not bool(self._errors)
 
     def create(self, validated_data):
+        request = self.context['request']
+        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
+        registry = Registry.objects.get(employee=employee)
         deposite = Deposite.objects.create(**validated_data)
         registry = Registry.objects.first()
         registry.total += deposite.total
@@ -1052,9 +1056,14 @@ class DepositeSerializer(serializers.ModelSerializer):
         return deposite
 
     def update(self, instance, validated_data):
+        request = self.context['request']
+        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
+        registry = Registry.objects.get(employee=employee)
+        if instance.registry != registry:
+            raise serializers.ValidationError("you are not allowed into this registry!")
+        
         difference = validated_data.get('total', instance.total) - instance.total
         super().update(instance, validated_data)
-        registry = Registry.objects.first()
         registry.total += difference
         registry.save()
         return instance
@@ -1069,9 +1078,10 @@ class DepositeSerializer(serializers.ModelSerializer):
 
 class WithDrawSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id',read_only=True)
+
     class Meta:
         model = WithDraw
-        fields = ['id','client','client_id','withdraw_name','details_withdraw','total','verify_code','total_withdraws','total_sum','date']
+        fields = ['id','client','client_id','withdraw_name','details_withdraw','total','registry','verify_code','total_withdraws','total_sum','date']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1102,21 +1112,30 @@ class WithDrawSerializer(serializers.ModelSerializer):
         return not bool(self._errors)
 
     def create(self, validated_data):
+        request = self.context['request']
+        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
+        registry = Registry.objects.get(employee=employee)
+        validated_data['registry'] = registry
         withdraw = WithDraw.objects.create(**validated_data)
-        registry = Registry.objects.first()
         registry.total -= withdraw.total
         registry.save()
         return withdraw
 
+            
     def update(self, instance, validated_data):
+        request = self.context['request']
+        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
+        registry = Registry.objects.get(employee=employee)
+        validated_data['registry'] = registry
+        if instance.registry != registry:
+            raise serializers.ValidationError("you are not allowed into this registry!")
+        
         difference = validated_data.get('total', instance.total) - instance.total
         super().update(instance, validated_data)
-        registry = Registry.objects.first()
         if registry.total - difference < 0:
             raise serializers.ValidationError("The total in the registry cannot go below zero.")
         registry.total -= difference
         registry.save()
-
         return instance
    
     def to_representation(self, instance):
