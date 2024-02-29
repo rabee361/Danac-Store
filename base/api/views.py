@@ -760,6 +760,32 @@ class RetUpdDesSalary(RetrieveUpdateDestroyAPIView):
 
 
 
+class GetRegistryOperations(APIView):
+    def post(self,request):
+        operation = request.data.get('operation', None)
+        receipt_num = request.data.get('receipt_num', None)
+
+        operations_dict = {
+            'مدفوعات': (Payment, PaymentSerializer),
+            'مقبوضات': (Recieved_Payment, RecievedPaymentSerializer),
+            'مصاريف': (Expense, ExpenseSerializer),
+            'ديون عميل': (Debt_Client, Client_DebtSerializer),
+            'ديون مورد': (Debt_Supplier, Supplier_DebtSerializer),
+        }
+        if operation in operations_dict:
+            model, serializer_class = operations_dict[operation]
+            instance = model.objects.filter(receipt_num=receipt_num).first()
+            instance.added_to_registry = True
+            instance.save()
+            serializer = serializer_class(instance, many=False)
+            return Response(serializer.data)
+        else:
+            return Response({
+                "msg": "لا يوجد عملية بهذا الاسم"
+            })
+
+
+
 class ListRegistries(ListAPIView):
     serializer_class = RegistrySerializer
     permission_classes = [IsAuthenticated]

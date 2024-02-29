@@ -908,7 +908,7 @@ class Client_DebtSerializer(serializers.ModelSerializer):
 
     class Meta :
         model = Debt_Client
-        fields = ['id','client_name','client_id','amount','payment_method','bank_name','receipt_num','date','total_client_debts','total_sum']
+        fields = ['id','client_name','client_id','amount','payment_method','bank_name','receipt_num','date','total_client_debts','total_sum','added_to_registry']
 
     def create(self, validated_data):
         debt_client = Debt_Client.objects.create(**validated_data)
@@ -969,7 +969,7 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
     supplier_id = serializers.IntegerField(source='supplier_name.id',read_only=True)
     class Meta :
         model = Debt_Supplier
-        fields = ['id','supplier_name','supplier_id','amount','payment_method','bank_name','check_num','date','total_supplier_debts','total_sum']
+        fields = ['id','supplier_name','supplier_id','amount','payment_method','bank_name','receipt_num','date','total_supplier_debts','total_sum','added_to_registry']
 
     def create(self, validated_data):
         debt_supplier = Debt_Supplier.objects.create(**validated_data)
@@ -1163,7 +1163,7 @@ class WithDrawSerializer(serializers.ModelSerializer):
 class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
-        fields = ['id','expense_name','details','name','amount','receipt_num','date','total_expenses','total_amount']
+        fields = ['id','expense_name','details','name','amount','receipt_num','date','total_expenses','total_amount','added_to_registry']
     
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1197,7 +1197,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = ['id','employee','name','payment_method','bank_name','receipt_num','amount','date','total_payments','total_amount']
+        fields = ['id','employee','name','payment_method','bank_name','receipt_num','amount','date','total_payments','total_amount','added_to_registry']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1232,7 +1232,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 class RecievedPaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recieved_Payment
-        fields = ['id','employee','name','payment_method','bank_name','receipt_num','amount','date','total_recieved_payments','total_amount']
+        fields = ['id','employee','name','payment_method','bank_name','receipt_num','amount','date','total_recieved_payments','total_amount','added_to_registry']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)

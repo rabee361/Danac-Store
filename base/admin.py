@@ -420,16 +420,16 @@ class WithDrawAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 class ExpenseAdmin(admin.ModelAdmin):
-    list_display = ['id', 'expense_name', 'details', 'name', 'amount', 'receipt_num', 'date']
+    list_display = ['id', 'expense_name', 'details', 'name', 'amount', 'receipt_num', 'date','added_to_registry']
     list_per_page = 50
 
 class Debt_SupplierAdmin(admin.ModelAdmin):
-    list_display = ['id', 'supplier_name', 'amount', 'payment_method', 'bank_name', 'check_num', 'date']
+    list_display = ['id', 'supplier_name', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date','added_to_registry']
     search_fields = ['supplier_name__name']
     list_per_page = 50
 
 class Debt_ClientAdmin(admin.ModelAdmin):
-    list_display = ['id', 'client_name', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date']
+    list_display = ['id', 'client_name', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date','added_to_registry']
     search_fields = ['client_name__name']
     list_per_page = 50
 
@@ -449,7 +449,7 @@ class MediumTwo_ProductsAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 
-class SalarAdmin(admin.ModelAdmin):
+class SalaryAdmin(admin.ModelAdmin):
     list_display = ['employee_name','job_position','salary','percentage','date']
     search_fields = ['employee_name']
     list_per_page = 50
@@ -459,12 +459,12 @@ class RegistryAdmin(admin.ModelAdmin):
     list_display = ['id','total']
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name','employee', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date']
+    list_display = ['id', 'name','employee', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date','added_to_registry']
     search_fields = ['employee__name']
     list_per_page = 50
 
 class Recieved_PaymentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name','employee', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date']
+    list_display = ['id', 'name','employee', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date','added_to_registry']
     search_fields = ['employee__name']
     list_per_page = 50
 
@@ -473,7 +473,7 @@ class Recieved_PaymentAdmin(admin.ModelAdmin):
 admin.site.register(OverTime,OverTimeAdmin)
 admin.site.register(Bonus,BounsAdmin)
 admin.site.register(Advance_On_salary,Advance_On_salaryAdmin)
-admin.site.register(Salary,SalarAdmin)
+admin.site.register(Salary,SalaryAdmin)
 admin.site.register(Absence,AbsenceAdmin)
 admin.site.register(Extra_Expense,Extra_ExpenseAdmin)
 admin.site.register(Discount,DiscountAdmin)

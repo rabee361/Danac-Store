@@ -102,6 +102,7 @@ urlpatterns = [
     path('get-recieved-payment/<str:pk>/' , RetUpdDesRecievedPaymnt.as_view() , name="get-payment"),
     path('expenses/' , ListCreateExpense.as_view() , name="expenses"),
     path('get-expense/<str:pk>/' , RetUpdDesExpense.as_view() , name="get-expense"),
+    path('operation-info/',GetRegistryOperations.as_view(),name="operation-info"),
 
     path('returned-supplier-package/',ListReturnedSupplierPackages.as_view()),### new
     path('get-package-supplier/<str:pk>/',RetReturnedSupplierPackages.as_view()), #### new
