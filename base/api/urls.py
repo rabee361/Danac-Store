@@ -91,7 +91,7 @@ urlpatterns = [
     path('get-client-debt/<str:pk>/' , RetUpdDesClientDebt.as_view() , name="client-debt"),
     path('debt-for-supplier/<str:pk>/' , GetSupplierDebt.as_view()),
     path('get-supplier-debt/<str:pk>/' , RetUpdDesSupplierDebt.as_view() , name="supplier-debt"),
-    path('get-registry/' , GetRegistry.as_view() , name="registry"),
+    path('get-registry/' , ListRegistries.as_view() , name="list-registries"),
     path('deposites/' , ListCreateDeposite.as_view() , name="deposites"),
     path('get-deposite/<str:pk>/' , RetUpdDesDeposite.as_view() , name="get-deposite"),
     path('withdraws/' , ListCreateWithDraw.as_view() , name="withdraws"),

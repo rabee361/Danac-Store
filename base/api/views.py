@@ -758,9 +758,21 @@ class RetUpdDesSalary(RetrieveUpdateDestroyAPIView):
 
 ######################################## Registry ######################################################################
 
-class GetRegistry(ListAPIView):
-    queryset = Registry.objects.all()
+
+
+class ListRegistries(ListAPIView):
     serializer_class = RegistrySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        employee = Employee.objects.get(phonenumber=self.request.user.phonenumber)
+        try:
+            employee = Employee.objects.get(phonenumber=self.request.user.phonenumber)
+            queryset = Registry.objects.filter(employee=employee)
+            return queryset
+        except ObjectDoesNotExist:
+            return Registry.objects.none()
+
 
 
 class ListCreateClientDebts(ListCreateAPIView):

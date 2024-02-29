@@ -900,7 +900,7 @@ class EmployeeSalarySerializer(serializers.ModelSerializer):
 class RegistrySerializer(serializers.ModelSerializer):
     class Meta :
         model = Registry
-        fields = ['total']
+        fields = ['employee','total']
 
 
 class Client_DebtSerializer(serializers.ModelSerializer):
