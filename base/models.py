@@ -125,7 +125,7 @@ class Client(models.Model):
     phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
     category = models.CharField(max_length=75,choices=CHOICES,default='سوبرماركت')
     notes = models.TextField(max_length=150,default='_')
-    location = models.PointField(null=True)
+    location = models.PointField(default=Point(10,20),null=True)
     debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
 
     class Meta:
