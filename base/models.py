@@ -192,7 +192,7 @@ class CodeVerification(models.Model):
 
 class ProductType(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='images/product_types', null=True,default='images/category.webp')
+    image = models.ImageField(upload_to='images/product_types', null=True,default='images/account.jpg')
 
     def __str__(self):
         return self.name
@@ -210,7 +210,7 @@ class ProductType(models.Model):
 class Category(models.Model):
     product_type = models.ForeignKey(ProductType,on_delete=models.CASCADE)
     name = models.CharField(max_length=35)
-    image = models.ImageField(upload_to='images/categories', null=True,default='images/category.webp')
+    image = models.ImageField(upload_to='images/categories', null=True,default='images/account.jpg')
 
     class Meta:
         ordering = ['-id']
@@ -226,7 +226,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='images/products',null=True,blank=True,default='images/category.webp')
+    image = models.ImageField(upload_to='images/products',null=True,blank=True,default='images/account.jpg')
     description = models.TextField(max_length=2000,null=True,blank=True)
     quantity = models.IntegerField()
     purchasing_price = models.FloatField()
