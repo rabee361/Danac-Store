@@ -1472,10 +1472,11 @@ class ReturnedSupplierPackageSerializer(serializers.ModelSerializer):
 class DamagedProductSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     employee = serializers.CharField(read_only=True)
+    package_id = serializers.CharField(write_only=True)#####
 
     class Meta:
         model = DamagedProduct
-        fields  = ['id','product','quantity','employee','total_price','product_id']
+        fields  = ['id','product','quantity','employee','total_price','product_id','package_id']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1506,10 +1507,14 @@ class DamagedProductSerializer(serializers.ModelSerializer):
         return not bool(self._errors)
 
     def create(self, validated_data):
+        package_id = validated_data.pop('package_id')#####
         instance = super().create(validated_data)
         product = instance.product
         product.quantity -= instance.quantity
         product.save()
+        package = ReturnedSupplierPackage.objects.get(id=package_id)####
+        package.goods.add(instance)####
+        package.save()#####
 
         return instance
 
