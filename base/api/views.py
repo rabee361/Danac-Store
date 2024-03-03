@@ -83,8 +83,8 @@ class UserLoginApiView(GenericAPIView):
             data['chat_id'] = chat.id
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
-        # data['username'] = user.username
-        # data['phonenumber'] = user.phonenumber
+        data['longitude'] = user.location.x
+        data['laritude'] = user.location.y
         data['address'] = user.address
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)
