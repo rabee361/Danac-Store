@@ -1032,8 +1032,8 @@ class ListCreateDamagedProduct(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = DamagedProductFilter
     queryset = DamagedProduct.objects.all()
-    serializer_class = DamagedProductSerializer    
-    # permission_classes = [permissions.IsAuthenticated]    
+    serializer_class = DamagedProductSerializer
+    permission_classes = [permissions.IsAuthenticated]  
 
     def perform_create(self,serializer):
         user = self.request.user
