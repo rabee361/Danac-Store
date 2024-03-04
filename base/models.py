@@ -130,6 +130,7 @@ class Client(models.Model):
 
     class Meta:
         app_label = 'Clients_and_Products'
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
@@ -168,8 +169,8 @@ class UserNotification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-
         ordering = ['-created_at']
+        
     def __str__(self) -> str:
         return f'{self.user.username} : {self.body[:50]}'
 
@@ -431,7 +432,7 @@ class Supplier(models.Model):
     phone_number = PhoneNumberField(region='DZ')
     phone_number2 = PhoneNumberField(region='DZ',null=True,blank=True)
     address = models.CharField(max_length=100)
-    info = models.TextField(max_length=500,default='_')
+    info = models.TextField(max_length=500,null=True,blank=True,default='_')
     debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
 
     class Meta:
