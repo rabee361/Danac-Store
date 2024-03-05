@@ -480,7 +480,7 @@ class OverTime(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     num_hours = models.FloatField()
     amount = models.FloatField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-date']
@@ -491,7 +491,7 @@ class OverTime(models.Model):
 
 class Absence(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
     days = models.IntegerField()
     amount = models.FloatField()
 
@@ -506,7 +506,7 @@ class Bonus(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     reason = models.CharField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-date']
@@ -520,7 +520,7 @@ class Discount(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     reason = models.CharField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-date']
@@ -535,7 +535,7 @@ class Advance_On_salary(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     reason = models.CharField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.employee.name
@@ -550,7 +550,7 @@ class Extra_Expense(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     reason = models.TextField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-date']

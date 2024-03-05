@@ -1,6 +1,5 @@
 from django.shortcuts import render
-from .models import Chat , ChatMessage
-
+from .models import ChatMessage
 
 
 def TestChat(request):
