@@ -27,6 +27,7 @@ urlpatterns = [
     path('chats/' , Chats.as_view()),#### new
     path('get-chat/<str:pk>/', GetChat.as_view() , name="get-chat"),
     path('chat-messages/<str:chat_id>/', ChatMessages.as_view()), #### new
+    path('send-message/<str:chat_id>/<str:user_id>/' , SendMessage.as_view()),
 
     path('states/' , States.as_view() , name="states"),
     path('get-state/' , GetState.as_view() , name="get-state"),

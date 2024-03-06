@@ -1709,6 +1709,25 @@ class ListOrderEnvoy(APIView):
 
 ########################### chat ##########################
     
+
+class SendMessage(APIView):
+    # permission_classes = [IsAuthenticated]
+    def post(self,request,chat_id,user_id):
+        user = CustomUser.objects.get(id=user_id)
+        chat = Chat.objects.get(id=chat_id)
+        message = self.request.data['message']
+
+        try:
+            Employee.objects.get(phonenumber=user.phonenumber)
+            msg = ChatMessage.objects.create(sender=user,content=message,chat=chat,employee=True)
+        except Employee.DoesNotExist:
+            msg = ChatMessage.objects.create(sender=user,content=message,chat=chat,employee=False)
+        serializer = MessageSerializer(msg,many=False)
+
+        return Response(serializer.data)
+
+
+
 class ChatMessages(APIView):
     def get(self,request,chat_id):
         chat = Chat.objects.get(id=chat_id)
