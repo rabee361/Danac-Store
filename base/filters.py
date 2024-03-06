@@ -117,58 +117,6 @@ class DebtSupplierFilter(django_filters.FilterSet):
 
 ################################# HR #############################################
         
-# class MonthFilter(filters.Filter):
-#     def filter(self, qs, value):
-#         if value:
-#             date = datetime.strptime(value, "%Y-%m")
-#             return qs.filter(date__year=date.year, date__month=date.month)
-#         return qs
-
-# class SalaryFilter(django_filters.FilterSet):
-#     date = MonthFilter(field_name="date")
-
-#     class Meta: 
-#         model = Salary
-#         fields = ['date']
-
-
-
-
-
-
-
-
-
-
-# class DateRangeFilter(filters.Filter):
-#     def filter(self, qs, value):
-#         if value:
-#             # Assuming value is a dictionary with 'from_date' and 'to_date' keys
-#             from_date = value.get('from_date')
-#             to_date = value.get('to_date')
-
-#             if from_date and to_date:
-#                 # Parse the dates and filter the queryset
-#                 from_date_obj = datetime.strptime(from_date, "%Y-%m-%d")
-#                 to_date_obj = datetime.strptime(to_date, "%Y-%m-%d")
-#                 return qs.filter(date__range=(from_date_obj, to_date_obj))
-#             elif from_date:
-#                 # Filter by from_date only
-#                 from_date_obj = datetime.strptime(from_date, "%Y-%m-%d")
-#                 return qs.filter(date__gte=from_date_obj)
-#             elif to_date:
-#                 # Filter by to_date only
-#                 to_date_obj = datetime.strptime(to_date, "%Y-%m-%d")
-#                 return qs.filter(date__lte=to_date_obj)
-#         return qs
-
-
-# class SalaryFilter(django_filters.FilterSet):
-#     date_range = DateRangeFilter(field_name="date")
-
-#     class Meta:  
-#         model = Salary
-#         fields = ['date_range']
 
 class SalaryFilter(django_filters.FilterSet):
     date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
@@ -177,17 +125,6 @@ class SalaryFilter(django_filters.FilterSet):
     class Meta:
         model = Salary
         fields = ['date_from', 'date_to']
-
-
-
-
-
-
-
-
-
-
-
 
 
 class OverTimeFilter(django_filters.FilterSet):

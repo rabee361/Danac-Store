@@ -1512,7 +1512,7 @@ class DamagedProductSerializer(serializers.ModelSerializer):
         product = instance.product
         product.quantity -= instance.quantity
         product.save()
-        package = ReturnedSupplierPackage.objects.get(id=package_id)####
+        package = DamagedPackage.objects.get(id=package_id)####
         package.goods.add(instance)####
         package.save()#####
 
