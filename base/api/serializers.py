@@ -922,7 +922,7 @@ class Client_DebtSerializer(serializers.ModelSerializer):
         return debt_client
 
     def update(self, instance, validated_data):
-        debt_difference = validated_data.get('amount', instance.amount) - instance.amount
+        debt_difference = instance.amount - validated_data.get('amount')
         instance = super().update(instance, validated_data)
         client = instance.client_name
         client.debts += debt_difference
@@ -984,9 +984,10 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        debt_difference = validated_data.get('amount', instance.amount) - instance.amount
+        debt_difference = instance.amount - validated_data.get('amount')
         instance = super().update(instance, validated_data)
         supplier = instance.supplier_name
+        print(debt_difference)
         supplier.debts += debt_difference
         supplier.save()
         return instance
@@ -1560,8 +1561,6 @@ class PointsSerializer(serializers.ModelSerializer):
 
 
 ################################# INCOMING ############################################# 
-
-
 
 class SpecialSerializer(serializers.ModelSerializer):
     class Meta:
