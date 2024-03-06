@@ -1387,7 +1387,6 @@ class ReturnedClientPackageSerializer(serializers.ModelSerializer):
 
 
 
-
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
@@ -1437,7 +1436,7 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         package_id = validated_data.pop('package_id')#####
-        instance = super().create(**validated_data)
+        instance = super().create(validated_data)
         product = instance.product
         product.quantity -= instance.quantity
         product.save()
