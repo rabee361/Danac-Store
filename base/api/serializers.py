@@ -1315,10 +1315,11 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
     employee_id = serializers.IntegerField(source='employee.id',read_only=True)
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     employee = serializers.CharField(read_only=True)
+    package_id = serializers.CharField(write_only=True)#####
 
     class Meta:
         model = ReturnedGoodsClient
-        fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason']
+        fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason','package_id']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
