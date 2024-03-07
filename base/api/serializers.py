@@ -1274,9 +1274,10 @@ class MediumSerializer(serializers.ModelSerializer):
 class ProductsMediumSerializer(serializers.ModelSerializer):
     product = ProductSerializer(many=False,read_only=True)
     product_id = serializers.IntegerField(source='product.id',read_only=True)
+    product_points = serializers.IntegerField(source='product.points',read_only=True)
     class Meta:
         model = Products_Medium
-        fields = ['id','medium','product','product_id','price','num_item','total_price_of_item']
+        fields = ['id','medium','product','product_id','price','num_item','total_price_of_item','product_points']
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['num_per_item'] = instance.product.num_per_item
@@ -1755,7 +1756,7 @@ class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
         model = ManualReceipt_Products
         fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'num_item' ,'total_price', 'manualreceipt']
 
-    def create(self, validated_data):
+    def create(self, validated_data):   
         product = validated_data.get('product')
         num_item = validated_data.get('num_item')
         manual_receipt = validated_data.get('manualreceipt')

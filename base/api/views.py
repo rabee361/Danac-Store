@@ -1075,6 +1075,27 @@ class Add_To_Medium(APIView):
         return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
 
     
+
+
+class Add_product_to_Medium(APIView):
+    def post(self,request):
+        product_id = self.request.data['product']
+        medium_id = self.request.data['medium']
+        product = Product.objects.get(id=product_id)
+        medium = Medium.objects.get(id=medium_id)
+        num_item = self.request.data['num_item']
+        sale_price = self.request.data['sale_price']
+        medium_products, created = Products_Medium.objects.get_or_create(product=product, medium=medium)
+        if created:
+            medium_products.price += float(sale_price)
+            medium_products.num_item += int(num_item)
+            medium_products.total_price = medium_products.total_price_of_item
+            medium_products.save()
+        pro_med_serializer = ProductsMediumSerializer(medium_products)
+        return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
+
+
+
 class GetMediumView(RetrieveAPIView):
     queryset = Medium.objects.all()
     serializer_class = MediumSerializer
