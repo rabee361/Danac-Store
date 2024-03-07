@@ -608,6 +608,7 @@ class WithDraw(models.Model):
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def __str__(self):
         return self.client.name
@@ -631,6 +632,7 @@ class Deposite(models.Model):
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def __str__(self):
         return self.client.name
@@ -658,6 +660,7 @@ class Debt_Client(models.Model):
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def __str__(self):
         return self.client_name.name
@@ -685,6 +688,7 @@ class Debt_Supplier(models.Model):
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def __str__(self):
         return self.supplier_name.name
@@ -708,6 +712,7 @@ class Expense(models.Model):
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def __str__(self):
         return self.expense_name
@@ -736,6 +741,7 @@ class Recieved_Payment(models.Model):
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def total_recieved_payments(self):
         return Recieved_Payment.objects.count()
@@ -761,6 +767,7 @@ class Payment(models.Model):
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def total_payments(self):
         return Payment.objects.count()

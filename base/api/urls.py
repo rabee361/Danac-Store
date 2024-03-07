@@ -50,6 +50,8 @@ urlpatterns = [
     path('get-category/<str:pk>/' , RetUpdDesCategory.as_view() , name="get-category"),
     path('product-types/' ,ListCreateProductType.as_view(), name="product-types"), ##### new
     path('get-product-type/<str:pk>/' , RetUpdDesProductType.as_view() , name="get-product-type"),#### new
+    path('total-categories/' , GetTotalCategories.as_view()),
+    path('total-product-types/', GetTotalProductTypes.as_view()),
     
     path('cart_items/<str:pk>' , Cart_Items.as_view() , name="cart_products"),
     path('cart_details/<str:pk>' , Cart_Items_Details.as_view() , name="cart_products_details"),

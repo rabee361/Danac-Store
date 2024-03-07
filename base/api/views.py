@@ -267,6 +267,22 @@ class ListAds(ListAPIView):
     serializer_class = AdSerializer
 
 
+class GetTotalCategories(APIView):
+    def get(self,request):
+        total_categories = Category.objects.count()
+        return Response({
+            "total_categories":total_categories
+        })
+    
+
+class GetTotalProductTypes(APIView):
+    def get(self,request):
+        total_product_types = ProductType.objects.count()
+        return Response({
+            "total_product_types":total_product_types
+        })
+
+
 
 class ListCreateProductType(ListCreateAPIView):
     # permission_classes = [IsAuthenticated]
