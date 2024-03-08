@@ -785,6 +785,7 @@ class Payment(models.Model):
 ############################################-Returned & Damaged Goods-----###############################################################################
         
 class ReturnedGoodsSupplier(models.Model):
+    supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
@@ -799,7 +800,6 @@ class ReturnedGoodsSupplier(models.Model):
 
 
 class ReturnedSupplierPackage(models.Model):
-    supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     goods = models.ManyToManyField(ReturnedGoodsSupplier)
     date = models.DateField(auto_now_add=True,null=True)
@@ -817,6 +817,7 @@ class ReturnedSupplierPackage(models.Model):
     
     
 class ReturnedGoodsClient(models.Model):
+    client =  models.ForeignKey(Client, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
@@ -831,7 +832,6 @@ class ReturnedGoodsClient(models.Model):
 
 
 class ReturnedClientPackage(models.Model):
-    client =  models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     goods = models.ManyToManyField(ReturnedGoodsClient)
     date = models.DateField(auto_now_add=True,null=True)

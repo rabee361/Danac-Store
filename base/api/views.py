@@ -987,10 +987,6 @@ class ListCreateRetGoodsSupplier(ListCreateAPIView):
     serializer_class = ReturnedGoodsSupplierSerializer
     permission_classes = [permissions.IsAuthenticated]  
 
-    def perform_create(self,serializer):
-        user = self.request.user
-        employee = Employee.objects.get(phonenumber=user.phonenumber)
-        serializer.save(employee=employee)
 
 
 class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
@@ -1018,10 +1014,6 @@ class ListCreateRetGoodsClient(ListCreateAPIView):
     serializer_class = ReturnedGoodsClientSerializer
     permission_classes = [permissions.IsAuthenticated]    
 
-    def perform_create(self,serializer):
-        user = self.request.user
-        employee = Employee.objects.get(phonenumber=user.phonenumber)
-        serializer.save(employee=employee)   
 
 
 

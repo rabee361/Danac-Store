@@ -360,7 +360,7 @@ class DElevaryArrivedAdmin(admin.ModelAdmin):
 
 
 class ReturnedGoodsClientAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'quantity', 'total_price', 'reason']
+    list_display = ['id', 'name_product','client', 'quantity', 'total_price', 'reason']
     def name_product(self, obj):
         return obj.product.name
     
@@ -372,13 +372,13 @@ class ReturnedClientPackageAdmin(admin.ModelAdmin):
     
 
 class ReturnedGoodsSupplierAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'quantity', 'total_price', 'reason']
+    list_display = ['id', 'name_product','supplier', 'quantity', 'total_price', 'reason']
     def name_product(self, obj):
         return obj.product.name
     
 
 class ReturnedSupplierPackageAdmin(admin.ModelAdmin):
-    list_display = ['id','supplier','employee','date','barcode']
+    list_display = ['id','employee','date','barcode']
 
 
 
