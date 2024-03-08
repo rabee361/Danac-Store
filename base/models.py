@@ -850,7 +850,6 @@ class ReturnedClientPackage(models.Model):
 class DamagedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE,null=True)
     total_price = models.FloatField()
 
     class Meta:
@@ -862,6 +861,7 @@ class DamagedProduct(models.Model):
 
 
 class DamagedPackage(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     goods = models.ManyToManyField(DamagedProduct)
     date = models.DateField(auto_now_add=True,null=True)
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)

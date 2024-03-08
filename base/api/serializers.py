@@ -1475,12 +1475,11 @@ class ReturnedSupplierPackageSerializer(serializers.ModelSerializer):
 
 class DamagedProductSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    employee = serializers.CharField(read_only=True)
     package_id = serializers.CharField(write_only=True)#####
 
     class Meta:
         model = DamagedProduct
-        fields  = ['id','product','quantity','employee','total_price','product_id','package_id']
+        fields  = ['id','product','quantity','total_price','product_id','package_id']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1545,9 +1544,13 @@ class DamagedPackageSerializer(serializers.ModelSerializer):
     goods = DamagedProductSerializer(many=True,read_only=True)
     class Meta:
         model = DamagedPackage
-        fields = ['id','date','total_num','total_price','barcode','goods']
-
-
+        fields = ['id','date','employee','total_num','total_price','barcode','goods']
+    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
+        instance = DamagedPackage.objects.create(employee=employee,**validated_data)
+        return instance
 
 
 

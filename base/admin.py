@@ -248,6 +248,11 @@ class SupplierAdmin(admin.ModelAdmin):
 
 
 
+class DamagedPackageAdmin(admin.ModelAdmin):
+    list_display = ['employee','date','barcode']
+
+
+
 class DamagedProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'get_name_product', 'quantity', 'total_price']
     search_fields = ['product__name']
@@ -509,7 +514,7 @@ admin.site.register(ReturnedClientPackage,ReturnedClientPackageAdmin)
 admin.site.register(ReturnedGoodsClient, ReturnedGoodsClientAdmin)
 admin.site.register(ReturnedSupplierPackage,ReturnedClientPackageAdmin)
 admin.site.register(ReturnedGoodsSupplier, ReturnedGoodsSupplierAdmin)
-admin.site.register(DamagedPackage)
+admin.site.register(DamagedPackage,DamagedPackageAdmin)
 admin.site.register(DamagedProduct,DamagedProductAdmin)
 
 #### Medium ####
