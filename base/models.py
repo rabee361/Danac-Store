@@ -1165,7 +1165,6 @@ class ManualReceipt(models.Model):
     reclaimed_products = models.FloatField(null=True,blank=True,default=0.0)
     previous_depts = models.FloatField(null=True,blank=True,default=0.0)
     remaining_amount = models.FloatField(blank=True,default=0.0)
-    shipping_cost = models.FloatField(default=0.0)
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
     freeze = models.BooleanField(default=False)
