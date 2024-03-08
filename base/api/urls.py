@@ -152,7 +152,7 @@ urlpatterns = [
     path('get-incoming-product/<str:pk>/' , RetUpdDesIncomingProduct.as_view()),
     path('create-incoming-product/' , CreateIncomingProduct.as_view()),
  
-    path('list-medium-products/<str:medium_id>/',  GetMediumView.as_view()),
+    path('list-medium-products/<str:medium_id>/',  ListMediumView.as_view()),
     path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),
     path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),
     path('create-medium/', CreateMedium.as_view()),

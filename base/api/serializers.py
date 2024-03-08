@@ -1312,16 +1312,13 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
 
 
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
-    client_id = serializers.IntegerField(source='client.id',read_only=True)
     product_id = serializers.IntegerField(source='product.id',read_only=True)
-    employee_id = serializers.IntegerField(source='employee.id',read_only=True)
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    employee = serializers.CharField(read_only=True)
     package_id = serializers.CharField(write_only=True)#####
 
     class Meta:
         model = ReturnedGoodsClient
-        fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason','package_id']
+        fields = ['id','product','product_id','quantity','total_price','reason','package_id']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1358,7 +1355,6 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
         product = instance.product
         product.quantity += quantity_diff
         product.save()
-
         return instance
     
     def create(self, validated_data):
@@ -1375,8 +1371,6 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['product'] = instance.product.name
-        representation['client'] = instance.client.name
-        representation['employee'] = instance.employee.name
         return representation
 
 
@@ -1388,16 +1382,19 @@ class ReturnedClientPackageSerializer(serializers.ModelSerializer):
         model = ReturnedClientPackage
         fields = '__all__'
 
+    def create(self, validated_data):
+        request = self.context.get('request')
+        employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
+        instance = ReturnedClientPackage.objects.create(employee,**validated_data)
+        return instance
 
 
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
-    employee = serializers.CharField(read_only=True)
-    package_id = serializers.CharField(write_only=True)#####
+    package_id = serializers.CharField(write_only=True)
     class Meta:
         model = ReturnedGoodsSupplier
-        fields = ['id', 'supplier', 'product', 'employee', 'quantity', 'total_price', 'reason','package_id']
+        fields = ['id', 'product', 'quantity', 'total_price', 'reason','package_id']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1434,7 +1431,6 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
         product = instance.product
         product.quantity += quantity_diff
         product.save()
-
         return instance
     
     def create(self, validated_data):
@@ -1446,14 +1442,11 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
         package = ReturnedSupplierPackage.objects.get(id=package_id)####
         package.goods.add(instance)####
         package.save()#####
-
         return instance
     
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['product'] = instance.product.name
-        representation['supplier'] = instance.supplier.name
-        representation['employee'] = instance.employee.name
         return representation
 
 
@@ -1465,6 +1458,9 @@ class ReturnedSupplierPackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReturnedSupplierPackage
         fields = '__all__'
+
+    def create(self, validated_data):
+        return super().create(validated_data)
 
     
 

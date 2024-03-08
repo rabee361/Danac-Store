@@ -786,8 +786,6 @@ class Payment(models.Model):
         
 class ReturnedGoodsSupplier(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
     reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
@@ -801,6 +799,8 @@ class ReturnedGoodsSupplier(models.Model):
 
 
 class ReturnedSupplierPackage(models.Model):
+    supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     goods = models.ManyToManyField(ReturnedGoodsSupplier)
     date = models.DateField(auto_now_add=True,null=True)
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
@@ -818,8 +818,6 @@ class ReturnedSupplierPackage(models.Model):
     
 class ReturnedGoodsClient(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    client =  models.ForeignKey(Client, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
     reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
@@ -833,6 +831,8 @@ class ReturnedGoodsClient(models.Model):
 
 
 class ReturnedClientPackage(models.Model):
+    client =  models.ForeignKey(Client, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     goods = models.ManyToManyField(ReturnedGoodsClient)
     date = models.DateField(auto_now_add=True,null=True)
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
