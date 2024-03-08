@@ -25,7 +25,9 @@ urlpatterns = [
     path('get-location/<str:employee_id>/' , GetSalesEmployeeLocation.as_view() , name="get-location"),
 
     path('chats/' , Chats.as_view()),#### new
+    path('get-chat/<str:pk>/', GetChat.as_view() , name="get-chat"),
     path('chat-messages/<str:chat_id>/', ChatMessages.as_view()), #### new
+    path('send-message/<str:chat_id>/<str:user_id>/' , SendMessage.as_view()),
 
     path('states/' , States.as_view() , name="states"),
     path('get-state/' , GetState.as_view() , name="get-state"),
@@ -40,7 +42,6 @@ urlpatterns = [
     path('expired-points/', ExpiredClientPointsView.as_view(), name='expired-points'),
     path('points/', ClientPointsView.as_view(), name='client-points'),
     
-    path('get-category-product-type/<str:product_type_id>/', ListCategoryProductType.as_view()), ### new
     path('products/' , listCreateProducts.as_view() , name="products"),
     path('special-products/' , SpecialProducts.as_view() , name="special-products"),
     path('ads/' , ListAds.as_view() , name="list-ads"),
@@ -49,6 +50,8 @@ urlpatterns = [
     path('get-category/<str:pk>/' , RetUpdDesCategory.as_view() , name="get-category"),
     path('product-types/' ,ListCreateProductType.as_view(), name="product-types"), ##### new
     path('get-product-type/<str:pk>/' , RetUpdDesProductType.as_view() , name="get-product-type"),#### new
+    path('total-categories/' , GetTotalCategories.as_view()),
+    path('total-product-types/', GetTotalProductTypes.as_view()),
     
     path('cart_items/<str:pk>' , Cart_Items.as_view() , name="cart_products"),
     path('cart_details/<str:pk>' , Cart_Items_Details.as_view() , name="cart_products_details"),
@@ -91,7 +94,7 @@ urlpatterns = [
     path('get-client-debt/<str:pk>/' , RetUpdDesClientDebt.as_view() , name="client-debt"),
     path('debt-for-supplier/<str:pk>/' , GetSupplierDebt.as_view()),
     path('get-supplier-debt/<str:pk>/' , RetUpdDesSupplierDebt.as_view() , name="supplier-debt"),
-    path('get-registry/' , GetRegistry.as_view() , name="registry"),
+    path('get-registry/' , ListRegistries.as_view() , name="list-registries"),
     path('deposites/' , ListCreateDeposite.as_view() , name="deposites"),
     path('get-deposite/<str:pk>/' , RetUpdDesDeposite.as_view() , name="get-deposite"),
     path('withdraws/' , ListCreateWithDraw.as_view() , name="withdraws"),
@@ -102,50 +105,60 @@ urlpatterns = [
     path('get-recieved-payment/<str:pk>/' , RetUpdDesRecievedPaymnt.as_view() , name="get-payment"),
     path('expenses/' , ListCreateExpense.as_view() , name="expenses"),
     path('get-expense/<str:pk>/' , RetUpdDesExpense.as_view() , name="get-expense"),
+    path('operation-info/',GetRegistryOperations.as_view(),name="operation-info"),
 
-    path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),#####
-    path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),
+    path('returned-supplier-package/',ListReturnedSupplierPackages.as_view()),### new
+    path('get-package-supplier/<str:pk>/',RetReturnedSupplierPackages.as_view()), #### new
+    path('returned-goods-supplier/', ListCreateRetGoodsSupplier.as_view()),
+    path('get-returned-supplier/<str:pk>/', RetUpdDesReturnGoodSupplier.as_view()),###### delete
 
     path('returned-client-package/',ListReturnedClientPackages.as_view()),##### new
     path('get-package-client/<str:pk>/',RetReturnedClientPackages.as_view()),#### new
     path('returned-goods-client/', ListCreateRetGoodsClient.as_view()),
     path('get-returned-client/<str:pk>/', RetUpdDesReturnGoodClient.as_view()),
 
-    path('damaged-product-package/',ListCreateDamagedProductPackage.as_view()),##### new
-    path('get-package-damaged/<str:pk>/',RetDamagedProductPackage.as_view()),#### new
+    path('damaged-packages/',ListDamagedPackages.as_view()),##### new
+    path('get-damaged-package/<str:pk>/',RetDamagedPackages.as_view()),#### new
     path('damaged-product/', ListCreateDamagedProduct.as_view()),
     path('get-damaged-product/<str:pk>/', RetUpdDesDamagedProduct.as_view()),
 
     path('get-receipt-manual/<str:pk>/', GetManualReceipt.as_view(), name="get-manuals"),
-    path('freeze-manual/' , ListCreateFreezeManualReceipt.as_view(),name="freeze-manual"),### new
+    path('freeze-manual/<str:receipt_id>/' , FreezeManualReceipt.as_view(),name="freeze-manual"),
+    path('unfreeze-manual/<str:receipt_id>/' , UnFreezeManualReceipt.as_view(),name="funreeze-manual"),
     path('create-manual-receipt/<str:medium_id>/',CreateManualReceiptView.as_view()),
     path('list-manuals/' , ListManualReceipt.as_view() , name="list-manual"),
+    path('list-frozen-manual/' , ListFrozenManualReceipts.as_view()),
     path('update-manual/<str:pk>/' , UpdateManualReceipt.as_view() , name="update-manual"),
     path('get-manual-product/<str:pk>/' , RetUpdDesManualReceiptProduct.as_view()),
     path('create-manual-product/' , CreateManualProduct.as_view()),
  
     path('get-receipt-output/<str:pk>/', GetOutput.as_view(), name='get-output'),
     path('freeze-output/<str:receipt_id>/' , FreezeOutputReceipt.as_view(),name="freeze-output"),
+    path('unfreeze-output/<str:receipt_id>/' , UnFreezeOutputReceipt.as_view(),name="funreeze-output"),
     path('create-output-receipt/<int:medium_id>/', ReceiptOrdersView.as_view()),
     path('list-outputs/' , ListOutputs.as_view() , name="list-outputs"),
+    path('list-frozen-outputs/' , ListFrozenOutputReceipts.as_view()),
     path('update-output/<str:pk>/' , UpdateOutputReceipt.as_view() , name="update-output"),
     path('get-output-product/<str:pk>/' , RetUpdDesOutputProduct.as_view()),
     path('create-output-product/' , CreateOutputProduct.as_view()),
  
     path('get-receipt-incoming/<str:pk>/' , GetIncoming.as_view() , name="get-incoming"),
     path('freeze-incoming/<str:receipt_id>/' , FreezeIncomingReceipt.as_view(),name="freeze-incoming"),
+    path('unfreeze-incoming/<str:receipt_id>/' , UnFreezeIncomingReceipt.as_view(),name="funreeze-incoming"),
     path('create-incoming/<str:medium_id>/', CreateIncomingView.as_view()),
     path('list-incoming/' , ListIncomings.as_view() , name="list-incomings"),
+    path('list-frozen-incoming/' , ListFrozenIncomingReceipts.as_view()),
     path('update-incoming/<str:pk>/' , UpdateIncomingReceipt.as_view() , name="update-incoming"),
     path('get-incoming-product/<str:pk>/' , RetUpdDesIncomingProduct.as_view()),
     path('create-incoming-product/' , CreateIncomingProduct.as_view()),
  
-    path('list-medium-products/<str:medium_id>/', ListMediumView.as_view()),
+    path('list-medium-products/<str:medium_id>/',  ListMediumView.as_view()),
     path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),
     path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),
     path('create-medium/', CreateMedium.as_view()),
     path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),
     path('delete-product-from-medium/<str:pk>/', DeleteProductsMediumView.as_view()),
+    path('add-product-to-medium/' , Add_product_to_Medium.as_view()),
     path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),
 
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
@@ -161,10 +174,6 @@ urlpatterns = [
     path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
     path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view()),
     path('delete-medium-two/<str:pk>/' , DeleteMediumTwo.as_view()),
-    path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view()),
- 
-    ##### new
-    path('returned-goods/', ListCreateReturnedGoods.as_view()),
-    path('return-good/<str:pk>/', RetReturnedGoods.as_view()),
-    path('create-returned-goods-supplier/<str:pk>/', CreateReturnedGoodsSupplier.as_view()),
+    path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view())
+    
     ]

@@ -5,7 +5,8 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
 from django.db.models import Q , Sum , F
 from deep_translator import GoogleTranslator
-
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.validators import ValidationError
 
 ############################################################## AUTHENTICATION ###################################################
 
@@ -192,28 +193,23 @@ class StateSerializer(serializers.ModelSerializer):
 class ProductTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductType
-        fields = '__all__'
+        fields = ['id','image','name','total_product_types']
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['id','product_type','name','image','total_categories']
 
-### new
-class   CategorySerializer2(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ['id', 'name','product_type']
 
 class ClientSerializer(serializers.ModelSerializer):
-    total_points = serializers.SerializerMethodField()
-    total_receipts = serializers.SerializerMethodField()
     phonenumber = serializers.CharField()
-    # phonenumber2
+    longitude = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+
     class Meta:
         model = Client
-        fields = ['id','name', 'address', 'phonenumber', 'category', 'notes', 'location', 'total_points','debts','total_receipts']
+        fields = ['id','name', 'address', 'phonenumber','phonenumber2', 'category', 'notes', 'longitude','latitude', 'total_points','debts','total_receipts']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -243,15 +239,12 @@ class ClientSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
     
-    def get_total_points(self,obj):
-        total = Points.objects.filter(Q(client=obj)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).aggregate(total_points=models.Sum('number'))['total_points'] or 0
-        return total
+    def get_longitude(self,obj):
+        return obj.location.x
     
-    def get_total_receipts(self,obj):
-        manuals = ManualReceipt.objects.filter(client=obj).count()
-        outputs = Output.objects.filter(client=obj).count()
-        total = manuals + outputs
-        return total
+    def get_latitude(self,obj):
+        return obj.location.y
+
 
 
 
@@ -307,7 +300,7 @@ class ProductSerializer(serializers.ModelSerializer):
                 category = Category.objects.get(name=category_name)
                 validated_data['category'] = category
             except Category.DoesNotExist:
-                raise serializers.ValidationError({"category": "Object with name does not exist."})
+                raise serializers.ValidationError({"category": "Object with this name does not exist."})
         return super(ProductSerializer, self).update(instance, validated_data)
 
 
@@ -533,8 +526,23 @@ class EmployeeSerializer(serializers.ModelSerializer):
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        related_models = {
+            'overtime':'overtime_set',
+            'absence':'absence_set',
+            'bonus':'bonus_set',
+            'discount':'discount_set',
+        }
+        totals = {}
+        for key,value in related_models.items():
+            related_objects = getattr(instance, value).all()
+            total = sum(obj.amount for obj in related_objects)
+            totals[value] = total
+            representation[key] = total
+        return representation
 
-        return not bool(self._errors)
 
         
 class SalesEmployeeSerializer(serializers.ModelSerializer):
@@ -568,11 +576,9 @@ class SalesEmployeeLocationSerializer(serializers.ModelSerializer):
 
 
 class SupplierSerializer(serializers.ModelSerializer):
-    total_receipts = serializers.SerializerMethodField()
-
     class Meta:
         model = Supplier
-        fields = ['id','name','company_name','address','phone_number','info','debts', 'total_receipts']
+        fields = ['id','name','company_name','address','phone_number','phone_number2','info','debts','total_receipts']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -607,9 +613,7 @@ class SupplierSerializer(serializers.ModelSerializer):
         repr['name'] = modify_name(repr['name'])
         return repr
     
-    def get_total_receipts(self,obj):
-        manuals = Incoming.objects.filter(supplier=obj).count()
-        return manuals
+
     
 
 ############################################################## HR ##################################################################
@@ -794,7 +798,7 @@ class ExtraExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Extra_Expense
         fields = '__all__'
-        fields = ['id','employee','employee_name','reason','amount','date','barcode']
+        fields = ['id','employee','employee_name','reason','amount','date']
         
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -838,7 +842,7 @@ class SalarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Salary
         fields = '__all__'
-        read_only_fields = ('hr',)  # Add 'hr' to the read-only fields
+        read_only_fields = ('hr',)
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -896,23 +900,15 @@ class EmployeeSalarySerializer(serializers.ModelSerializer):
 class RegistrySerializer(serializers.ModelSerializer):
     class Meta :
         model = Registry
-        fields = ['total']
+        fields = ['employee','total']
 
 
 class Client_DebtSerializer(serializers.ModelSerializer):
-    total_client_debts = serializers.SerializerMethodField()
-    total_sum = serializers.SerializerMethodField()
     client_id = serializers.IntegerField(source='client_name.id',read_only=True)
+
     class Meta :
         model = Debt_Client
-        fields = ['id','client_name','client_id','amount','payment_method','bank_name','receipt_num','date','total_client_debts','total_sum']
-
-    def get_total_client_debts(self, obj):
-        return Debt_Client.get_total_client_debts()
-
-    def get_total_sum(self, obj):
-        return Debt_Client.get_total_sum()
-
+        fields = ['id','client_name','client_id','amount','payment_method','bank_name','receipt_num','date','total_client_debts','total_sum','added_to_registry']
 
     def create(self, validated_data):
         debt_client = Debt_Client.objects.create(**validated_data)
@@ -926,7 +922,7 @@ class Client_DebtSerializer(serializers.ModelSerializer):
         return debt_client
 
     def update(self, instance, validated_data):
-        debt_difference = validated_data.get('amount', instance.amount) - instance.amount
+        debt_difference = instance.amount - validated_data.get('amount')
         instance = super().update(instance, validated_data)
         client = instance.client_name
         client.debts += debt_difference
@@ -970,19 +966,11 @@ class Client_DebtSerializer(serializers.ModelSerializer):
 
 
 class Supplier_DebtSerializer(serializers.ModelSerializer):
-    total_supplier_debts = serializers.SerializerMethodField()
-    total_sum = serializers.SerializerMethodField()
     supplier_id = serializers.IntegerField(source='supplier_name.id',read_only=True)
     class Meta :
         model = Debt_Supplier
-        fields = ['id','supplier_name','supplier_id','amount','payment_method','bank_name','check_num','date','total_supplier_debts','total_sum']
+        fields = ['id','supplier_name','supplier_id','amount','payment_method','bank_name','receipt_num','date','total_supplier_debts','total_sum','added_to_registry']
 
-    def get_total_supplier_debts(self, obj):
-        return Debt_Supplier.get_total_supplier_debts()
-
-    def get_total_sum(self, obj):
-        return Debt_Supplier.get_total_sum()
-    
     def create(self, validated_data):
         debt_supplier = Debt_Supplier.objects.create(**validated_data)
         supplier = debt_supplier.supplier_name
@@ -996,9 +984,10 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        debt_difference = validated_data.get('amount', instance.amount) - instance.amount
+        debt_difference = instance.amount - validated_data.get('amount')
         instance = super().update(instance, validated_data)
         supplier = instance.supplier_name
+        print(debt_difference)
         supplier.debts += debt_difference
         supplier.save()
         return instance
@@ -1039,18 +1028,10 @@ class Supplier_DebtSerializer(serializers.ModelSerializer):
 
 
 class DepositeSerializer(serializers.ModelSerializer):
-    total_deposites = serializers.SerializerMethodField()
-    total_sum = serializers.SerializerMethodField()
     client_id = serializers.IntegerField(source='client.id',read_only=True)
     class Meta:
         model = Deposite
-        fields = ['id','client','client_id','deposite_name','detail_deposite','total','verify_code','total_deposites','total_sum','date']
-
-    def get_total_deposites(self, obj):
-        return Deposite.get_total_deposites()
-
-    def get_total_sum(self, obj):
-        return Deposite.get_total_sum()
+        fields = ['id','client','client_id','deposite_name','detail_deposite','total','registry','verify_code','total_deposites','total_sum','date']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1081,6 +1062,9 @@ class DepositeSerializer(serializers.ModelSerializer):
         return not bool(self._errors)
 
     def create(self, validated_data):
+        request = self.context['request']
+        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
+        registry = Registry.objects.get(employee=employee)
         deposite = Deposite.objects.create(**validated_data)
         registry = Registry.objects.first()
         registry.total += deposite.total
@@ -1088,9 +1072,14 @@ class DepositeSerializer(serializers.ModelSerializer):
         return deposite
 
     def update(self, instance, validated_data):
+        request = self.context['request']
+        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
+        registry = Registry.objects.get(employee=employee)
+        if instance.registry != registry:
+            raise serializers.ValidationError("you are not allowed into this registry!")
+        
         difference = validated_data.get('total', instance.total) - instance.total
         super().update(instance, validated_data)
-        registry = Registry.objects.first()
         registry.total += difference
         registry.save()
         return instance
@@ -1104,18 +1093,11 @@ class DepositeSerializer(serializers.ModelSerializer):
 
 
 class WithDrawSerializer(serializers.ModelSerializer):
-    total_withdraws = serializers.SerializerMethodField()
-    total_sum = serializers.SerializerMethodField()
     client_id = serializers.IntegerField(source='client.id',read_only=True)
+
     class Meta:
         model = WithDraw
-        fields = ['id','client','client_id','withdraw_name','details_withdraw','total','verify_code','total_withdraws','total_sum','date']
-
-    def get_total_withdraws(self, obj):
-        return WithDraw.get_total_withdraws()
-
-    def get_total_sum(self, obj):
-        return WithDraw.get_total_sum()
+        fields = ['id','client','client_id','withdraw_name','details_withdraw','total','registry','verify_code','total_withdraws','total_sum','date']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1146,21 +1128,30 @@ class WithDrawSerializer(serializers.ModelSerializer):
         return not bool(self._errors)
 
     def create(self, validated_data):
+        request = self.context['request']
+        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
+        registry = Registry.objects.get(employee=employee)
+        validated_data['registry'] = registry
         withdraw = WithDraw.objects.create(**validated_data)
-        registry = Registry.objects.first()
         registry.total -= withdraw.total
         registry.save()
         return withdraw
 
+            
     def update(self, instance, validated_data):
+        request = self.context['request']
+        employee = Employee.objects.get(phonenumber=request.user.phonenumber)
+        registry = Registry.objects.get(employee=employee)
+        validated_data['registry'] = registry
+        if instance.registry != registry:
+            raise serializers.ValidationError("you are not allowed into this registry!")
+        
         difference = validated_data.get('total', instance.total) - instance.total
         super().update(instance, validated_data)
-        registry = Registry.objects.first()
         if registry.total - difference < 0:
             raise serializers.ValidationError("The total in the registry cannot go below zero.")
         registry.total -= difference
         registry.save()
-
         return instance
    
     def to_representation(self, instance):
@@ -1171,17 +1162,9 @@ class WithDrawSerializer(serializers.ModelSerializer):
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
-    total_expenses = serializers.SerializerMethodField()
-    total_amount = serializers.SerializerMethodField()
     class Meta:
         model = Expense
-        fields = '__all__'
-
-    def get_total_expenses(self, obj):
-        return Expense.get_total_expenses()
-
-    def get_total_amount(self, obj):
-        return Expense.get_total_amount()
+        fields = ['id','expense_name','details','name','amount','receipt_num','date','total_expenses','total_amount','added_to_registry']
     
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1213,17 +1196,9 @@ class ExpenseSerializer(serializers.ModelSerializer):
 
 
 class PaymentSerializer(serializers.ModelSerializer):
-    total_payments = serializers.SerializerMethodField()
-    total_amount = serializers.SerializerMethodField()
     class Meta:
         model = Payment
-        fields = '__all__'
-
-    def get_total_payments(self, obj):
-        return Payment.get_total_payments()
-
-    def get_total_amount(self, obj):
-        return Payment.get_total_amount()
+        fields = ['id','employee','name','payment_method','bank_name','receipt_num','amount','date','total_payments','total_amount','added_to_registry']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1258,13 +1233,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 class RecievedPaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recieved_Payment
-        fields = '__all__'
-
-    def get_total_recieved_payments(self, obj):
-        return Recieved_Payment.get_total_revieved_payments()
-
-    def get_total_amount(self, obj):
-        return Recieved_Payment.get_total_amount()
+        fields = ['id','employee','name','payment_method','bank_name','receipt_num','amount','date','total_recieved_payments','total_amount','added_to_registry']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1305,9 +1274,10 @@ class MediumSerializer(serializers.ModelSerializer):
 class ProductsMediumSerializer(serializers.ModelSerializer):
     product = ProductSerializer(many=False,read_only=True)
     product_id = serializers.IntegerField(source='product.id',read_only=True)
+    product_points = serializers.IntegerField(source='product.points',read_only=True)
     class Meta:
         model = Products_Medium
-        fields = ['id','medium','product','product_id','price','num_item','total_price_of_item']
+        fields = ['id','medium','product','product_id','price','num_item','total_price_of_item','product_points']
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['num_per_item'] = instance.product.num_per_item
@@ -1338,19 +1308,18 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
 
 ######################################## RETURNED GOODS #####################################################################
 
-######### new
+
 
 
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
-    # client_id = serializers.IntegerField(source='client.id',read_only=True)
-    # product_id = serializers.IntegerField(source='product.id',read_only=True)
-    # employee_id = serializers.IntegerField(source='employee.id',read_only=True)
-    # product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    package_id = serializers.CharField(write_only=True)
+    product_id = serializers.IntegerField(source='product.id',read_only=True)
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    package_id = serializers.CharField(write_only=True)#####
+
     class Meta:
         model = ReturnedGoodsClient
-        # fields = ['id','client','client_id','product','product_id','employee','employee_id','quantity','total_price','reason','date', 'package_id']
-        fields = ['id','client','product', 'employee','quantity','total_price','reason','date', 'package_id']
+        fields = ['id','product','product_id','quantity','total_price','reason','package_id']
+
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
         if self._errors:
@@ -1386,7 +1355,6 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
         product = instance.product
         product.quantity += quantity_diff
         product.save()
-
         return instance
     
     def create(self, validated_data):
@@ -1403,66 +1371,59 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['product'] = instance.product.name
-        representation['client'] = instance.client.name
-        representation['employee'] = instance.employee.name
         return representation
 
 
 
 
 class ReturnedClientPackageSerializer(serializers.ModelSerializer):
-    goods = ReturnedGoodsClientSerializer(many=True, read_only=True)
+    goods = ReturnedGoodsClientSerializer(many=True,read_only=True)
     class Meta:
         model = ReturnedClientPackage
         fields = '__all__'
 
+    def create(self, validated_data):
+        request = self.context.get('request')
+        employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
+        instance = ReturnedClientPackage.objects.create(employee,**validated_data)
+        return instance
 
 
 class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
-    returned_goods = serializers.IntegerField(source='returned_goods.id', read_only=True)
+    package_id = serializers.CharField(write_only=True)
     class Meta:
         model = ReturnedGoodsSupplier
-        fields = ['id', 'supplier', 'product', 'quantity', 'total_price', 'reason', 'returned_goods']
+        fields = ['id', 'product', 'quantity', 'total_price', 'reason','package_id']
 
-    # def is_valid(self, raise_exception=False):
-    #     is_valid = super().is_valid(raise_exception=False)
-    #     if self._errors:
-    #         first_error_field = next(iter(self._errors))
-    #         first_error_message = self._errors[first_error_field][0]
-    #         # if first_error_message == "This field is required.":
-    #         #     translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #         #     first_error_message = f"{translation} مطلوب"
-    #         if first_error_message == "This field may not be blank.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
-    #         elif first_error_message == "A valid number is required.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"رقم صالح مطلوب لـ {translation}"
-    #         elif first_error_message == "A valid integer is required.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
-    #         elif first_error_message == "This field may not be null.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
-    #         elif first_error_message == "Invalid pk \"0\" - object does not exist.":
-    #             translation = translate_to_arabic(first_error_field.replace('_', ' '))
-    #             first_error_message = f"يرجى اختيار قيمة لـ {translation}"
-    #         self._errors = {"error": first_error_message}
-    #         if raise_exception:
-    #             raise serializers.ValidationError(self._errors)
-    #     return not bool(self._errors)
-        
-    def create(self, validated_data):
-        returend_good = self.context.get('returned_good', None)
-        good = validated_data.pop('product')
-        good_id = Product.objects.get(name= good)
-        instance = ReturnedGoodsSupplier.objects.create(returned_goods=returend_good,product=good_id, **validated_data)
-        good_id.quantity -= instance.quantity
-        good_id.save()
-        return instance 
-     
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
+            elif first_error_message == "This field may not be blank.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+            elif first_error_message == "A valid number is required.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
+            elif first_error_message == "A valid integer is required.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
+            elif first_error_message == "This field may not be null.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+
     def update(self, instance, validated_data):
         original_quantity = instance.quantity
         super().update(instance, validated_data)
@@ -1470,35 +1431,51 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
         product = instance.product
         product.quantity += quantity_diff
         product.save()
-
         return instance
-      
+    
+    def create(self, validated_data):
+        package_id = validated_data.pop('package_id')#####
+        instance = super().create(validated_data)
+        product = instance.product
+        product.quantity -= instance.quantity
+        product.save()
+        package = ReturnedSupplierPackage.objects.get(id=package_id)####
+        package.goods.add(instance)####
+        package.save()#####
+        return instance
     
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['product'] = instance.product.name
-        representation['supplier'] = instance.supplier.name
-        # representation['employee'] = instance.employee.name
         return representation
 
 
-class ReturnedGoodsSerializer(serializers.ModelSerializer):
-    # goods = ProductSerializer(read_only=True, many=True)
+
+###### new
+class ReturnedSupplierPackageSerializer(serializers.ModelSerializer):
+    goods = ReturnedGoodsSupplierSerializer(many=True,read_only=True)
+
     class Meta:
-        model = ReturnedGoods
+        model = ReturnedSupplierPackage
         fields = '__all__'
+
+    def create(self, validated_data):
+        return super().create(validated_data)
+
+    
+
+    
 ############################################# DAMAGED PRODUCTS #########################################################
 
 class DamagedProductSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    package_id = serializers.CharField(write_only=True)
+    employee = serializers.CharField(read_only=True)
+    package_id = serializers.CharField(write_only=True)#####
+
     class Meta:
         model = DamagedProduct
-        fields  = ['id','product','quantity','total_price', 'employee','product_id', 'package_id']
-        # exclude = ['employee'
-        extra_kwargs = {
-            'employee':{'read_only':True,}
-        }
+        fields  = ['id','product','quantity','employee','total_price','product_id','package_id']
+
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
         if self._errors:
@@ -1533,9 +1510,10 @@ class DamagedProductSerializer(serializers.ModelSerializer):
         product = instance.product
         product.quantity -= instance.quantity
         product.save()
-        package = ReturnedDamagedPackage.objects.get(id=package_id)####
+        package = DamagedPackage.objects.get(id=package_id)####
         package.goods.add(instance)####
         package.save()#####
+
         return instance
 
     def update(self, instance, validated_data):
@@ -1552,17 +1530,22 @@ class DamagedProductSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['product'] = instance.product.name
-        representation['employee'] = instance.employee.name
         return representation
 
-class ReturnedDamagedPackageSerializer(serializers.ModelSerializer):
-    goods = DamagedProductSerializer(many=True, read_only=True)
+    
 
+
+class DamagedPackageSerializer(serializers.ModelSerializer):
+    goods = DamagedProductSerializer(many=True,read_only=True)
     class Meta:
-        model=ReturnedDamagedPackage
-        fields = '__all__'
+        model = DamagedPackage
+        fields = ['id','date','total_num','total_price','barcode','goods']
 
-        
+
+
+
+
+
 class PointsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Points
@@ -1575,8 +1558,6 @@ class PointsSerializer(serializers.ModelSerializer):
 
 
 ################################# INCOMING ############################################# 
-
-
 
 class SpecialSerializer(serializers.ModelSerializer):
     class Meta:
@@ -1666,7 +1647,7 @@ class IncomingSerializer2(serializers.ModelSerializer):
     total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = Incoming
-        fields = ['id','supplier','employee','total_receipt','supplier_phone','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
+        fields = ['id','serial','supplier','employee','total_receipt','supplier_phone','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
     
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
@@ -1680,6 +1661,13 @@ class IncomingSerializer2(serializers.ModelSerializer):
         repr['supplier'] = instance.supplier.name
         repr['employee'] = instance.employee.name
         return repr
+
+
+
+class FrozenIncomingReceiptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FrozenIncomingReceipt
+        fields = '__all__'
 
 
 
@@ -1722,7 +1710,6 @@ class IncomingSerializer(serializers.ModelSerializer):
         supplier_data = validated_data.pop('supplier', None)
         remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
-        print(employee)
         supplier = Supplier.objects.get(id=supplier_data.id)
         instance = Incoming.objects.create(employee=employee, supplier=supplier,remaining_amount=remaining_amount ,**validated_data)
         supplier.debts += remaining_amount
@@ -1765,7 +1752,7 @@ class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
         model = ManualReceipt_Products
         fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'num_item' ,'total_price', 'manualreceipt']
 
-    def create(self, validated_data):
+    def create(self, validated_data):   
         product = validated_data.get('product')
         num_item = validated_data.get('num_item')
         manual_receipt = validated_data.get('manualreceipt')
@@ -1898,7 +1885,7 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
     client_points = serializers.SerializerMethodField()
     class Meta:
         model = ManualReceipt
-        fields = ['id','client','client_phone','client_points','total_receipt','employee','client_service','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
+        fields = ['id','serial','client','client_phone','client_points','total_receipt','employee','client_service','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
 
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
@@ -1922,29 +1909,14 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
         repr['client'] = instance.client.name
         return repr
 
-### new
+
+
+
 class FrozenManualReceiptSerializer(serializers.ModelSerializer):
     class Meta:
         model = FrozenManualReceipt
         fields = '__all__'
 
-    def create(self, validated_data):
-        receipt = validated_data.pop('receipt')
-        manual_receipt = ManualReceipt.objects.get(id=receipt.id)
-        frozen_receipt = FrozenManualReceipt.objects.filter(receipt=manual_receipt).first()
-        if frozen_receipt:
-            raise serializers.ValidationError({"message":'already exists'})
-        instance = FrozenManualReceipt.objects.create(receipt=manual_receipt, **validated_data)
-        manual_receipt.freeze = True
-        manual_receipt.save()
-        products_manaul = ManualReceipt_Products.objects.filter(manualreceipt=manual_receipt)
-        for product_manaul in products_manaul:
-            product = Product.objects.get(id = product_manaul.product.id)
-            product.quantity += product_manaul.num_item
-            product.save()
-        
-        return instance
-    
 ########################################## OUTPUT ##############################################
         
 class OutputSerializer(serializers.ModelSerializer):
@@ -1952,7 +1924,7 @@ class OutputSerializer(serializers.ModelSerializer):
     address = serializers.CharField(source='client.address',read_only=True)
     class Meta:
         model = Output
-        fields = ['id','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered','freeze']
+        fields = ['id','serial','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered','freeze']
 
 
 class ProductsOutputSerializer2(serializers.ModelSerializer):
@@ -2128,6 +2100,16 @@ class OutputSerializer2(serializers.ModelSerializer):
         repr['employee'] = instance.employee.name
         return repr
 
+
+
+
+
+class FrozenOutputReceiptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FrozenOutputReceipt
+        fields = '__all__'
+
+
 ##########################################
 
 class DelevaryArrivedSerializer(serializers.ModelSerializer):
@@ -2231,9 +2213,18 @@ class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
 
 
 class ChatSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    username = serializers.CharField(source='user.username',read_only=True)
+
     class Meta:
         model = Chat
         fields = '__all__'
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.user.image:
+            return request.build_absolute_uri(obj.user.image.url)
+        return None
 
 
 

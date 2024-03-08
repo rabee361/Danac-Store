@@ -16,7 +16,6 @@ from firebase_admin.messaging import Message, Notification
 from .permissions import *
 
 
-
 ####################################### AUTHENTICATION ###################################################################3#######
 
 class SignUpView(GenericAPIView):
@@ -73,19 +72,19 @@ class UserLoginApiView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        # user = CustomUser.objects.filter(email = request.data['username']).first()
-        # if not user:
         user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
 
-        chat = Chat.objects.get(user=user)
+        chat = Chat.objects.filter(user=user).first()
+
 
         data = serializer.data
+        if chat:
+            data['chat_id'] = chat.id
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
-        data['chat_id'] = chat.id
-        # data['username'] = user.username
-        # data['phonenumber'] = user.phonenumber
+        data['longitude'] = user.location.x
+        data['laritude'] = user.location.y
         data['address'] = user.address
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
         return Response(data, status=status.HTTP_200_OK)
@@ -268,6 +267,22 @@ class ListAds(ListAPIView):
     serializer_class = AdSerializer
 
 
+class GetTotalCategories(APIView):
+    def get(self,request):
+        total_categories = Category.objects.count()
+        return Response({
+            "total_categories":total_categories
+        })
+    
+
+class GetTotalProductTypes(APIView):
+    def get(self,request):
+        total_product_types = ProductType.objects.count()
+        return Response({
+            "total_product_types":total_product_types
+        })
+
+
 
 class ListCreateProductType(ListCreateAPIView):
     # permission_classes = [IsAuthenticated]
@@ -300,7 +315,7 @@ class RetUpdDesProductType(RetrieveUpdateDestroyAPIView):
 
 
 class ListCreateCategory(ListCreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend]
@@ -318,31 +333,14 @@ class ListCreateCategory(ListCreateAPIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # def post(self, request, product_type):
-    #     serializer = self.get_serializer(data=request.data, context={'product_type':product_type})
-    #     if serializer.is_valid():
-    #         headers = self.get_success_headers(serializer.data)
-    #         return Response(
-    #             {"message": "تمت الإضافة بنجاح"},
-    #             status=status.HTTP_201_CREATED,
-    #             headers=headers
-    #         )
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class RetUpdDesCategory(RetrieveUpdateDestroyAPIView):
     pagination_class = [IsAuthenticated]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-#### new
-class ListCategoryProductType(ListAPIView):
-    serializer_class = CategorySerializer2
-
-    def get(self, request, product_type_id):
-        product_type = ProductType.objects.filter(id=product_type_id).first()
-        category = product_type.category_set.all()
-        serializer = self.get_serializer(category, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class listCreateProducts(ListCreateAPIView):
     # permission_classes = [IsAuthenticated]
@@ -350,6 +348,7 @@ class listCreateProducts(ListCreateAPIView):
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
+
 
 
 class SpecialProducts(APIView):
@@ -437,15 +436,26 @@ class Add_to_Cart(APIView):
         item = Product.objects.get(id=pk)
         cart, created = Cart.objects.get_or_create(customer=client)
         quantity = request.data.get('quantity')
-        
+        cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart)
+
         if quantity :
-            cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart,quantity=quantity)
-            serializer = Cart_ProductsSerializer2(cart_product,many=False)
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        else:
-            cart_product,created = Cart_Products.objects.get_or_create(products=item,cart=cart)
-            serializer = Cart_ProductsSerializer2(cart_product,many=False)
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
+            cart_product.quantity = quantity
+            cart_product.save()
+
+        serializer = Cart_ProductsSerializer2(cart_product,many=False)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+
+        # if not created:
+        #     # Cart_Products.objects.filter(products=item, cart=cart).\
+        #     #                         update(quantity=F('quantity') + 1)
+        #     product = Cart_Products.objects.get(products=item, cart=cart)
+        #     serializer = Cart_ProductsSerializer2(product,many=False)
+        #     return Response(serializer.data,status=status.HTTP_201_CREATED)       
+
+
+                        # Cart_Products.objects.filter(products=item, cart=cart).\
+                        #             update(quantity=F('quantity')+request.data['quantity'])
 
 
 
@@ -764,9 +774,47 @@ class RetUpdDesSalary(RetrieveUpdateDestroyAPIView):
 
 ######################################## Registry ######################################################################
 
-class GetRegistry(ListAPIView):
-    queryset = Registry.objects.all()
+
+
+class GetRegistryOperations(APIView):
+    def post(self,request):
+        operation = request.data.get('operation', None)
+        receipt_num = request.data.get('receipt_num', None)
+
+        operations_dict = {
+            'مدفوعات': (Payment, PaymentSerializer),
+            'مقبوضات': (Recieved_Payment, RecievedPaymentSerializer),
+            'مصاريف': (Expense, ExpenseSerializer),
+            'ديون عميل': (Debt_Client, Client_DebtSerializer),
+            'ديون مورد': (Debt_Supplier, Supplier_DebtSerializer),
+        }
+        if operation in operations_dict:
+            model, serializer_class = operations_dict[operation]
+            instance = model.objects.filter(receipt_num=receipt_num).first()
+            instance.added_to_registry = True
+            instance.save()
+            serializer = serializer_class(instance, many=False)
+            return Response(serializer.data)
+        else:
+            return Response({
+                "msg": "لا يوجد عملية بهذا الاسم"
+            })
+
+
+
+class ListRegistries(ListAPIView):
     serializer_class = RegistrySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        employee = Employee.objects.get(phonenumber=self.request.user.phonenumber)
+        try:
+            employee = Employee.objects.get(phonenumber=self.request.user.phonenumber)
+            queryset = Registry.objects.filter(employee=employee)
+            return queryset
+        except ObjectDoesNotExist:
+            return Registry.objects.none()
+
 
 
 class ListCreateClientDebts(ListCreateAPIView):
@@ -822,23 +870,59 @@ class ListCreateDeposite(ListCreateAPIView):
     filterset_class = DepositeFilter
     queryset = Deposite.objects.all()
     serializer_class = DepositeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        employee = Employee.objects.get(phonenumber=self.request.user.phonenumber)
+        employee_registry = Registry.objects.get(employee=employee)
+        queryset = Deposite.objects.filter(registry=employee_registry)
+        return queryset
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
 
 class RetUpdDesDeposite(RetrieveUpdateDestroyAPIView):
     queryset = Deposite.objects.all()
     serializer_class = DepositeSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
 
 class ListCreateWithDraw(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = WithdrawFilter
     queryset = WithDraw.objects.all()
     serializer_class = WithDrawSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        employee = Employee.objects.get(phonenumber=self.request.user.phonenumber)
+        employee_registry = Registry.objects.get(employee=employee)
+        queryset = WithDraw.objects.filter(registry=employee_registry)
+        return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
 
 
 class RetUpdDesWithDraw(RetrieveUpdateDestroyAPIView):
     queryset = WithDraw.objects.all()
     serializer_class = WithDrawSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
 
 
 class ListCreatePayment(ListCreateAPIView):
@@ -882,32 +966,32 @@ class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
 
 # ------------------------------------------DAMAGED & RETURNED PRODUCTS------------------------------------------
 
-### new
-class ListCreateReturnedGoods(ListCreateAPIView):
-    queryset = ReturnedGoods.objects.all()
-    serializer_class = ReturnedGoodsSerializer
 
-class RetReturnedGoods(RetrieveAPIView):
-    queryset = ReturnedGoods.objects.all()
-    serializer_class = ReturnedGoodsSerializer
+class ListReturnedSupplierPackages(ListCreateAPIView):
+    queryset = ReturnedSupplierPackage.objects.all()
+    serializer_class = ReturnedSupplierPackageSerializer
+ 
+
+
+class RetReturnedSupplierPackages(RetrieveAPIView):
+    queryset = ReturnedSupplierPackage.objects.all()
+    serializer_class = ReturnedSupplierPackageSerializer
+
+    # manual_receipt_serializer = ManualRecieptSerializer(data=request.data, context={'request': request})
+
 
 class ListCreateRetGoodsSupplier(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ReturnedGoodsSupplierFilter
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
-    # permission_classes = [permissions.IsAuthenticated]
-    # def get()   
+    permission_classes = [permissions.IsAuthenticated]  
 
-class CreateReturnedGoodsSupplier(CreateAPIView):
-    def post(self, request, pk):
-        returned_good = ReturnedGoods.objects.get(id=pk)
-        serializer = ReturnedGoodsSupplierSerializer(data=request.data, context={'returned_good':returned_good}
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self,serializer):
+        user = self.request.user
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        serializer.save(employee=employee)
+
 
 class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
     queryset = ReturnedGoodsSupplier.objects.all()
@@ -932,7 +1016,12 @@ class ListCreateRetGoodsClient(ListCreateAPIView):
     filterset_class = ReturnedGoodsClientFilter
     queryset = ReturnedGoodsClient.objects.all()
     serializer_class = ReturnedGoodsClientSerializer
-    # permission_classes = [permissions.IsAuthenticated]    
+    permission_classes = [permissions.IsAuthenticated]    
+
+    def perform_create(self,serializer):
+        user = self.request.user
+        employee = Employee.objects.get(phonenumber=user.phonenumber)
+        serializer.save(employee=employee)   
 
 
 
@@ -942,26 +1031,33 @@ class RetUpdDesReturnGoodClient(RetrieveUpdateDestroyAPIView):
     # permission_classes = [permissions.IsAuthenticated]
 
 
-class ListCreateDamagedProductPackage(ListCreateAPIView):
-    queryset = ReturnedDamagedPackage.objects.all()
-    serializer_class = ReturnedDamagedPackageSerializer
 
-class RetDamagedProductPackage(RetrieveUpdateDestroyAPIView):
-    queryset = ReturnedDamagedPackage.objects.all()
-    serializer_class = ReturnedDamagedPackageSerializer
+class ListDamagedPackages(ListCreateAPIView):
+    queryset = DamagedPackage.objects.all()
+    serializer_class = DamagedPackageSerializer
+
+
+
+class RetDamagedPackages(RetrieveUpdateDestroyAPIView):
+    queryset = DamagedPackage.objects.all()
+    serializer_class = DamagedPackageSerializer
+
 
 
 class ListCreateDamagedProduct(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = DamagedProductFilter
     queryset = DamagedProduct.objects.all()
-    serializer_class = DamagedProductSerializer    
-    permission_classes = [permissions.IsAuthenticated]    
+    serializer_class = DamagedProductSerializer
+    permission_classes = [permissions.IsAuthenticated]  
 
-    def perform_create(self, serializer):
+    def perform_create(self,serializer):
         user = self.request.user
         employee = Employee.objects.get(phonenumber=user.phonenumber)
-        serializer.save(employee=employee)
+        serializer.save(employee=employee)   
+
+
+
 
 class RetUpdDesDamagedProduct(RetrieveUpdateDestroyAPIView):
     queryset = DamagedProduct.objects.all()
@@ -995,6 +1091,27 @@ class Add_To_Medium(APIView):
         return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
 
     
+
+
+class Add_product_to_Medium(APIView):
+    def post(self,request):
+        product_id = self.request.data['product']
+        medium_id = self.request.data['medium']
+        product = Product.objects.get(id=product_id)
+        medium = Medium.objects.get(id=medium_id)
+        num_item = self.request.data['num_item']
+        sale_price = self.request.data['sale_price']
+        medium_products, created = Products_Medium.objects.get_or_create(product=product, medium=medium)
+        if created:
+            medium_products.price += float(sale_price)
+            medium_products.num_item += int(num_item)
+            medium_products.total_price = medium_products.total_price_of_item
+            medium_products.save()
+        pro_med_serializer = ProductsMediumSerializer(medium_products)
+        return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
+
+
+
 class GetMediumView(RetrieveAPIView):
     queryset = Medium.objects.all()
     serializer_class = MediumSerializer
@@ -1029,6 +1146,7 @@ class CreateMediumForOrderView(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
        
 
+
 class DeleteProductsMediumView(RetrieveDestroyAPIView):
     queryset = Products_Medium.objects.all()
     serializer_class = ProductsMediumSerializer
@@ -1041,14 +1159,43 @@ class FreezeOutputReceipt(APIView):
     def post(self,request,receipt_id):
         try:
             receipt = Output.objects.get(id=receipt_id)
+            reason = request.data.get('reason')
+            if not reason:
+                return Response({
+                    "msg":"provide the reason for freezing"
+                })
             receipt.freeze = True
             receipt.save()
+            freeze_receipt,created = FrozenOutputReceipt.objects.get_or_create(receipt=receipt)
+            freeze_receipt.reason = reason
+            freeze_receipt.save()
             return Response({
                 "msg":"receipt freezed"
             })
-        except:
-            raise Output.DoesNotExist
+        except Output.DoesNotExist:
+            return Response({
+                "msg":"receipt doesn't exist"
+            })
         
+
+
+class UnFreezeOutputReceipt(APIView):
+    def post(self,request,receipt_id):
+        try:
+            receipt = Output.objects.get(id=receipt_id)
+            receipt.freeze = False
+            receipt.adjustment_applied = False
+            receipt.save()
+            freeze_receipt = FrozenOutputReceipt.objects.get(receipt=receipt)
+            freeze_receipt.save()
+            freeze_receipt.delete()
+            return Response({
+                "msg":"receipt unfreezed"
+            })
+        except Output.DoesNotExist:
+            return Response({
+                "msg":"receipt doesn't exist"
+            })
 
 
 
@@ -1070,6 +1217,12 @@ class ListOutputs(ListAPIView):
 
     def get_serializer_context(self):
         return {'show_datetime': False}
+
+
+class ListFrozenOutputReceipts(ListAPIView):
+    queryset = FrozenOutputReceipt.objects.all()
+    serializer_class = FrozenOutputReceiptSerializer
+
 
 
 class UpdateOutputReceipt(RetrieveUpdateDestroyAPIView):
@@ -1286,6 +1439,13 @@ class ListIncomings(ListAPIView):
         return {'show_datetime': False}
 
 
+
+class ListFrozenIncomingReceipts(ListAPIView):
+    queryset = FrozenIncomingReceipt.objects.all()
+    serializer_class = FrozenIncomingReceiptSerializer
+
+
+
 class UpdateIncomingReceipt(RetrieveUpdateDestroyAPIView):
     queryset = Incoming.objects.all()
     serializer_class = IncomingSerializer
@@ -1312,17 +1472,45 @@ class FreezeIncomingReceipt(APIView):
     def post(self,request,receipt_id):
         try:
             receipt = Incoming.objects.get(id=receipt_id)
+            reason = request.data.get('reason')
+            if not reason:
+                return Response({
+                    "msg":"provide the reason for freezing"
+                })
             receipt.freeze = True
             receipt.save()
+            freeze_receipt,created = FrozenIncomingReceipt.objects.get_or_create(receipt=receipt)
+            freeze_receipt.reason = reason
+            freeze_receipt.save()
             return Response({
                 "msg":"receipt freezed"
             })
-        except:
-            raise Incoming.DoesNotExist
+        except Incoming.DoesNotExist:
+            return Response({
+                "msg":"receipt doesn't exist"
+            })
+
         
+class UnFreezeIncomingReceipt(APIView):
+    def post(self,request,receipt_id):
+        try:
+            receipt = Incoming.objects.get(id=receipt_id)
+            receipt.freeze = False
+            receipt.adjustment_applied = False
+            receipt.save()
+            freeze_receipt = FrozenIncomingReceipt.objects.get(receipt=receipt)
+            freeze_receipt.save()
+            freeze_receipt.delete()
+            return Response({
+                "msg":"receipt unfreezed"
+            })
+        except Incoming.DoesNotExist:
+            return Response({
+                "msg":"receipt doesn't exist"
+            })
 
 ############################### MANUAL RECEIPT #####################################################
-    
+
 
 class CreateManualReceiptView(APIView):
     permission_classes = [IsAuthenticated]
@@ -1391,6 +1579,11 @@ class ListManualReceipt(ListAPIView):
         return {'show_datetime': False}
 
 
+class ListFrozenManualReceipts(ListAPIView):
+    queryset = FrozenManualReceipt.objects.all()
+    serializer_class = FrozenManualReceiptSerializer
+
+
 class UpdateManualReceipt(RetrieveUpdateDestroyAPIView):
     queryset = ManualReceipt.objects.all()
     serializer_class = ManualRecieptSerializer
@@ -1412,11 +1605,48 @@ class CreateManualProduct(CreateAPIView):
     serializer_class = ManualRecieptProductsSerializer2
 
 
-### new
-class ListCreateFreezeManualReceipt(ListCreateAPIView):
-    queryset = FrozenManualReceipt.objects.all()
-    serializer_class = FrozenManualReceiptSerializer
 
+class FreezeManualReceipt(APIView):
+    def post(self,request,receipt_id):
+        try:
+            receipt = ManualReceipt.objects.get(id=receipt_id)
+            reason = request.data.get('reason')
+            if not reason:
+                return Response({
+                    "msg":"provide the reason for freezing"
+                })
+            receipt.freeze = True
+            receipt.save()
+            freeze_receipt,created = FrozenManualReceipt.objects.get_or_create(receipt=receipt)
+            freeze_receipt.reason = reason
+            freeze_receipt.save()
+            return Response({
+                "msg":"receipt freezed"
+            })
+        except ManualReceipt.DoesNotExist:
+            return Response({
+                "msg":"receipt doesn't exist"
+            })
+        
+
+class UnFreezeManualReceipt(APIView):
+    def post(self,request,receipt_id):
+        try:
+            receipt = ManualReceipt.objects.get(id=receipt_id)
+            receipt.freeze = False
+            receipt.adjustment_applied = False
+            receipt.save()
+            freeze_receipt = FrozenManualReceipt.objects.get(receipt=receipt)
+            freeze_receipt.save()
+            freeze_receipt.delete()
+            return Response({
+                "msg":"receipt unfreezed"
+            })
+        except ManualReceipt.DoesNotExist:
+            return Response({
+                "msg":"receipt doesn't exist"
+            })
+        
 ########################## MEDIUM 2 #######################################################################################
 
 
@@ -1516,6 +1746,25 @@ class ListOrderEnvoy(APIView):
 
 ########################### chat ##########################
     
+
+class SendMessage(APIView):
+    # permission_classes = [IsAuthenticated]
+    def post(self,request,chat_id,user_id):
+        user = CustomUser.objects.get(id=user_id)
+        chat = Chat.objects.get(id=chat_id)
+        message = self.request.data['message']
+
+        try:
+            Employee.objects.get(phonenumber=user.phonenumber)
+            msg = ChatMessage.objects.create(sender=user,content=message,chat=chat,employee=True)
+        except Employee.DoesNotExist:
+            msg = ChatMessage.objects.create(sender=user,content=message,chat=chat,employee=False)
+        serializer = MessageSerializer(msg,many=False)
+
+        return Response(serializer.data)
+
+
+
 class ChatMessages(APIView):
     def get(self,request,chat_id):
         chat = Chat.objects.get(id=chat_id)
@@ -1527,5 +1776,10 @@ class ChatMessages(APIView):
 class Chats(APIView):
     def get(self,request):
         chats = Chat.objects.all()
-        serializer = ChatSerializer(chats,many=True)
+        serializer = ChatSerializer(chats,many=True, context={'request': request})
         return Response(serializer.data)
+    
+
+class GetChat(RetrieveAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer

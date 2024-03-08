@@ -1,10 +1,12 @@
+from django.db import models, IntegrityError
 from django.contrib.gis.db import models
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Sum
-import uuid
+from django.utils import timezone
+from datetime import date
 from django.contrib.gis.geos import Point
 from django.utils import timezone
 from datetime import timedelta
@@ -13,6 +15,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.admin import display
 import random
 import string
+from django.db.models import Sum, Count , Sum ,F , Q
 
 
 def get_expiration_time():
@@ -37,15 +40,15 @@ class UserType(models.Model):
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length=50, unique=True,null=True,blank=True)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
-    work_hours = models.CharField(max_length=100)
-    store_name = models.CharField(max_length=100)
+    work_hours = models.CharField(max_length=100,null=True,blank=True)
+    store_name = models.CharField(max_length=100,null=True,blank=True)
     state = models.CharField(max_length=50 , null=True)
     town = models.CharField(max_length=100 , null=True)
     address = models.CharField(max_length=100 , null=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True,default='images/account.jpg')
-    location = models.PointField(default=Point(0,0))
+    location = models.PointField(default=Point(3.0589,36.7539),null=True,blank=True)
     user_type = models.ForeignKey(UserType,on_delete=models.CASCADE,null=True)
     is_accepted = models.BooleanField(default=False)
 
@@ -116,23 +119,31 @@ class Client(models.Model):
     )
 
     name = models.CharField(max_length=30)
-    address = models.CharField(max_length=100)
-    # state = models.CharField(max_length=50 , null=True)
-    # town = models.CharField(max_length=100 , null=True)
+    address = models.CharField(max_length=100 , null=True)
+    store_name = models.CharField(max_length=100 , null=True)
     phonenumber = PhoneNumberField(region='DZ')
-    # phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
-    category = models.CharField(max_length=75,choices=CHOICES)
-    notes = models.TextField(max_length=150,default='_')
-    location = models.PointField(null=True)
+    phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
+    category = models.CharField(max_length=75,choices=CHOICES,default='سوبرماركت')
+    notes = models.TextField(max_length=150,null=True,blank=True,default='_')
+    location = models.PointField(default=Point(10,20),null=True)
     debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
 
     class Meta:
         app_label = 'Clients_and_Products'
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
+    
+    def total_points(self):
+        return Points.objects.filter(Q(client=self)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).\
+                                aggregate(total_points=models.Sum('number'))['total_points'] or 0
 
-
+    def total_receipts(self):
+        manuals = ManualReceipt.objects.filter(client=self).count()
+        outputs = Output.objects.filter(client=self).count()
+        total = manuals + outputs
+        return total
 
 
 
@@ -158,8 +169,8 @@ class UserNotification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-
         ordering = ['-created_at']
+        
     def __str__(self) -> str:
         return f'{self.user.username} : {self.body[:50]}'
 
@@ -182,7 +193,7 @@ class CodeVerification(models.Model):
 
 class ProductType(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='images/product_types', null=True,default='images/category.webp')
+    image = models.ImageField(upload_to='images/product_types', null=True,default='images/account.jpg')
 
     def __str__(self):
         return self.name
@@ -191,13 +202,16 @@ class ProductType(models.Model):
         ordering = ['-id']
         app_label = 'Clients_and_Products'
 
+    def total_product_types(self):
+        return ProductType.objects.count()
+
 
 
 
 class Category(models.Model):
     product_type = models.ForeignKey(ProductType,on_delete=models.CASCADE)
     name = models.CharField(max_length=35)
-    image = models.ImageField(upload_to='images/categories', null=True,default='images/category.webp')
+    image = models.ImageField(upload_to='images/categories', null=True,default='images/account.jpg')
 
     class Meta:
         ordering = ['-id']
@@ -206,16 +220,18 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def total_categories(self):
+        return Category.objects.count()
+
 
 
 class Product(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='images/products',null=True,blank=True,default='images/category.webp')
+    image = models.ImageField(upload_to='images/products',null=True,blank=True,default='images/account.jpg')
     description = models.TextField(max_length=2000,null=True,blank=True)
     quantity = models.IntegerField()
     purchasing_price = models.FloatField()
     category = models.ForeignKey(Category , on_delete=models.CASCADE)
-    product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE) ###new
     notes = models.TextField(max_length=1000,null=True,blank=True)
     made_at = models.DateField(null=True,blank=True)
     expires_at = models.DateField(null=True,blank=True)
@@ -414,8 +430,9 @@ class Supplier(models.Model):
     name = models.CharField(max_length=30)
     company_name = models.CharField(max_length=50)
     phone_number = PhoneNumberField(region='DZ')
+    phone_number2 = PhoneNumberField(region='DZ',null=True,blank=True)
     address = models.CharField(max_length=100)
-    info = models.TextField(max_length=500,default='_')
+    info = models.TextField(max_length=500,null=True,blank=True,default='_')
     debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
 
     class Meta:
@@ -423,6 +440,9 @@ class Supplier(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+    
+    def total_receipts(self):
+        return Incoming.objects.filter(supplier=self).count()
 
 
 
@@ -434,7 +454,7 @@ class Employee(models.Model):
     phonenumber = PhoneNumberField(region='DZ')
     job_position = models.CharField(max_length=20)
     truck_num = models.IntegerField(null=True,blank=True)
-    location = models.PointField(default=Point(0,0))
+    location = models.PointField(default=Point(3.0589,36.7539))
     salary = models.FloatField()
     sale_percentage = models.FloatField(null=True,blank=True,default=0.0)
     address = models.CharField(max_length=100)
@@ -460,7 +480,7 @@ class OverTime(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     num_hours = models.FloatField()
     amount = models.FloatField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-date']
@@ -471,7 +491,7 @@ class OverTime(models.Model):
 
 class Absence(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
     days = models.IntegerField()
     amount = models.FloatField()
 
@@ -486,7 +506,7 @@ class Bonus(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     reason = models.CharField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-date']
@@ -500,7 +520,7 @@ class Discount(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     reason = models.CharField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-date']
@@ -515,7 +535,7 @@ class Advance_On_salary(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     reason = models.CharField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.employee.name
@@ -530,8 +550,7 @@ class Extra_Expense(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     reason = models.TextField(max_length=100,blank=True,null=True,default=' ')
     amount = models.FloatField()
-    barcode = models.CharField(max_length=200,default=" ")
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-date']
@@ -567,38 +586,38 @@ class Salary(models.Model):
 ################################### Register Department #######################################################
 
 class Registry(models.Model):
+    employee = models.ForeignKey(Employee,on_delete=models.SET_NULL,null=True)
     total = models.FloatField()
-    employee = models.OneToOneField(Employee, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.employee.name
+        return f'{self.employee} Registry'
     
     class Meta:
         app_label = 'Company_Fund'
-    
-    
+
+
 
 class WithDraw(models.Model):
     withdraw_name = models.CharField(max_length=50)
     details_withdraw = models.CharField(max_length=50,null=True,blank=True,default=' ')
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
+    registry = models.ForeignKey(Registry,on_delete=models.CASCADE,null=True)
     verify_code = models.IntegerField(null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def __str__(self):
         return self.client.name
     
-    @classmethod
-    def get_total_withdraws(cls):
-        return cls.objects.count()
+    def total_withdraws(self):
+        return WithDraw.objects.count()
     
-    @classmethod
-    def get_total_sum(cls):
-        return cls.objects.aggregate(Sum('total'))['total__sum'] or 0
+    def total_sum(self):
+        return WithDraw.objects.aggregate(Sum('total'))['total__sum'] or 0
 
 
 
@@ -607,22 +626,22 @@ class Deposite(models.Model):
     detail_deposite = models.CharField(max_length=50,null=True,blank=True,default=' ')
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     total = models.FloatField()
+    registry = models.ForeignKey(Registry,on_delete=models.CASCADE,null=True)
     verify_code = models.IntegerField(null=True,blank=True)
     date = models.DateField(auto_now_add=True)
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def __str__(self):
         return self.client.name
     
-    @classmethod
-    def get_total_deposites(cls):
-        return cls.objects.count()
+    def total_deposites(self):
+        return Deposite.objects.count()
     
-    @classmethod
-    def get_total_sum(cls):
-        return cls.objects.aggregate(Sum('total'))['total__sum'] or 0
+    def total_sum(self):
+        return Deposite.objects.aggregate(Sum('total'))['total__sum'] or 0
 
 
     
@@ -635,22 +654,22 @@ class Debt_Client(models.Model):
     amount = models.FloatField(validators=[MinValueValidator(0.0)])
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=60,null=True,blank=True,default='_')
-    receipt_num = models.IntegerField(null=True,blank=True)
+    receipt_num = models.IntegerField(null=True,blank=True,unique=True)
     date = models.DateField(auto_now_add=True)
+    added_to_registry = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def __str__(self):
         return self.client_name.name
 
-    @classmethod
-    def get_total_client_debts(cls):
-        return cls.objects.count()
+    def total_client_debts(self):
+        return Debt_Client.objects.count()
     
-    @classmethod
-    def get_total_sum(cls):
-        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    def total_sum(self):
+        return Debt_Client.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 
@@ -663,22 +682,22 @@ class Debt_Supplier(models.Model):
     amount = models.FloatField(validators=[MinValueValidator(0.0)])
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=60,null=True,blank=True,default='_')
-    check_num = models.IntegerField(null=True,blank=True)
+    receipt_num = models.IntegerField(null=True,blank=True,unique=True)
     date = models.DateField(auto_now_add=True)
+    added_to_registry = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def __str__(self):
         return self.supplier_name.name
     
-    @classmethod
-    def get_total_supplier_debts(cls):
-        return cls.objects.count()
+    def total_supplier_debts(self):
+        return Supplier.objects.count()
     
-    @classmethod
-    def get_total_sum(cls):
-        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    def total_sum(self):
+        return Debt_Supplier.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 
@@ -687,22 +706,22 @@ class Expense(models.Model):
     details = models.TextField(max_length=100,null=True,blank=True,default=' ')
     name =  models.CharField(max_length=50)
     amount = models.IntegerField()
-    receipt_num = models.IntegerField(null=True,blank=True)
+    receipt_num = models.IntegerField(null=True,blank=True,unique=True)
     date = models.DateField(auto_now_add=True)
+    added_to_registry = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
     def __str__(self):
         return self.expense_name
     
-    @classmethod
-    def get_total_expenses(cls):
-        return cls.objects.count()
+    def total_expenses(self):
+        return Expense.objects.count()
 
-    @classmethod
-    def get_total_amount(cls):
-        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    def total_amount(self):
+        return Expense.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 
@@ -715,20 +734,20 @@ class Recieved_Payment(models.Model):
     name = models.CharField(max_length=50)
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=60,null=True,blank=True,default='_')
-    receipt_num = models.IntegerField(null=True,blank=True)
+    receipt_num = models.IntegerField(null=True,blank=True,unique=True)
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
+    added_to_registry = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
-    @classmethod
-    def get_total_recieved_payments(cls):
-        return cls.objects.count()
+    def total_recieved_payments(self):
+        return Recieved_Payment.objects.count()
 
-    @classmethod
-    def get_total_amount(cls):
-        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    def total_amount(self):
+        return Recieved_Payment.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 
@@ -741,20 +760,20 @@ class Payment(models.Model):
     name = models.CharField(max_length=50)
     payment_method = models.CharField(max_length=30,choices=CHOICES)
     bank_name = models.CharField(max_length=60,null=True,blank=True,default='_')
-    receipt_num = models.IntegerField(null=True,blank=True)
+    receipt_num = models.IntegerField(null=True,blank=True,unique=True)
     amount = models.FloatField()
     date = models.DateField(auto_now_add=True)
+    added_to_registry = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'Company_Fund'
+        ordering = ['-id']
 
-    @classmethod
-    def get_total_payments(cls):
-        return cls.objects.count()
+    def total_payments(self):
+        return Payment.objects.count()
 
-    @classmethod
-    def get_total_amount(cls):
-        return cls.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    def total_amount(cls):
+        return Payment.objects.aggregate(Sum('amount'))['amount__sum'] or 0
 
 
 
@@ -764,38 +783,44 @@ class Payment(models.Model):
 
 
 ############################################-Returned & Damaged Goods-----###############################################################################
-class ReturnedGoods(models.Model):
-    goods = models.ManyToManyField(Product, through='ReturnedGoodsSupplier')
-    date = models.DateField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return str(self.id)
-    
+        
 class ReturnedGoodsSupplier(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    returned_goods = models.ForeignKey(ReturnedGoods, on_delete=models.CASCADE)
-    # employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    total_price = models.FloatField()
-    reason = models.CharField(max_length=50,null=True,blank=True,default='')
-
-    class Meta:
-        ordering = ['-id']
-
-    def __str__(self) -> str:
-        return f'{self.product.name}:{self.reason}'
-
-
-    
-class ReturnedGoodsClient(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    client =  models.ForeignKey(Client, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
     reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
-    date = models.DateField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-id']
+
+    def __str__(self) -> str:
+        return f'{self.product.name}:{self.reason}'
+    
+
+
+class ReturnedSupplierPackage(models.Model):
+    supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    goods = models.ManyToManyField(ReturnedGoodsSupplier)
+    date = models.DateField(auto_now_add=True,null=True)
+    barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
+
+    def total_price(self):
+        total_price = 0
+        for i in self.goods.all():
+            total_price += i.total_price
+        return total_price
+
+    def total_num(self):
+        return self.goods.count()
+    
+    
+    
+class ReturnedGoodsClient(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.FloatField()
+    reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
 
     class Meta:
         ordering = ['-id']
@@ -803,17 +828,29 @@ class ReturnedGoodsClient(models.Model):
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
 
+
+
 class ReturnedClientPackage(models.Model):
+    client =  models.ForeignKey(Client, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     goods = models.ManyToManyField(ReturnedGoodsClient)
     date = models.DateField(auto_now_add=True,null=True)
+    barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
 
+    def total_price(self):
+        total_price = 0
+        for i in self.goods.all():
+            total_price += i.total_price
+        return total_price
 
+    def total_num(self):
+        return self.goods.count()
 
 
 class DamagedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     quantity = models.IntegerField()
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE,null=True)
     total_price = models.FloatField()
 
     class Meta:
@@ -823,14 +860,27 @@ class DamagedProduct(models.Model):
         return self.product.name
     
 
-class ReturnedDamagedPackage(models.Model):
+
+class DamagedPackage(models.Model):
     goods = models.ManyToManyField(DamagedProduct)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(auto_now_add=True,null=True)
+    barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
+
+    def total_price(self):
+        total_price = 0
+        for i in self.goods.all():
+            total_price += i.total_price
+        return total_price
+
+    def total_num(self):
+        return self.goods.count()
+
+
+
 
 #########################################-------- Medium & Medium 2---------###########################################################
 
 class Medium(models.Model):
-
     products = models.ManyToManyField(Product, through='Products_Medium')
 
     def __str__(self) -> str:
@@ -894,6 +944,7 @@ class MediumTwo_Products(models.Model):
 
 
 class Incoming(models.Model):
+    serial = models.IntegerField(null=True,blank=True,editable=False)
     products = models.ManyToManyField(Product, through='Incoming_Product')
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -906,10 +957,25 @@ class Incoming(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
     freeze = models.BooleanField(default=False)
+    adjustment_applied = models.BooleanField(default=False) 
 
     class Meta:
         ordering=['-date']
         app_label = 'Receipts'
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            today = timezone.now().date()
+            last_instance = Incoming.objects.filter(date__date=today).order_by('-serial').first()
+
+            if last_instance:
+                if last_instance.date.date() != date.today():
+                    self.serial = 1
+                else:
+                    self.serial = last_instance.serial + 1
+            else:
+                self.serial = 1
+        super(Incoming, self).save(*args, **kwargs)
 
     def calculate_total_receipt(self):
         return self.incoming_product_set.aggregate(
@@ -919,6 +985,38 @@ class Incoming(models.Model):
     def __str__(self):
         return str(self.id)
         
+
+class FrozenIncomingReceipt(models.Model):
+    receipt = models.ForeignKey(Incoming,on_delete=models.CASCADE)
+    reason = models.TextField()
+
+    class Meta:
+        app_label = 'Receipts'
+
+    def __str__(self):
+        return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if not self.receipt.adjustment_applied:
+            if self.receipt.freeze:
+                self.adjust_product_quantities(True)
+            else:
+                self.adjust_product_quantities(False)
+            self.receipt.adjustment_applied = True
+            self.receipt.save()
+
+    def adjust_product_quantities(self, freeze):
+        for receipt_product in self.receipt.incoming_product_set.all():
+            product = receipt_product.product
+            if freeze:
+                product.quantity += receipt_product.num_item
+            else:
+                product.quantity -= receipt_product.num_item
+            product.save()
+
+
 
 class Incoming_Product(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -938,20 +1036,11 @@ class Incoming_Product(models.Model):
     def __str__(self) -> str:
         return f'{self.incoming.supplier.name}:{str(self.incoming.id)}'
 
-
-# class FrozenIncomingReceipt(models.Model):
-#     receipt = models.ForeignKey(Incoming,on_delete=models.CASCADE)
-#     reason = models.TextField()
-
-#     class Meta:
-#         app_label = 'Receipts'
-
-#     def __str__(self):
-#         return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
 ####################################### OUTPUT #################################################################################
 
 
 class Output(models.Model):
+    serial = models.IntegerField(null=True,blank=True,editable=False)
     products = models.ManyToManyField(Product, through='Output_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -962,15 +1051,30 @@ class Output(models.Model):
     previous_depts = models.FloatField(blank=True,default=0.0)
     remaining_amount = models.FloatField(blank=True,default=0.0)
     date = models.DateTimeField(auto_now_add=True,null=True)
-    # shipping_cost = models.FloatField(default=0.0)
+    shipping_cost = models.FloatField(default=0.0)
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
-    location = models.PointField(default=Point(0.0,0.0))
+    location = models.PointField(default=Point(3.0589,36.7539))
     delivered = models.BooleanField(default=False)
     freeze = models.BooleanField(default=False)
+    adjustment_applied = models.BooleanField(default=False) 
 
     class Meta:
         ordering = ['-date']
         app_label = 'Receipts'
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            today = timezone.now().date()
+            last_instance = Output.objects.filter(date__date=today).order_by('-serial').first()
+
+            if last_instance:
+                if last_instance.date.date() != date.today():
+                    self.serial = 1
+                else:
+                    self.serial = last_instance.serial + 1
+            else:
+                self.serial = 1
+        super(Output, self).save(*args, **kwargs)
 
     def calculate_total_receipt(self):
         return self.output_products_set.aggregate(
@@ -981,8 +1085,42 @@ class Output(models.Model):
         return str(self.id)
     
 
+
+
+class FrozenOutputReceipt(models.Model):
+    receipt = models.ForeignKey(Output,on_delete=models.CASCADE)
+    reason = models.TextField()
+
+    class Meta:
+        app_label = 'Receipts'
+
+    def __str__(self):
+        return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if not self.receipt.adjustment_applied:
+            if self.receipt.freeze:
+                self.adjust_product_quantities(True)
+            else:
+                self.adjust_product_quantities(False)
+            self.receipt.adjustment_applied = True
+            self.receipt.save()
+
+    def adjust_product_quantities(self, freeze):
+        for receipt_product in self.receipt.output_products_set.all():
+            product = receipt_product.product
+            if freeze:
+                product.quantity -= receipt_product.quantity
+            else:
+                product.quantity += receipt_product.quantity
+            product.save()
+
+
+
 class Output_Products(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE) 
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     output = models.ForeignKey(Output, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField(default=0)
@@ -998,7 +1136,7 @@ class Output_Products(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f'{self.products.name} {self.output.id}'
+        return f'{self.product.name} {self.output.id}'
 
 
 
@@ -1017,6 +1155,7 @@ class DelievaryArrived(models.Model):
 
 
 class ManualReceipt(models.Model):
+    serial = models.IntegerField(null=True,blank=True,editable=False)
     products = models.ManyToManyField(Product, through='ManualReceipt_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -1029,10 +1168,27 @@ class ManualReceipt(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
     freeze = models.BooleanField(default=False)
+    adjustment_applied = models.BooleanField(default=False) 
 
     class Meta:
         ordering = ['-date']
         app_label = 'Receipts'
+
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            today = timezone.now().date()
+            last_instance = ManualReceipt.objects.filter(date__date=today).order_by('-serial').first()
+
+            if last_instance:
+                if last_instance.date.date() != date.today():
+                    self.serial = 1
+                else:
+                    self.serial = last_instance.serial + 1
+            else:
+                self.serial = 1
+        super(ManualReceipt, self).save(*args, **kwargs)
+
 
     def calculate_total_receipt(self):
         return self.manualreceipt_products_set.aggregate(
@@ -1040,12 +1196,8 @@ class ManualReceipt(models.Model):
         )['total_receipt'] or 0.0
 
     def __str__(self) -> str:
-        return str(self.id)
+        return f'{self.client.name} - {str(self.id)}'
     
-
-  
-
-
 
 
 class ManualReceipt_Products(models.Model): 
@@ -1068,7 +1220,7 @@ class ManualReceipt_Products(models.Model):
         return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
     
 
-### new
+
 class FrozenManualReceipt(models.Model):
     receipt = models.ForeignKey(ManualReceipt,on_delete=models.CASCADE)
     reason = models.TextField()
@@ -1077,7 +1229,32 @@ class FrozenManualReceipt(models.Model):
         app_label = 'Receipts'
 
     def __str__(self):
-        return f'Manual Receipt {str(self.receipt.id)} reason: {self.reason}'
+        return f'Manual Receipt {self.receipt.serial} reason: {self.reason}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if not self.receipt.adjustment_applied:
+            if self.receipt.freeze:
+                self.adjust_product_quantities(True)
+            else:
+                self.adjust_product_quantities(False)
+            self.receipt.adjustment_applied = True
+            self.receipt.save()
+
+    def adjust_product_quantities(self, freeze):
+        for receipt_product in self.receipt.manualreceipt_products_set.all():
+            product = receipt_product.product
+            if freeze:
+                product.quantity -= receipt_product.num_item
+            else:
+                product.quantity += receipt_product.num_item
+            product.save()
+
+
+
+
+
 
 
 
@@ -1142,4 +1319,10 @@ class ChatMessage(models.Model):
     def __str__(self):
         return f'{self.sender} : "{self.content[0:20]}..."'
 
+    class Meta:
+        ordering=['-timestamp']
+
 #########################################
+    
+
+

@@ -94,16 +94,17 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     ordering = ['-id']
 
     def Accept_User(self, request, queryset):
-        queryset.update(is_active=True) 
+        queryset.update(is_active=True)
         user_type = UserType.objects.get(user_type='عميل')
         queryset.update(is_accepted=True, user_type=user_type)
         user = queryset.get(is_active=True)
         client,created = Client.objects.get_or_create(
             name=user.username,
-            address = f'{user.address}-{user.town}-{user.state}', ### new
             phonenumber = user.phonenumber,
             location = user.location
         )
+        client.address = f'{user.state}-{user.town}-{user.address}'
+        client.save()
         cart,created = Cart.objects.get_or_create(customer=client)
         chat,created = Chat.objects.get_or_create(user=user)
 
@@ -191,7 +192,8 @@ class ProductMediumAdmin(admin.ModelAdmin):
         return obj.product.name
     get_name_product.short_descreption = 'product'
 
-class ProductAdmin(ImportExportModelAdmin):
+
+class ProductAdmin(ImportExportModelAdmin): 
     resource_class = ProductResource
     list_display = ['id', 'name', 'quantity', 'purchasing_price', 'points','category', 'num_per_item', 'item_per_carton']
     search_fields = ['name']
@@ -220,7 +222,15 @@ class EmployeeAdmin(LeafletGeoAdmin):
     list_per_page = 25
 
 
+class Cart_ProductsInline(admin.TabularInline):
+    model = Cart_Products
+    extra = 0
+    def get_readonly_fields(self, request, obj=None):
+        return [field.name for field in self.model._meta.fields]
+
+
 class CartAdmin(admin.ModelAdmin):
+    inlines = [Cart_ProductsInline]
     list_display = ['id', 'customer']
 
 
@@ -233,7 +243,7 @@ class CartProductsAdmin(admin.ModelAdmin):
 
 
 class SupplierAdmin(admin.ModelAdmin):
-    list_display = ['name', 'company_name', 'phone_number', 'address']
+    list_display = ['id','name', 'company_name', 'phone_number', 'address']
     search_fields = ['name', 'phonenumber']
 
 
@@ -275,6 +285,8 @@ class IncomingProductAdmin(admin.ModelAdmin):
 class IncomingAdmin(admin.ModelAdmin):
     list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date','freeze']
     search_fields = ['supplier__name', 'employee__name']
+    readonly_fields = ['serial']
+
     def get_name_supplier(self, obj):
         return obj.supplier.name
     
@@ -283,6 +295,14 @@ class IncomingAdmin(admin.ModelAdmin):
     
     get_name_employee.short_descreption = 'employee'
     get_name_supplier.short_descreption = 'supplier'
+
+
+
+class FreezeIncomingAdmin(admin.ModelAdmin):
+    list_display = ['receipt','reason']
+    class Meta:
+        app_label = 'Receipts'
+
 
 
 class ManualReceiptProductAdmin(admin.ModelAdmin):
@@ -295,18 +315,33 @@ class ManualReceiptProductAdmin(admin.ModelAdmin):
     def num_manul_receipt(self, obj):
         return obj.manualreceipt.id
 
+
 class ManualReceiptAdmin(admin.ModelAdmin):
     list_display = ['id', 'client', 'employee', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
+    readonly_fields = ['serial']
 
     class Meta:
         app_label = 'Receipts'
         admin_order = 1 
 
 
+class FreezeManualAdmin(admin.ModelAdmin):
+    list_display = ['receipt','reason']
+    class Meta:
+        app_label = 'Receipts'
+
+
 class OutputsproductAdmin(LeafletGeoAdmin):
     list_display = ['id', 'client', 'employee', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
+    readonly_fields = ['serial']
+
+
+class FreezeOutputAdmin(admin.ModelAdmin):
+    list_display = ['receipt','reason']
+    class Meta:
+        app_label = 'Receipts'
 
 
 class OutputProductAdmin(admin.ModelAdmin):
@@ -325,17 +360,26 @@ class DElevaryArrivedAdmin(admin.ModelAdmin):
 
 
 class ReturnedGoodsClientAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'client', 'employee', 'quantity', 'total_price', 'reason', 'date']
-    search_fields = ['client__name']
+    list_display = ['id', 'name_product', 'quantity', 'total_price', 'reason']
     def name_product(self, obj):
         return obj.product.name
     
 
+
+class ReturnedClientPackageAdmin(admin.ModelAdmin):
+    list_display = ['id','employee','date','barcode']
+
+    
+
 class ReturnedGoodsSupplierAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'supplier', 'quantity', 'total_price', 'reason']
-    search_fields = ['supplier__name']
+    list_display = ['id', 'name_product', 'quantity', 'total_price', 'reason']
     def name_product(self, obj):
         return obj.product.name
+    
+
+class ReturnedSupplierPackageAdmin(admin.ModelAdmin):
+    list_display = ['id','supplier','employee','date','barcode']
+
 
 
 class OrderEnvoyAdmin(admin.ModelAdmin):
@@ -377,31 +421,31 @@ class Advance_On_salaryAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 class Extra_ExpenseAdmin(admin.ModelAdmin):
-    list_display = ['id', 'employee','reason', 'amount', 'barcode', 'date']
+    list_display = ['id', 'employee','reason', 'amount', 'date']
     search_fields = ['employee__name']
     list_per_page = 50
 
 class DepositeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'client', 'detail_deposite', 'total', 'verify_code', 'date']
+    list_display = ['id', 'client', 'detail_deposite', 'total', 'registry','verify_code', 'date']
     search_fields = ['client__name']
     list_per_page = 50
 
 class WithDrawAdmin(admin.ModelAdmin):
-    list_display = ['id', 'details_withdraw', 'client', 'total', 'verify_code', 'date']
+    list_display = ['id', 'details_withdraw', 'client', 'total','registry', 'verify_code', 'date']
     search_fields = ['client__name']
     list_per_page = 50
 
 class ExpenseAdmin(admin.ModelAdmin):
-    list_display = ['id', 'expense_name', 'details', 'name', 'amount', 'receipt_num', 'date']
+    list_display = ['id', 'expense_name', 'details', 'name', 'amount', 'receipt_num', 'date','added_to_registry']
     list_per_page = 50
 
 class Debt_SupplierAdmin(admin.ModelAdmin):
-    list_display = ['id', 'supplier_name', 'amount', 'payment_method', 'bank_name', 'check_num', 'date']
+    list_display = ['id', 'supplier_name', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date','added_to_registry']
     search_fields = ['supplier_name__name']
     list_per_page = 50
 
 class Debt_ClientAdmin(admin.ModelAdmin):
-    list_display = ['id', 'client_name', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date']
+    list_display = ['id', 'client_name', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date','added_to_registry']
     search_fields = ['client_name__name']
     list_per_page = 50
 
@@ -421,22 +465,22 @@ class MediumTwo_ProductsAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 
-class SalarAdmin(admin.ModelAdmin):
+class SalaryAdmin(admin.ModelAdmin):
     list_display = ['employee_name','job_position','salary','percentage','date']
     search_fields = ['employee_name']
     list_per_page = 50
 
 
 class RegistryAdmin(admin.ModelAdmin):
-    list_display = ['total']
+    list_display = ['id','total']
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name','employee', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date']
+    list_display = ['id', 'name','employee', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date','added_to_registry']
     search_fields = ['employee__name']
     list_per_page = 50
 
 class Recieved_PaymentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name','employee', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date']
+    list_display = ['id', 'name','employee', 'amount', 'payment_method', 'bank_name', 'receipt_num', 'date','added_to_registry']
     search_fields = ['employee__name']
     list_per_page = 50
 
@@ -445,7 +489,7 @@ class Recieved_PaymentAdmin(admin.ModelAdmin):
 admin.site.register(OverTime,OverTimeAdmin)
 admin.site.register(Bonus,BounsAdmin)
 admin.site.register(Advance_On_salary,Advance_On_salaryAdmin)
-admin.site.register(Salary,SalarAdmin)
+admin.site.register(Salary,SalaryAdmin)
 admin.site.register(Absence,AbsenceAdmin)
 admin.site.register(Extra_Expense,Extra_ExpenseAdmin)
 admin.site.register(Discount,DiscountAdmin)
@@ -461,9 +505,12 @@ admin.site.register(Payment,PaymentAdmin)
 admin.site.register(Recieved_Payment,Recieved_PaymentAdmin)
 
 ##### Goods ###
+admin.site.register(ReturnedClientPackage,ReturnedClientPackageAdmin)
 admin.site.register(ReturnedGoodsClient, ReturnedGoodsClientAdmin)
+admin.site.register(ReturnedSupplierPackage,ReturnedClientPackageAdmin)
 admin.site.register(ReturnedGoodsSupplier, ReturnedGoodsSupplierAdmin)
-admin.site.register(DamagedProduct, DamagedProductAdmin)
+admin.site.register(DamagedPackage)
+admin.site.register(DamagedProduct,DamagedProductAdmin)
 
 #### Medium ####
 admin.site.register(Medium, MediumAdmin)
@@ -472,11 +519,14 @@ admin.site.register(MediumTwo,MediumTwoAdmin)
 admin.site.register(MediumTwo_Products,MediumTwo_ProductsAdmin)
 
 #### Rceipts ###
-admin.site.register(Incoming_Product, IncomingProductAdmin)
 admin.site.register(Incoming, IncomingAdmin)
-admin.site.register(ManualReceipt_Products, ManualReceiptProductAdmin)
+admin.site.register(FrozenIncomingReceipt , FreezeIncomingAdmin)
+admin.site.register(Incoming_Product, IncomingProductAdmin)
 admin.site.register(ManualReceipt, ManualReceiptAdmin)
+admin.site.register(FrozenManualReceipt , FreezeManualAdmin)
+admin.site.register(ManualReceipt_Products, ManualReceiptProductAdmin)
 admin.site.register(Output, OutputsproductAdmin)
+admin.site.register(FrozenOutputReceipt , FreezeOutputAdmin)
 admin.site.register(Output_Products, OutputProductAdmin)
 admin.site.register(DelievaryArrived, DElevaryArrivedAdmin)
 admin.site.register(OrderEnvoy, OrderEnvoyAdmin)
@@ -504,8 +554,3 @@ admin.site.register(UserNotification)
 
 admin.site.register(Chat)
 admin.site.register(ChatMessage)
-
-
-admin.site.register(ReturnedGoods)
-
-admin.site.register(FrozenManualReceipt)
