@@ -91,6 +91,7 @@ class UserLoginApiView(GenericAPIView):
     
 
 class UpdateImageUserView(APIView):
+    permission_classes = [IsAuthenticated]
     def put(self, requset, user_pk):
         user = CustomUser.objects.get(id=user_pk)
         serializer = UpdateUserSerializer(user, data=requset.data, many=False, context={'request':requset})
@@ -107,8 +108,7 @@ class UpdateImageUserView(APIView):
 
 
 class GetNotificationView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         user = request.user
         notification = UserNotification.objects.filter(user__id=user.id)
@@ -142,7 +142,7 @@ class ResetPasswordView(UpdateAPIView):
 
 class LogoutAPIView(GenericAPIView):
     serializer_class = UserLogoutSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -152,10 +152,9 @@ class LogoutAPIView(GenericAPIView):
 
 
 class ListInformationUserView(RetrieveAPIView):
-    [IsAuthenticated]
     queryset = CustomUser.objects.all()
     serializer_class= CustomUserSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 
