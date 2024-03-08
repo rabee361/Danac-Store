@@ -418,7 +418,7 @@ class OrderProductsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order_Product
-        fields = ['product','order','quantity','total_price','price','description']
+        fields = ['product','order','quantity','total_price','price','points','description']
 
 
 
@@ -428,7 +428,7 @@ class OrderSerializer(serializers.ModelSerializer):
     products = OrderProductsSerializer(source='order_product_set', many=True)
     class Meta:
         model = Order
-        fields = ['id', 'client', 'products', 'total', 'products_num', 'created', 'delivery_date', 'delivered']
+        fields = ['id', 'client', 'products', 'total', 'products_num', 'created', 'delivery_date', 'delivered','barcode']
 
 
 
@@ -1542,6 +1542,7 @@ class DamagedProductSerializer(serializers.ModelSerializer):
 
 class DamagedPackageSerializer(serializers.ModelSerializer):
     goods = DamagedProductSerializer(many=True,read_only=True)
+    employee = serializers.CharField(source='employee.name',read_only=True)
     class Meta:
         model = DamagedPackage
         fields = ['id','date','employee','total_num','total_price','barcode','goods']
