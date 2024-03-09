@@ -1240,6 +1240,8 @@ class ReceiptOrdersView(APIView):
     def post(self, request, medium_id):
         order_id = request.data['order_id']
         order = Order.objects.get(id=order_id)
+        client = order.client
+        request.data['client'] = client.id
         order.processed = True
         order.save()
         output_serializer = OutputSerializer2(data=request.data, context={'request': request})
