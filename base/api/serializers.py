@@ -415,6 +415,7 @@ class CartSerializer(serializers.ModelSerializer):
 class OrderProductsSerializer(serializers.ModelSerializer):
     price = serializers.FloatField(source='product.sale_price',read_only=True)
     description = serializers.CharField(source='product.description',read_only=True)
+    points = serializers.IntegerField(source='product.points',read_only=True)
 
     class Meta:
         model = Order_Product
@@ -428,7 +429,7 @@ class OrderSerializer(serializers.ModelSerializer):
     products = OrderProductsSerializer(source='order_product_set', many=True)
     class Meta:
         model = Order
-        fields = ['id', 'client', 'products', 'total', 'products_num', 'created', 'delivery_date', 'delivered','barcode']
+        fields = ['id', 'client', 'products', 'total', 'products_num', 'created', 'delivery_date', 'delivered','barcode','processed']
 
 
 

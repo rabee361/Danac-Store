@@ -369,6 +369,7 @@ class Order(models.Model):
     barcode = models.CharField(max_length=200,null=True)
     shipping_cost = models.FloatField(default=0.0)
     client_service = models.CharField(max_length=20,default='000 208 0660')
+    processed = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'Clients_and_Products'
