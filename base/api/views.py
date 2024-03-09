@@ -1130,7 +1130,9 @@ class CreateMediumForOrderView(APIView):
                 total_price=product.total_price
             )
         serializer = MediumSerializer(medium,many=False)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        data = serializer.data
+        data['order_id'] = int(order_id)
+        return Response(data,status=status.HTTP_200_OK)
        
 
 
@@ -1236,6 +1238,10 @@ class CreateOutputProduct(CreateAPIView):
 class ReceiptOrdersView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def post(self, request, medium_id):
+        order_id = request.data['order_id']
+        order = Order.objects.get(id=order_id)
+        order.processed = True
+        order.save()
         output_serializer = OutputSerializer2(data=request.data, context={'request': request})
         if output_serializer.is_valid():
             total_points = 0
