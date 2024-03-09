@@ -1242,6 +1242,7 @@ class ReceiptOrdersView(APIView):
         order = Order.objects.get(id=order_id)
         client = order.client
         mutable_data = request.data.copy()
+        mutable_data['client'] = client.id 
         mutable_data = mutable_data.dict()
         order.processed = True
         order.save()
