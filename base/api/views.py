@@ -1241,10 +1241,11 @@ class ReceiptOrdersView(APIView):
         order_id = request.data['order_id']
         order = Order.objects.get(id=order_id)
         client = order.client
-        request.data['client'] = client.id
+        mutable_data = request.data.copy()
+        mutable_data = mutable_data.dict()
         order.processed = True
         order.save()
-        output_serializer = OutputSerializer2(data=request.data, context={'request': request})
+        output_serializer = OutputSerializer2(data=mutable_data, context={'request': request})
         if output_serializer.is_valid():
             total_points = 0
             output = output_serializer.save()
