@@ -262,6 +262,7 @@ class GetState(RetrieveAPIView):
 
 
 class ListAds(ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
 

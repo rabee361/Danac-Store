@@ -249,7 +249,7 @@ class SupplierAdmin(admin.ModelAdmin):
 
 
 class DamagedPackageAdmin(admin.ModelAdmin):
-    list_display = ['employee','date','barcode']
+    list_display = ['id','employee','date','barcode']
 
 
 
