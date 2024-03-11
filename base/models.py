@@ -121,7 +121,7 @@ class Client(models.Model):
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=100 , null=True)
     store_name = models.CharField(max_length=100 , null=True)
-    phonenumber = PhoneNumberField(region='DZ')
+    phonenumber = PhoneNumberField(region='DZ',unique=True)
     phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
     category = models.CharField(max_length=75,choices=CHOICES,default='سوبرماركت')
     notes = models.TextField(max_length=150,null=True,blank=True,default='_')
@@ -452,7 +452,7 @@ class Supplier(models.Model):
 
 class Employee(models.Model):
     name = models.CharField(max_length=30)
-    phonenumber = PhoneNumberField(region='DZ')
+    phonenumber = PhoneNumberField(region='DZ',unique=True)
     job_position = models.CharField(max_length=20)
     truck_num = models.IntegerField(null=True,blank=True)
     location = models.PointField(default=Point(3.0589,36.7539))
