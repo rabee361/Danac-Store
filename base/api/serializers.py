@@ -1066,6 +1066,7 @@ class DepositeSerializer(serializers.ModelSerializer):
         request = self.context['request']
         employee = Employee.objects.get(phonenumber=request.user.phonenumber)
         registry = Registry.objects.get(employee=employee)
+        validated_data['registry'] = registry
         deposite = Deposite.objects.create(**validated_data)
         registry = Registry.objects.first()
         registry.total += deposite.total
