@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     'Human_Resources',
     'Company_Fund',
     'Clients_and_Products',
-    'corsheaders',
     
     
 ]
