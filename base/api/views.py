@@ -621,7 +621,7 @@ class ClientPointsView(ListAPIView):
 
 
 class SalesEmployee(APIView):
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend]
     filterset_class = SalesEmployeeFilter
     ordering_fields = ['name', 'truck_num']
 
@@ -1243,7 +1243,6 @@ class ReceiptOrdersView(APIView):
         client = order.client
         mutable_data = request.data.copy()
         mutable_data['client'] = client.id 
-        mutable_data = mutable_data.dict()
         order.processed = True
         order.save()
         output_serializer = OutputSerializer2(data=mutable_data, context={'request': request})
