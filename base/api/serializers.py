@@ -1277,7 +1277,7 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
     product = ProductSerializer(many=False,read_only=True)
     product_id = serializers.IntegerField(source='product.id',read_only=True)
     product_points = serializers.IntegerField(source='product.points',read_only=True)
-    item_per_carton = serializers.IntegerField(source='product.items_per_carton',read_only=True)
+    items_per_carton = serializers.IntegerField(source='product.items_per_carton',read_only=True)
     class Meta:
         model = Products_Medium
         fields = ['id','medium','product','product_id','price','num_item','total_price_of_item','items_per_carton','product_points']

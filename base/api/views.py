@@ -1092,7 +1092,11 @@ class Add_product_to_Medium(APIView):
         if not created:
             medium_products.price = float(sale_price)
             medium_products.num_item += int(num_item)
-            medium_products.total_price = medium_products.total_price_of_item
+            # medium_products.total_price = medium_products.total_price_of_item
+            medium_products.save()
+        else:
+            medium_products.price = float(sale_price)
+            medium_products.num_item = int(num_item)
             medium_products.save()
 
         pro_med_serializer = ProductsMediumSerializer(medium_products)
