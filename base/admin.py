@@ -338,7 +338,7 @@ class FreezeManualAdmin(admin.ModelAdmin):
 
 
 class OutputsproductAdmin(LeafletGeoAdmin):
-    list_display = ['id', 'client', 'employee', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
+    list_display = ['id', 'client', 'employee','barcode', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
     readonly_fields = ['serial']
 

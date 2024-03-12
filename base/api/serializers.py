@@ -2181,8 +2181,8 @@ class OutputSerializer2(serializers.ModelSerializer):
         remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
         client = Client.objects.get(id=client_data.id)
-        barcode = Cart.objects.get(customer=client)
-        instance = Output.objects.create(employee=employee, client=client,barcode=barcode, **validated_data)
+        cart = Cart.objects.get(customer=client)
+        instance = Output.objects.create(employee=employee, client=client,barcode=cart.barcode, **validated_data)
         client.debts += remaining_amount
         client.save()
         order = Order.objects.get(id=order_id)
