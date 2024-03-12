@@ -786,6 +786,7 @@ class Payment(models.Model):
 ############################################-Returned & Damaged Goods-----###############################################################################
         
 class ReturnedGoodsSupplier(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     supplier =  models.ForeignKey(Supplier, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
@@ -820,6 +821,7 @@ class ReturnedSupplierPackage(models.Model):
 class ReturnedGoodsClient(models.Model):
     client =  models.ForeignKey(Client, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
     reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
@@ -854,7 +856,7 @@ class DamagedProduct(models.Model):
     total_price = models.FloatField()
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['id']
 
     def __str__(self) -> str:
         return self.product.name

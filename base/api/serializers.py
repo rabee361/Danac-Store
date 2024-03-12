@@ -1316,13 +1316,14 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
 
 class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField(source='product.id',read_only=True)
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all()) 
     client = serializers.PrimaryKeyRelatedField(queryset=Client.objects.all())
     package_id = serializers.CharField(write_only=True)#####
+    employee = serializers.CharField(read_only=True)
 
     class Meta:
         model = ReturnedGoodsClient
-        fields = ['id','product','product_id','client','quantity','total_price','reason','package_id']
+        fields = ['id','product','product_id','client','employee','quantity','total_price','reason','package_id']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1351,7 +1352,24 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
+    
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if 'package_id' not in attrs:
+            raise serializers.ValidationError({
+                'package_id': "This field is required."
+            })
+        
+        try:
+            package = ReturnedClientPackage.objects.get(id=attrs['package_id'])
+        except ReturnedClientPackage.DoesNotExist:
+            raise serializers.ValidationError({
+                'error' : "this package does not exist"
+            })
+        return attrs
+        
+        
     def update(self, instance, validated_data):
         original_quantity = instance.quantity
         super().update(instance, validated_data)
@@ -1363,9 +1381,11 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         package_id = validated_data.pop('package_id')#####
+        package = ReturnedClientPackage.objects.get(id=package_id)
+        validated_data['employee'] = package.employee
         instance = super().create(validated_data)
         product = instance.product
-        product.quantity -= instance.quantity
+        product.quantity += instance.quantity
         product.save()
         package = ReturnedClientPackage.objects.get(id=package_id)####
         package.goods.add(instance)####
@@ -1398,9 +1418,11 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
     package_id = serializers.CharField(write_only=True)
+    employee = serializers.CharField(read_only=True)
+
     class Meta:
         model = ReturnedGoodsSupplier
-        fields = ['id', 'product', 'quantity', 'supplier','total_price', 'reason','package_id']
+        fields = ['id', 'product', 'quantity', 'supplier','employee','total_price', 'reason','package_id']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1430,6 +1452,22 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
 
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if 'package_id' not in attrs:
+            raise serializers.ValidationError({
+                'package_id': "This field is required."
+            })
+        
+        try:
+            package = ReturnedSupplierPackage.objects.get(id=attrs['package_id'])
+        except ReturnedSupplierPackage.DoesNotExist:
+            raise serializers.ValidationError({
+                'error' : "this package does not exist"
+            })
+        return attrs
+        
     def update(self, instance, validated_data):
         original_quantity = instance.quantity
         super().update(instance, validated_data)
@@ -1441,6 +1479,8 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         package_id = validated_data.pop('package_id')#####
+        package = ReturnedClientPackage.objects.get(id=package_id)
+        validated_data['employee'] = package.employee
         instance = super().create(validated_data)
         product = instance.product
         product.quantity -= instance.quantity
