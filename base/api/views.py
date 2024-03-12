@@ -1243,14 +1243,12 @@ class CreateOutputProduct(CreateAPIView):
 class ReceiptOrdersView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def post(self, request, medium_id):
-        order_id = request.data['order_id']
-        order = Order.objects.get(id=order_id)
-        client = order.client
-        mutable_data = request.data.copy()
-        mutable_data['client'] = client.id 
-        order.processed = True
-        order.save()
-        output_serializer = OutputSerializer2(data=mutable_data, context={'request': request})
+        try:
+            Medium.objects.get(id=medium_id)
+        except Medium.DoesNotExist:
+            return Response({"medium":"medium does not exist"})
+        
+        output_serializer = OutputSerializer2(data=request.data, context={'request': request})
         if output_serializer.is_valid():
             total_points = 0
             output = output_serializer.save()
@@ -1398,6 +1396,11 @@ class AcceptDelevaryArrived(APIView):
 class CreateIncomingView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, medium_id):
+        try:
+            Medium.objects.get(id=medium_id)
+        except Medium.DoesNotExist:
+            return Response({"medium":"medium does not exist"})
+        
         incoming_serializer = IncomingSerializer(data=request.data, context={'request': request})
         if incoming_serializer.is_valid():
             incoming = incoming_serializer.save()
@@ -1516,6 +1519,11 @@ class UnFreezeIncomingReceipt(APIView):
 class CreateManualReceiptView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, medium_id):
+        try:
+            Medium.objects.get(id=medium_id)
+        except Medium.DoesNotExist:
+            return Response({"medium":"medium does not exist"})
+        
         manual_receipt_serializer = ManualRecieptSerializer(data=request.data, context={'request': request})
         if manual_receipt_serializer.is_valid():
             total_points = 0

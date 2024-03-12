@@ -1467,6 +1467,7 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
                 'error' : "this package does not exist"
             })
         return attrs
+    
         
     def update(self, instance, validated_data):
         original_quantity = instance.quantity
@@ -1551,6 +1552,22 @@ class DamagedProductSerializer(serializers.ModelSerializer):
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if 'package_id' not in attrs:
+            raise serializers.ValidationError({
+                'package_id': "This field is required."
+            })
+        
+        try:
+            package = DamagedPackage.objects.get(id=attrs['package_id'])
+        except DamagedPackage.DoesNotExist:
+            raise serializers.ValidationError({
+                'error' : "this package does not exist"
+            })
+        return attrs
+        
 
     def create(self, validated_data):
         package_id = validated_data.pop('package_id')#####
@@ -2066,11 +2083,12 @@ class OutputSerializer2(serializers.ModelSerializer):
     client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
     total_receipt = serializers.SerializerMethodField()
     client_points = serializers.SerializerMethodField()
+    order_id = serializers.CharField(write_only=True)
 
     class Meta:
         model = Output
         exclude = ['employee','location']
-        include = ['total_receipt']
+        include = ['total_receipt','order_id']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -2099,6 +2117,23 @@ class OutputSerializer2(serializers.ModelSerializer):
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
+
+    
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if 'order_id' not in attrs:
+            raise serializers.ValidationError({
+                'order_id': "This field is required."
+            })
+        
+        try:
+            order = Order.objects.get(id=attrs['order_id'])
+        except Order.DoesNotExist:
+            raise serializers.ValidationError({
+                'error' : "order does not exist"
+            })
+        return attrs
+
     
     def get_longitude(self, obj):
         return obj.location.x
@@ -2118,6 +2153,7 @@ class OutputSerializer2(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get('request')
+        order_id = validated_data.pop('order_id')
         client_data = validated_data.pop('client', None)
         remaining_amount = validated_data.pop('remaining_amount', None)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
@@ -2126,6 +2162,9 @@ class OutputSerializer2(serializers.ModelSerializer):
         instance = Output.objects.create(employee=employee, client=client,barcode=barcode, **validated_data)
         client.debts += remaining_amount
         client.save()
+        order = Order.objects.get(id=order_id)
+        order.processed = True
+        order.save()
         return instance
     
     def update(self, instance, validated_data):
