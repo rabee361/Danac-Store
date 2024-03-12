@@ -240,6 +240,7 @@ class ClientSerializer(serializers.ModelSerializer):
         return not bool(self._errors)
     
 
+
     def get_longitude(self,obj):
         return obj.location.x
     

@@ -841,25 +841,34 @@ class RetUpdDesClientDebt(RetrieveUpdateDestroyAPIView):
     serializer_class = Client_DebtSerializer
 
 
-class GetClientDebt(APIView):
+class ClientPreviousInfo(APIView):
     def get(self,request,pk):
         try:
             client = Client.objects.get(id=pk)
+            total_returned = ReturnedGoodsClient.objects.filter(client=client).aggregate(
+                total_returned=Sum('total_price')
+            )['total_returned'] or 0.0
             serializer = ClientSerializer(client,many=False)
             return Response({
                 "client" : pk ,
+                "total_returned" : total_returned,
                 "client_debt":serializer.data['debts']})
         except:
             return Response({"error": "No Cliet with that id"})
 
 
-class GetSupplierDebt(APIView):
+class SupplierPreviousInfo(APIView):
     def get(self,request,pk):
         try:
             supplier = Supplier.objects.get(id=pk)
+            total_returned = ReturnedGoodsSupplier.objects.filter(supplier=supplier).aggregate(
+                total_returned=Sum('total_price')
+            )['total_returned'] or 0.0
             serializer = SupplierSerializer(supplier,many=False)
+
             return Response({
                 "supplier" : pk,
+                "total_returned":total_returned,
                 "supplier_debt":serializer.data['debts']})
         except:
             return Response({"error": "No Supplier with that id"})   

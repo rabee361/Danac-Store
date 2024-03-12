@@ -90,9 +90,9 @@ urlpatterns = [
 
     path('supplier-debts/' , ListCreateSupplierDebts.as_view() , name="supplier-debts"),
     path('client-debts/' , ListCreateClientDebts.as_view() , name="client-debts"),
-    path('debt-for-client/<str:pk>/' , GetClientDebt.as_view()),
+    path('debt-for-client/<str:pk>/' , ClientPreviousInfo.as_view()),
     path('get-client-debt/<str:pk>/' , RetUpdDesClientDebt.as_view() , name="client-debt"),
-    path('debt-for-supplier/<str:pk>/' , GetSupplierDebt.as_view()),
+    path('debt-for-supplier/<str:pk>/' , SupplierPreviousInfo.as_view()),
     path('get-supplier-debt/<str:pk>/' , RetUpdDesSupplierDebt.as_view() , name="supplier-debt"),
     path('get-registry/' , ListRegistries.as_view() , name="list-registries"),
     path('deposites/' , ListCreateDeposite.as_view() , name="deposites"),
