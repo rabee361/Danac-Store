@@ -209,7 +209,7 @@ class ClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = ['id','name', 'address', 'phonenumber','phonenumber2', 'category', 'notes', 'longitude','latitude', 'total_points','debts','total_receipts']
+        fields = ['id','name', 'address', 'phonenumber','phonenumber2', 'category', 'notes', 'longitude','latitude', 'total_points','total_returned','debts','total_receipts']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -594,7 +594,7 @@ class SalesEmployeeLocationSerializer(serializers.ModelSerializer):
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
-        fields = ['id','name','company_name','address','phone_number','phone_number2','info','debts','total_receipts']
+        fields = ['id','name','company_name','address','phone_number','phone_number2','info','debts','total_returned','total_receipts']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)

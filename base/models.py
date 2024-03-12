@@ -145,6 +145,12 @@ class Client(models.Model):
         total = manuals + outputs
         return total
 
+    def total_returned(self):
+        total_returned = ReturnedGoodsClient.objects.filter(client=self).aggregate(
+                total_returned=Sum('total_price')
+            )['total_returned'] or 0.0
+        return total_returned
+
 
 
 class Points(models.Model):
@@ -445,7 +451,11 @@ class Supplier(models.Model):
     def total_receipts(self):
         return Incoming.objects.filter(supplier=self).count()
 
-
+    def total_returned(self):
+        total_returned = ReturnedGoodsSupplier.objects.filter(supplier=self).aggregate(
+                total_returned=Sum('total_price')
+            )['total_returned'] or 0.0
+        return total_returned
 
 
 
