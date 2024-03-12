@@ -239,12 +239,18 @@ class ClientSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
     
+
     def get_longitude(self,obj):
         return obj.location.x
     
     def get_latitude(self,obj):
         return obj.location.y
 
+    def create(self, validated_data):
+        try:
+            return Client.objects.create(**validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError({'unique_field': 'This client already exists.'})
 
 
 
@@ -528,6 +534,14 @@ class EmployeeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
     
+
+    def create(self, validated_data):
+        try:
+            return Employee.objects.create(**validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError({'unique_field': 'This employee already exists.'})
+
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         related_models = {
@@ -609,6 +623,14 @@ class SupplierSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
     
+    def create(self, validated_data):
+        try:
+            return Supplier.objects.create(**validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError({'unique_field': 'This supplier already exists.'})
+
+
+
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['name'] = modify_name(repr['name'])

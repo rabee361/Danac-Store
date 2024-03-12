@@ -430,7 +430,7 @@ class Order_Product(models.Model):
 class Supplier(models.Model):
     name = models.CharField(max_length=30)
     company_name = models.CharField(max_length=50)
-    phone_number = PhoneNumberField(region='DZ')
+    phone_number = PhoneNumberField(region='DZ',unique=True)
     phone_number2 = PhoneNumberField(region='DZ',null=True,blank=True)
     address = models.CharField(max_length=100)
     info = models.TextField(max_length=500,null=True,blank=True,default='_')
