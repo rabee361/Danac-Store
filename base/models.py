@@ -802,6 +802,7 @@ class ReturnedGoodsSupplier(models.Model):
     quantity = models.IntegerField()
     total_price = models.FloatField()
     reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-id']
@@ -835,6 +836,7 @@ class ReturnedGoodsClient(models.Model):
     quantity = models.IntegerField()
     total_price = models.FloatField()
     reason = models.CharField(max_length=50,null=True,blank=True,default=' ')
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-id']
@@ -864,6 +866,7 @@ class DamagedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['id']

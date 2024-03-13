@@ -171,11 +171,13 @@ class Extra_ExpenseFilter(django_filters.FilterSet):
         
 
 class DamagedProductFilter(django_filters.FilterSet):
+    date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
     product_name = django_filters.CharFilter(field_name='product__name' , lookup_expr='startswith')
     
     class Meta:
         model = DamagedProduct
-        fields = ['product_name']
+        fields = ['product_name','date_from','date_to']
 
 
 
@@ -190,13 +192,15 @@ class DamagedPackageFilter(django_filters.FilterSet):
 
 
 class ReturnedGoodsClientFilter(django_filters.FilterSet):
+    date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
     client_name = django_filters.CharFilter(field_name='client__name',lookup_expr='startswith')
     product_name = django_filters.CharFilter(field_name='product__name',lookup_expr='startswith')
     employee_name = django_filters.CharFilter(field_name='employee_name' , lookup_expr='startswith')
     
     class Meta:
         model = ReturnedGoodsClient
-        fields = ['product_name','client_name','employee_name']
+        fields = ['product_name','client_name','employee_name','date_from','date_to']
 
 
 
@@ -211,13 +215,15 @@ class ReturnedPackageClientFilter(django_filters.FilterSet):
 
 
 class ReturnedGoodsSupplierFilter(django_filters.FilterSet):
+    date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
     supplier_name = django_filters.CharFilter(field_name='supplier__name',lookup_expr='startswith')
     product_name = django_filters.CharFilter(field_name='product__name',lookup_expr='startswith')
     employee_name = django_filters.CharFilter(field_name='employee_name' , lookup_expr='startswith')
     
     class Meta:
         model = ReturnedGoodsSupplier
-        fields = ['product_name','supplier_name','employee_name']
+        fields = ['product_name','supplier_name','employee_name','date_from','date_to']
 
 
 
