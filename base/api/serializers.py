@@ -1304,6 +1304,7 @@ class ProductsMediumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Products_Medium
         fields = ['id','medium','product','product_id','price','num_item','total_price_of_item','items_per_carton','product_points']
+
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['num_per_item'] = instance.product.num_per_item
@@ -1331,6 +1332,69 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+
+
+
+class AddProductToMediumSerializer(serializers.Serializer):
+    product = serializers.IntegerField()
+    medium = serializers.IntegerField()
+    num_item = serializers.IntegerField()
+    sale_price = serializers.FloatField()
+
+    def is_valid(self, raise_exception=False):
+        is_valid = super().is_valid(raise_exception=False)
+        if self._errors:
+            first_error_field = next(iter(self._errors))
+            first_error_message = self._errors[first_error_field][0]
+            if first_error_message == "This field is required.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} مطلوب"
+            elif first_error_message == "This field may not be blank.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+            elif first_error_message == "A valid number is required.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"رقم صالح مطلوب لـ {translation}"
+            elif first_error_message == "A valid integer is required.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"عدد صحيح صالح مطلوب لـ {translation}"
+            elif first_error_message == "This field may not be null.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"{translation} لا يمكن أن يكون فارغًا"
+            elif first_error_message == "Invalid pk \"0\" - object does not exist.":
+                translation = translate_to_arabic(first_error_field.replace('_', ' '))
+                first_error_message = f"يرجى اختيار قيمة لـ {translation}"
+            self._errors = {"error": first_error_message}
+            if raise_exception:
+                raise serializers.ValidationError(self._errors)
+        return not bool(self._errors)
+    
+    def validate_num_item(self,value):
+        if value <= 0:
+            raise serializers.ValidationError("number of items should be greater than 0")
+          
+    def validate_sale_price(self,value):
+        if value <= 0:
+            raise serializers.ValidationError("sale price should be greater than 0.0")
+          
+
+    def validate_product(self, value):
+        try:
+            Product.objects.get(id=value)
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("Product does not exist.")
+        return value
+
+    def validate_medium(self, value):
+        try:
+            Medium.objects.get(id=value)
+        except Medium.DoesNotExist:
+            raise serializers.ValidationError("Medium does not exist.")
+        return value
+    
+
 
 ######################################## RETURNED GOODS #####################################################################
 
