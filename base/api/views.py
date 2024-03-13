@@ -1093,10 +1093,9 @@ class Add_product_to_Medium(APIView):
             num_item = validated_data['num_item']
             sale_price = validated_data['sale_price']
             medium_products, created = Products_Medium.objects.get_or_create(product=product, medium=medium)
-            if created:
-                medium_products.price = float(sale_price)
-                medium_products.num_item = int(num_item)
-                medium_products.save()
+            medium_products.price = float(sale_price)
+            medium_products.num_item = int(num_item)
+            medium_products.save()
 
             pro_med_serializer = ProductsMediumSerializer(medium_products)
             return Response(pro_med_serializer.data, status=status.HTTP_200_OK)
