@@ -1324,6 +1324,7 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
             Medium.objects.get(id=value)
         except Medium.DoesNotExist:
             raise serializers.ValidationError("medium does not exist")
+        return value
 
 
     def validate_product(self,value):
@@ -1331,6 +1332,8 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
             Product.objects.get(id=value)
         except Product.DoesNotExist:
             raise serializers.ValidationError("product does not exist")
+        
+        return value
 
 
     def update(self, instance, validated_data):
@@ -1388,10 +1391,12 @@ class AddProductToMediumSerializer(serializers.Serializer):
     def validate_num_item(self,value):
         if value <= 0:
             raise serializers.ValidationError("number of items should be greater than 0")
+        return value
           
     def validate_sale_price(self,value):
         if value <= 0:
             raise serializers.ValidationError("sale price should be greater than 0.0")
+        return value
           
 
     def validate_product(self, value):
