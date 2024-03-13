@@ -1319,6 +1319,20 @@ class UpdateProductMediumSerializer(serializers.ModelSerializer):
         model = Products_Medium
         fields = ['id','medium','product','price','num_item','total_price_of_item']
 
+    def validate_medium(self,value):
+        try:
+            Medium.objects.get(id=value)
+        except Medium.DoesNotExist:
+            raise serializers.ValidationError("medium does not exist")
+
+
+    def validate_product(self,value):
+        try:
+            Product.objects.get(id=value)
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("product does not exist")
+
+
     def update(self, instance, validated_data):
         medium_id = validated_data.pop('medium')
         medium = Medium.objects.get(id=medium_id)
