@@ -1410,7 +1410,7 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReturnedGoodsClient
-        fields = ['id','product','product_id','client','employee','quantity','total_price','reason','package_id']
+        fields = ['id','product','product_id','client','employee','quantity','total_price','reason','package_id','date']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1509,7 +1509,7 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReturnedGoodsSupplier
-        fields = ['id', 'product', 'quantity', 'supplier','employee','total_price', 'reason','package_id']
+        fields = ['id', 'product', 'quantity', 'supplier','employee','total_price', 'reason','package_id','date']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
@@ -1610,7 +1610,7 @@ class DamagedProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DamagedProduct
-        fields  = ['id','product','quantity','total_price','product_id','package_id']
+        fields  = ['id','product','quantity','total_price','product_id','package_id','date']
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
