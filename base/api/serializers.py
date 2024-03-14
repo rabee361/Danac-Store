@@ -566,7 +566,7 @@ class SalesEmployeeSerializer(serializers.ModelSerializer):
     latitude = serializers.SerializerMethodField()
     class Meta:
         model = Employee
-        fields = ['id','name','notes','truck_num','phonenumber','longitude','latitude','address']
+        fields = ['id','name','notes','truck_num','phonenumber','phonenumber2','longitude','latitude','address']
 
     def get_longitude(self, obj):
         return obj.location.x

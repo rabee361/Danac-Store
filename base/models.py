@@ -463,6 +463,7 @@ class Supplier(models.Model):
 class Employee(models.Model):
     name = models.CharField(max_length=30)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
+    phonenumber2 = PhoneNumberField(region='DZ',null=True)
     job_position = models.CharField(max_length=20)
     truck_num = models.IntegerField(null=True,blank=True)
     location = models.PointField(default=Point(3.0589,36.7539))
