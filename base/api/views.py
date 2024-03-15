@@ -1095,6 +1095,7 @@ class Add_product_to_Medium(APIView):
             medium_products, created = Products_Medium.objects.get_or_create(product=product, medium=medium)
             medium_products.price = float(sale_price)
             medium_products.num_item = int(num_item)
+
             medium_products.save()
 
             pro_med_serializer = ProductsMediumSerializer(medium_products)
@@ -1415,7 +1416,7 @@ class CreateIncomingView(APIView):
                     product = product.product,
                     incoming = incoming,
                     num_item = product.num_item,
-                    total_price = product.total_price,
+                    total_price = product.total_price_of_item,
                 )
             products.delete()
             medium = Medium.objects.get(id=medium_id)
