@@ -119,8 +119,8 @@ class Client(models.Model):
     )
 
     name = models.CharField(max_length=30)
-    address = models.CharField(max_length=100 , null=True)
-    store_name = models.CharField(max_length=100 , null=True)
+    address = models.CharField(max_length=100 , null=True,blank=True)
+    store_name = models.CharField(max_length=100 , null=True,blank=True)
     phonenumber = PhoneNumberField(region='DZ',unique=True)
     phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
     category = models.CharField(max_length=75,choices=CHOICES,default='سوبرماركت')

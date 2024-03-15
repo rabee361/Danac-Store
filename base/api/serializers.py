@@ -2100,7 +2100,7 @@ class OutputSerializer(serializers.ModelSerializer):
     address = serializers.CharField(source='client.address',read_only=True)
     class Meta:
         model = Output
-        fields = ['id','serial','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered','freeze']
+        fields = ['id','serial','client','client_name','address','products','employee','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered','freeze']
 
 
 class ProductsOutputSerializer2(serializers.ModelSerializer):
