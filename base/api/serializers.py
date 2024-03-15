@@ -2098,9 +2098,13 @@ class FrozenManualReceiptSerializer(serializers.ModelSerializer):
 class OutputSerializer(serializers.ModelSerializer):
     client_name = serializers.CharField(source='client.name',read_only=True)
     address = serializers.CharField(source='client.address',read_only=True)
+    total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = Output
-        fields = ['id','serial','client','client_name','address','products','employee','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered','freeze']
+        fields = ['id','serial','client','client_name','address','products','employee','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','total_receipt','date','barcode','location','delivered','freeze']
+
+    def get_total_receipt(self, obj):
+        return obj.calculate_total_receipt()
 
 
 class ProductsOutputSerializer2(serializers.ModelSerializer):
