@@ -2326,7 +2326,7 @@ class GetProductsOutputsSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(source='product.image',read_only=True)
     class Meta:
         model = Output_Products
-        fields = ['product', 'quantity', 'total', 'discount','image']
+        fields = ['product', 'quantity', 'total_price', 'discount','image']
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
