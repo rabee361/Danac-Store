@@ -1173,9 +1173,9 @@ class WithDrawSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("you are not allowed into this registry!")
         
         difference = validated_data['total'] - instance.total
-        super().update(instance, validated_data)
         if registry.total - abs(difference) < 0:
             raise serializers.ValidationError("The total in the registry cannot go below zero.")
+        super().update(instance, validated_data)
         registry.total -= difference
         registry.save()
         return instance
