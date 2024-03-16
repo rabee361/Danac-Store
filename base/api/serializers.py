@@ -1919,12 +1919,7 @@ class FrozenManualReceiptSerializer(serializers.ModelSerializer):
 
 ########################################## OUTPUT ##############################################
         
-class OutputSerializer(serializers.ModelSerializer):
-    client_name = serializers.CharField(source='client.name',read_only=True)
-    address = serializers.CharField(source='client.address',read_only=True)
-    class Meta:
-        model = Output
-        fields = ['id','serial','client','client_name','address','products','employee','phonenumber','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered','freeze']
+
 
 
 class ProductsOutputSerializer2(serializers.ModelSerializer):
@@ -2005,6 +2000,18 @@ class ProductsOutputSerializer(serializers.ModelSerializer):
         model = Output_Products
         fields = ['id', 'product_id','name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'discount', 'output']
 
+class OutputSerializer(serializers.ModelSerializer):
+    client_phonenumber = serializers.CharField(source='client.phonenumber', read_only=True)
+    address = serializers.CharField(source='client.address',read_only=True)
+    class Meta:
+        model = Output
+        fields = ['id','serial','client','client_phonenumber','address','products','employee','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','date','barcode','location','delivered','freeze']
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['employee'] = instance.employee.name
+        repr['client'] = instance.client.name
+        return repr
 
 class OutputSerializer2(serializers.ModelSerializer):
     products = ProductsOutputSerializer(source='output_products_set', many=True,read_only=True)
@@ -2114,7 +2121,7 @@ class FrozenOutputReceiptSerializer(serializers.ModelSerializer):
 
 class DelevaryArrivedSerializer(serializers.ModelSerializer):
     output_receipt = OutputSerializer(read_only=True)
-    employee = EmployeeSerializer(read_only=True)
+    # employee = EmployeeSerializer(read_only=True)
     class Meta:
         model = DelievaryArrived
         fields = '__all__'
@@ -2124,7 +2131,7 @@ class GetProductsOutputsSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(source='product.image',read_only=True)
     class Meta:
         model = Output_Products
-        fields = ['product', 'quantity', 'total', 'discount','image']
+        fields = ['product', 'quantity','total_price','product_points','discount','image']
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
