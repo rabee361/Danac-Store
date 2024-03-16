@@ -1100,9 +1100,11 @@ class DepositeSerializer(serializers.ModelSerializer):
         employee = Employee.objects.get(phonenumber=request.user.phonenumber)
         registry = Registry.objects.get(employee=employee)
         if instance.registry != registry:
-            raise serializers.ValidationError("you are not allowed into this registry!")
+            raise serializers.ValidationError({"خطأ":"لا يسمح لك بتعديل هذا الصندوق"})
         
-        difference = validated_data.get('total', instance.total) - instance.total
+        difference = validated_data['total'] - instance.total
+        if registry.total - abs(difference) < 0:
+            raise serializers.ValidationError({"خطأ":"رصيد الخزنة لا يمكن أن يكون أقل من صفر"})
         super().update(instance, validated_data)
         registry.total += difference
         registry.save()
@@ -1157,7 +1159,7 @@ class WithDrawSerializer(serializers.ModelSerializer):
         registry = Registry.objects.get(employee=employee)
         validated_data['registry'] = registry
         if registry.total < validated_data['total']:
-            raise serializers.ValidationError("The total in the registry cannot go below zero.")
+            raise serializers.ValidationError({"خطأ":"رصيد الخزنة لا يمكن أن يكون أقل من صفر"})
         withdraw = WithDraw.objects.create(**validated_data)
         registry.total -= withdraw.total
         registry.save()
@@ -1170,11 +1172,11 @@ class WithDrawSerializer(serializers.ModelSerializer):
         registry = Registry.objects.get(employee=employee)
         validated_data['registry'] = registry
         if instance.registry != registry:
-            raise serializers.ValidationError("you are not allowed into this registry!")
+            raise serializers.ValidationError({"خطأ":"لا يسمح لك بتعديل هذا الصندوق"})
         
         difference = validated_data['total'] - instance.total
         if registry.total - abs(difference) < 0:
-            raise serializers.ValidationError("The total in the registry cannot go below zero.")
+            raise serializers.ValidationError({"خطأ":"رصيد الخزنة لا يمكن أن يكون أقل من صفر"})
         super().update(instance, validated_data)
         registry.total -= difference
         registry.save()
