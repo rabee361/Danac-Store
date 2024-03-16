@@ -574,7 +574,7 @@ class Salary(models.Model):
     employee_name = models.CharField(max_length=100)
     job_position = models.CharField(max_length=50)
     salary = models.FloatField()
-    percentage = models.FloatField()
+    percentage = models.FloatField(null=True,blank=True,default=0)
     hr = models.ForeignKey(Employee,on_delete=models.CASCADE, related_name='hr_employee_salaries')
     barcode = models.CharField(max_length=200, default=generate_barcode, editable=False)
     overtime = models.FloatField(default=0.0)

@@ -103,14 +103,14 @@ class DebtClientFilter(django_filters.FilterSet):
     client_name = django_filters.CharFilter(field_name='client_name__name', lookup_expr='startswith')
     class Meta: 
         model = Debt_Client
-        fields = ['client_name','payment_method']
+        fields = ['client_name','payment_method','receipt_num']
 
 
 class DebtSupplierFilter(django_filters.FilterSet):
     supplier_name = django_filters.CharFilter(field_name='supplier_name__name', lookup_expr='startswith')
     class Meta: 
         model = Debt_Supplier
-        fields = ['supplier_name','payment_method']
+        fields = ['supplier_name','payment_method','receipt_num']
 
 
 ################################# HR #############################################
