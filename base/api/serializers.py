@@ -2239,6 +2239,8 @@ class OutputSerializer2(serializers.ModelSerializer):
         
         try:
             order = Order.objects.get(id=attrs['order_id'])
+            client = order.client
+            attr['client'] = client
         except Order.DoesNotExist:
             raise serializers.ValidationError({
                 'error' : "order does not exist"
@@ -2265,12 +2267,12 @@ class OutputSerializer2(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         order_id = validated_data.pop('order_id')
-        # client_data = validated_data.pop('client', None)
-        order = Order.objects.get(id=order_id)
-        client_data = order.client
+        client_data = validated_data.pop('client', None)
+        # order = Order.objects.get(id=order_id)
+        # client_data = order.client
         remaining_amount = validated_data.pop('remaining_amount', 0.0)
         employee = Employee.objects.filter(phonenumber=request.user.phonenumber).first()
-        client = Client.objects.get(id=client_data)#### client_data.id
+        client = Client.objects.get(id=client_data.id)#### client_data.id
         cart = Cart.objects.get(customer=client)
         instance = Output.objects.create(employee=employee, client=client,barcode=cart.barcode, **validated_data)
         client.debts += remaining_amount

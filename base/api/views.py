@@ -558,7 +558,6 @@ class GetDelevaryArrivedForEmployee(APIView):
         delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
         serializer = DelevaryArrivedSerializer(delevary_arrived, many=False)
         output = Output.objects.filter(id=delevary_arrived.output_receipt.id).first()
-        print(output.id)
         products = Output_Products.objects.filter(output__id= output.id)
         products_serializer = ProductsOutputSerializer(products, many=True)
         receipt_serializer = OutputSerializer(output)
