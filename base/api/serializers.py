@@ -2098,10 +2098,11 @@ class FrozenManualReceiptSerializer(serializers.ModelSerializer):
 class OutputSerializer(serializers.ModelSerializer):
     client_name = serializers.CharField(source='client.name',read_only=True)
     address = serializers.CharField(source='client.address',read_only=True)
+    client_phonenumber = serializers.CharField(source='client.phonenumber',read_only=True)
     total_receipt = serializers.SerializerMethodField()
     class Meta:
         model = Output
-        fields = ['id','serial','client','client_name','address','products','employee','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','total_receipt','date','barcode','location','delivered','freeze']
+        fields = ['id','serial','client','client_name','client_phonenumber','address','products','employee','client_service','recive_pyement','discount','Reclaimed_products','previous_depts','remaining_amount','total_receipt','shipping_cost','date','barcode','location','delivered','freeze']
 
     def get_total_receipt(self, obj):
         return obj.calculate_total_receipt()
@@ -2324,9 +2325,11 @@ class DelevaryArrivedSerializer(serializers.ModelSerializer):
 
 class GetProductsOutputsSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(source='product.image',read_only=True)
+    points = serializers.IntegerField(source='product.points',read_only=True)
+
     class Meta:
         model = Output_Products
-        fields = ['product', 'quantity', 'total_price', 'discount','image']
+        fields = ['product', 'quantity', 'total_price', 'points','discount','image']
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
