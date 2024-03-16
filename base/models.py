@@ -599,7 +599,7 @@ class Salary(models.Model):
 
 class Registry(models.Model):
     employee = models.ForeignKey(Employee,on_delete=models.SET_NULL,null=True)
-    total = models.FloatField()
+    total = models.FloatField(validators=[MinValueValidator(0.0)])
 
     def __str__(self):
         return f'{self.employee} Registry'
