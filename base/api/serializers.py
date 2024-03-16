@@ -1091,7 +1091,6 @@ class DepositeSerializer(serializers.ModelSerializer):
         registry = Registry.objects.get(employee=employee)
         validated_data['registry'] = registry
         deposite = Deposite.objects.create(**validated_data)
-        registry = Registry.objects.first()
         registry.total += deposite.total
         registry.save()
         return deposite
