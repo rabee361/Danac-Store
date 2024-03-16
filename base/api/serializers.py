@@ -2240,7 +2240,7 @@ class OutputSerializer2(serializers.ModelSerializer):
         try:
             order = Order.objects.get(id=attrs['order_id'])
             client = order.client
-            attr['client'] = client
+            attrs['client'] = client
         except Order.DoesNotExist:
             raise serializers.ValidationError({
                 'error' : "order does not exist"
