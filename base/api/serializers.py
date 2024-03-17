@@ -910,7 +910,7 @@ class EmployeeSalarySerializer(serializers.ModelSerializer):
         sale_percentage = instance.sale_percentage if instance.sale_percentage is not None else 0
 
 
-        total = instance.salary - totals['advance_on_salary_set'] - totals['extra_expense_set'] - totals['absence_set'] - totals['discount_set'] + totals['overtime_set'] + totals['bonus_set'] + (instance.salary * sale_percentage)
+        total = instance.salary - totals['advance_on_salary_set'] - totals['extra_expense_set'] - totals['absence_set'] - totals['discount_set'] + totals['overtime_set'] + totals['bonus_set'] + sale_percentage
         representation['total'] = total
         return representation
 
