@@ -490,6 +490,17 @@ class Recieved_PaymentAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 
+
+
+class ChatAdmin(admin.ModelAdmin):
+    list_display = ['id','user','created']
+
+
+
+class ChatMessageAdmin(admin.ModelAdmin):
+    list_display = ['sender','timestamp','chat','employee']
+
+
 #### HR ####
 admin.site.register(OverTime,OverTimeAdmin)
 admin.site.register(Bonus,BounsAdmin)
@@ -557,5 +568,5 @@ admin.site.register(Cart_Products, CartProductsAdmin)
 
 admin.site.register(UserNotification) 
 
-admin.site.register(Chat)
-admin.site.register(ChatMessage)
+admin.site.register(Chat ,ChatAdmin)
+admin.site.register(ChatMessage , ChatMessageAdmin)
