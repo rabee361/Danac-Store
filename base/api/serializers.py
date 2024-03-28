@@ -197,7 +197,8 @@ class ProductTypeSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    product_type_name = serializers.CharField(source='product_type__name' , read_only=True)
+    product_type_name = serializers.CharField(source='product_type.name' , read_only=True)
+
     class Meta:
         model = Category
         fields = ['id','product_type','product_type_name','name','image','total_categories']
