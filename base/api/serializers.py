@@ -197,9 +197,10 @@ class ProductTypeSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    product_type_name = serializers.CharField(source='product_type__name' , read_only=True)
     class Meta:
         model = Category
-        fields = ['id','product_type','name','image','total_categories']
+        fields = ['id','product_type','product_type_name','name','image','total_categories']
 
 
 class ClientSerializer(serializers.ModelSerializer):
