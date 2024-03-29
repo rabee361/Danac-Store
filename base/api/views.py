@@ -297,7 +297,7 @@ class ListCreateProductType(ListCreateAPIView):
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(
-                {"message": "تمت الإضافة بنجاح"},
+                serializer.data,
                 status=status.HTTP_201_CREATED,
                 headers=headers
             )
@@ -327,7 +327,7 @@ class ListCreateCategory(ListCreateAPIView):
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(
-                {"message": "تمت الإضافة بنجاح"},
+                serializer.data,
                 status=status.HTTP_201_CREATED,
                 headers=headers
             )
@@ -1780,6 +1780,7 @@ class SendMessage(APIView):
 class ChatMessages(APIView):
     def get(self,request,chat_id):
         chat = Chat.objects.get(id=chat_id)
+        print(request.encoding)
         messages = ChatMessage.objects.filter(chat=chat)
         serializer = MessageSerializer(messages,many=True)
         return Response(serializer.data)
@@ -1788,6 +1789,7 @@ class ChatMessages(APIView):
 class Chats(APIView):
     def get(self,request):
         chats = Chat.objects.all()
+        print(request.encoding)
         serializer = ChatSerializer(chats,many=True, context={'request': request})
         return Response(serializer.data)
     
