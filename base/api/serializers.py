@@ -466,6 +466,8 @@ class OrderSerializer2(serializers.ModelSerializer):
     products = OrderProductsSerializer2(source='order_product_set', many=True)
     longitude = serializers.SerializerMethodField()
     latitude = serializers.SerializerMethodField()
+    client_debt = serializers.FloatField(source='client.debts' , read_only=True)
+    total_retuned = serializers.FloatField(source='client.total_returned' , read_only=True)
 
     class Meta:
         model = Order
