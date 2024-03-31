@@ -1122,15 +1122,9 @@ class UpdateProductsMedium(RetrieveUpdateAPIView):
 class ListMediumView(APIView):
     # permission_classes = [permissions.IsAuthenticated]
     def get(self, request, medium_id):
-        mediums = Products_Medium.objects.filter(medium__id=medium_id).annotate(
-            total_price_item=F('num_item') * F('price')
-        )
-        total_medium = mediums.aggregate(Sum('total_price_item'))['total_price_item__sum']
+        mediums = Products_Medium.objects.filter(medium__id=medium_id)
         medium_serializer = ProductsMediumSerializer(mediums, many=True)
-        return Response({
-            'data':medium_serializer.data,
-            'total_medium':total_medium
-        })
+        return Response(medium_serializer.data)
     
 
 class CreateMediumForOrderView(APIView):
