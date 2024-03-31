@@ -841,7 +841,7 @@ class ReturnedGoodsClient(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['id']
 
     def __str__(self) -> str:
         return f'{self.product.name}:{self.reason}'
@@ -1063,7 +1063,6 @@ class Incoming_Product(models.Model):
         return f'{self.incoming.supplier.name}:{str(self.incoming.id)}'
 
 ####################################### OUTPUT #################################################################################
-
 
 class Output(models.Model):
     serial = models.IntegerField(null=True,blank=True,editable=False)
