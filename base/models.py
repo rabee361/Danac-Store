@@ -924,7 +924,7 @@ class Products_Medium(models.Model):
     
     @property
     def total_medium(self):
-        product_mediums =Products_Medium.objects.filter(id=self.id).annotate(
+        product_mediums =Products_Medium.objects.filter(medium=self.medium).annotate(
             total_price_item=F('num_item') * F('price')
         )
         return product_mediums.aggregate(Sum('total_price_item'))['total_price_item__sum'] or 0.0
