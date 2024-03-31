@@ -1129,7 +1129,7 @@ class ListMediumView(APIView):
 class CreateMediumForOrderView(APIView):
     def post(self, request, order_id):
         order = Order.objects.get(id=order_id)
-        client = Client.objects.get(client=order.client)
+        client = Client.objects.get(client=order.client.id)
         medium = Medium.objects.create()
         order_produdts = Order_Product.objects.filter(order=order)
         for product in order_produdts:
