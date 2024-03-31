@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from base.filters import *
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound
 from fcm_django.models import FCMDevice
@@ -1121,9 +1122,15 @@ class UpdateProductsMedium(RetrieveUpdateAPIView):
 class ListMediumView(APIView):
     # permission_classes = [permissions.IsAuthenticated]
     def get(self, request, medium_id):
-        mediums = Products_Medium.objects.filter(medium__id=medium_id)
+        mediums = Products_Medium.objects.filter(medium__id=medium_id).annotate(
+            total_price_item=F('num_item') * F('price')
+        )
+        total_medium = mediums.aggregate(Sum('total_price_item'))['total_price_item__sum']
         medium_serializer = ProductsMediumSerializer(mediums, many=True)
-        return Response(medium_serializer.data)
+        return Response({
+            'data':medium_serializer.data,
+            'total_medium':total_medium
+        })
     
 
 class CreateMediumForOrderView(APIView):
