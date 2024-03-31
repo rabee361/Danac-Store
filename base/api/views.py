@@ -1129,7 +1129,7 @@ class ListMediumView(APIView):
 class CreateMediumForOrderView(APIView):
     def post(self, request, order_id):
         order = Order.objects.get(id=order_id)
-        client = Client.objects.get(client=order.client.id)
+        client = Client.objects.get(id=order.client.id)
         medium = Medium.objects.create()
         order_produdts = Order_Product.objects.filter(order=order)
         for product in order_produdts:
@@ -1142,8 +1142,8 @@ class CreateMediumForOrderView(APIView):
         serializer = MediumSerializer(medium,many=False)
         data = serializer.data
         data['order_id'] = int(order_id)
-        data['client_debts'] = client.debts
-        data['total_returned'] = client.total_returned
+        data['client_debts'] = float(client.debts)
+        data['total_returned'] = float(client.total_returned())
         return Response(data,status=status.HTTP_200_OK)
        
 

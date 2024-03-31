@@ -138,12 +138,13 @@ class Client(models.Model):
     def total_points(self):
         return Points.objects.filter(Q(client=self)&Q(is_used=False)&Q(expire_date__gt=timezone.now())).\
                                 aggregate(total_points=models.Sum('number'))['total_points'] or 0
-
+    
     def total_receipts(self):
         manuals = ManualReceipt.objects.filter(client=self).count()
         outputs = Output.objects.filter(client=self).count()
         total = manuals + outputs
         return total
+
 
     def total_returned(self):
         total_returned = ReturnedGoodsClient.objects.filter(client=self).aggregate(
