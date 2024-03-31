@@ -467,11 +467,11 @@ class OrderSerializer2(serializers.ModelSerializer):
     longitude = serializers.SerializerMethodField()
     latitude = serializers.SerializerMethodField()
     client_debt = serializers.FloatField(source='client.debts' , read_only=True)
-    total_retuned = serializers.FloatField(source='client.total_returned' , read_only=True)
+    total_returned = serializers.FloatField(source='client.total_returned' , read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id','client_id','address','name','phonenumber','client_service','products','total_price','shipping_cost','total','total_points','products_num','created','longitude','latitude','barcode']
+        fields = ['id','client_id','address','name','phonenumber','client_service','products','total_price','shipping_cost','total','total_points','products_num','created','longitude','latitude','client_debt','total_returned','barcode']
 
     def get_longitude(self, obj):
         return obj.client.location.x or 0
