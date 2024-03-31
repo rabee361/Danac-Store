@@ -1122,13 +1122,14 @@ class ListMediumView(APIView):
     # permission_classes = [permissions.IsAuthenticated]
     def get(self, request, medium_id):
         mediums = Products_Medium.objects.filter(medium__id=medium_id)
-        mediums_serializer = ProductsMediumSerializer(mediums, many=True)
-        return Response(mediums_serializer.data)
+        medium_serializer = ProductsMediumSerializer(mediums, many=True)
+        return Response(medium_serializer.data)
     
 
 class CreateMediumForOrderView(APIView):
     def post(self, request, order_id):
         order = Order.objects.get(id=order_id)
+        client = Client.objects.get(client=order.client)
         medium = Medium.objects.create()
         order_produdts = Order_Product.objects.filter(order=order)
         for product in order_produdts:
@@ -1141,6 +1142,8 @@ class CreateMediumForOrderView(APIView):
         serializer = MediumSerializer(medium,many=False)
         data = serializer.data
         data['order_id'] = int(order_id)
+        data['client_debts'] = client.debts
+        data['total_returned'] = client.total_returned
         return Response(data,status=status.HTTP_200_OK)
        
 
