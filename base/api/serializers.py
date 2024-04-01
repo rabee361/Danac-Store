@@ -2188,11 +2188,12 @@ class ProductsOutputSerializer(serializers.ModelSerializer):
     num_per_item = serializers.IntegerField(source='product.num_per_item')
     sale_price = serializers.FloatField(source='product.sale_price')
     num_item = serializers.IntegerField(source='quantity',read_only=True)
+    points = serializers.IntegerField(source='product.points',read_only=True)
     # total_price = serializers.FloatField(source='total',read_only=True)
 
     class Meta:
         model = Output_Products
-        fields = ['id', 'product_id','name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'discount', 'output']
+        fields = ['id', 'product_id','name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'discount', 'output','points']
 
 
 class OutputSerializer2(serializers.ModelSerializer):
