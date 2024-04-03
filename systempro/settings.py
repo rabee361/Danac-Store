@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'django_filters',
     'import_export',
+    'channels',
     'leaflet',
     'fcm_django',
     'rest_framework_simplejwt.token_blacklist',
@@ -89,9 +90,14 @@ ASGI_APPLICATION = 'systempro.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
     },
 }
+
+
 
 AUTH_USER_MODEL = 'base.CustomUser'
 
