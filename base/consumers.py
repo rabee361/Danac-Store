@@ -12,7 +12,19 @@ class CreateMessage(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.chat_id = self.scope['url_route']['kwargs']['id']
 		self.user_id = self.scope['url_route']['kwargs']['id2']
+		messages = await self.get_chat_msgs(self.chat_id)
 		await self.accept()
+
+		# await self.send(text_data=json.dumps({
+		# 	'message': 'hi'
+		# }))
+
+		for message in messages:
+			await self.send(text_data=json.dumps({
+				'messages' : message
+			}))
+
+
 
 	async def receive(self, text_data):
 		text_data_json = json.loads(text_data)
@@ -38,6 +50,14 @@ class CreateMessage(AsyncWebsocketConsumer):
 			'timestamp': serializer.data['timestamp'],
 			'employee': serializer.data['employee']
 		}))
+
+	@database_sync_to_async
+	def get_chat_msgs(self,chat_id):
+		messages = ChatMessage.objects.filter(chat=chat_id)
+		serializer = MessageSerializer(messages,many=True)
+		return serializer.data
+
+
 
 	@database_sync_to_async
 	def get_employee(self,phonenumber):
