@@ -172,7 +172,7 @@ class ClientAdmin(LeafletGeoAdmin):
     ordering = ['-id']
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'get_client_name','products_num' ,'total_price','shipping_cost','total' ,'total_points', 'delivery_date', 'delivered']
+    list_display = ['id', 'get_client_name','products_num' ,'total_price','shipping_cost','total' ,'total_points', 'delivery_date', 'delivered','processed']
     search_fields = ['client__name',]
     list_filter = ['delivered']
 

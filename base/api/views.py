@@ -1254,7 +1254,7 @@ class ReceiptOrdersView(APIView):
         try:
             Medium.objects.get(id=medium_id)
         except Medium.DoesNotExist:
-            return Response({"medium":"medium does not exist"})
+            return Response({"medium":"medium does not exist"},status=status.HTTP_404_NOT_FOUND)
         
         output_serializer = OutputSerializer2(data=request.data, context={'request': request})
         if output_serializer.is_valid():
@@ -1289,6 +1289,9 @@ class ReceiptOrdersView(APIView):
                     quantity = product.num_item,
                     total_price = product.total_price
                 )
+                order_id = request.data.get('order_id')
+                order = Order.objects.get(id=order_id)
+                Order_Product.objects.get_or_create(product=output_product.product,order=order,quantity=output_product.quantity,total_price=output_product.total_price)
                 total_points += output_product.product_points
             client_points = Points.objects.create(
                 client = output.client,

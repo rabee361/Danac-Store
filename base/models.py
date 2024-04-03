@@ -199,7 +199,7 @@ class CodeVerification(models.Model):
 
 
 class ProductType(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50,unique=True)
     image = models.ImageField(upload_to='images/product_types', null=True,default='images/account.jpg')
 
     def __str__(self):
@@ -413,7 +413,7 @@ class Order_Product(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.FloatField()
-    total_points = models.IntegerField()
+    total_points = models.IntegerField(default=0)
 
     class Meta:
         app_label = 'Clients_and_Products'
