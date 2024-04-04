@@ -138,7 +138,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
                 {'fields':('username', 'first_name', 'last_name','image','location')}
             ),
             ('Permissions', 
-                {'fields':('is_verified', 'is_accepted', 'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type','address','state','town','store_name','work_hours','get_notifications')}
+                {'fields':('is_verified', 'is_accepted', 'get_notifications' ,'is_staff', 'is_superuser', 'is_active', 'groups','user_permissions', 'user_type','address','state','town','store_name','work_hours')}
             ),
             ('Registration', 
                 {'fields':('date_joined', 'last_login',)}

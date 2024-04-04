@@ -74,15 +74,17 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 	@database_sync_to_async
 	def send_to_client(self,chat,title,body):
-		device = FCMDevice.objects.filter(user=chat.user)
-		device.send_message(
-			message=Message(
-				notification=Notification(
-					title=title,
-					body=body
+		user = CustomUser.objects.get(user=chat.user)
+		if user.get_notifications:
+			device = FCMDevice.objects.filter(user=user)
+			device.send_message(
+				message=Message(
+					notification=Notification(
+						title=title,
+						body=body
+					),
 				),
-			),
-		)
+			)
 
 
 	@database_sync_to_async

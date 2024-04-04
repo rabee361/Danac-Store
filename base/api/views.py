@@ -1363,7 +1363,7 @@ class ListCreateDeliveryArrived(APIView):
                 title = title,
                 body=body
             )
-            
+
         return Response(del_arr_serializer.data)
 
     def get(self, request):
@@ -1548,22 +1548,23 @@ class CreateManualReceiptView(APIView):
                 update_quantity.save()
                 if update_quantity.quantity < update_quantity.limit_less:
                     user = CustomUser.objects.get(id=request.user.id)
-                    devices = FCMDevice.objects.filter(user=user.id)
-                    title = 'نقص كمية منتج'
-                    body = f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج {update_quantity.name}إلى أقل من 10'
-                    devices.send_message(
-                        message=Message(
-                            notification=Notification(
-                                title=title,
-                                body=body
+                    if user.get_notifications:
+                        devices = FCMDevice.objects.filter(user=user.id)
+                        title = 'نقص كمية منتج'
+                        body = f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج {update_quantity.name}إلى أقل من 10'
+                        devices.send_message(
+                            message=Message(
+                                notification=Notification(
+                                    title=title,
+                                    body=body
+                                ),
                             ),
-                        ),
-                    )
-                    UserNotification.objects.create(
-                        user = user,
-                        title = title,
-                        body = body
-                    ) 
+                        )
+                        UserNotification.objects.create(
+                            user = user,
+                            title = title,
+                            body = body
+                        ) 
                 manual_receipt_products = ManualReceipt_Products.objects.create(
                     product = product.product,
                     manualreceipt = manual_receipt,
