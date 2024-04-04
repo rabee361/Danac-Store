@@ -485,19 +485,20 @@ class CreateOrderView(APIView):
         order = cart.create_order(delivery_date)
 
         ### sending a notification
-        user = CustomUser.objects.filter(Q(phonenumber=cart.customer.phonenumber) & Q(get_notifications=True)).first()
-        devices = FCMDevice.objects.filter(user=user.id)
-        title = 'انشاء طلب'
-        body = f'تم ارسال طلبك بنجاح'
-        devices.send_message(
-                message =Message(
-                    notification=Notification(
-                        title=title,
-                        body=body
+        user = CustomUser.objects.get(phonenumber=cart.customer.phonenumber)
+        if user.get_notifications:
+            devices = FCMDevice.objects.filter(user=user.id)
+            title = 'انشاء طلب'
+            body = f'تم ارسال طلبك بنجاح'
+            devices.send_message(
+                    message =Message(
+                        notification=Notification(
+                            title=title,
+                            body=body
+                        ),
                     ),
-                ),
-            )
-        UserNotification.objects.create(user=user,body=body,title=title)
+                )
+            UserNotification.objects.create(user=user,body=body,title=title)
 
         order.save()
         order_serializer = OrderSerializer(order)
@@ -1344,23 +1345,25 @@ class ListCreateDeliveryArrived(APIView):
         )
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=False)
         
-        user = CustomUser.objects.filter(Q(phonenumber=delivery_arrived.employee.phonenumber) & Q(get_notificatinos=True))
-        devices = FCMDevice.objects.filter(user=user.id)
-        title = "طلب توصيل جديد"
-        body = "لديك طلب جديد لتوصيله"
-        devices.send_message(
-            message=Message(
-                notification=Notification(
-                    title=title,
-                    body= body
+        user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
+        if user.get_notifications:
+            devices = FCMDevice.objects.filter(user=user.id)
+            title = "طلب توصيل جديد"
+            body = "لديك طلب جديد لتوصيله"
+            devices.send_message(
+                message=Message(
+                    notification=Notification(
+                        title=title,
+                        body= body
+                    ),
                 ),
-            ),
-        )
-        UserNotification.objects.create(
-            user=user,
-            title = title,
-            body=body
-        )
+            )
+            UserNotification.objects.create(
+                user=user,
+                title = title,
+                body=body
+            )
+            
         return Response(del_arr_serializer.data)
 
     def get(self, request):
