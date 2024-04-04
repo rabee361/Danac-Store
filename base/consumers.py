@@ -52,7 +52,7 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 		try:
 			employee = await self.get_employee(user.phonenumber)
-			device = await self.get_device(chat)
+			device = await self.send_to_client(chat)
 			title = 'testing'
 			body = 'testing'
 			self.send_to_client(device)
@@ -86,7 +86,8 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 
 	@database_sync_to_async
-	def send_to_client(self,device):
+	def send_to_client(self,chat):
+		device = FCMDevice.objects.filter(user=chat.user)
 		device.send_message(
 			message=Message(
 				notification=Notification(
