@@ -52,17 +52,11 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 		try:
 			employee = await self.get_employee(user.phonenumber)
-			devices = self.get_device(chat)
+			device = await self.get_device(chat)
 			title = 'testing'
 			body = 'testing'
-			devices.send_message(
-				message=Message(
-					notification=Notification(
-						title=title,
-						body=body
-					),
-				),
-			)
+			self.send_to_client(device)
+
 		except:
 			user_ids = await self.get_user_ids()
 			devices = await self.get_devices(user_ids)
@@ -88,6 +82,19 @@ class CreateMessage(AsyncWebsocketConsumer):
 			'timestamp': serializer.data['timestamp'],
 			'employee': serializer.data['employee']
 		}))
+
+
+
+	@database_sync_to_async
+	def send_to_client(self,device):
+		device.send_message(
+			message=Message(
+				notification=Notification(
+					title='testingggg',
+					body='body'
+				),
+			),
+		)
 
 
 	@database_sync_to_async
