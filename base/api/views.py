@@ -485,7 +485,7 @@ class CreateOrderView(APIView):
         order = cart.create_order(delivery_date)
 
         ### sending a notification
-        user = CustomUser.objects.get(phonenumber=cart.customer.phonenumber)
+        user = CustomUser.objects.filter(Q(phonenumber=cart.customer.phonenumber) & Q(get_notifications=True)).first()
         devices = FCMDevice.objects.filter(user=user.id)
         title = 'انشاء طلب'
         body = f'تم ارسال طلبك بنجاح'
