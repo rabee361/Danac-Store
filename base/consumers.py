@@ -52,15 +52,15 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 		try:
 			employee = await self.get_employee(user.phonenumber)
-			title = f'{user}'
-			body = f'{message}'
-			await self.send_to_client(chat,title,body)
+			if self.get_permission(chat):
+				title = f'{user}'
+				body = f'{message}'
+				await self.send_to_client(chat,title,body)
 
 		except:
 			title = 'test'
 			body = 'test'
 			await self.send_to_all(title,body)
-
 
 
 		await self.send(text_data=json.dumps({
@@ -71,25 +71,32 @@ class CreateMessage(AsyncWebsocketConsumer):
 		}))
 
 
+	@database_sync_to_async
+	def get_permission(self,chat):
+		user = CustomUser.objects.get(user=chat.user)
+		return user.get_notifications
+
 
 	@database_sync_to_async
 	def send_to_client(self,chat,title,body):
 		user = CustomUser.objects.get(user=chat.user)
-		if user.get_notifications:
-			device = FCMDevice.objects.filter(user=user)
-			device.send_message(
-				message=Message(
-					notification=Notification(
-						title=title,
-						body=body
-					),
+		# if user.get_notifications:
+		device = FCMDevice.objects.filter(user=user)
+		device.send_message(
+			message=Message(
+				notification=Notification(
+					title=title,
+					body=body
 				),
-			)
+			),
+		)
+		# else:
+		# 	return None
 
 
 	@database_sync_to_async
 	def send_to_all(self,title,body):
-		devices = FCMDevice.objects.filter(Q(user__in=Employee.objects.values_list('id', flat=True)))
+		devices = FCMDevice.objects.filter(user__in=Employee.objects.values_list('id', flat=True))
 		for device in devices:
 			device.send_message(
 				message=Message(
