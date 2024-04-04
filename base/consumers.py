@@ -54,26 +54,13 @@ class CreateMessage(AsyncWebsocketConsumer):
 			employee = await self.get_employee(user.phonenumber)
 			title = f'{user}'
 			body = f'{message}'
-			# title = 'test'
-			# body = 'body'
 			await self.send_to_client(chat,title,body)
 
 		except:
 			user_ids = await self.get_user_ids()
-			devices = await self.get_devices(user_ids)
 			title = 'test'
 			body = 'test'
-			self.send_to_all(devices)
-			# for device in devices:
-			# 	await device.send_message(
-			# 		message=Message(
-			# 			notification=Notification(
-			# 				title=title,
-			# 				body=body,
-			# 				to=device.registration_id
-			# 			),
-			# 		),
-			# 	)
+			await self.send_to_all(user_ids,title,body)
 
 
 
@@ -100,13 +87,14 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 
 	@database_sync_to_async
-	def send_to_all(devices):
+	def send_to_all(user_ids,title,body):
+		devices = FCMDevice.objects.filter(user__in=user_ids).values_list('registration_id', flat=True)
 		for device in devices:
 			device.send_message(
 				message=Message(
 					notification=Notification(
-						title='title',
-						body='body',
+						title=title,
+						body=body,
 						to=device.registration_id
 					),
 				),
