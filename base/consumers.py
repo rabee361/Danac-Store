@@ -6,6 +6,8 @@ from asgiref.sync import async_to_sync
 import json
 from .models import *
 from .api.serializers import *
+from fcm_django.models import FCMDevice
+from firebase_admin.messaging import Message, Notification
 
 
 class CreateMessage(AsyncWebsocketConsumer):
@@ -24,10 +26,16 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 
 
+
+
+
+
+
+
 	async def receive(self, text_data):
 		text_data_json = json.loads(text_data)
 		message = text_data_json['message']
-		# user_id = text_data_json['user_id']
+		# user_id = text_data_json['user_id'] 
 		# chat_id = text_data_json['chat_id']
 
 		user = await self.get_user(self.user_id)
@@ -42,12 +50,58 @@ class CreateMessage(AsyncWebsocketConsumer):
 		serializer = MessageSerializer(msg,many=False)
 		await self.save_message(msg)
 
+
+		employee = await self.get_employee(user.phonenumber)
+		if not employee:
+			user_ids = self.get_user_ids
+			devices = self.get_devices(user_ids)
+			title = 'test'
+			body = 'test'
+			devices.send_message(
+				message=Message(
+					notification=Notification(
+						title=title,
+						body=body,
+						to=devices
+					),
+				),
+			)
+		else:
+			devices = self.get_device(chat)
+			title = 'testing'
+			body = 'testing'
+			devices.send_message(
+				message=Message(
+					notification=Notification(
+						title=title,
+						body=body
+					),
+				),
+			)
+
 		await self.send(text_data=json.dumps({
 			'sender' : serializer.data['sender'],
 			'content': serializer.data['content'],
 			'timestamp': serializer.data['timestamp'],
 			'employee': serializer.data['employee']
 		}))
+
+
+	@database_sync_to_async
+	def get_user_ids():
+		return Employee.objects.values_list('id',flat=True)
+
+
+	@database_sync_to_async
+	def get_device(chat):
+		return FCMDevice.objects.filter(user=chat.user)
+
+
+	@database_sync_to_async
+	def get_devices(self,user_ids):
+		return FCMDevice.objects.filter(user__in=user_ids).values_list('registration_id', flat=True)
+
+
 
 	@database_sync_to_async
 	def get_chat_msgs(self,chat_id):
