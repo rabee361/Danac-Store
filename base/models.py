@@ -51,6 +51,7 @@ class CustomUser(AbstractUser):
     location = models.PointField(default=Point(3.0589,36.7539),null=True,blank=True)
     user_type = models.ForeignKey(UserType,on_delete=models.CASCADE,null=True)
     is_accepted = models.BooleanField(default=False)
+    get_notifications = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'phonenumber'
     REQUIRED_FIELDS = ('username',) 

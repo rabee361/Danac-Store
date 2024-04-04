@@ -87,7 +87,7 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 	@database_sync_to_async
 	def send_to_all(self,title,body):
-		devices = FCMDevice.objects.filter(user__in=Employee.objects.values_list('id', flat=True))
+		devices = FCMDevice.objects.filter(Q(user__in=Employee.objects.values_list('id', flat=True)))
 		for device in devices:
 			device.send_message(
 				message=Message(

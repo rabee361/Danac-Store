@@ -1344,7 +1344,7 @@ class ListCreateDeliveryArrived(APIView):
         )
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=False)
         
-        user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
+        user = CustomUser.objects.filter(Q(phonenumber=delivery_arrived.employee.phonenumber) & Q(get_notificatinos=True))
         devices = FCMDevice.objects.filter(user=user.id)
         title = "طلب توصيل جديد"
         body = "لديك طلب جديد لتوصيله"
