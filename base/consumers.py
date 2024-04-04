@@ -52,10 +52,9 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 		try:
 			employee = await self.get_employee(user.phonenumber)
-			device = await self.send_to_client(chat)
-			title = 'testing'
-			body = 'testing'
-			self.send_to_client(device)
+			title = serializer.data['sender']
+			body = message
+			device = await self.send_to_client(chat,title,body)
 
 		except:
 			user_ids = await self.get_user_ids()
@@ -86,13 +85,13 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 
 	@database_sync_to_async
-	def send_to_client(self,chat):
+	def send_to_client(self,chat,title,body):
 		device = FCMDevice.objects.filter(user=chat.user)
 		device.send_message(
 			message=Message(
 				notification=Notification(
-					title='testingggg',
-					body='body'
+					title=title,
+					body=body
 				),
 			),
 		)
