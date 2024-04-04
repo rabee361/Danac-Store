@@ -20,9 +20,7 @@ class CreateMessage(AsyncWebsocketConsumer):
 		# }))
 
 		for message in messages:
-			await self.send(text_data=json.dumps({
-				'messages' : message
-			}))
+			await self.send(text_data=json.dumps(message))
 
 
 
@@ -46,7 +44,7 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 		await self.send(text_data=json.dumps({
 			'sender' : serializer.data['sender'],
-			'message': serializer.data['content'],
+			'content': serializer.data['content'],
 			'timestamp': serializer.data['timestamp'],
 			'employee': serializer.data['employee']
 		}))

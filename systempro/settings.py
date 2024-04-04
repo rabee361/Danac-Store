@@ -35,37 +35,6 @@ ALLOWED_HOSTS = []
 
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s [%(asctime)s] %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-        },
-    },
-    'handlers': {
-        "file": {
-            "level": "DEBUG", # Set the level to WARNING
-            "class": "logging.FileHandler",
-            "filename": "django.log",
-            "formatter": "verbose",
-        },
-        "console": {
-            "level": "DEBUG",
-            "class" : "logging.StreamHandler",
-            "formatter": "verbose",
-        }
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file','console'],
-            'level': 'INFO', # Set the logger's level to WARNING
-        },
-    },
-}
-
-
 
 # Application definition
 
