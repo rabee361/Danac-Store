@@ -53,8 +53,10 @@ class CreateMessage(AsyncWebsocketConsumer):
 		try:
 			employee = await self.get_employee(user.phonenumber)
 			title = serializer.data['sender']
-			body = message
-			device = await self.send_to_client(chat,title,body)
+			body = serializer.data['content']
+			title = 'test'
+			body = 'test'
+			await self.send_to_client(chat,title,body)
 
 		except:
 			user_ids = await self.get_user_ids()
