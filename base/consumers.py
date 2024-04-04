@@ -52,10 +52,10 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 		try:
 			employee = await self.get_employee(user.phonenumber)
-			if self.get_permission(chat):
-				title = f'{user}'
-				body = f'{message}'
-				await self.send_to_client(chat,title,body)
+			# if self.get_permission(chat):
+			title = f'{user}'
+			body = f'{message}'
+			await self.send_to_client(chat,title,body)
 
 		except:
 			title = 'test'
