@@ -1928,13 +1928,12 @@ class IncomingSerializer(serializers.ModelSerializer):
 
 
 class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
-    name = serializers.CharField(source='product.name',read_only=True)
+    product_name = serializers.CharField(source='product.name',read_only=True)
     num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
-    sale_price = serializers.FloatField(source='price')
     
     class Meta :
         model = ManualReceipt_Products
-        fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'num_item' ,'total_price', 'manualreceipt']
+        fields = ['id', 'product','product_name', 'num_per_item', 'sale_price', 'num_item' ,'total_price', 'manualreceipt']
 
     def create(self, validated_data):   
         product = validated_data.get('product')

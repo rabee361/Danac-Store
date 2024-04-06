@@ -1229,7 +1229,7 @@ class ManualReceipt(models.Model):
 class ManualReceipt_Products(models.Model): 
     product = models.ForeignKey(Product, on_delete= models.CASCADE)
     manualreceipt = models.ForeignKey(ManualReceipt, on_delete= models.CASCADE)
-    price = models.FloatField()
+    sale_price = models.FloatField()
     num_item = models.IntegerField()
     total_price = models.FloatField(default=0)
     product_points = models.IntegerField()

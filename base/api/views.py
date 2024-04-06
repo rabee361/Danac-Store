@@ -15,6 +15,7 @@ from rest_framework.exceptions import NotFound
 from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
 from .permissions import *
+from rest_framework.decorators import api_view
 
 
 ####################################### AUTHENTICATION ###################################################################3#######
@@ -1808,3 +1809,11 @@ class Chats(APIView):
 class GetChat(RetrieveAPIView):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
+
+
+
+@api_view(['GET'])
+def test(self):
+    x = Employee.objects.values_list('phonenumber',flat=True)
+    t = CustomUser.objects.filter(phonenumber__in=x).values_list('id',flat=True)
+    return Response(t)

@@ -174,6 +174,8 @@ urlpatterns = [
     path('create-order-envoy/<str:mediumtwo_id>/', CreateOrderEnvoyView.as_view()),
     path('list-order-envoy/<str:pk>/', ListOrderEnvoy.as_view()),
     path('delete-medium-two/<str:pk>/' , DeleteMediumTwo.as_view()),
-    path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view())
+    path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view()),
+
+    path('t/' , test)
     
     ]
