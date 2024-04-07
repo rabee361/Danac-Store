@@ -14,12 +14,7 @@ class CreateMessage(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.chat_id = self.scope['url_route']['kwargs']['id']
 		self.user_id = self.scope['url_route']['kwargs']['id2']
-		
-		if len(str(self.chat_id)) > 50: # Arbitrary limit to ensure length is manageable
-			self.room_group_name = 'default_group'
-		else:
-			self.room_group_name = f'chat:{str(self.chat_id)}'
-
+		self.room_group_name = str(self.chat_id)
 		messages = await self.get_chat_msgs(self.chat_id)
 
 
