@@ -14,22 +14,19 @@ class CreateMessage(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.chat_id = self.scope['url_route']['kwargs']['id']
 		self.user_id = self.scope['url_route']['kwargs']['id2']
+		self.room_group_name = 'test'
 		messages = await self.get_chat_msgs(self.chat_id)
-		await self.accept()
 
-		# await self.send(text_data=json.dumps({
-		# 	'message': 'hi'
-		# }))
+
+		await self.channel_layer.group.add(
+			self.room_group_name,
+			self.channel_name
+		)
+
+		await self.accept()
 
 		for message in messages:
 			await self.send(text_data=json.dumps(message))
-
-
-
-
-
-
-
 
 
 	async def receive(self, text_data):
@@ -68,6 +65,14 @@ class CreateMessage(AsyncWebsocketConsumer):
 			'timestamp': serializer.data['timestamp'],
 			'employee': serializer.data['employee']
 		}))
+
+		await self.channel_layer.group_send(
+			self.room_group_name,
+			{
+				'type':'chat-message',
+				'message':message
+			}
+		)
 
 
 	@database_sync_to_async

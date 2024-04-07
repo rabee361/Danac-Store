@@ -1811,9 +1811,3 @@ class GetChat(RetrieveAPIView):
     serializer_class = ChatSerializer
 
 
-
-@api_view(['GET'])
-def test(self):
-    x = Employee.objects.values_list('phonenumber',flat=True)
-    t = CustomUser.objects.filter(phonenumber__in=x).values_list('id',flat=True)
-    return Response(t)
