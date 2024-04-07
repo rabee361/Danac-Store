@@ -74,6 +74,12 @@ class CreateMessage(AsyncWebsocketConsumer):
 			}
 		)
 
+	async def chat_message(self, event):
+		message = event['message']
+		# Here, you can process the message and send it to the WebSocket
+		await self.send(text_data=json.dumps({
+			'message': message
+		}))
 
 	@database_sync_to_async
 	def send_to_client(self,chat,title,body):
