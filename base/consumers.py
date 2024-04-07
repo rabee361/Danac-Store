@@ -79,9 +79,15 @@ class CreateMessage(AsyncWebsocketConsumer):
 		)
 
 	async def chat_message(self, event):
-		message = event['message']
+		content = event['content']
+		sender = event['sender']
+		timestamp = event['timestamp']
+		employee = event['employee']
 		await self.send(text_data=json.dumps({
-			'message': message
+			'sender': sender,
+			'content': content,
+			'timestamp': timestamp,
+			'employee': employee,
 		}))
 
 	@database_sync_to_async
