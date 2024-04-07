@@ -14,7 +14,7 @@ class CreateMessage(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.chat_id = self.scope['url_route']['kwargs']['id']
 		self.user_id = self.scope['url_route']['kwargs']['id2']
-		self.room_group_name = f'chat:{str(self.chat_id)}'
+		self.room_group_name = f'chat:{str(self.chat_id).encode("utf-8").decode("utf-8")}'
 		messages = await self.get_chat_msgs(self.chat_id)
 
 
