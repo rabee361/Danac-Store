@@ -59,24 +59,27 @@ class CreateMessage(AsyncWebsocketConsumer):
 			await self.send_to_all(title,body)
 
 
-		await self.send(text_data=json.dumps({
-			'sender' : serializer.data['sender'],
-			'content': serializer.data['content'],
-			'timestamp': serializer.data['timestamp'],
-			'employee': serializer.data['employee']
-		}))
+		# await self.send(text_data=json.dumps({
+		# 	'sender' : serializer.data['sender'],
+		# 	'content': serializer.data['content'],
+		# 	'timestamp': serializer.data['timestamp'],
+		# 	'employee': serializer.data['employee']
+		# }))
+
 
 		await self.channel_layer.group_send(
 			self.room_group_name,
 			{
 				'type':'chat_message',
-				'message':message
+				'sender' : serializer.data['sender'],
+				'content': serializer.data['content'],
+				'timestamp': serializer.data['timestamp'],
+				'employee': serializer.data['employee']				
 			}
 		)
 
 	async def chat_message(self, event):
 		message = event['message']
-		# Here, you can process the message and send it to the WebSocket
 		await self.send(text_data=json.dumps({
 			'message': message
 		}))
