@@ -18,7 +18,7 @@ class CreateMessage(AsyncWebsocketConsumer):
 		messages = await self.get_chat_msgs(self.chat_id)
 
 
-		await self.channel_layer.group.add(
+		await self.channel_layer.group_add(
 			self.room_group_name,
 			self.channel_name
 		)
