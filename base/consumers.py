@@ -144,7 +144,7 @@ class CreateMessage(AsyncWebsocketConsumer):
 
 	@database_sync_to_async
 	def get_chat_msgs(self,chat_id):
-		messages = ChatMessage.objects.filter(chat=chat_id)
+		messages = ChatMessage.objects.filter(chat=chat_id).order('timestamp')
 		serializer = MessageSerializer(messages,many=True)
 		return serializer.data
 

@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from rest_framework import serializers
 from base.models import *
 from django.contrib.auth import  authenticate
@@ -113,7 +114,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 
-class SerializerNotification(serializers.ModelSerializer):
+class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserNotification
         fields = '__all__'
@@ -1185,7 +1186,7 @@ class WithDrawSerializer(serializers.ModelSerializer):
         registry.total -= difference
         registry.save()
         return instance
-   
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['client'] = instance.client.name

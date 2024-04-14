@@ -3,8 +3,6 @@ from .models import *
 from leaflet.admin import LeafletGeoAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.admin import UserAdmin
-import random
-from base.api.utils import Utlil
 from import_export.admin import ImportExportModelAdmin
 from base.resources import ProductResource
 from arabic_reshaper import reshape
@@ -123,7 +121,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         # cart.save()
 
 
-    def Refusal_User(self, request, queryset):
+    def Refuse_User(self, request, queryset):
         user = queryset.get(is_accepted=False)
         # email_body = 'Hi '+user.username+' نعتذر منك لقد تم رفض حسابك لأن موقعك بعيد ولا يمكن توصيل طلبات إليه \n'
         # data = {'to_email':user.email, 'email_subject':'Account Refused','username':user.username}

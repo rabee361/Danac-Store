@@ -1,4 +1,4 @@
-from django.db import models, IntegrityError
+from django.db import models
 from django.contrib.gis.db import models
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
@@ -12,10 +12,9 @@ from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
-from django.contrib.admin import display
 import random
 import string
-from django.db.models import Sum, Count , Sum ,F , Q
+from django.db.models import Sum , Sum ,F , Q
 
 
 def get_expiration_time():
