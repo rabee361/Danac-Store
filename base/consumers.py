@@ -54,8 +54,8 @@ class CreateMessage(AsyncWebsocketConsumer):
 			await self.send_to_client(chat,title,body)
 
 		except:
-			title = 'test'
-			body = 'test'
+			title = f'{user}'
+			body = f'{message}'
 			await self.send_to_all(title,body)
 
 
