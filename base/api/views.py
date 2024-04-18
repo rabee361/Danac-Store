@@ -33,7 +33,7 @@ class SignUpView(GenericAPIView):
         device_token = request.data.get('device_token',None)
         device_type = request.data.get('device_type',None)
         try:
-            device_tok = FCMDevice.objects.get(defaults={'registration_id': device_token ,'type' : device_type})
+            device_tok = FCMDevice.objects.get(registration_id=device_token ,type=device_type)
             device_tok.user = user
             device_tok.save()
         except:
