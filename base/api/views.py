@@ -37,7 +37,7 @@ class SignUpView(GenericAPIView):
             device_tok.user = user
             device_tok.save()
         except:
-            FCMDevice.objects.get(user=user , defaults={'registration_id': device_token ,'type' : device_type})
+            FCMDevice.objects.create(user=user , defaults={'registration_id': device_token ,'type' : device_type})
     
         token = RefreshToken.for_user(user)
         tokens = {
