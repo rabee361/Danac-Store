@@ -33,7 +33,9 @@ class SignUpView(GenericAPIView):
         device_token = request.data.get('device_token')
         device_type = request.data.get('device_type')
         if device_token:
-            FCMDevice.objects.update_or_create(user=user, defaults={'registration_id': device_token ,'type' : device_type})        
+            FCMDevice.objects.update_or_create(user=user, defaults={'registration_id': device_token ,'type' : device_type})
+        else:
+            return Response({"error":"error with fcm"})        
     
         token = RefreshToken.for_user(user)
         tokens = {
