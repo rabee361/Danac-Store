@@ -29,11 +29,20 @@ class DateOnlyField(serializers.DateTimeField):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    longitude = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'phonenumber', 'address','password', 'image']
+        fields = ['id', 'username', 'phonenumber', 'address','password', 'image','longitude','latitude']
 
+    def get_longitude(self, obj):
+        return obj.location.x
 
+    def get_latitude(self, obj):
+        return obj.location.y
+    
+    
 class UpdateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
