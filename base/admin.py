@@ -87,7 +87,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     list_filter = ['is_accepted']
-    actions = ['Accept_User', 'Refusal_User']
+    actions = ['Accept_User', 'Refuse_User']
     list_display = ['id', 'phonenumber','username', 'is_staff', 'is_accepted']    
     ordering = ['-id']
 
