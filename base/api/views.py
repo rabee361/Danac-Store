@@ -1574,7 +1574,7 @@ class CreateManualReceiptView(APIView):
                     product = product.product,
                     manualreceipt = manual_receipt,
                     num_item = product.num_item,
-                    price=product.price,
+                    sale_price=product.price,
                     total_price = product.total_price_of_item,
                 )
                 total_points += manual_receipt_products.product_points
