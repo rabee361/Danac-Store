@@ -24,9 +24,9 @@ urlpatterns = [
     path('update-location/' , UpdateLocationView.as_view() , name="update-location"),
     path('get-location/<str:employee_id>/' , GetSalesEmployeeLocation.as_view() , name="get-location"),
 
-    path('chats/' , Chats.as_view()),#### new
+    path('chats/' , Chats.as_view()),
     path('get-chat/<str:pk>/', GetChat.as_view() , name="get-chat"),
-    path('chat-messages/<str:chat_id>/', ChatMessages.as_view()), #### new
+    path('chat-messages/<str:chat_id>/', ChatMessages.as_view()),
     path('send-message/<str:chat_id>/<str:user_id>/' , SendMessage.as_view()),
 
     path('states/' , States.as_view() , name="states"),
@@ -163,7 +163,7 @@ urlpatterns = [
 
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),
     path('get-delivery-arrived/', ListCreateDeliveryArrived.as_view()),
-    path('get-delivery-arrived-for-employee/<str:state>/', DelevaryArrivedForEmployee.as_view()),
+    path('get-delivery-arrived-for-employee/<str:state>/', ListSaleEmployeeDeliveries.as_view()),
     path('get/<str:pk>/', GetDelevaryArrivedForEmployee.as_view()),
     path('accept-delevary-arrived/<str:pk>/', AcceptDelevaryArrived.as_view()),
 

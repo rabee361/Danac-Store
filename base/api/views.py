@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from base.filters import *
-from django.db.models import Sum
+from django.db.models import Sum , Max
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound
 from fcm_django.models import FCMDevice
@@ -481,7 +481,7 @@ class CreateOrderView(APIView):
 
         ### check if the cart is empty
         cart = get_object_or_404(Cart, id=cart_id)
-        if cart.get_items_num == 0: 
+        if cart.get_items_num == 0:
             return Response({"error": "السلة فارغة لا يمكن إنشاء طلب"}, status=status.HTTP_400_BAD_REQUEST)
         
         delivery_date = request.data.get('delivery_date')
@@ -547,7 +547,7 @@ class DeleteOrder(DestroyAPIView):
 
 
 ######################################Delivery Arrived ##########################################################3
-    
+ 
 
 class DelevaryArrivedForEmployee(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -1310,14 +1310,29 @@ class ReceiptOrdersView(APIView):
         return Response(output_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
-class DelevaryArrivedForEmployee(APIView):
-    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, state):
-        user = request.user
-        delevary_arrived = DelievaryArrived.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
-        serializer = DelevaryArrivedSerializer(delevary_arrived, many=True)
+class ListSaleEmployeeDeliveries(ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DeliveryFilter
+    serializer_class = DelevaryArrivedSerializer
+
+    def get_queryset(self):
+        queryset = DelievaryArrived.objects.all()
+        filterset = DeliveryFilter(self.request.GET, queryset=queryset)
+        queryset = filterset.qs
+
+        queryset = queryset.filter(employee__phonenumber= self.request.user.phonenumber, is_delivered=self.kwargs['state'])
+
+        return queryset
+
+    def get_(self, request, state):
+        # user = request.user
+        # delevary_arrived = DelievaryArrived.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
+        queryset = self.get_queryset()
+        serializer = DelevaryArrivedSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class ListCreateDeliveryArrived(APIView):
@@ -1373,7 +1388,7 @@ class ListCreateDeliveryArrived(APIView):
 
     def get(self, request):
         queryset = DelievaryArrived.objects.all()
-        filterset = DelivaryFilter(request.GET, queryset=queryset)
+        filterset = DeliveryFilter(request.GET, queryset=queryset)
         if filterset.is_valid():
             delivery_arrived = filterset.qs
         else:
@@ -1632,6 +1647,9 @@ class CreateManualProduct(CreateAPIView):
     queryset = ManualReceipt_Products.objects.all()
     serializer_class = ManualRecieptProductsSerializer2
 
+    def create(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+
 
 
 class FreezeManualReceipt(APIView):
@@ -1802,12 +1820,15 @@ class ChatMessages(APIView):
         return Response(serializer.data)
     
 
-class Chats(APIView):
-    def get(self,request):
-        chats = Chat.objects.all()
-        print(request.encoding)
-        serializer = ChatSerializer(chats,many=True, context={'request': request})
-        return Response(serializer.data)
+class Chats(ListAPIView):
+    querset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    # permission_clasess = [IsAuthenticated]
+
+    def get_queryset(self):
+        chats = Chat.objects.annotate(latest_message_timestamp=Max('chatmessage__timestamp'))
+        chats = chats.order_by('-latest_message_timestamp')
+        return chats
     
 
 class GetChat(RetrieveAPIView):

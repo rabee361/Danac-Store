@@ -282,9 +282,10 @@ class OrderFilter(django_filters.FilterSet):
         fields = ['client_name']
 
 
-class DelivaryFilter(django_filters.FilterSet):
+class DeliveryFilter(django_filters.FilterSet):
     employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
+    client_name = django_filters.CharFilter(field_name='output_receipt__client__name', lookup_expr='startswith')
 
     class Meta:
         model = DelievaryArrived
-        fields = ['employee_name']
+        fields = ['employee_name','client_name']
