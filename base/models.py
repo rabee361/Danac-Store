@@ -944,6 +944,7 @@ class Products_Medium(models.Model):
 
 class MediumTwo(models.Model):
     products = models.ManyToManyField(Product, through='MediumTwo_Products')
+    barcode = models.CharField(max_length=200, default=generate_barcode)
 
     def __str__(self) -> str:
         return f'medium_two - {str(self.id)}'
@@ -961,6 +962,12 @@ class MediumTwo_Products(models.Model):
     def sub_item(self):
         self.quantity -= 1
         self.save()
+
+    def total_price_of_item(self):
+        return (self.quantity * self.product.sale_price)
+    
+    def total_points_of_item(self):
+        return (self.quantity * self.product.points)
 
     def __str__(self) -> str:
         return f'{self.product.name} - {str(self.mediumtwo.id)}'

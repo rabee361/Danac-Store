@@ -558,7 +558,7 @@ class DelevaryArrivedForEmployee(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class GetDelevaryArrivedForEmployee(APIView):
+class GetDelivery(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
@@ -1398,22 +1398,21 @@ class ListCreateDeliveryArrived(APIView):
     
 
 
-class GetDelevaryArrivedForEmployee(APIView):
-    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, pk):
-        delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
-        serializer = DelevaryArrivedSerializer(delevary_arrived, many=False)
-        output = Output.objects.filter(id=delevary_arrived.output_receipt.id).first()
-        products = Output_Products.objects.filter(output__id= output.id)
-        products_serializer = GetProductsOutputsSerializer(products, many=True, context={'request': request})
-        receipt_serializer = OutputSerializer(output)
-        return Response({'receipt':receipt_serializer.data, 'products':products_serializer.data , 'is_delivered':serializer.data['is_delivered']})
+
+class GetMediumTwoDetails(APIView):
+    # permission_classes = [IsAuthenticated,Is_Client]
+    def get(self,request,pk):
+        products = MediumTwo_Products.objects.filter(mediumtwo=pk)
+        serializer = MediumTwoDetailsSerializer(products,many=True, context={'request': request})
+        return Response(serializer.data)
 
 
 
 
-class AcceptDelevaryArrived(APIView):
+
+
+class DeliveredOrder(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):

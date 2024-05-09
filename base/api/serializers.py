@@ -395,7 +395,7 @@ class Client_DetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = ['id','name','phonenumber','address']
+        fields = ['id','name','phonenumber','address','total_points']
 
 
 
@@ -2431,6 +2431,23 @@ class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
 
         return reper
     
+
+
+
+class MediumTwoDetailsSerializer(serializers.ModelSerializer):
+    total_points = serializers.IntegerField(source='mediumtwo.total_cart_points',read_only=True)
+    total_price = serializers.FloatField(source='mediumtwo.total_cart_price',read_only=True)
+    barcode = serializers.CharField(source='mediumtwo.barcode',read_only=True)
+    item_per_carton = serializers.IntegerField(source='product.item_per_carton',read_only=True)
+    sale_price = serializers.FloatField(source='product.sale_price',read_only=True)
+    product_name = serializers.CharField(source='product.name',read_only=True)
+    points = serializers.IntegerField(source='product.points',read_only=True)
+    product_id = serializers.IntegerField(source='product.id',read_only=True)
+
+    class Meta:
+        model = MediumTwo_Products
+        fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points','barcode']
+
 
 
 
