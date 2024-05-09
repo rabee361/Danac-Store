@@ -2397,13 +2397,11 @@ class ProductOrderEnvoySerializer(serializers.ModelSerializer):
         reper['image'] = instance.product.image.url
         reper['sale_price'] = instance.product.sale_price
         reper['description'] = instance.product.description
-
         return reper
 
 
 
 class OrderEnvoySerializer(serializers.ModelSerializer):
-    products = ProductOrderEnvoySerializer(many=True, read_only=True)
     class Meta:
         model = OrderEnvoy
         fields = '__all__'
