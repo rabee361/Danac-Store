@@ -2378,14 +2378,6 @@ class GetProductsOutputsSerializer(serializers.ModelSerializer):
 
 # ---------------------------------------------ORDER ENVOY---------------------------------------------
 
-class OrderEnvoySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderEnvoy
-        fields = '__all__'
-    # def to_representation(self, instance):
-    #     print(instance.client.address)  # Add this line
-    #     representation = super().to_representation(instance)
-    #     return representation
 
 
 class ListOrderEnvoySerialzier(serializers.ModelSerializer):
@@ -2407,6 +2399,21 @@ class ProductOrderEnvoySerializer(serializers.ModelSerializer):
         reper['description'] = instance.product.description
 
         return reper
+
+
+
+class OrderEnvoySerializer(serializers.ModelSerializer):
+    products = ProductOrderEnvoySerializer(many=True, read_only=True)
+    class Meta:
+        model = OrderEnvoy
+        fields = '__all__'
+    # def to_representation(self, instance):
+    #     print(instance.client.address)  # Add this line
+    #     representation = super().to_representation(instance)
+    #     return representation
+
+
+
 
 
 class MediumTwoSerializer(serializers.ModelSerializer):
