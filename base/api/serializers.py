@@ -2398,10 +2398,12 @@ class ProductOrderEnvoySerializer(serializers.ModelSerializer):
         reper['sale_price'] = instance.product.sale_price
         reper['description'] = instance.product.description
         return reper
+    
 
 
 
-class OrderEnvoySerializer(serializers.ModelSerializer):
+class OrderEnvoySerializer(serializers.ModelSerializer): 
+    products = Product3Serializer(many=True,read_only=True) 
     class Meta:
         model = OrderEnvoy
         fields = '__all__'

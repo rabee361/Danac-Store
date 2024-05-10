@@ -1758,7 +1758,7 @@ class CreateOrderEnvoyView(APIView):
             'phonenumber': request.data['phonenumber'],
             'delivery_date':request.data['delivery_date'],
             'address' : request.data['address']
-        })
+        } , context = {'request':request})
         if order_envoy_ser.is_valid():
             order_envoy = order_envoy_ser.save()
             for medium in mediumtwo:
@@ -1770,7 +1770,16 @@ class CreateOrderEnvoyView(APIView):
                 order_envoy.total_price += (medium.quantity * medium.product.sale_price)
                 order_envoy.save()
             MediumTwo.objects.get(id=mediumtwo_id).delete()
-            return Response(order_envoy_ser.data, status=status.HTTP_201_CREATED)
+            return Response({"receipt":{"id":order_envoy_ser.data['id'],
+                             "client_name":order_envoy_ser.data['client'],
+                             "address":order_envoy_ser.data['address'],
+                             "phonenumber":order_envoy_ser.data['phonenumber'],
+                             "products_num":order_envoy_ser.data['products_num'],
+                             "total_price":order_envoy_ser.data['total_price'],
+                             "created":order_envoy_ser.data['created'],
+                             "delivery_date":order_envoy_ser.data['delivery_date'],}
+                            ,"products":order_envoy_ser.data['products'],
+                            "is_delivered":order_envoy_ser.data['delivered']}, status=status.HTTP_201_CREATED)
         return Response(order_envoy_ser.errors, status=status.HTTP_400_BAD_REQUEST)    
 
 
