@@ -1350,7 +1350,7 @@ class Chat(models.Model):
 
 
 class ChatMessage(models.Model):
-    sender = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+    sender = models.ForeignKey('CustomUser', on_delete=models.CASCADE, blank=True , null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
