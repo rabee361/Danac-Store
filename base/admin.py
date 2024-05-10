@@ -87,11 +87,11 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     list_filter = ['is_accepted']
-    actions = ['Accept_User', 'Refuse_User']
+    actions = ['Accept_Client', 'Accept_Employee' ,'Refuse_User']
     list_display = ['id', 'phonenumber','username', 'is_staff', 'is_accepted']    
     ordering = ['-id']
 
-    def Accept_User(self, request, queryset):
+    def Accept_Client(self, request, queryset):
         queryset.update(is_active=True)
         user_type = UserType.objects.get(user_type='عميل')
         queryset.update(is_accepted=True, user_type=user_type)
@@ -105,7 +105,6 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         client.save()
         cart,created = Cart.objects.get_or_create(customer=client)
         chat,created = Chat.objects.get_or_create(user=user , chat_type='driver')
-        chat,created = Chat.objects.get_or_create(user=user , chat_type='employee')
 
         # rand_num = random.randint(1,10000)
         # code_verivecation = random.randint(1000,9999)
@@ -120,6 +119,26 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         # serializer.is_valid(raise_exception=True)
         # serializer.save()
         # cart.save()
+
+
+
+    def Accept_Employee(self, request, queryset):
+        queryset.update(is_active=True)
+        user_type = UserType.objects.get(user_type='موظف')
+        queryset.update(is_accepted=True, user_type=user_type)
+        user = queryset.get(is_active=True)
+        employee,created = Employee.objects.get_or_create(
+            name=user.username,
+            phonenumber = user.phonenumber,
+            location = user.location
+        )
+        employee.address = f'{user.state}-{user.town}-{user.address}'
+        employee.save()
+        cart,created = Cart.objects.get_or_create(customer=employee)
+        chat,created = Chat.objects.get_or_create(user=user)
+
+
+
 
 
     def Refuse_User(self, request, queryset):

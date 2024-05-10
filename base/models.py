@@ -1334,16 +1334,11 @@ class Product_Order_Envoy(models.Model):
 
 ################# Chat ##################
 
-CHOICES = (
-    ('driver','driver'),
-    ('employee' , 'employee')
-)
 
 
 class Chat(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True,null=True)
-    chat_type = models.CharField(max_length=30,choices=CHOICES)
 
     def __str__(self):
         return f'{self.id}'
