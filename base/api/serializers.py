@@ -2463,7 +2463,7 @@ class MediumTwoDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MediumTwo
-        fields = ['id','products','barcode']
+        fields = ['id','products']
 
 
 
