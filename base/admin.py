@@ -87,7 +87,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     list_filter = ['is_accepted']
-    actions = ['Accept_Client', 'Accept_Employee' ,'Refuse_User']
+    actions = ['Accept_Client', 'Accept_User' ,'Refuse_User']
     list_display = ['id', 'phonenumber','username', 'is_staff', 'is_accepted']    
     ordering = ['-id']
 
@@ -122,19 +122,13 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
 
 
 
-    def Accept_Employee(self, request, queryset):
+    def Accept_User(self, request, queryset):
         queryset.update(is_active=True)
         user_type = UserType.objects.get(user_type='موظف')
         queryset.update(is_accepted=True, user_type=user_type)
         user = queryset.get(is_active=True)
-        employee,created = Employee.objects.get_or_create(
-            name=user.username,
-            phonenumber = user.phonenumber,
-            location = user.location
-        )
-        employee.address = f'{user.state}-{user.town}-{user.address}'
-        employee.save()
-        cart,created = Cart.objects.get_or_create(customer=employee)
+        user.address = f'{user.state}-{user.town}-{user.address}'
+        user.save()
         chat,created = Chat.objects.get_or_create(user=user)
 
 
