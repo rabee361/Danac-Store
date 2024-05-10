@@ -214,16 +214,8 @@ class CreateDriverMessage(AsyncWebsocketConsumer):
 			self.channel_name
 		)
 
-		# await self.accept()
+		await self.accept()
 
-		chat_owner = await self.get_chat_owner(self.chat_id)
-
-		if chat_owner == int(self.user_id) or await self.is_driver(self.user_id):
-			await self.accept()
-		else:
-			raise ValueError('this is not your chat')
-
-	
 
 		for message in messages:
 			await self.send(text_data=json.dumps(message))
@@ -240,9 +232,9 @@ class CreateDriverMessage(AsyncWebsocketConsumer):
 
 		try:
 			await self.get_employee(user.phonenumber)
-			msg = ChatMessage(sender=user,content=message, chat=chat, employee=True)
-		except Employee.DoesNotExist:
 			msg = ChatMessage(sender=user,content=message, chat=chat, employee=False)
+		except Employee.DoesNotExist:
+			msg = ChatMessage(sender=user,content=message, chat=chat, employee=True)
 
 		serializer = MessageSerializer(msg,many=False)
 		await self.save_message(msg)
@@ -333,12 +325,6 @@ class CreateDriverMessage(AsyncWebsocketConsumer):
 
 
 	@database_sync_to_async
-	def get_chat_owner(self, chat_id):
-		chat = Chat.objects.get(id=chat_id)
-		return int(chat.user.id)
-
-
-	@database_sync_to_async
 	def get_device(chat):
 		return FCMDevice.objects.filter(user=chat.user)
 
@@ -356,18 +342,11 @@ class CreateDriverMessage(AsyncWebsocketConsumer):
 		return serializer.data
 
 
-	@database_sync_to_async
-	def is_driver(self, user_id):
-		user = CustomUser.objects.get(id=user_id)
-		if Employee.objects.filter(Q(phonenumber=user.phonenumber) & Q( truck_num__gt=0)).exists():
-			return True
-		else:
-			return False
 
 
 	@database_sync_to_async
 	def get_employee(self,phonenumber):
-		return Employee.objects.get(phonenumber=phonenumber) or None
+		return Employee.objects.filter(phonenumber=phonenumber,truck_num__gt=0).first or None
 
 	@database_sync_to_async
 	def get_user(self, user_id):
