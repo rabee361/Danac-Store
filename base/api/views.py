@@ -1403,10 +1403,9 @@ class ListCreateDeliveryArrived(APIView):
 class GetMediumTwoDetails(APIView):
     # permission_classes = [IsAuthenticated,Is_Client]
     def get(self,request,pk):
-        products = MediumTwo_Products.objects.filter(mediumtwo=pk)
-        serializer = MediumTwoDetailsSerializer(products,many=True, context={'request': request})
+        medium = MediumTwo.objects.get(id=pk)
+        serializer = MediumTwoDetailsSerializer(medium,context={'request': request})
         return Response(serializer.data)
-
 
 
 
@@ -1770,16 +1769,7 @@ class CreateOrderEnvoyView(APIView):
                 order_envoy.total_price += (medium.quantity * medium.product.sale_price)
                 order_envoy.save()
             MediumTwo.objects.get(id=mediumtwo_id).delete()
-            return Response({"receipt":{"id":order_envoy_ser.data['id'],
-                             "client_name":order_envoy_ser.data['client'],
-                             "address":order_envoy_ser.data['address'],
-                             "phonenumber":order_envoy_ser.data['phonenumber'],
-                             "products_num":order_envoy_ser.data['products_num'],
-                             "total_price":order_envoy_ser.data['total_price'],
-                             "created":order_envoy_ser.data['created'],
-                             "delivery_date":order_envoy_ser.data['delivery_date'],}
-                            ,"products":order_envoy_ser.data['products'],
-                            "is_delivered":order_envoy_ser.data['delivered']}, status=status.HTTP_201_CREATED)
+            return Response(order_envoy_ser.data, status=status.HTTP_201_CREATED)
         return Response(order_envoy_ser.errors, status=status.HTTP_400_BAD_REQUEST)    
 
 

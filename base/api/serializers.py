@@ -2441,7 +2441,7 @@ class MediumTwo_ProductsSerializer(serializers.ModelSerializer):
 
 
 
-class MediumTwoDetailsSerializer(serializers.ModelSerializer):
+class MediumTwoProductDetailsSerializer(serializers.ModelSerializer):
     total_points = serializers.IntegerField(source='mediumtwo.total_cart_points',read_only=True)
     total_price = serializers.FloatField(source='mediumtwo.total_cart_price',read_only=True)
     barcode = serializers.CharField(source='mediumtwo.barcode',read_only=True)
@@ -2455,6 +2455,15 @@ class MediumTwoDetailsSerializer(serializers.ModelSerializer):
         model = MediumTwo_Products
         fields = ['id','product_id','points','product_name','quantity','item_per_carton','sale_price','total_price_of_item','total_points_of_item','total_price','total_points','barcode']
 
+
+
+
+class MediumTwoDetailsSerializer(serializers.ModelSerializer):
+    products = Product3Serializer(many=True , read_only=True)
+
+    class Meta:
+        model = MediumTwo
+        fields = ['id','products','barcode']
 
 
 
