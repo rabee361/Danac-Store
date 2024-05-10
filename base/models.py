@@ -1341,7 +1341,7 @@ CHOICES = (
 
 
 class Chat(models.Model):
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True,null=True)
     chat_type = models.CharField(max_length=30,choices=CHOICES)
 
