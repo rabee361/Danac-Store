@@ -104,7 +104,8 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
         client.address = f'{user.state}-{user.town}-{user.address}'
         client.save()
         cart,created = Cart.objects.get_or_create(customer=client)
-        chat,created = Chat.objects.get_or_create(user=user)
+        chat,created = Chat.objects.get_or_create(user=user , chat_type='driver')
+        chat,created = Chat.objects.get_or_create(user=user , chat_type='employee')
 
         # rand_num = random.randint(1,10000)
         # code_verivecation = random.randint(1000,9999)

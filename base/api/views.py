@@ -81,12 +81,15 @@ class UserLoginApiView(GenericAPIView):
         user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
 
-        chat = Chat.objects.filter(user=user).first()
+        chat = Chat.objects.filter(user=user, chat_type='employee').first()
+        driver_chat = Chat.objects.filter(user=user, chat_type='driver').first()
 
 
         data = serializer.data
         if chat:
             data['chat_id'] = chat.id
+        if driver_chat:
+            data['driver_chat_id'] = driver_chat.id
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
         data['longitude'] = user.location.x
