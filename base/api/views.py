@@ -82,7 +82,8 @@ class UserLoginApiView(GenericAPIView):
         token = RefreshToken.for_user(user)
 
         chat = Chat.objects.filter(user=user).first()
-
+        client = Client.objects.get(phonenumber=request.user.phonenumber)
+        cart = Cart.objects.get(customer=client)
 
         data = serializer.data
         if chat:
@@ -93,6 +94,7 @@ class UserLoginApiView(GenericAPIView):
 
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
+        data['cart_id'] = cart.id
         data['longitude'] = user.location.x
         data['laritude'] = user.location.y
         data['address'] = user.address
