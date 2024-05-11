@@ -82,7 +82,7 @@ class UserLoginApiView(GenericAPIView):
         token = RefreshToken.for_user(user)
 
         chat = Chat.objects.filter(user=user).first()
-        client = Client.objects.get(phonenumber=request.user.phonenumber)
+        client = Client.objects.get(phonenumber=user.phonenumber)
         cart = Cart.objects.get(customer=client)
 
         data = serializer.data
