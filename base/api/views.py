@@ -94,7 +94,7 @@ class UserLoginApiView(GenericAPIView):
 
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
-        data['cart_id'] = cart.id
+        data['cart'] = cart.id
         data['longitude'] = user.location.x
         data['laritude'] = user.location.y
         data['address'] = user.address
@@ -441,7 +441,7 @@ class Quantity_Handler(APIView):
 
 
 class Add_to_Cart(APIView):
-    permission_classes = [IsAuthenticated,Is_Client]
+    permission_classes = [IsAuthenticated]
     def post(self,request,pk,pk2):
         user = CustomUser.objects.get(id=pk2)
         client = Client.objects.get(phonenumber=user.phonenumber)
