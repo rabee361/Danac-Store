@@ -472,7 +472,7 @@ class Add_to_Cart(APIView):
 
 
 class Delete_From_Cart(DestroyAPIView):
-    permission_classes = [IsAuthenticated,Is_Client]
+    permission_classes = [IsAuthenticated]
     queryset = Cart_Products.objects.all()
     serializer_class = Cart_Products
 
@@ -481,7 +481,7 @@ class Delete_From_Cart(DestroyAPIView):
 
 
 class CreateOrderView(APIView):
-    # permission_classes = [IsAuthenticated,Is_Client]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request, cart_id):
 
@@ -537,7 +537,7 @@ class ListSimpleOrders(ListAPIView):
 
 
 class ListClientOrders(GenericAPIView):
-    permission_classes = [IsAuthenticated,Is_Client]
+    permission_classes = [IsAuthenticated]
     serializer_class = OrderSerializer
     def get(self,request):
         user = request.user
