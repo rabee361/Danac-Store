@@ -370,7 +370,7 @@ class SpecialProducts(APIView):
 
 
 class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
-    [IsAuthenticated,Is_Client]
+    [IsAuthenticated]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
