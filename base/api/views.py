@@ -395,7 +395,7 @@ class RetUpdDesProduct(RetrieveUpdateDestroyAPIView):
 #################################################### CART HNADLING #####################################################################
 
 class Cart_Items(APIView):
-    permission_classes = [IsAuthenticated,Is_Client]
+    permission_classes = [IsAuthenticated]
     def get(self,request,pk):
         products = Cart_Products.objects.filter(cart=pk)
         serializer = Cart_ProductsSerializer(products,many=True, context={'request': request})
