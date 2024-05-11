@@ -414,7 +414,7 @@ class Client_Details(APIView):
 
 
 class Cart_Items_Details(APIView):
-    # permission_classes = [IsAuthenticated,Is_Client]
+    # permission_classes = [IsAuthenticated]
     def get(self,request,pk):
         products = Cart_Products.objects.filter(cart=pk)
         serializer = Cart_Product_DetailsSerialzier(products,many=True, context={'request': request})
@@ -423,7 +423,7 @@ class Cart_Items_Details(APIView):
 
 
 class Quantity_Handler(APIView):
-    permission_classes = [IsAuthenticated,Is_Client]
+    permission_classes = [IsAuthenticated]
     def post(self,request,pk,pk2):
         item = Cart_Products.objects.get(id=pk)
         if pk2 == 'add':
@@ -1407,7 +1407,7 @@ class ListCreateDeliveryArrived(APIView):
 
 
 class GetMediumTwoDetails(APIView):
-    # permission_classes = [IsAuthenticated,Is_Client]
+    # permission_classes = [IsAuthenticated]
     def get(self,request,pk):
         medium = MediumTwo.objects.get(id=pk)
         serializer = MediumTwoDetailsSerializer(medium,context={'request': request})
