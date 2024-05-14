@@ -1352,7 +1352,6 @@ class OrderEnvoy(models.Model):
     client = models.CharField(max_length=50)
     address = models.CharField(max_length=100,default="address")
     phonenumber = models.CharField(
-        unique=True ,
         max_length=30,
         validators=[RegexValidator(
             regex=r"^(05|06|07)\d{7}$"
