@@ -509,7 +509,7 @@ class CreateOrderView(APIView):
                         ),
                     ),
                 )
-            UserNotification.objects.create(user=user,body=body,title=title)
+            UserNotification.objects.create(user=user,body=body,title=title,)
 
         order.save()
         order_serializer = OrderSerializer(order)

@@ -18,7 +18,6 @@ from django.db.models import Sum , Sum ,F , Q
 import re
 
 
-
 def get_expiration_time():
     return timezone.now() + timedelta(minutes=10)
 
@@ -129,8 +128,22 @@ class Client(models.Model):
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=100 , null=True,blank=True)
     store_name = models.CharField(max_length=100 , null=True,blank=True)
-    phonenumber = PhoneNumberField(region='DZ',unique=True)
-    phonenumber2 = PhoneNumberField(region='DZ',null=True,blank=True)
+    phonenumber = models.CharField(
+        unique=True ,
+        max_length=30,
+        validators=[RegexValidator(
+            regex=r"^(05|06|07)\d{7 }$"
+        )]
+    )
+    phonenumber2 = models.CharField(
+        unique=True ,
+        max_length=30,
+        validators=[RegexValidator(
+            regex=r"^(05|06|07)\d{7 }$"
+        )],
+        null=True,
+        blank=True
+    )
     category = models.CharField(max_length=75,choices=CHOICES,default='سوبرماركت')
     notes = models.TextField(max_length=150,null=True,blank=True,default='_')
     location = models.PointField(default=Point(10,20),null=True)
@@ -182,6 +195,8 @@ class UserNotification(models.Model):
     body = models.CharField(max_length=500)
     title = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=50,null=True,blank=True)
+    info = models.IntegerField(validators=[MinValueValidator(1) , MaxValueValidator(100000)],null=True,blank=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -445,8 +460,22 @@ class Order_Product(models.Model):
 class Supplier(models.Model):
     name = models.CharField(max_length=30)
     company_name = models.CharField(max_length=50)
-    phone_number = PhoneNumberField(region='DZ',unique=True)
-    phone_number2 = PhoneNumberField(region='DZ',null=True,blank=True)
+    phone_number = models.CharField(
+        unique=True ,
+        max_length=30,
+        validators=[RegexValidator(
+            regex=r"^(05|06|07)\d{7}$"
+        )]
+    )
+    phone_number2 = models.CharField(
+        unique=True ,
+        max_length=30,
+        validators=[RegexValidator(
+            regex=r"^(05|06|07)\d{7}$"
+        )],
+        null=True,
+        blank=True
+    )
     address = models.CharField(max_length=100)
     info = models.TextField(max_length=500,null=True,blank=True,default='_')
     debts = models.FloatField(validators=[MinValueValidator(0.0)],default=0.0)
@@ -471,8 +500,22 @@ class Supplier(models.Model):
 
 class Employee(models.Model):
     name = models.CharField(max_length=30)
-    phonenumber = PhoneNumberField(region='DZ',unique=True)
-    phonenumber2 = PhoneNumberField(region='DZ',null=True)
+    phonenumber = models.CharField(
+        unique=True ,
+        max_length=30,
+        validators=[RegexValidator(
+            regex=r"^(05|06|07)\d{7}$"
+        )]
+    )
+    phonenumber2 = models.CharField(
+        unique=True ,
+        max_length=30,
+        validators=[RegexValidator(
+            regex=r"^(05|06|07)\d{7}$"
+        )],
+        null=True,
+        blank=True
+    )
     job_position = models.CharField(max_length=20)
     truck_num = models.IntegerField(null=True,blank=True)
     location = models.PointField(default=Point(3.0589,36.7539))
@@ -1308,7 +1351,13 @@ class FrozenManualReceipt(models.Model):
 class OrderEnvoy(models.Model):
     client = models.CharField(max_length=50)
     address = models.CharField(max_length=100,default="address")
-    phonenumber = PhoneNumberField(region='DZ')
+    phonenumber = models.CharField(
+        unique=True ,
+        max_length=30,
+        validators=[RegexValidator(
+            regex=r"^(05|06|07)\d{7}$"
+        )],
+    )
     products = models.ManyToManyField(Product, through='Product_Order_Envoy')
     products_num = models.IntegerField(default=0)
     total_price = models.FloatField(default=0)
