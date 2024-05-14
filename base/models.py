@@ -3,7 +3,7 @@ from django.contrib.gis.db import models
 from base.api.managers import CustomManagers
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator , RegexValidator
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import date
@@ -15,6 +15,7 @@ from django.contrib.auth.models import AbstractUser
 import random
 import string
 from django.db.models import Sum , Sum ,F , Q
+import re
 
 
 
@@ -39,7 +40,13 @@ class UserType(models.Model):
 
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length=50, unique=True,null=True,blank=True)
-    phonenumber = PhoneNumberField(region='DZ',unique=True)
+    phonenumber = models.CharField(
+        unique=True ,
+        max_length=30,
+        validators=[RegexValidator(
+            regex=r"^(05|06|07)\d{7}$"
+        )]
+    )
     work_hours = models.CharField(max_length=100,null=True,blank=True)
     store_name = models.CharField(max_length=100,null=True,blank=True)
     state = models.CharField(max_length=50 , null=True)

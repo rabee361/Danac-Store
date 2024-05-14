@@ -135,7 +135,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
             ),
             ('Registration', 
                 {'fields':('date_joined', 'last_login',)}
-        )
+            )
     )
 
     add_fieldsets = (
