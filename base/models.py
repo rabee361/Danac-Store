@@ -43,7 +43,7 @@ class CustomUser(AbstractUser):
         unique=True ,
         max_length=30,
         validators=[RegexValidator(
-            regex=r"^(05|06|07)\d{7}$"
+            regex=r"^(05|06|07)\d{8}$"
         )]
     )
     work_hours = models.CharField(max_length=100,null=True,blank=True)
@@ -132,7 +132,7 @@ class Client(models.Model):
         unique=True ,
         max_length=30,
         validators=[RegexValidator(
-            regex=r"^(05|06|07)\d{7 }$"
+            regex=r"^(05|06|07)\d{8}$"
         )]
     )
     phonenumber2 = models.CharField(
@@ -464,14 +464,14 @@ class Supplier(models.Model):
         unique=True ,
         max_length=30,
         validators=[RegexValidator(
-            regex=r"^(05|06|07)\d{7}$"
+            regex=r"^(05|06|07)\d{8}$"
         )]
     )
     phone_number2 = models.CharField(
         unique=True ,
         max_length=30,
         validators=[RegexValidator(
-            regex=r"^(05|06|07)\d{7}$"
+            regex=r"^(05|06|07)\d{8}$"
         )],
         null=True,
         blank=True
@@ -1354,7 +1354,7 @@ class OrderEnvoy(models.Model):
     phonenumber = models.CharField(
         max_length=30,
         validators=[RegexValidator(
-            regex=r"^(05|06|07)\d{7}$"
+            regex=r"^(05|06|07)\d{8}$"
         )],
     )
     products = models.ManyToManyField(Product, through='Product_Order_Envoy')
