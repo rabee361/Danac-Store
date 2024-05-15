@@ -417,7 +417,7 @@ class Cart_Items_Details(APIView):
     # permission_classes = [IsAuthenticated]
     def get(self,request,pk):
         products = Cart_Products.objects.filter(cart=pk)
-        serializer = Cart_Product_DetailsSerialzier(products,many=True, context={'request': request})
+        serializer = Cart_Product_DetailsSerializer(products,many=True, context={'request': request})
         return Response(serializer.data)
     
 
@@ -509,7 +509,14 @@ class CreateOrderView(APIView):
                         ),
                     ),
                 )
-            UserNotification.objects.create(user=user,body=body,title=title,)
+            UserNotification.objects.create(
+                user=user,
+                body=body,
+                title=title,
+                info=order.id,
+                info_type='order'
+
+            )
 
         order.save()
         order_serializer = OrderSerializer(order)

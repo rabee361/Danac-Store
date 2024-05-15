@@ -399,7 +399,7 @@ class Client_DetailsSerializer(serializers.ModelSerializer):
 
 
 
-class Cart_Product_DetailsSerialzier(serializers.ModelSerializer):
+class Cart_Product_DetailsSerializer(serializers.ModelSerializer):
     total_points = serializers.IntegerField(source='cart.total_cart_points',read_only=True)
     total_price = serializers.FloatField(source='cart.total_cart_price',read_only=True)
     barcode = serializers.CharField(source='cart.barcode',read_only=True)

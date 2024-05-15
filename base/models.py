@@ -190,13 +190,18 @@ class Points(models.Model):
 
 
 
+CHOICES = (
+    ('order','order'),
+    ('info','info')
+)
+
 class UserNotification(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     body = models.CharField(max_length=500)
     title = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
-    type = models.CharField(max_length=50,null=True,blank=True)
     info = models.IntegerField(validators=[MinValueValidator(1) , MaxValueValidator(100000)],null=True,blank=True)
+    info_type = models.CharField(max_length=50,choices=CHOICES,null=True,blank=True)
 
     class Meta:
         ordering = ['-created_at']
