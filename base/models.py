@@ -139,7 +139,7 @@ class Client(models.Model):
         unique=True ,
         max_length=30,
         validators=[RegexValidator(
-            regex=r"^(05|06|07)\d{7 }$"
+            regex=r"^(05|06|07)\d{8}$"
         )],
         null=True,
         blank=True
@@ -509,14 +509,14 @@ class Employee(models.Model):
         unique=True ,
         max_length=30,
         validators=[RegexValidator(
-            regex=r"^(05|06|07)\d{7}$"
+            regex=r"^(05|06|07)\d{8}$"
         )]
     )
     phonenumber2 = models.CharField(
         unique=True ,
         max_length=30,
         validators=[RegexValidator(
-            regex=r"^(05|06|07)\d{7}$"
+            regex=r"^(05|06|07)\d{8}$"
         )],
         null=True,
         blank=True
