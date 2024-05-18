@@ -16,7 +16,7 @@ import random
 import string
 from django.db.models import Sum , Sum ,F , Q
 import re
-
+from django.utils.timezone import localtime
 
 def get_expiration_time():
     return timezone.now() + timedelta(minutes=10)
@@ -1054,11 +1054,11 @@ class Incoming(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            today = timezone.now().date()
+            today = date.today()
             last_instance = Incoming.objects.filter(date__date=today).order_by('-serial').first()
-
             if last_instance:
-                if last_instance.date.date() != date.today():
+                local_instance_time = localtime(last_instance.date).date()
+                if local_instance_time != date.today():
                     self.serial = 1
                 else:
                     self.serial = last_instance.serial + 1
@@ -1152,11 +1152,12 @@ class Output(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            today = timezone.now().date()
+            today = date.today()
             last_instance = Output.objects.filter(date__date=today).order_by('-serial').first()
 
             if last_instance:
-                if last_instance.date.date() != date.today():
+                local_instance_time = localtime(last_instance.date).date()
+                if local_instance_time != date.today():
                     self.serial = 1
                 else:
                     self.serial = last_instance.serial + 1
@@ -1265,11 +1266,12 @@ class ManualReceipt(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            today = timezone.now().date()
+            today = date.today()
             last_instance = ManualReceipt.objects.filter(date__date=today).order_by('-serial').first()
 
             if last_instance:
-                if last_instance.date.date() != date.today():
+                local_instance_time = localtime(last_instance.date).date()
+                if local_instance_time != date.today():
                     self.serial = 1
                 else:
                     self.serial = last_instance.serial + 1

@@ -321,7 +321,7 @@ class ManualReceiptAdmin(admin.ModelAdmin):
 
     class Meta:
         app_label = 'Receipts'
-        admin_order = 1 
+        admin_order = 1
 
 
 class FreezeManualAdmin(admin.ModelAdmin):
