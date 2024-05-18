@@ -281,7 +281,7 @@ class IncomingProductAdmin(admin.ModelAdmin):
 
 
 class IncomingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date','freeze']
+    list_display = ['id','serial', 'supplier', 'employee', 'recive_pyement', 'Reclaimed_products', 'remaining_amount', 'date','freeze']
     search_fields = ['supplier__name', 'employee__name']
     readonly_fields = ['serial']
 
@@ -315,7 +315,7 @@ class ManualReceiptProductAdmin(admin.ModelAdmin):
 
 
 class ManualReceiptAdmin(admin.ModelAdmin):
-    list_display = ['id', 'client', 'employee', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
+    list_display = ['id','serial', 'client', 'employee', 'discount','reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
     readonly_fields = ['serial']
 
@@ -331,7 +331,7 @@ class FreezeManualAdmin(admin.ModelAdmin):
 
 
 class OutputsproductAdmin(LeafletGeoAdmin):
-    list_display = ['id', 'client', 'employee','barcode', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
+    list_display = ['id','serial', 'client', 'employee','barcode', 'recive_pyement', 'discount', 'Reclaimed_products', 'previous_depts', 'remaining_amount', 'date','freeze']
     search_fields = ['client__name', 'employee__name']
     readonly_fields = ['serial']
 
