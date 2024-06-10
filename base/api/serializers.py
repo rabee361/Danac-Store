@@ -4,10 +4,9 @@ from base.models import *
 from django.contrib.auth import  authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import TokenError, RefreshToken
-from django.db.models import Q , Sum , F
+from django.db.models import Q , Sum
 from deep_translator import GoogleTranslator
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.validators import ValidationError
+
 
 ############################################################## AUTHENTICATION ###################################################
 
@@ -90,6 +89,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password':{'write_only':True,}
         }
+
     def validate(self, validated_data):
         if validated_data['password'] != validated_data['password2']:
             raise serializers.ValidationError({"password": "Passwords doesn't match."})

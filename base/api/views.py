@@ -16,6 +16,7 @@ from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
 from .permissions import *
 from rest_framework.decorators import api_view
+from django.core.exceptions import ObjectDoesNotExist
 
 
 ####################################### AUTHENTICATION ###################################################################3#######
@@ -80,21 +81,7 @@ class UserLoginApiView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = CustomUser.objects.get(phonenumber = request.data['username'])
         token = RefreshToken.for_user(user)
-
-        chat = Chat.objects.filter(user=user).first()
-
-
         data = serializer.data
-        if chat:
-            data['chat_id'] = chat.id
-        # else:
-        #     driver_chat = Chat.objects.get_or_create(user=user, chat_type='driver')
-        #     data['chat_id'] = driver_chat.id
-
-        if user.user_type == 'عميل':
-            client = Client.objects.get(phonenumber=user.phonenumber)
-            cart = Cart.objects.get(customer=client)
-            data['cart'] = cart.id
 
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
@@ -104,8 +91,19 @@ class UserLoginApiView(GenericAPIView):
         data['laritude'] = user.location.y
         data['address'] = user.address
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
+
+        if user.user_type == 'عميل':
+            chat = Chat.objects.filter(user=user).first()
+            client = Client.objects.get(phonenumber=user.phonenumber)
+            cart = Cart.objects.get(customer=client)
+            data['cart'] = cart.id
+            if chat:
+                data['chat_id'] = chat.id
+
         return Response(data, status=status.HTTP_200_OK)
     
+
+
 
 class UpdateImageUserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -169,9 +167,9 @@ class LogoutAPIView(GenericAPIView):
 
 
 class ListInformationUserView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = CustomUser.objects.all()
     serializer_class= CustomUserSerializer
-    permission_classes = [IsAuthenticated]
 
 
 
@@ -445,7 +443,7 @@ class Quantity_Handler(APIView):
             
 
 
-class Add_to_Cart(APIView):
+class AddToCart(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request,pk,pk2):
         user = CustomUser.objects.get(id=pk2)
@@ -476,7 +474,7 @@ class Add_to_Cart(APIView):
 
 
 
-class Delete_From_Cart(DestroyAPIView):
+class DeleteFromCart(DestroyAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Cart_Products.objects.all()
     serializer_class = Cart_Products

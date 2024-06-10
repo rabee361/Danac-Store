@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.gis.db import models
 from base.api.managers import CustomManagers
-from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator , RegexValidator
 from django.db.models import Sum
@@ -9,25 +8,14 @@ from django.utils import timezone
 from datetime import date
 from django.contrib.gis.geos import Point
 from django.utils import timezone
-from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
-import random
-import string
 from django.db.models import Sum , Sum ,F , Q
-import re
 from django.utils.timezone import localtime
+from utils.helper import get_expiration_time , get_expiration_date , generate_barcode
 
-def get_expiration_time():
-    return timezone.now() + timedelta(minutes=10)
 
-def get_expiration_date():
-    return timezone.now() + timedelta(days=30)
 
-def generate_barcode():
-    characters = string.ascii_letters + string.digits
-    code = ''.join(random.choice(characters) for _ in range(8))
-    return code
 
 
 class UserType(models.Model):
@@ -48,14 +36,14 @@ class CustomUser(AbstractUser):
     )
     work_hours = models.CharField(max_length=100,null=True,blank=True)
     store_name = models.CharField(max_length=100,null=True,blank=True)
-    state = models.CharField(max_length=50 , null=True)
-    town = models.CharField(max_length=100 , null=True)
-    address = models.CharField(max_length=100 , null=True)
+    state = models.CharField(max_length=50 , null=True,blank=True)
+    town = models.CharField(max_length=100 , null=True,blank=True)
+    address = models.CharField(max_length=100 , null=True,blank=True)
     username = models.CharField(max_length=200)
     is_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/users', null=True,default='images/account.jpg')
     location = models.PointField(default=Point(3.0589,36.7539),null=True,blank=True)
-    user_type = models.ForeignKey(UserType,on_delete=models.CASCADE,null=True)
+    user_type = models.ForeignKey(UserType,on_delete=models.SET_NULL,null=True)
     is_accepted = models.BooleanField(default=False)
     get_notifications = models.BooleanField(default=True)
 

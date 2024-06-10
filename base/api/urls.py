@@ -57,8 +57,8 @@ urlpatterns = [
     path('cart_details/<str:pk>' , Cart_Items_Details.as_view() , name="cart_products_details"),
     path('create-order/<str:cart_id>/' , CreateOrderView.as_view() , name="create-order"),
     path('change-quantity/<str:pk>/<str:pk2>/' , Quantity_Handler.as_view() , name="quantity-handler"), 
-    path('add_to_cart/<str:pk>/<str:pk2>/' , Add_to_Cart.as_view() , name="add-to-cart"),
-    path('delete-item/<str:pk>/' , Delete_From_Cart.as_view() , name="delete-item"),
+    path('add_to_cart/<str:pk>/<str:pk2>/' , AddToCart.as_view() , name="add-to-cart"),
+    path('delete-item/<str:pk>/' , DeleteFromCart.as_view() , name="delete-item"),
 
     path('suppliers/' , ListCreateSupplier.as_view() , name="suppliers"),
     path('get-supplier/<str:pk>/' , GetSupplier.as_view() , name="get-supplier"),
