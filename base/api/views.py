@@ -99,7 +99,7 @@ class UserLoginApiView(GenericAPIView):
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
         if user.user_type:
-            data['user_type'] = user.user_type
+            data['user_type'] = user.user_type.user_type
         data['longitude'] = user.location.x
         data['laritude'] = user.location.y
         data['address'] = user.address
