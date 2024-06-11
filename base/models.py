@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.gis.db import models
-from base.api.managers import CustomManagers
+from base.api.managers import CustomManagers , ChatsManager
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator , RegexValidator
 from django.db.models import Sum
@@ -1006,9 +1006,11 @@ class MediumTwo_Products(models.Model):
         self.quantity -= 1
         self.save()
 
+    @property
     def total_price_of_item(self):
         return (self.quantity * self.product.sale_price)
     
+    @property
     def total_points_of_item(self):
         return (self.quantity * self.product.points)
 
@@ -1389,6 +1391,8 @@ class Product_Order_Envoy(models.Model):
 class Chat(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True,null=True)
+
+    # chats = ChatsManager()
 
     def __str__(self):
         return f'{self.id}'

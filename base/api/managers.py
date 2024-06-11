@@ -1,4 +1,6 @@
 from django.contrib.auth.models import BaseUserManager
+from django.db import models
+from django.db.models import Max
 
 class CustomManagers(BaseUserManager):
     def _create_user(self, phonenumber, username, password=None, **extrafileds):
@@ -29,3 +31,12 @@ class CustomManagers(BaseUserManager):
             raise ValueError("Superuser must have is is_staff=True")
         
         return self._create_user(phonenumber, username, password, **extrafileds)
+    
+
+
+
+
+# class ChatsManager(models.Manager):
+#     def get_queryset(self) -> models.QuerySet:
+#         return super().get_queryset().annotate(latest_message_timestamp=Max('chatmessage__timestamp'))\
+#                                     .order_by('latest_message_timestamp')

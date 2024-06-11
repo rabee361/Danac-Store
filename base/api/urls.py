@@ -156,9 +156,9 @@ urlpatterns = [
     path('update-product-medium/<str:pk>/', UpdateProductsMedium.as_view()),
     path('add-order-to-medium/<str:order_id>/', CreateMediumForOrderView.as_view()),
     path('create-medium/', CreateMedium.as_view()),
-    path('add-to-medium/<str:medium_id>/<str:product_id>/', Add_To_Medium.as_view()),
+    path('add-to-medium/<str:medium_id>/<str:product_id>/', AddToMedium.as_view()),
     path('delete-product-from-medium/<str:pk>/', DeleteProductsMediumView.as_view()),
-    path('add-product-to-medium/' , Add_product_to_Medium.as_view()),
+    path('add-product-to-medium/' , AddProductMedium.as_view()),
     path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),
 
     path('create-delivery-arrived/<str:pk>/', ListCreateDeliveryArrived.as_view()),

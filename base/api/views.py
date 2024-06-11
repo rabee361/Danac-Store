@@ -549,12 +549,30 @@ class ListSimpleOrders(ListAPIView):
 class ListClientOrders(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = OrderSerializer
+    
     def get(self,request):
         user = request.user
         client = Client.objects.get(phonenumber=user.phonenumber)
         orders = client.order_set.all()
         serializer = self.get_serializer(orders,many=True)
-        return Response(serializer.data,)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+
+
+class ListClientOrders(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
+    
+    def get(self,request):
+        user = request.user
+        client = Client.objects.get(phonenumber=user.phonenumber)
+        orders = client.order_set.all()
+        serializer = self.get_serializer(orders,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+
+
+
         
 
 class DeleteOrder(DestroyAPIView):
@@ -1092,7 +1110,7 @@ class RetDesMedium(RetrieveDestroyAPIView):
     serializer_class = MediumSerializer
 
 
-class Add_To_Medium(APIView):
+class AddToMedium(APIView):
     def post(self, request, medium_id, product_id):
         product = Product.objects.get(id=product_id)
         medium = Medium.objects.get(id=medium_id)
@@ -1108,7 +1126,7 @@ class Add_To_Medium(APIView):
 
 
 
-class Add_product_to_Medium(APIView):
+class AddProductMedium(APIView):
     def post(self, request):
         serializer = AddProductToMediumSerializer(data=request.data)
         if serializer.is_valid():
@@ -1337,10 +1355,9 @@ class ListSaleEmployeeDeliveries(ListAPIView):
         queryset = DelievaryArrived.objects.all()
         filterset = DeliveryFilter(self.request.GET, queryset=queryset)
         queryset = filterset.qs
-
         queryset = queryset.filter(employee__phonenumber= self.request.user.phonenumber, is_delivered=self.kwargs['state'])
-
         return queryset
+
 
     def get_(self, request, state):
         # user = request.user
@@ -1664,7 +1681,7 @@ class CreateManualProduct(CreateAPIView):
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)
 
-
+############## freezing and unfreezing needs to be put sepearatly
 
 class FreezeManualReceipt(APIView):
     def post(self,request,receipt_id):
@@ -1807,7 +1824,7 @@ class ListOrderEnvoy(APIView):
 ########################### chat ##########################
     
 
-class SendMessage(APIView):
+class SendMessage(APIView):######## delete this shit
     # permission_classes = [IsAuthenticated]
     def post(self,request,chat_id,user_id):
         user = CustomUser.objects.get(id=user_id)
@@ -1827,19 +1844,18 @@ class SendMessage(APIView):
 
 class ChatMessages(APIView):
     def get(self,request,chat_id):
-        chat = Chat.objects.get(id=chat_id)
-        print(request.encoding)
+        chat = Chat.objects.get(id=chat_id)#### delete this
         messages = ChatMessage.objects.filter(chat=chat)
         serializer = MessageSerializer(messages,many=True)
         return Response(serializer.data)
     
 
 class Chats(ListAPIView):
+    # permission_clasess = [IsAuthenticated]
     querset = Chat.objects.all()
     serializer_class = ChatSerializer
-    # permission_clasess = [IsAuthenticated]
 
-    def get_queryset(self):
+    def get_queryset(self):######### use manager instead
         chats = Chat.objects.annotate(latest_message_timestamp=Max('chatmessage__timestamp'))
         chats = chats.order_by('-latest_message_timestamp')
         return chats
