@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.gis.db import models
-from base.api.managers import CustomManagers , ChatsManager
+from base.api.managers import CustomManagers
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator , RegexValidator
 from django.db.models import Sum
