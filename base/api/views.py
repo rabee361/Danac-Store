@@ -122,7 +122,7 @@ class UpdateImageUserView(APIView):
 
 
 
-class GetNotificationView(APIView):
+class ListNotificationView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         user = request.user
