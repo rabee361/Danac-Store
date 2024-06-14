@@ -1218,7 +1218,7 @@ class Output_Products(models.Model):
 
 
 
-class DelievaryArrived(models.Model):
+class Delivery(models.Model):
     output_receipt = models.OneToOneField(Output, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     is_delivered = models.BooleanField(default=False)

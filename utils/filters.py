@@ -287,5 +287,5 @@ class DeliveryFilter(django_filters.FilterSet):
     client_name = django_filters.CharFilter(field_name='output_receipt__client__name', lookup_expr='startswith')
 
     class Meta:
-        model = DelievaryArrived
+        model = Delivery
         fields = ['employee_name','client_name']

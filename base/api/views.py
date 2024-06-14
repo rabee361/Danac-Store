@@ -15,7 +15,7 @@ from firebase_admin.messaging import Message, Notification
 from django.core.exceptions import ObjectDoesNotExist
 from utils.filters import *
 from utils.permissions import *
-from utils.notifications import send_product_notification , send_order_notification
+from utils.notifications import send_product_notification , send_order_notification , send_driver_notification
 
 
 
@@ -569,7 +569,7 @@ class DelevaryArrivedForEmployee(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, state):
         user = request.user             
-        delevary_arrived = DelievaryArrived.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
+        delevary_arrived = Delivery.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
         serializer = DelevaryArrivedSerializer(delevary_arrived, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -578,7 +578,7 @@ class GetDelivery(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
-        delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
+        delevary_arrived = Delivery.objects.filter(id=pk).first()
         serializer = DelevaryArrivedSerializer(delevary_arrived, many=False)
         output = Output.objects.filter(id=delevary_arrived.output_receipt.id).first()
         products = Output_Products.objects.filter(output__id= output.id)
@@ -591,7 +591,7 @@ class AcceptDelevaryArrived(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
+        delevary_arrived = Delivery.objects.filter(id=pk).first()
         delevary_arrived.is_delivered = request.data['state']
         delevary_arrived.save()
         return Response(status=status.HTTP_200_OK)
@@ -1337,7 +1337,7 @@ class ListSaleEmployeeDeliveries(ListAPIView):
     serializer_class = DelevaryArrivedSerializer
 
     def get_queryset(self):
-        queryset = DelievaryArrived.objects.all()
+        queryset = Delivery.objects.all()
         filterset = DeliveryFilter(self.request.GET, queryset=queryset)
         queryset = filterset.qs
         queryset = queryset.filter(employee__phonenumber= self.request.user.phonenumber, is_delivered=self.kwargs['state'])
@@ -1346,7 +1346,7 @@ class ListSaleEmployeeDeliveries(ListAPIView):
 
     def get_(self, request, state):
         # user = request.user
-        # delevary_arrived = DelievaryArrived.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
+        # delevary_arrived = Delivery.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
         queryset = self.get_queryset()
         serializer = DelevaryArrivedSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -1355,16 +1355,16 @@ class ListSaleEmployeeDeliveries(ListAPIView):
 
 class ListCreateDeliveryArrived(APIView):
     def post(self, request, pk):
-        if DelievaryArrived.objects.filter(output_receipt_id=pk).exists():
+        if Delivery.objects.filter(output_receipt_id=pk).exists():
             return Response(
-                {"error": "Delivery with this output has already arrived."},
+                {"error": "This order has already been delivered."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         output = Output.objects.filter(id=pk).first()
         if not output:
             return Response(
-                {"error": "Output not found."},
+                {"error": "Output Receipt not found."},
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -1377,38 +1377,19 @@ class ListCreateDeliveryArrived(APIView):
         
         output = Output.objects.filter(id=pk).first()
         employee = Employee.objects.filter(id=request.data['employee']).first()
-        delivery_arrived = DelievaryArrived.objects.create(
+        delivery_arrived = Delivery.objects.create(
             output_receipt=output,
             employee = employee
         )
         del_arr_serializer = DelevaryArrivedSerializer(delivery_arrived, many=False)
         
         user = CustomUser.objects.get(phonenumber=delivery_arrived.employee.phonenumber)
-        if user.get_notifications:
-            devices = FCMDevice.objects.filter(user=user.id)
-            title = "طلب توصيل جديد"
-            body = "لديك طلب جديد لتوصيله"
-            devices.send_message(
-                message=Message(
-                    notification=Notification(
-                        title=title,
-                        body= body
-                    ),
-                ),
-            )
-            UserNotification.objects.create(
-                user=user,
-                title = title,
-                body=body,
-                details={
-                    "delivery_id":delivery_arrived.id
-                }
-            )
+        send_driver_notification(user=user,details=delivery_arrived.id)
 
         return Response(del_arr_serializer.data)
 
     def get(self, request):
-        queryset = DelievaryArrived.objects.all()
+        queryset = Delivery.objects.all()
         filterset = DeliveryFilter(request.GET, queryset=queryset)
         if filterset.is_valid():
             delivery_arrived = filterset.qs
@@ -1436,7 +1417,7 @@ class DeliveredOrder(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
+        delevary_arrived = Delivery.objects.filter(id=pk).first()
         delevary_arrived.is_delivered = request.data['state']
         delevary_arrived.save()
         return Response(status=status.HTTP_200_OK)

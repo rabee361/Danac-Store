@@ -50,3 +50,30 @@ def send_order_notification(user,details):
             }
 
         )
+
+
+
+
+
+
+def send_driver_notification(user,details):
+    if user.get_notifications:
+        devices = FCMDevice.objects.filter(user=user.id)
+        title = "طلب توصيل جديد"
+        body = "لديك طلب جديد لتوصيله"
+        devices.send_message(
+            message=Message(
+                notification=Notification(
+                    title=title,
+                    body= body
+                ),
+            ),
+        )
+        UserNotification.objects.create(
+            user=user,
+            title = title,
+            body=body,
+            details={
+                "delivery_id":details
+            }
+        )

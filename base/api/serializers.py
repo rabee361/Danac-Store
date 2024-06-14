@@ -2338,7 +2338,7 @@ class DelevaryArrivedSerializer(serializers.ModelSerializer):
     output_receipt = OutputSerializer(read_only=True)
     employee = EmployeeSerializer(read_only=True)
     class Meta:
-        model = DelievaryArrived
+        model = Delivery
         fields = '__all__'
 
 

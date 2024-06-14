@@ -88,7 +88,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     form = CustomUserChangeForm
     list_filter = ['is_accepted']
     actions = ['Accept_Client', 'Accept_User' ,'Refuse_User']
-    list_display = ['id', 'phonenumber','username', 'is_staff', 'is_accepted']    
+    list_display = ['id', 'phonenumber','username', 'is_staff', 'is_accepted','get_notifications']    
     ordering = ['-id']
 
     def Accept_Client(self, request, queryset):
@@ -353,8 +353,8 @@ class OutputProductAdmin(admin.ModelAdmin):
         return obj.output.id
 
 
-class DElevaryArrivedAdmin(admin.ModelAdmin):
-    list_display = ['id', 'output_receipt', 'employee']
+class DeliveryArrivedAdmin(admin.ModelAdmin):
+    list_display = ['id', 'output_receipt', 'employee','is_delivered']
 
 
 class ReturnedGoodsClientAdmin(admin.ModelAdmin):
@@ -537,7 +537,7 @@ admin.site.register(ManualReceipt_Products, ManualReceiptProductAdmin)
 admin.site.register(Output, OutputsproductAdmin)
 admin.site.register(FrozenOutputReceipt , FreezeOutputAdmin)
 admin.site.register(Output_Products, OutputProductAdmin)
-admin.site.register(DelievaryArrived, DElevaryArrivedAdmin)
+admin.site.register(Delivery, DeliveryArrivedAdmin)
 admin.site.register(OrderEnvoy, OrderEnvoyAdmin)
 admin.site.register(Product_Order_Envoy, ProductOrderEnvoyAdmin)
 admin.site.register(Order, OrderAdmin)
