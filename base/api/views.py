@@ -2,9 +2,8 @@ from rest_framework.response import Response
 from base.models import *
 from .serializers import *
 from rest_framework.generics import ListAPIView, DestroyAPIView ,RetrieveAPIView,UpdateAPIView ,RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView , ListCreateAPIView , RetrieveUpdateAPIView , RetrieveDestroyAPIView
-from rest_framework import permissions
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated , Allowany
+from rest_framework.permissions import IsAuthenticated , AllowAny
 from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -14,9 +13,9 @@ from rest_framework.exceptions import NotFound
 from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
 from django.core.exceptions import ObjectDoesNotExist
-from ...utils.filters import *
-from ...utils.permissions import *
-from ...utils.notifications import send_product_notification , send_order_notification
+from utils.filters import *
+from utils.permissions import *
+from utils.notifications import send_product_notification , send_order_notification
 
 
 
@@ -74,7 +73,7 @@ class RefreshFirebaseToken(GenericAPIView):
 
 
 class UserLoginApiView(GenericAPIView):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = [AllowAny]
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
@@ -135,7 +134,7 @@ class ListNotificationView(APIView):
 
 class ResetPasswordView(UpdateAPIView):
     serializer_class = ResetPasswordSerializer
-    permission_classes = [permissions.AllowAny,]
+    permission_classes = [AllowAny]
 
     def put(self, request, user_id):
         user = CustomUser.objects.get(id=user_id)
@@ -1014,7 +1013,7 @@ class ListCreateRetGoodsSupplier(ListCreateAPIView):
     filterset_class = ReturnedGoodsSupplierFilter
     queryset = ReturnedGoodsSupplier.objects.all()
     serializer_class = ReturnedGoodsSupplierSerializer
-    permission_classes = [permissions.IsAuthenticated]  
+    permission_classes = [IsAuthenticated]  
 
 
 
@@ -1041,7 +1040,7 @@ class ListCreateRetGoodsClient(ListCreateAPIView):
     filterset_class = ReturnedGoodsClientFilter
     queryset = ReturnedGoodsClient.objects.all()
     serializer_class = ReturnedGoodsClientSerializer
-    permission_classes = [permissions.IsAuthenticated]    
+    permission_classes = [IsAuthenticated]    
 
 
 
@@ -1070,7 +1069,7 @@ class ListCreateDamagedProduct(ListCreateAPIView):
     filterset_class = DamagedProductFilter
     queryset = DamagedProduct.objects.all()
     serializer_class = DamagedProductSerializer
-    permission_classes = [permissions.IsAuthenticated]    
+    permission_classes = [IsAuthenticated]    
     
 
 
@@ -1272,7 +1271,7 @@ class CreateOutputProduct(CreateAPIView):
 
 
 class ReceiptOrdersView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     def post(self, request, medium_id):
         try:
             Medium.objects.get(id=medium_id)
