@@ -90,6 +90,8 @@ class UserLoginApiView(GenericAPIView):
             device_tok.user = user
             device_tok.save()
         except:
+            if device_token is None or device_type is None:
+                return Response({"error":"device token and device type can't be None"},status=status.HTTP_400_BAD_REQUEST)
             FCMDevice.objects.create(user=user , registration_id=device_token ,type=device_type)
 
         data['image'] = request.build_absolute_uri(user.image.url)
@@ -100,14 +102,14 @@ class UserLoginApiView(GenericAPIView):
         data['laritude'] = user.location.y
         data['address'] = user.address
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
+        chat = Chat.objects.filter(user=user).first()
+        if chat:
+            data['chat_id'] = chat.id
 
         if user.user_type.user_type == "عميل":
-            chat = Chat.objects.filter(user=user).first()
             client = Client.objects.get(phonenumber=user.phonenumber)
             cart = Cart.objects.get(customer=client)
             data['cart'] = cart.id
-            if chat:
-                data['chat_id'] = chat.id
 
         return Response(data, status=status.HTTP_200_OK)
     

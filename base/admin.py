@@ -88,7 +88,7 @@ class AdminCustomUser(UserAdmin, LeafletGeoAdmin):
     form = CustomUserChangeForm
     list_filter = ['is_accepted']
     actions = ['Accept_Client', 'Accept_User' ,'Refuse_User']
-    list_display = ['id', 'phonenumber','username', 'is_staff', 'is_accepted','get_notifications']    
+    list_display = ['id', 'username','phonenumber', 'is_staff', 'is_accepted','get_notifications']    
     ordering = ['-id']
 
     def Accept_Client(self, request, queryset):
