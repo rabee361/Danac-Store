@@ -516,8 +516,9 @@ class CreateOrderView(APIView):
                 user=user,
                 body=body,
                 title=title,
-                info=order.id,
-                info_type='order'
+                details={
+                    "order_id":order.id
+                }
 
             )
 
@@ -1321,7 +1322,10 @@ class ReceiptOrdersView(APIView):
                     UserNotification.objects.create(
                         user = user,
                         title = title,
-                        body = body
+                        body = body,
+                        details = {
+                            "product_id":quantity_product.id
+                        }
                     )
                 output_product = Output_Products.objects.create(
                     product = product.product,
@@ -1414,7 +1418,10 @@ class ListCreateDeliveryArrived(APIView):
             UserNotification.objects.create(
                 user=user,
                 title = title,
-                body=body
+                body=body,
+                details={
+                    "delivery_id":delivery_arrived.id
+                }
             )
 
         return Response(del_arr_serializer.data)
@@ -1614,7 +1621,10 @@ class CreateManualReceiptView(APIView):
                         UserNotification.objects.create(
                             user = user,
                             title = title,
-                            body = body
+                            body = body,
+                            details={
+                                "product_id":update_quantity.id
+                            }
                         ) 
                 manual_receipt_products = ManualReceipt_Products.objects.create(
                     product = product.product,

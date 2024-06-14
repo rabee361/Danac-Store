@@ -188,8 +188,7 @@ class UserNotification(models.Model):
     body = models.CharField(max_length=500)
     title = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
-    info = models.IntegerField(validators=[MinValueValidator(1) , MaxValueValidator(100000)],null=True,blank=True)
-    info_type = models.CharField(max_length=50,choices=CHOICES,null=True,blank=True)
+    details = models.JSONField(default=dict)
 
     class Meta:
         ordering = ['-created_at']
