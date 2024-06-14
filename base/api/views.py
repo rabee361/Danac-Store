@@ -4,19 +4,20 @@ from .serializers import *
 from rest_framework.generics import ListAPIView, DestroyAPIView ,RetrieveAPIView,UpdateAPIView ,RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView , ListCreateAPIView , RetrieveUpdateAPIView , RetrieveDestroyAPIView
 from rest_framework import permissions
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated , Allowany
 from rest_framework import status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
-from base.filters import *
-from django.db.models import Sum , Max
+from django.db.models import  Max
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound
 from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
-from .permissions import *
-from rest_framework.decorators import api_view
 from django.core.exceptions import ObjectDoesNotExist
+from ...utils.filters import *
+from ...utils.permissions import *
+from ...utils.notifications import send_product_notification , send_order_notification
+
 
 
 ####################################### AUTHENTICATION ###################################################################3#######
@@ -185,7 +186,7 @@ class ListInformationUserView(RetrieveAPIView):
 #             code_verivecation = random.randint(1000,9999)
 #             # email_body = 'Hi '+user.username+' Use the code below to verify your email \n'+ str(code_verivecation)
 #             data= {'to_email':user.email, 'email_subject':'Verify your email','username':user.username, 'code': str(code_verivecation)}
-#             Utlil.send_email(data)
+#             send_email(data)
 #             serializer = CodeVerivecationSerializer(data ={
 #                 'user':user.id,
 #                 'code':code_verivecation,
@@ -500,27 +501,8 @@ class CreateOrderView(APIView):
 
         ### sending a notification
         user = CustomUser.objects.get(phonenumber=cart.customer.phonenumber)
-        if user.get_notifications:
-            devices = FCMDevice.objects.filter(user=user.id)
-            title = 'انشاء طلب'
-            body = f'تم ارسال طلبك بنجاح'
-            devices.send_message(
-                    message =Message(
-                        notification=Notification(
-                            title=title,
-                            body=body
-                        ),
-                    ),
-                )
-            UserNotification.objects.create(
-                user=user,
-                body=body,
-                title=title,
-                details={
-                    "order_id":order.id
-                }
-
-            )
+        details = order.id
+        send_order_notification(user,details)
 
         order.save()
         order_serializer = OrderSerializer(order)
@@ -585,7 +567,7 @@ class DeleteOrder(DestroyAPIView):
  
 
 class DelevaryArrivedForEmployee(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     def get(self, request, state):
         user = request.user             
         delevary_arrived = DelievaryArrived.objects.filter(employee__phonenumber= user.phonenumber, is_delivered=state)
@@ -594,7 +576,7 @@ class DelevaryArrivedForEmployee(APIView):
 
 
 class GetDelivery(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
@@ -607,7 +589,7 @@ class GetDelivery(APIView):
     
 
 class AcceptDelevaryArrived(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
         delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
@@ -1350,7 +1332,7 @@ class ReceiptOrdersView(APIView):
 
 
 class ListSaleEmployeeDeliveries(ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_class = DeliveryFilter
     serializer_class = DelevaryArrivedSerializer
@@ -1452,7 +1434,7 @@ class GetMediumTwoDetails(APIView):
 
 
 class DeliveredOrder(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
         delevary_arrived = DelievaryArrived.objects.filter(id=pk).first()
@@ -1606,26 +1588,11 @@ class CreateManualReceiptView(APIView):
                 update_quantity.save()
                 if update_quantity.quantity < update_quantity.limit_less:
                     user = CustomUser.objects.get(id=request.user.id)
-                    if user.get_notifications:
-                        devices = FCMDevice.objects.filter(user=user.id)
-                        title = 'نقص كمية منتج'
-                        body = f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج {update_quantity.name}إلى أقل من 10'
-                        devices.send_message(
-                            message=Message(
-                                notification=Notification(
-                                    title=title,
-                                    body=body
-                                ),
-                            ),
-                        )
-                        UserNotification.objects.create(
-                            user = user,
-                            title = title,
-                            body = body,
-                            details={
-                                "product_id":update_quantity.id
-                            }
-                        ) 
+                    details = update_quantity.id
+                    title = 'نقص كمية منتج'
+                    body = f'يرجى الانتباه وصل الحد الأدنى من كمية المنتج {update_quantity.name}إلى أقل من 10'
+                    send_product_notification(user,title,body,details)
+
                 manual_receipt_products = ManualReceipt_Products.objects.create(
                     product = product.product,
                     manualreceipt = manual_receipt,

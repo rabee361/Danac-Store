@@ -1,5 +1,5 @@
 from import_export import resources
-from .models import *
+from ..base.models import *
 
 class ProductResource(resources.ModelResource):
     class Meta:

@@ -4,7 +4,7 @@ from leaflet.admin import LeafletGeoAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.admin import UserAdmin
 from import_export.admin import ImportExportModelAdmin
-from base.resources import ProductResource
+from utils.resources import ProductResource
 from arabic_reshaper import reshape
 from bidi.algorithm import get_display
 from django.http import HttpResponse
