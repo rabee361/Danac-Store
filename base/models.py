@@ -1391,6 +1391,7 @@ class Chat(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True,null=True)
 
+    objects = models.Manager()
     chats = ChatsManager()
 
     def __str__(self):
