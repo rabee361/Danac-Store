@@ -92,7 +92,7 @@ class UserLoginApiView(GenericAPIView):
         data['address'] = user.address
         data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
 
-        if user.user_type == "عميل":
+        if user.user_type.name == "عميل":
             chat = Chat.objects.filter(user=user).first()
             client = Client.objects.get(phonenumber=user.phonenumber)
             cart = Cart.objects.get(customer=client)
