@@ -83,6 +83,15 @@ class UserLoginApiView(GenericAPIView):
         token = RefreshToken.for_user(user)
         data = serializer.data
 
+        device_token = request.data.get('device_token',None)
+        device_type = request.data.get('device_type',None)
+        try:
+            device_tok = FCMDevice.objects.get(user=user ,type=device_type)
+            device_tok.user = user
+            device_tok.save()
+        except:
+            FCMDevice.objects.create(user=user , registration_id=device_token ,type=device_type)
+
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id
         if user.user_type:
@@ -1813,9 +1822,7 @@ class Chats(ListAPIView):
     serializer_class = ChatSerializer
 
     def get_queryset(self):######### use manager instead
-        chats = Chat.objects.annotate(latest_message_timestamp=Max('chatmessage__timestamp'))
-        chats = chats.order_by('-latest_message_timestamp')
-        return chats
+        return Chat.chats
     
 
 class GetChat(RetrieveAPIView):

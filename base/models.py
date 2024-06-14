@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.gis.db import models
-from utils.managers import CustomManagers
+from utils.managers import CustomManagers , ChatsManager
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator , RegexValidator
 from django.db.models import Sum
@@ -1391,7 +1391,7 @@ class Chat(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True,null=True)
 
-    # chats = ChatsManager()
+    chats = ChatsManager()
 
     def __str__(self):
         return f'{self.id}'
