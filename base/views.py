@@ -85,16 +85,17 @@ class UserLoginApiView(GenericAPIView):
 
         device_token = request.data.get('device_token',None)
         device_type = request.data.get('device_type',None)
-        try:
-            if device_token and device_type:
-                device_tok = FCMDevice.objects.get(registration_id=device_token ,type=device_type)
-                device_tok.user = user
-                device_tok.save()
-            else:
-                return Response({"error":"device token and device type can't be None"},status=status.HTTP_400_BAD_REQUEST)
 
-        except FCMDevice.DoesNotExist:
+        if device_token is None or device_type is None:
+            return Response({"error":"device token and device type can't be None"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            device_tok = FCMDevice.objects.get(registration_id=device_token)
+            device_tok.user = user
+            device_tok.save()
+        except:
             FCMDevice.objects.create(user=user , registration_id=device_token ,type=device_type)
+
+
 
         data['image'] = request.build_absolute_uri(user.image.url)
         data['id'] = user.id

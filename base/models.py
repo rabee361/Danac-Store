@@ -395,6 +395,7 @@ class Order(models.Model):
 
     class Meta:
         app_label = 'Clients_and_Products'
+        ordering = ['-id']
 
     def total(self):
         return (self.total_price + self.shipping_cost)
