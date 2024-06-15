@@ -87,7 +87,7 @@ class UserLoginApiView(GenericAPIView):
         device_type = request.data.get('device_type',None)
         try:
             device_tok = FCMDevice.objects.get(user=user ,type=device_type)
-            device_tok.user = user
+            device_tok.registration_id = device_token
             device_tok.save()
         except:
             if device_token is None or device_type is None:
@@ -267,7 +267,6 @@ class GetSalesEmployeeLocation(APIView):
     def get(self,request,employee_id):
         employee = Employee.objects.get(id=employee_id)
         serializer = SalesEmployeeLocationSerializer(employee,many=False)
-
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 
@@ -1364,7 +1363,7 @@ class ListSaleEmployeeDeliveries(ListAPIView):
 
 
 
-class ListCreateDeliveryArrived(APIView):
+class ListCreateDelivery(APIView):
     def post(self, request, pk):
         if Delivery.objects.filter(output_receipt_id=pk).exists():
             return Response(
