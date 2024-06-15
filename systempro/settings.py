@@ -79,7 +79,7 @@ LEAFLET_CONFIG = {
 
 
 AUTHENTICATION_BACKENDS = [
-    'base.api.backend.CustomUserModelBackend',
+    'utils.backend.CustomUserModelBackend',
     ]
 
 REST_FRAMEWORK = {
