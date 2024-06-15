@@ -1224,6 +1224,9 @@ class Delivery(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     is_delivered = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self) -> str:
         return f'{self.employee.name} - {str(self.output_receipt.id)}'
     
