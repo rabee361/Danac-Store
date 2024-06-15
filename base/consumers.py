@@ -46,11 +46,12 @@ class CreateEmployeeMessage(AsyncWebsocketConsumer):
 		user = await self.get_user(self.user_id)
 		chat = await self.get_chat(self.chat_id)
 
-		try:
-			await self.get_employee(user.phonenumber)
-			msg = ChatMessage(sender=user,content=message, chat=chat, employee=True)
-		except Employee.DoesNotExist:
+		chat_owner = await self.get_chat_owner(self.chat_id)
+
+		if chat_owner == int(self.user_id):
 			msg = ChatMessage(sender=user,content=message, chat=chat, employee=False)
+		else:
+			msg = ChatMessage(sender=user,content=message, chat=chat, employee=True)
 
 		serializer = MessageSerializer(msg,many=False)
 		await self.save_message(msg)
