@@ -1,17 +1,10 @@
 from django.contrib import admin
 from .models import *
 from leaflet.admin import LeafletGeoAdmin
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+from utils.forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.admin import UserAdmin
 from import_export.admin import ImportExportModelAdmin
 from utils.resources import ProductResource
-from arabic_reshaper import reshape
-from bidi.algorithm import get_display
-from django.http import HttpResponse
-from io import BytesIO
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet
 styles = getSampleStyleSheet()
 
@@ -20,61 +13,6 @@ styles = getSampleStyleSheet()
 admin.site.site_header = "Danac"
 admin.site.index_title = "Welcome to Danac Admin Panel" 
 
-
-
-
-
-
-def export_to_pdf_reportlab(modeladmin, request, queryset):
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="recipes.pdf"'
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter)
-    elements = []
-
-    # Key-value pairs
-    for op in queryset:
-        elements.append(Paragraph(f"date: {op.output.date}", styles['Normal']))
-        elements.append(Paragraph(f"Receipt num: {op.output.id}", styles['Normal']))
-        elements.append(Paragraph(f"client name: {op.output.client.name}", styles['Normal']))
-        elements.append(Paragraph(f"client service: {op.output.phonenumber}", styles['Normal']))
-        elements.append(Paragraph(f"client phonenumber: {op.output.client}", styles['Normal']))
-        elements.append(Spacer(1, 12))
-
-        # Table data
-        data = [
-        [get_display(reshape('رقم المنتج')), get_display(reshape('اسم المنتج')), get_display(reshape('عدد الوحدات')), get_display(reshape('السعر')), get_display(reshape('الكمية')), get_display(reshape('المبلغ الإجمالي'))],  # Table header reshaped and reordered
-            # Add table rows here for each ingredient in the recipe
-        ]
-        for item in Output_Products.objects.all():
-            data.append([
-                item.products.id,
-                item.products.name,
-                item.products.num_per_item,
-                item.products.sale_price,
-                item.products.quantity,
-                item.total_price
-            ])
-
-        # Create the table with the data
-        table = Table(data, colWidths=100)
-        table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.pink),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ]))
-
-        elements.append(table)
-        elements.append(PageBreak())  # Add a page break after each recipe
-
-    # Build the PDF
-    doc.build(elements)
-    pdf = buffer.getvalue()
-    buffer.close()
-    response.write(pdf)
-    return response
-
-export_to_pdf_reportlab.short_description = "Export selected objects to PDF"
 
 
 
@@ -344,7 +282,6 @@ class FreezeOutputAdmin(admin.ModelAdmin):
 
 class OutputProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'name_product', 'output', 'quantity', 'total_price', 'discount']
-    actions = [export_to_pdf_reportlab]
 
     def name_product(self, obj):
         return obj.product.name
