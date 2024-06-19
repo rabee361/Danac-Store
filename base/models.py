@@ -31,8 +31,9 @@ class CustomUser(AbstractUser):
         unique=True ,
         max_length=30,
         validators=[RegexValidator(
-            regex=r"^(05|06|07)\d{8}$"
-        )]
+            regex=r"^(05|06|07)\d{8}$",
+            message='رقم الهاتف يجب أن يبدأ ب 05 , 06 أو 07 يتبعه 8 أرقام',
+            )]
     )
     work_hours = models.CharField(max_length=100,null=True,blank=True)
     store_name = models.CharField(max_length=100,null=True,blank=True)

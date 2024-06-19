@@ -65,11 +65,11 @@ class LoginSerializer(serializers.Serializer):
         if username and password:
             user = authenticate(request=self.context.get('request'), username=username, password=password)
             if not user:
-                raise serializers.ValidationError("Incorrect Credentials")
+                raise serializers.ValidationError("خطأ في كلمة المرور أو رقم الهاتف")
             if not user.is_active:
-                raise serializers.ValidationError({'message_error':'this account is not active'})
+                raise serializers.ValidationError({'message_error':'هذا الحساب غير مفعل'})
             if not user.is_accepted:
-                raise serializers.ValidationError({'message_error':'this account is not accepted'})
+                raise serializers.ValidationError({'message_error':'هذا الحساب لم يقبل بعد'})
         else:
             raise serializers.ValidationError('Must include "username" and "password".')
 
@@ -92,7 +92,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     def validate(self, validated_data):
         if validated_data['password'] != validated_data['password2']:
-            raise serializers.ValidationError({"password": "Passwords doesn't match."})
+            raise serializers.ValidationError({"password": "كلمات السر لم تتطابق"})
 
         validate_password(validated_data['password'])
         return validated_data
