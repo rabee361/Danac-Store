@@ -40,7 +40,7 @@ class CreateEmployeeMessage(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		text_data_json = json.loads(text_data)
 		message = text_data_json['message']
-		# user_id = text_data_json['user_id'] 
+		# user_id = text_data_json['user_id']
 		# chat_id = text_data_json['chat_id']
 
 		user = await self.get_user(self.user_id)

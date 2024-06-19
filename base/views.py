@@ -89,9 +89,11 @@ class UserLoginApiView(GenericAPIView):
         if device_token is None or device_type is None:
             return Response({"error":"device token and device type can't be None"},status=status.HTTP_400_BAD_REQUEST)
         try:
-            device_tok = FCMDevice.objects.get(user=user)
+            device_tok = FCMDevice.objects.get(registration_id=device_token)
             device_tok.registration_id = device_token
-            device_tok.save()
+            device_tok.delete()
+            new_device_tok = FCMDevice.objects.create(user=user , registration_id=device_token ,type=device_type)
+            new_device_tok.save()
         except:
             FCMDevice.objects.create(user=user , registration_id=device_token ,type=device_type)
 
@@ -1430,9 +1432,10 @@ class DeliveredOrder(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        delevary_arrived = Delivery.objects.filter(id=pk).first()
-        delevary_arrived.is_delivered = request.data['state']
-        delevary_arrived.save()
+        delivery = Delivery.objects.filter(id=pk).first()
+        delivery.is_delivered = request.data['state']
+        delivery.output_receipt.delivered = request.data['state']
+        delivery.save()
         return Response(status=status.HTTP_200_OK)
 
 
