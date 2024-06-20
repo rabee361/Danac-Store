@@ -149,8 +149,6 @@ class CodeVerivecationAdmin(admin.ModelAdmin):
 class EmployeeAdmin(LeafletGeoAdmin):
     list_display = ['id', 'name', 'phonenumber', 'salary', 'address', 'birthday']
     search_fields = ['name', 'phonenumber']
-    # list_filter = ['type_employee']
-    list_per_page = 25
 
 
 class Cart_ProductsInline(admin.TabularInline):
@@ -317,12 +315,12 @@ class ReturnedSupplierPackageAdmin(admin.ModelAdmin):
 
 
 
-class OrderEnvoyAdmin(admin.ModelAdmin):
+class DriverOrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'client', 'phonenumber', 'products_num', 'total_price', 'created', 'delivery_date', 'delivered']
     list_filter = ['delivered']
 
 
-class ProductOrderEnvoyAdmin(admin.ModelAdmin):
+class DriverOrderProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'order_envoy', 'name_product']
     def name_product(self, obj):
         return obj.product.name
@@ -475,8 +473,8 @@ admin.site.register(Output, OutputsproductAdmin)
 admin.site.register(FrozenOutputReceipt , FreezeOutputAdmin)
 admin.site.register(Output_Products, OutputProductAdmin)
 admin.site.register(Delivery, DeliveryArrivedAdmin)
-admin.site.register(OrderEnvoy, OrderEnvoyAdmin)
-admin.site.register(Product_Order_Envoy, ProductOrderEnvoyAdmin)
+admin.site.register(DriverOrder, DriverOrderAdmin)
+admin.site.register(DriverOrderProduct, DriverOrderProductAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(Order_Product, OrderProductAdmin)
 

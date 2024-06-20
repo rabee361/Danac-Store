@@ -2380,15 +2380,15 @@ class GetProductsOutputsSerializer(serializers.ModelSerializer):
 
 
 
-class ListOrderEnvoySerialzier(serializers.ModelSerializer):
+class ListDriverOrderSerialzier(serializers.ModelSerializer):
     class Meta : 
-        model = OrderEnvoy
+        model = DriverOrder
         fields = ['client', 'phonenumber', 'products_num', 'total_price', 'delivery_date']
 
 
-class ProductOrderEnvoySerializer(serializers.ModelSerializer):
+class DriverOrderProductSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Product_Order_Envoy
+        model = DriverOrderProduct
         fields = '__all__'
 
     def to_representation(self, instance):
@@ -2402,10 +2402,10 @@ class ProductOrderEnvoySerializer(serializers.ModelSerializer):
 
 
 
-class OrderEnvoySerializer(serializers.ModelSerializer): 
+class DriverOrderSerializer(serializers.ModelSerializer): 
     products = Product3Serializer(many=True,read_only=True) 
     class Meta:
-        model = OrderEnvoy
+        model = DriverOrder
         fields = '__all__'
     # def to_representation(self, instance):
     #     print(instance.client.address)  # Add this line

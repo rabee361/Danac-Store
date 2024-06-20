@@ -28,7 +28,7 @@ class UserType(models.Model):
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length=50, unique=True,null=True,blank=True)
     phonenumber = models.CharField(
-        unique=True ,
+        unique=True,
         max_length=30,
         validators=[RegexValidator(
             regex=r"^(05|06|07)\d{8}$",
@@ -1349,7 +1349,7 @@ class FrozenManualReceipt(models.Model):
 
 # ----------------------------------------------ORDER ENVOY----------------------------------------------
 
-class OrderEnvoy(models.Model):
+class DriverOrder(models.Model):
     client = models.CharField(max_length=50)
     address = models.CharField(max_length=100,default="address")
     phonenumber = models.CharField(
@@ -1358,7 +1358,7 @@ class OrderEnvoy(models.Model):
             regex=r"^(05|06|07)\d{8}$"
         )],
     )
-    products = models.ManyToManyField(Product, through='Product_Order_Envoy')
+    products = models.ManyToManyField(Product, through='DriverOrderProduct')
     products_num = models.IntegerField(default=0)
     total_price = models.FloatField(default=0)
     created = models.DateField(auto_now_add=True)
@@ -1371,8 +1371,8 @@ class OrderEnvoy(models.Model):
         return f'{self.client} - {str(self.id)}'
     
 
-class Product_Order_Envoy(models.Model):
-    order_envoy = models.ForeignKey(OrderEnvoy, on_delete=models.CASCADE)
+class DriverOrderProduct(models.Model):
+    order_envoy = models.ForeignKey(DriverOrder, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     # num_item = models.IntegerField(default=0)
     # total_price = models.FloatField(default=0)

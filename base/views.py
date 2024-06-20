@@ -1758,10 +1758,10 @@ class MediumTow_Handler(APIView):
         return Response(serializer.data)
     
 
-class CreateOrderEnvoyView(APIView):
+class CreateDriverOrder(APIView):
     def post(self, request, mediumtwo_id):
         mediumtwo = MediumTwo_Products.objects.filter(mediumtwo__id = mediumtwo_id)
-        order_envoy_ser = OrderEnvoySerializer(data={
+        order_envoy_ser = DriverOrderSerializer(data={
             'client':request.data['client'],
             'phonenumber': request.data['phonenumber'],
             'delivery_date':request.data['delivery_date'],
@@ -1770,7 +1770,7 @@ class CreateOrderEnvoyView(APIView):
         if order_envoy_ser.is_valid():
             order_envoy = order_envoy_ser.save()
             for medium in mediumtwo:
-                product_order_envoy = Product_Order_Envoy.objects.create(
+                product_order_envoy = DriverOrderProduct.objects.create(
                     order_envoy = order_envoy,
                     product = medium.product,
                 )
@@ -1782,12 +1782,12 @@ class CreateOrderEnvoyView(APIView):
         return Response(order_envoy_ser.errors, status=status.HTTP_400_BAD_REQUEST)    
 
 
-class ListOrderEnvoy(APIView):
+class ListDriverOrder(APIView):
     def get(self, request, pk):
-        order_envoy = OrderEnvoy.objects.get(id=pk)
-        serializer = ListOrderEnvoySerialzier(order_envoy, many=False)
-        product_order_envoy = Product_Order_Envoy.objects.filter(order_envoy__id = pk)
-        serializer_two = ProductOrderEnvoySerializer(product_order_envoy, many=True)
+        order_envoy = DriverOrder.objects.get(id=pk)
+        serializer = ListDriverOrderSerialzier(order_envoy, many=False)
+        product_order_envoy = DriverOrderProduct.objects.filter(order_envoy__id = pk)
+        serializer_two = DriverOrderProductSerializer(product_order_envoy, many=True)
 
         return Response({
             'order_envoy':serializer.data,
