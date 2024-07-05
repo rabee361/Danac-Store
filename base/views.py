@@ -1731,11 +1731,13 @@ class AddToMediumTwo(APIView):
             product = product,
             mediumtwo= medium_two,
         )
-        mediumtwo_products.quantity=int(quantity)
-        mediumtwo_products.save()
-        # if created:
-        #     mediumtwo_products.quantity=1
-        #     mediumtwo_products.save()
+        if not created and int(quantity) == 1:
+            pass
+        else:
+            mediumtwo_products.quantity=int(quantity)
+            mediumtwo_products.save()
+
+
         mediumtwo_serializer = MediumTwo_ProductsSerializer(mediumtwo_products, context={'request': request})
         return Response(mediumtwo_serializer.data, status=status.HTTP_201_CREATED)
     
