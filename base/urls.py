@@ -173,7 +173,7 @@ urlpatterns = [
     path('medium-two-handler/<str:mediumtwo_id>/<str:pk2>/', MediumTow_Handler.as_view()),
     path('delete-product-from-medium-two/<str:pk>/', DesMediumTwo.as_view()),
     path('create-order-envoy/<str:mediumtwo_id>/', CreateDriverOrder.as_view()),
-    path('list-order-envoy/<str:pk>/', ListDriverOrder.as_view()),
+    path('list-order-envoy/<str:pk>/', GetDriverOrder.as_view()),
     path('delete-medium-two/<str:pk>/' , DeleteMediumTwo.as_view()),
     path('list-medium-two-products/<str:medium2_id>/' , ListMediumTwoProducts.as_view()),
 

@@ -1724,22 +1724,29 @@ class ListMediumTwoProducts(APIView):
 
 class AddToMediumTwo(APIView):
     def post(self, request, mediumtwo_id, product_id):
+        quantity = request.data.get('quantity',1)
         medium_two = MediumTwo.objects.get(id=mediumtwo_id)
         product = Product.objects.get(id = product_id)
         mediumtwo_products, created = MediumTwo_Products.objects.get_or_create(
             product = product,
             mediumtwo= medium_two,
         )
-        if created:
-            mediumtwo_products.quantity=1
-            mediumtwo_products.save()
+        mediumtwo_products.quantity=int(quantity)
+        mediumtwo_products.save()
+        # if created:
+        #     mediumtwo_products.quantity=1
+        #     mediumtwo_products.save()
         mediumtwo_serializer = MediumTwo_ProductsSerializer(mediumtwo_products, context={'request': request})
         return Response(mediumtwo_serializer.data, status=status.HTTP_201_CREATED)
     
 
+
+
 class DeleteMediumTwo(DestroyAPIView):
     queryset = MediumTwo.objects.all()
     serializer_class = MediumTwoSerializer
+
+
 
 
 class MediumTow_Handler(APIView):
@@ -1757,6 +1764,8 @@ class MediumTow_Handler(APIView):
             serializer = MediumTwo_ProductsSerializer(item,many=False, context={'request': request})
         return Response(serializer.data)
     
+
+
 
 class CreateDriverOrder(APIView):
     def post(self, request, mediumtwo_id):
@@ -1782,7 +1791,9 @@ class CreateDriverOrder(APIView):
         return Response(order_envoy_ser.errors, status=status.HTTP_400_BAD_REQUEST)    
 
 
-class ListDriverOrder(APIView):
+
+
+class GetDriverOrder(APIView):
     def get(self, request, pk):
         order_envoy = DriverOrder.objects.get(id=pk)
         serializer = ListDriverOrderSerialzier(order_envoy, many=False)
@@ -1795,6 +1806,14 @@ class ListDriverOrder(APIView):
         })
     
 
+
+
+class ListDriverOrder(ListAPIView):
+    queryset = DriverOrder.objects.all()
+    serializer_class = ListDriverOrderSerialzier
+
+    def get_queryset(self):
+        return DriverOrder.objects.get()
 
 
 ########################### chat ##########################

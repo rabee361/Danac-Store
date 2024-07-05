@@ -381,6 +381,7 @@ class Cart(models.Model):
 
 
 
+# ----------------------------------------------CLIENT ORDER----------------------------------------------
 
 
 class Order(models.Model):
@@ -444,6 +445,55 @@ class Order_Product(models.Model):
     def __str__(self):
         return f'{self.order.client} - {self.product.name} - {self.quantity}'
 
+
+
+
+
+
+
+
+
+
+
+# ----------------------------------------------DRIVER ORDER----------------------------------------------
+
+class DriverOrder(models.Model):
+    client = models.CharField(max_length=50)
+    address = models.CharField(max_length=100,default="address")
+    phonenumber = models.CharField(
+        max_length=30,
+        validators=[RegexValidator(
+            regex=r"^(05|06|07)\d{8}$"
+        )],
+    )
+    products = models.ManyToManyField(Product, through='DriverOrderProduct')
+    products_num = models.IntegerField(default=0)
+    total_price = models.FloatField(default=0)
+    created = models.DateField(auto_now_add=True)
+    delivery_date = models.DateField()
+    delivered = models.BooleanField(null=True, default=False)
+
+    # location = 
+
+    def __str__(self) -> str:
+        return f'{self.client} - {str(self.id)}'
+    
+
+
+
+class DriverOrderProduct(models.Model):
+    order_envoy = models.ForeignKey(DriverOrder, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    # num_item = models.IntegerField(default=0)
+    # total_price = models.FloatField(default=0)
+
+    def __str__(self):
+        return f'{self.product.name} - {str(self.order_envoy.id)}'
+
+    
+
+
+    
 
 
 
@@ -1342,48 +1392,6 @@ class FrozenManualReceipt(models.Model):
 
 
 
-
-
-
-
-
-# ----------------------------------------------ORDER ENVOY----------------------------------------------
-
-class DriverOrder(models.Model):
-    client = models.CharField(max_length=50)
-    address = models.CharField(max_length=100,default="address")
-    phonenumber = models.CharField(
-        max_length=30,
-        validators=[RegexValidator(
-            regex=r"^(05|06|07)\d{8}$"
-        )],
-    )
-    products = models.ManyToManyField(Product, through='DriverOrderProduct')
-    products_num = models.IntegerField(default=0)
-    total_price = models.FloatField(default=0)
-    created = models.DateField(auto_now_add=True)
-    delivery_date = models.DateField()
-    delivered = models.BooleanField(null=True, default=False)
-
-    # location = 
-
-    def __str__(self) -> str:
-        return f'{self.client} - {str(self.id)}'
-    
-
-class DriverOrderProduct(models.Model):
-    order_envoy = models.ForeignKey(DriverOrder, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    # num_item = models.IntegerField(default=0)
-    # total_price = models.FloatField(default=0)
-
-    def __str__(self):
-        return f'{self.product.name} - {str(self.order_envoy.id)}'
-
-    
-
-
-    
 
 
 
