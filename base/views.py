@@ -89,16 +89,16 @@ class UserLoginApiView(GenericAPIView):
         device_token = request.data.get('device_token',None)
         device_type = request.data.get('device_type',None)
 
-        if device_token is None or device_type is None:
-            return Response({"error":"device token and device type can't be None"},status=status.HTTP_400_BAD_REQUEST)
-        try:
-            device_tok = FCMDevice.objects.get(registration_id=device_token)
-            device_tok.registration_id = device_token
-            device_tok.delete()
-            new_device_tok = FCMDevice.objects.create(user=user , registration_id=device_token ,type=device_type)
-            new_device_tok.save()
-        except:
-            FCMDevice.objects.create(user=user , registration_id=device_token ,type=device_type)
+        #     return Response({"error":"device token and device type can't be None"},status=status.HTTP_400_BAD_REQUEST)
+        if device_token and device_type :
+            try:
+                device_tok = FCMDevice.objects.get(registration_id=device_token)
+                device_tok.registration_id = device_token
+                device_tok.delete()
+                new_device_tok = FCMDevice.objects.create(user=user , registration_id=device_token ,type=device_type)
+                new_device_tok.save()
+            except:
+                FCMDevice.objects.create(user=user , registration_id=device_token ,type=device_type)
 
 
 
