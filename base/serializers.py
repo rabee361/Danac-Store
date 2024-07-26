@@ -2274,9 +2274,9 @@ class OutputSerializer2(serializers.ModelSerializer):
     
     def get_client_points(self,obj):
         client = obj.client
-        points = int(Points.objects.filter(client=client).aggregate(
+        points = Points.objects.filter(client=client).aggregate(
             total = Sum('number')
-        )['total']) or 0
+        )['total'] or 0
         return points
 
     def create(self, validated_data):
