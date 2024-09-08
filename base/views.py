@@ -148,7 +148,7 @@ class DeleteImageView(APIView):
         try:
             user = CustomUser.objects.get(id=user_id)
 
-            image_filename = os.path.join('images','account.png')
+            image_filename = os.path.join('images','account.jpg')
             image_path = os.path.join(settings.MEDIA_ROOT, image_filename)
             relative_path = os.path.relpath(image_path, settings.MEDIA_ROOT)
             user.image = relative_path
