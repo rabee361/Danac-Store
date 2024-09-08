@@ -19,7 +19,8 @@ urlpatterns = [
 
     path('notifications/', ListNotificationView.as_view()),
     path('settings/<str:pk>/', ListInformationUserView.as_view(), name='settings'),
-    path('settings/update-image/<str:user_pk>/', UpdateImageUserView.as_view(), name='update-image'),
+    path('settings/update-image/<str:user_id>/', UpdateImageUserView.as_view(), name='update-image'),
+    path('settings/delete-image/<str:user_id>/', DeleteImageView.as_view(), name='delete-image'),
 
     path('update-location/' , UpdateLocationView.as_view() , name="update-location"),
     path('get-location/<str:employee_id>/' , GetSalesEmployeeLocation.as_view() , name="get-location"),
@@ -71,6 +72,8 @@ urlpatterns = [
 
     path('sales-employees/' , SalesEmployee.as_view() , name="sale-employees"),
     path('get-sales-employee/<str:pk>' , RetSalesEmployee.as_view() , name="get-sales-employee"),
+    # path('update-sales-employee/<str:pk>' , RetSalesEmployee.as_view() , name="get-sales-employee"),
+    # path('delete-sales-employee/<str:pk>' , RetSalesEmployee.as_view() , name="get-sales-employee"),
 
     path('bonuses/', ListCreateBonus.as_view(), name='bonuses'),
     path('get-bonus/<str:pk>/', RetUpdDesBonus.as_view(), name='get-bonus'),

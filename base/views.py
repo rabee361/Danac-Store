@@ -16,7 +16,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from utils.filters import *
 from utils.permissions import *
 from utils.notifications import send_product_notification , send_order_notification , send_driver_notification
-
+import os
+from django.conf import settings
 
 
 ####################################### AUTHENTICATION ###################################################################3#######
@@ -126,8 +127,8 @@ class UserLoginApiView(GenericAPIView):
 
 class UpdateImageUserView(APIView):
     permission_classes = [IsAuthenticated]
-    def put(self, requset, user_pk):
-        user = CustomUser.objects.get(id=user_pk)
+    def put(self, requset, user_id):
+        user = CustomUser.objects.get(id=user_id)
         serializer = UpdateUserSerializer(user, data=requset.data, many=False, context={'request':requset})
         if serializer.is_valid():
             serializer.save()
@@ -137,6 +138,27 @@ class UpdateImageUserView(APIView):
                 status=status.HTTP_200_OK
             )
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+class DeleteImageView(APIView):
+    def delete(self,request,user_id):
+        try:
+            user = CustomUser.objects.get(id=user_id)
+
+            image_filename = os.path.join('images','account.png')
+            image_path = os.path.join(settings.MEDIA_ROOT, image_filename)
+            relative_path = os.path.relpath(image_path, settings.MEDIA_ROOT)
+            user.image = relative_path
+            user.save()
+            return Response({"message":"Image Deleted successfully"}, status=status.HTTP_200_OK)
+            # else:
+            #     return Response({"error":"an error occured"},status=status.HTTP_400_BAD_REQUEST)
+        except CustomUser.DoesNotExist:
+            return Response({"erro":"user does not exist"} , status=status.HTTP_404_NOT_FOUND)
+
 
 
 

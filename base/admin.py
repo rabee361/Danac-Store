@@ -204,7 +204,7 @@ class OrderProductAdmin(admin.ModelAdmin):
 
 
 class IncomingProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'employee', 'num_item', 'total_price']
+    list_display = ['id', 'name_product', 'incoming', 'employee', 'num_item', 'total_price']
     search_fields = ['incoming__employee__name']
     def name_product(self, obj):
         return obj.product.name
