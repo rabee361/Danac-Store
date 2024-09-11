@@ -204,15 +204,12 @@ class OrderProductAdmin(admin.ModelAdmin):
 
 
 class IncomingProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'incoming', 'employee', 'num_item', 'total_price']
+    list_display = ['id', 'name', 'incoming', 'employee', 'num_item', 'total_price']
     search_fields = ['incoming__employee__name']
-    def name_product(self, obj):
-        return obj.product.name
     
     def employee(self, obj):
         return obj.incoming.employee.name
 
-    name_product.short_descreption = 'product_name'
     employee.short_descreption = 'employee'
 
 
