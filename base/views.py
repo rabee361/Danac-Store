@@ -1629,13 +1629,27 @@ class CreateManualReceiptView(APIView):
                     send_product_notification(user,title,body,details)
 
                 manual_receipt_products = ManualReceipt_Products.objects.create(
-                    product = product.product,
+                    product_id = update_quantity.id,
                     manualreceipt = manual_receipt,
                     num_item = product.num_item,
-                    sale_price=product.price,
+                    name = update_quantity.name,
+                    category = update_quantity.category,
+                    sale_price = update_quantity.sale_price,
+                    quantity = update_quantity.quantity,
+                    purchasing_price = update_quantity.purchasing_price,
+                    notes = update_quantity.notes,
+                    made_at = update_quantity.made_at,
+                    expires_at = update_quantity.expires_at,
+                    limit_less = update_quantity.limit_less,
+                    limit_more = update_quantity.limit_more,
+                    num_per_item = update_quantity.num_per_item,
+                    item_per_carton = update_quantity.item_per_carton,
+                    added = update_quantity.added,
+                    points = update_quantity.points,
+                    barcode = update_quantity.barcode,
                     total_price = product.total_price_of_item,
                 )
-                total_points += manual_receipt_products.product_points
+                total_points += manual_receipt_products.points
             client_points = Points.objects.create(
                 client = manual_receipt.client,
                 number = total_points
@@ -1645,6 +1659,7 @@ class CreateManualReceiptView(APIView):
             medium.delete()
             return Response(manual_receipt_serializer.data)
         return Response(manual_receipt_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
     
 
 class GetManualReceipt(RetrieveAPIView):
