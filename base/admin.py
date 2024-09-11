@@ -237,10 +237,9 @@ class FreezeIncomingAdmin(admin.ModelAdmin):
 
 
 class ManualReceiptProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name_product', 'num_manul_receipt', 'name_client', 'num_item', 'total_price']
+    list_display = ['id', 'name', 'num_manul_receipt', 'name_client', 'num_item', 'total_price']
     search_fields = ['manualreceipt__client__name']
-    def name_product(self, obj):
-        return obj.product.name
+
     def name_client(self, obj):
         return obj.manualreceipt.client.name
     def num_manul_receipt(self, obj):
