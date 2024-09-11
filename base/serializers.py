@@ -1760,35 +1760,59 @@ class SpecialSerializer(serializers.ModelSerializer):
 
 
 class IncomingProductsSerializer2(serializers.ModelSerializer):
-    # product = serializers.IntegerField(source='product.id',read_only=True)
-    name = serializers.CharField(source='product.name',read_only=True)
-    num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
-    sale_price = serializers.FloatField(source='product.sale_price',read_only=True)
+    product = serializers.IntegerField(source='product_id')
+    name = serializers.CharField(read_only=True)
+    num_per_item = serializers.IntegerField(read_only=True)
+    sale_price = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Incoming_Product
         fields = ['id', 'product','name', 'num_per_item', 'sale_price', 'num_item', 'total_price', 'incoming']
 
+    def validate_product(self,value):
+        try:
+            Product.objects.get(id=value)
+            return value
+        except Product.DoesNotExist:
+            raise serializers.ValidationError('product does not exist')
+
     def create(self, validated_data):
         product = validated_data.get('product')
         num_item = validated_data.get('num_item')
         incoming_receipt = validated_data.get('incoming')
-        incoming_product = Incoming_Product.objects.filter(product=product,incoming=incoming_receipt).first()
+        incoming_product = Incoming_Product.objects.filter(product_id=product,incoming=incoming_receipt).first()
         if incoming_product:
             incoming_product.num_item += num_item
             incoming_product.save()
             return incoming_product
         else:
+            original_product = Product.objects.filter(id=validated_data['product_id']).first()
+            validated_data['category'] = original_product.category
+            validated_data['name'] = original_product.name
+            validated_data['limit_less'] = original_product.limit_less
+            validated_data['limit_more'] = original_product.limit_more
+            validated_data['sale_price'] = original_product.sale_price
+            validated_data['purchasing_price'] = original_product.purchasing_price
+            validated_data['description'] = original_product.description
+            validated_data['image'] = original_product.image
+            validated_data['notes'] = original_product.notes
+            validated_data['made_at'] = original_product.made_at
+            validated_data['expires_at'] = original_product.expires_at
+            validated_data['num_per_item'] = original_product.num_per_item
+            validated_data['item_per_carton'] = original_product.item_per_carton
+            validated_data['barcode'] = original_product.barcode
+            validated_data['points'] = original_product.points
+            validated_data['quantity'] = original_product.quantity
             instance = super().create(validated_data)
-            product.quantity -= num_item
-            product.save()
+            original_product.quantity -= num_item
+            original_product.save()
             return instance
 
     def update(self, instance, validated_data):
         original_quantity = instance.num_item
         super().update(instance, validated_data)
         quantity_diff = instance.num_item - original_quantity
-        product = instance.product
+        product = Product.objects.filter(id=instance.product_id).first()
         product.quantity -= quantity_diff
         product.save()
         return instance
