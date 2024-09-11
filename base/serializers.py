@@ -2119,11 +2119,13 @@ class ManualRecieptProductsSerializer(serializers.ModelSerializer):
         fields = ['id','product_id', 'name', 'num_per_item', 'sale_price', 'num_item','total_price', 'manualreceipt']
 
 
+
 class ManualRecieptSerializer2(serializers.ModelSerializer):
     products = ManualRecieptProductsSerializer(source='manualreceipt_products_set', many=True,read_only=True)
     client_phone = serializers.CharField(source='client.phonenumber',read_only=True)
     total_receipt = serializers.SerializerMethodField()
     client_points = serializers.SerializerMethodField()
+
     class Meta:
         model = ManualReceipt
         fields = ['id','serial','client','client_phone','client_points','total_receipt','employee','client_service','discount','recive_payment','reclaimed_products','previous_depts','remaining_amount','date','barcode','products','freeze']
@@ -2137,8 +2139,6 @@ class ManualRecieptSerializer2(serializers.ModelSerializer):
             total = Sum('number')
         )['total'] or 0
         return points
-
-        
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
