@@ -1041,7 +1041,7 @@ class ListReturnedSupplierPackages(ListCreateAPIView):
  
 
 
-class RetReturnedSupplierPackages(RetrieveAPIView):
+class RetReturnedSupplierPackages(RetrieveUpdateDestroyAPIView):
     queryset = ReturnedSupplierPackage.objects.all()
     serializer_class = ReturnedSupplierPackageSerializer
 
@@ -1070,7 +1070,7 @@ class ListReturnedClientPackages(ListCreateAPIView):
     serializer_class = ReturnedClientPackageSerializer
 
 
-class RetReturnedClientPackages(RetrieveAPIView):
+class RetReturnedClientPackages(RetrieveUpdateDestroyAPIView):
     queryset = ReturnedClientPackage.objects.all()
     serializer_class = ReturnedClientPackageSerializer
 
