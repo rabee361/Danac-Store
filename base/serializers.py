@@ -1966,34 +1966,53 @@ class IncomingSerializer(serializers.ModelSerializer):
 
 
 
+
 class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
-    product_name = serializers.CharField(source='product.name',read_only=True)
-    num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
+    product_name = serializers.CharField(source='name',read_only=True)
+    product = serializers.CharField(source='product_id')
+    # num_per_item = serializers.IntegerField(source='product.num_per_item',read_only=True)
     
     class Meta :
         model = ManualReceipt_Products
         fields = ['id', 'product','product_name', 'num_per_item', 'sale_price', 'num_item' ,'total_price', 'manualreceipt']
 
-    def create(self, validated_data):   
-        product = validated_data.get('product')
+    def create(self, validated_data):
+        product = validated_data.get('product_id')
         num_item = validated_data.get('num_item')
         manual_receipt = validated_data.get('manualreceipt')
-        manual_product = ManualReceipt_Products.objects.filter(product=product,manualreceipt=manual_receipt).first()
+        manual_product = ManualReceipt_Products.objects.filter(product_id=product,manualreceipt=manual_receipt).first()
         if manual_product:
             manual_product.num_item += num_item
             manual_product.save()
             return manual_product
         else:
+            original_product = Product.objects.filter(id=validated_data['product_id']).first()
+            validated_data['category'] = original_product.category
+            validated_data['name'] = original_product.name
+            validated_data['limit_less'] = original_product.limit_less
+            validated_data['limit_more'] = original_product.limit_more
+            validated_data['sale_price'] = original_product.sale_price
+            validated_data['purchasing_price'] = original_product.purchasing_price
+            validated_data['description'] = original_product.description
+            validated_data['image'] = original_product.image
+            validated_data['notes'] = original_product.notes
+            validated_data['made_at'] = original_product.made_at
+            validated_data['expires_at'] = original_product.expires_at
+            validated_data['num_per_item'] = original_product.num_per_item
+            validated_data['item_per_carton'] = original_product.item_per_carton
+            validated_data['barcode'] = original_product.barcode
+            validated_data['points'] = original_product.points
+            validated_data['quantity'] = original_product.quantity
             instance = super().create(validated_data)
-            product.quantity -= num_item
-            product.save()
+            original_product.quantity -= num_item
+            original_product.save()
             return instance
 
     def update(self, instance, validated_data):
         original_quantity = instance.num_item
         super().update(instance, validated_data)
         quantity_diff = instance.num_item - original_quantity
-        product = instance.product
+        product = Product.objects.filter(id=instance.product_id).first()
         product.quantity -= quantity_diff
         product.save()
         return instance
@@ -2025,6 +2044,7 @@ class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
             if raise_exception:
                 raise serializers.ValidationError(self._errors)
         return not bool(self._errors)
+
 
 
 
