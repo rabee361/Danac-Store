@@ -1890,10 +1890,15 @@ class FrozenIncomingReceiptSerializer(serializers.ModelSerializer):
 
 
 class IncomingSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Incoming
         exclude = ['employee']
         
+    def get_products(self, obj):
+        return [product.product_id for product in obj.incoming_product_set.all()]
+
+
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
         if self._errors:
@@ -1954,7 +1959,7 @@ class IncomingSerializer(serializers.ModelSerializer):
         repr['supplier'] = instance.supplier.name
         return repr
      
-    
+
 
 ############################# 
 
