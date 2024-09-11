@@ -1604,7 +1604,7 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         package_id = validated_data.pop('package_id')#####
-        package = ReturnedClientPackage.objects.get(id=package_id)
+        package = ReturnedSupplierPackage.objects.get(id=package_id)
         validated_data['employee'] = package.employee
         instance = super().create(validated_data)
         product = instance.product
