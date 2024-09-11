@@ -2048,11 +2048,14 @@ class ManualRecieptProductsSerializer2(serializers.ModelSerializer):
 
 
 
-
 class ManualRecieptSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = ManualReceipt
         exclude = ['employee']
+
+    def get_products(self, obj):
+        return [product.product_id for product in obj.manualreceipt_products_set.all()]
 
     def is_valid(self, raise_exception=False):
         is_valid = super().is_valid(raise_exception=False)
