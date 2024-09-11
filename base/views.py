@@ -1480,14 +1480,28 @@ class CreateIncomingView(APIView):
             incoming = incoming_serializer.save()
             products = Products_Medium.objects.filter(medium__id=medium_id)
             for product in products:
-                print(product.id)
                 update_quantity =Product.objects.get(id=product.product.id)
                 update_quantity.quantity += product.num_item
                 update_quantity.save()
                 income_product = Incoming_Product.objects.create(
-                    product = product.product,
-                    incoming = incoming,
+                    product_id = update_quantity.id,
                     num_item = product.num_item,
+                    incoming = incoming,
+                    name = update_quantity.name,
+                    category = update_quantity.category,
+                    sale_price = update_quantity.sale_price,
+                    quantity = update_quantity.quantity,
+                    purchasing_price = update_quantity.purchasing_price,
+                    notes = update_quantity.notes,
+                    made_at = update_quantity.made_at,
+                    expires_at = update_quantity.expires_at,
+                    limit_less = update_quantity.limit_less,
+                    limit_more = update_quantity.limit_more,
+                    num_per_item = update_quantity.num_per_item,
+                    item_per_carton = update_quantity.item_per_carton,
+                    added = update_quantity.added,
+                    points = update_quantity.points,
+                    barcode = update_quantity.barcode,
                     total_price = product.total_price_of_item,
                 )
             products.delete()
