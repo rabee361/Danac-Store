@@ -1305,7 +1305,7 @@ class Delivery(models.Model):
 
 class ManualReceipt(models.Model):
     serial = models.IntegerField(null=True,blank=True,editable=False)
-    products = models.ManyToManyField(Product, through='ManualReceipt_Products')
+    # products = models.ManyToManyField(Product, through='ManualReceipt_Products')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     client_service = models.CharField(max_length=20,default='000 208 0660')
@@ -1350,10 +1350,28 @@ class ManualReceipt(models.Model):
     
 
 
+
 class ManualReceipt_Products(models.Model): 
-    product = models.ForeignKey(Product, on_delete= models.CASCADE)
+    product_id = models.IntegerField()
+    name = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='images/products',null=True,blank=True,default='images/account.jpg')
+    description = models.TextField(max_length=2000,null=True,blank=True)
+    quantity = models.IntegerField()
+    purchasing_price = models.FloatField()
+    category = models.ForeignKey(Category , on_delete=models.CASCADE)
+    notes = models.TextField(max_length=1000,null=True,blank=True)
+    made_at = models.DateField(null=True,blank=True)
+    expires_at = models.DateField(null=True,blank=True)
+    limit_less = models.IntegerField()
+    limit_more = models.IntegerField()
+    num_per_item = models.IntegerField(blank=True,default=0)
+    item_per_carton = models.IntegerField(blank=True,default=0)
+    sale_price = models.IntegerField()
+    added = models.DateTimeField(auto_now_add=True)
+    barcode = models.CharField(max_length=200,default=' ',blank=True)
+    points = models.IntegerField()
+
     manualreceipt = models.ForeignKey(ManualReceipt, on_delete= models.CASCADE)
-    sale_price = models.FloatField()
     num_item = models.IntegerField()
     total_price = models.FloatField(default=0)
     product_points = models.IntegerField()
@@ -1363,12 +1381,13 @@ class ManualReceipt_Products(models.Model):
         app_label = 'Receipts'
 
     def save(self, *args, **kwargs):
-        self.product_points = self.num_item * self.product.points
+        self.product_points = self.num_item * self.points
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f'{self.manualreceipt.client.name} - {str(self.manualreceipt.id)}'
     
+
 
 
 class FrozenManualReceipt(models.Model):
