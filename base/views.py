@@ -1690,8 +1690,7 @@ class CreateManualProduct(CreateAPIView):
     queryset = ManualReceipt_Products.objects.all()
     serializer_class = ManualRecieptProductsSerializer2
 
-    def create(self, request, *args, **kwargs):
-        super().create(request, *args, **kwargs)
+
 
 ############## freezing and unfreezing needs to be put sepearatly
 

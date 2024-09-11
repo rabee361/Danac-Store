@@ -2110,9 +2110,9 @@ class ManualRecieptSerializer(serializers.ModelSerializer):
 
 
 class ManualRecieptProductsSerializer(serializers.ModelSerializer):
-    product_id = serializers.IntegerField(source='product.id')
-    name = serializers.CharField(source='product.name')
-    num_per_item = serializers.IntegerField(source='product.num_per_item')
+    # product_id = serializers.IntegerField(source='product.id')
+    # name = serializers.CharField(source='product.name')
+    # num_per_item = serializers.IntegerField(source='product.num_per_item')
     
     class Meta :
         model = ManualReceipt_Products
