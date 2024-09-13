@@ -1138,7 +1138,7 @@ class FrozenIncomingReceipt(models.Model):
 
     def update_product_quantities(self, freeze):
         for receipt_product in self.receipt.incoming_product_set.all():
-            product = receipt_product.product
+            product = Product.objects.get(id=receipt_product.product_id)
             if freeze:
                 product.quantity += receipt_product.num_item
             else:
