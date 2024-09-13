@@ -122,10 +122,11 @@ class DebtSupplierFilter(django_filters.FilterSet):
 class SalaryFilter(django_filters.FilterSet):
     date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
     date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
+    employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
 
     class Meta:
         model = Salary
-        fields = ['date_from', 'date_to']
+        fields = ['date_from', 'date_to','employee_name']
 
 
 class OverTimeFilter(django_filters.FilterSet):
