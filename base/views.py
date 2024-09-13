@@ -1473,7 +1473,7 @@ class CreateIncomingView(APIView):
         try:
             Medium.objects.get(id=medium_id)
         except Medium.DoesNotExist:
-            return Response({"medium":"medium does not exist"})
+            return Response({"medium":"medium does not exist"} , status=status.HTTP_404_NOT_FOUND)
         
         incoming_serializer = IncomingSerializer(data=request.data, context={'request': request})
         if incoming_serializer.is_valid():
@@ -1566,21 +1566,15 @@ class FreezeIncomingReceipt(APIView):
             receipt = Incoming.objects.get(id=receipt_id)
             reason = request.data.get('reason')
             if not reason:
-                return Response({
-                    "msg":"provide the reason for freezing"
-                })
+                return Response({"msg":"provide the reason for freezing"} , status=status.HTTP_400_BAD_REQUEST)
             receipt.freeze = True
             receipt.save()
             freeze_receipt,created = FrozenIncomingReceipt.objects.get_or_create(receipt=receipt)
             freeze_receipt.reason = reason
             freeze_receipt.save()
-            return Response({
-                "msg":"receipt freezed"
-            })
+            return Response({"msg":"receipt freezed"} , status=status.HTTP_400_BAD_REQUEST)
         except Incoming.DoesNotExist:
-            return Response({
-                "msg":"receipt doesn't exist"
-            })
+            return Response({"msg":"receipt doesn't exist"},status=status.HTTP_404_NOT_FOUND)
 
         
 class UnFreezeIncomingReceipt(APIView):
@@ -1593,13 +1587,9 @@ class UnFreezeIncomingReceipt(APIView):
             freeze_receipt = FrozenIncomingReceipt.objects.get(receipt=receipt)
             freeze_receipt.save()
             freeze_receipt.delete()
-            return Response({
-                "msg":"receipt unfreezed"
-            })
+            return Response({"msg":"receipt unfreezed"} , status=status.HTTP_400_BAD_REQUEST)
         except Incoming.DoesNotExist:
-            return Response({
-                "msg":"receipt doesn't exist"
-            })
+            return Response({"msg":"receipt doesn't exist"} , status=status.HTTP_404_NOT_FOUND)
 
 ############################### MANUAL RECEIPT #####################################################
 
@@ -1723,14 +1713,10 @@ class FreezeManualReceipt(APIView):
             freeze_receipt,created = FrozenManualReceipt.objects.get_or_create(receipt=receipt)
             freeze_receipt.reason = reason
             freeze_receipt.save()
-            return Response({
-                "msg":"receipt freezed"
-            },status=status.HTTP_200_OK)
+            return Response({"msg":"receipt unfreezed"} , status=status.HTTP_400_BAD_REQUEST)
         except ManualReceipt.DoesNotExist:
-            return Response({
-                "msg":"receipt doesn't exist"
-            },status=status.HTTP_404_NOT_FOUND)
-        
+            return Response({"msg":"receipt doesn't exist"} , status=status.HTTP_404_NOT_FOUND)
+
 
 class UnFreezeManualReceipt(APIView):
     def post(self,request,receipt_id):
@@ -1742,13 +1728,9 @@ class UnFreezeManualReceipt(APIView):
             freeze_receipt = FrozenManualReceipt.objects.get(receipt=receipt)
             freeze_receipt.save()
             freeze_receipt.delete()
-            return Response({
-                "msg":"receipt unfreezed"
-            })
+            return Response({"msg":"receipt unfreezed"} , status=status.HTTP_400_BAD_REQUEST)
         except ManualReceipt.DoesNotExist:
-            return Response({
-                "msg":"receipt doesn't exist"
-            })
+            return Response({"msg":"receipt doesn't exist"} , status=status.HTTP_404_NOT_FOUND)
         
 ########################## MEDIUM 2 #######################################################################################
 
