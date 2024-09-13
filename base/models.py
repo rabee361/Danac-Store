@@ -1130,13 +1130,13 @@ class FrozenIncomingReceipt(models.Model):
 
         if not self.receipt.adjustment_applied:
             if self.receipt.freeze:
-                self.adjust_product_quantities(True)
+                self.update_product_quantities(True)
             else:
-                self.adjust_product_quantities(False)
+                self.update_product_quantities(False)
             self.receipt.adjustment_applied = True
             self.receipt.save()
 
-    def adjust_product_quantities(self, freeze):
+    def update_product_quantities(self, freeze):
         for receipt_product in self.receipt.incoming_product_set.all():
             product = receipt_product.product
             if freeze:
@@ -1405,19 +1405,19 @@ class FrozenManualReceipt(models.Model):
 
         if not self.receipt.adjustment_applied:
             if self.receipt.freeze:
-                self.adjust_product_quantities(True)
+                self.update_product_quantities(True)
             else:
-                self.adjust_product_quantities(False)
+                self.update_product_quantities(False)
             self.receipt.adjustment_applied = True
             self.receipt.save()
 
-    def adjust_product_quantities(self, freeze):
+    def update_product_quantities(self, freeze):
         for receipt_product in self.receipt.manualreceipt_products_set.all():
-            product = receipt_product.product
+            product = Product.objects.get(id=receipt_product.product_id)
             if freeze:
-                product.quantity -= receipt_product.num_item
-            else:
                 product.quantity += receipt_product.num_item
+            else:
+                product.quantity -= receipt_product.num_item
             product.save()
 
 

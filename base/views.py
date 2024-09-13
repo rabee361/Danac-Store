@@ -1717,7 +1717,7 @@ class FreezeManualReceipt(APIView):
             if not reason:
                 return Response({
                     "msg":"provide the reason for freezing"
-                })
+                },status=status.HTTP_400_BAD_REQUEST)
             receipt.freeze = True
             receipt.save()
             freeze_receipt,created = FrozenManualReceipt.objects.get_or_create(receipt=receipt)
@@ -1725,11 +1725,11 @@ class FreezeManualReceipt(APIView):
             freeze_receipt.save()
             return Response({
                 "msg":"receipt freezed"
-            })
+            },status=status.HTTP_200_OK)
         except ManualReceipt.DoesNotExist:
             return Response({
                 "msg":"receipt doesn't exist"
-            })
+            },status=status.HTTP_404_NOT_FOUND)
         
 
 class UnFreezeManualReceipt(APIView):
