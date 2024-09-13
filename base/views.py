@@ -1572,7 +1572,7 @@ class FreezeIncomingReceipt(APIView):
             freeze_receipt,created = FrozenIncomingReceipt.objects.get_or_create(receipt=receipt)
             freeze_receipt.reason = reason
             freeze_receipt.save()
-            return Response({"msg":"receipt freezed"} , status=status.HTTP_400_BAD_REQUEST)
+            return Response({"msg":"receipt freezed"} , status=status.HTTP_200_OK)
         except Incoming.DoesNotExist:
             return Response({"msg":"receipt doesn't exist"},status=status.HTTP_404_NOT_FOUND)
 
@@ -1587,7 +1587,7 @@ class UnFreezeIncomingReceipt(APIView):
             freeze_receipt = FrozenIncomingReceipt.objects.get(receipt=receipt)
             freeze_receipt.save()
             freeze_receipt.delete()
-            return Response({"msg":"receipt unfreezed"} , status=status.HTTP_400_BAD_REQUEST)
+            return Response({"msg":"receipt unfreezed"} , status=status.HTTP_200_OK)
         except Incoming.DoesNotExist:
             return Response({"msg":"receipt doesn't exist"} , status=status.HTTP_404_NOT_FOUND)
 
@@ -1713,7 +1713,7 @@ class FreezeManualReceipt(APIView):
             freeze_receipt,created = FrozenManualReceipt.objects.get_or_create(receipt=receipt)
             freeze_receipt.reason = reason
             freeze_receipt.save()
-            return Response({"msg":"receipt unfreezed"} , status=status.HTTP_400_BAD_REQUEST)
+            return Response({"msg":"receipt freezed"} , status=status.HTTP_200_OK)
         except ManualReceipt.DoesNotExist:
             return Response({"msg":"receipt doesn't exist"} , status=status.HTTP_404_NOT_FOUND)
 
@@ -1728,7 +1728,7 @@ class UnFreezeManualReceipt(APIView):
             freeze_receipt = FrozenManualReceipt.objects.get(receipt=receipt)
             freeze_receipt.save()
             freeze_receipt.delete()
-            return Response({"msg":"receipt unfreezed"} , status=status.HTTP_400_BAD_REQUEST)
+            return Response({"msg":"receipt unfreezed"} , status=status.HTTP_200_OK)
         except ManualReceipt.DoesNotExist:
             return Response({"msg":"receipt doesn't exist"} , status=status.HTTP_404_NOT_FOUND)
         
