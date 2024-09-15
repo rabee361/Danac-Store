@@ -164,9 +164,9 @@ urlpatterns = [
     path('add-product-to-medium/' , AddProductMedium.as_view()),
     path('delete-medium/<str:pk>/' , RetDesMedium.as_view() , name="delete-medium"),
 
-    path('create-delivery-arrived/<str:pk>/', ListCreateDelivery.as_view()),
-    path('get-delivery-arrived/', ListCreateDelivery.as_view()),
-    path('get-delivery-arrived-for-employee/<str:state>/', ListSaleEmployeeDeliveries.as_view()),
+    path('create-delivery-arrived/<str:pk>/', ListCreateDelivery.as_view()),## for employee
+    path('get-delivery-arrived/', ListCreateDelivery.as_view()), ## for employee
+    path('get-delivery-arrived-for-employee/<str:state>/', ListSaleEmployeeDeliveries.as_view()),## for employee
     path('get/<str:pk>/', GetDelivery.as_view()),
     path('accept-delevary-arrived/<str:pk>/', DeliveredOrder.as_view()),
 
