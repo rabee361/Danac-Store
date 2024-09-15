@@ -294,7 +294,9 @@ class OrderFilter(django_filters.FilterSet):
 class DeliveryFilter(django_filters.FilterSet):
     employee_name = django_filters.CharFilter(field_name='employee__name', lookup_expr='startswith')
     client_name = django_filters.CharFilter(field_name='output_receipt__client__name', lookup_expr='startswith')
+    date_from = django_filters.DateFilter(field_name='output_receipt__date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='output_receipt__date', lookup_expr='lte')
 
     class Meta:
         model = Delivery
-        fields = ['employee_name','client_name']
+        fields = ['employee_name','client_name','date_from','date_to']
