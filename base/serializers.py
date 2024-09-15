@@ -1511,6 +1511,7 @@ class ReturnedGoodsClientSerializer(serializers.ModelSerializer):
         product = instance.product
         product.quantity += instance.quantity
         product.save()
+        package.client = instance.client
         package.goods.add(instance)####
         package.save()#####
         return instance
@@ -1609,6 +1610,7 @@ class ReturnedGoodsSupplierSerializer(serializers.ModelSerializer):
         product = instance.product
         product.quantity -= instance.quantity
         product.save()
+        package.supplier = instance.supplier
         package.goods.add(instance)####
         package.save()#####
         return instance
