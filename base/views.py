@@ -1038,7 +1038,8 @@ class RetUpdDesExpense(RetrieveUpdateDestroyAPIView):
 class ListReturnedSupplierPackages(ListCreateAPIView):
     queryset = ReturnedSupplierPackage.objects.all()
     serializer_class = ReturnedSupplierPackageSerializer
- 
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ReturnedPackageSupplierFilter
 
 
 class RetReturnedSupplierPackages(RetrieveUpdateDestroyAPIView):
@@ -1068,6 +1069,8 @@ class RetUpdDesReturnGoodSupplier(RetrieveUpdateDestroyAPIView):
 class ListReturnedClientPackages(ListCreateAPIView):
     queryset = ReturnedClientPackage.objects.all()
     serializer_class = ReturnedClientPackageSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ReturnedPackageClientFilter
 
 
 class RetReturnedClientPackages(RetrieveUpdateDestroyAPIView):
@@ -1095,7 +1098,8 @@ class RetUpdDesReturnGoodClient(RetrieveUpdateDestroyAPIView):
 class ListDamagedPackages(ListCreateAPIView):
     queryset = DamagedPackage.objects.all()
     serializer_class = DamagedPackageSerializer
-
+    filterset_class = DamagedPackageFilter
+    filter_backends = [DjangoFilterBackend]
 
 
 class RetDamagedPackages(RetrieveUpdateDestroyAPIView):

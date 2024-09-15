@@ -212,6 +212,7 @@ class ReturnedGoodsClientFilter(django_filters.FilterSet):
 class ReturnedPackageClientFilter(django_filters.FilterSet):
     date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
     date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
+    employee_name = django_filters.CharFilter(field_name='employee_name' , lookup_expr='startswith')
 
     class Meta:
         model = ReturnedClientPackage
@@ -236,10 +237,11 @@ class ReturnedGoodsSupplierFilter(django_filters.FilterSet):
 class ReturnedPackageSupplierFilter(django_filters.FilterSet):
     date_from = django_filters.DateFilter(field_name='date', lookup_expr='gte')
     date_to = django_filters.DateFilter(field_name='date', lookup_expr='lte')
+    employee_name = django_filters.CharFilter(field_name='employee_name' , lookup_expr='startswith')
 
     class Meta:
         model = ReturnedSupplierPackage
-        fields = ['date_from','date_to']
+        fields = ['date_from','date_to','employee_name']
 
 
 ################################################## Receipts #############################################
@@ -281,10 +283,12 @@ class ManualFilter(django_filters.FilterSet):
 
 class OrderFilter(django_filters.FilterSet):
     client_name = django_filters.CharFilter(field_name='client__name', lookup_expr='startswith')
+    date_from = django_filters.DateFilter(field_name='created', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='created', lookup_expr='lte')
 
     class Meta:
         model = Order
-        fields = ['client_name']
+        fields = ['client_name','date_from','date_to']
 
 
 class DeliveryFilter(django_filters.FilterSet):
