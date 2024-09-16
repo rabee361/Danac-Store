@@ -1303,7 +1303,7 @@ class RetUpdDesOutputProduct(RetrieveUpdateDestroyAPIView):
     serializer_class = ProductsOutputSerializer2
 
     def perform_destroy(self, instance):
-        product = instance.product
+        product = Product.objects.get(id=instance.product_id)
         product.quantity += instance.quantity
         product.save()
         instance.delete()
@@ -1552,7 +1552,7 @@ class RetUpdDesIncomingProduct(RetrieveUpdateDestroyAPIView):
     serializer_class = IncomingProductsSerializer2
 
     def perform_destroy(self, instance):
-        product = instance.product
+        product = Product.objects.get(id=instance.product_id)
         product.quantity += instance.num_item
         product.save()
         instance.delete()
